@@ -1,15 +1,15 @@
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Nav from "./components/nav";
-import AddCoursePage from "./pages/AddCoursePage";
 import CourseDetails from "./pages/CourseDetails";
 import CoursesPage from "./pages/CoursesPage";
-import EditCoursePage from "./pages/EditCoursePage";
 import HomePage from "./pages/HomePage";
 import { Route, Routes } from "react-router-dom";
 import NotFoundPage from "./pages/NotFoundPage";
 import ScrollToTop from "./pages/ScrollToTop"; 
 import Footer from "./components/Footer";
+import AboutusPage from "./pages/AboutusPage";
+import ContactPage from "./pages/ContactPage";
 
 function App() {
   return (
@@ -22,8 +22,8 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/courses/:id" element={<CourseDetails />} />
-        <Route path="/add-course" element={<AddCoursePage />} />
-        <Route path="/edit-course/:id" element={<EditCoursePage />} />
+        <Route path="about" element={<AboutusPage />} />
+        <Route path="contact" element={<ContactPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
 

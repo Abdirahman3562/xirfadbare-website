@@ -15,7 +15,7 @@ export default function Hero({
    
 }) {
   return (
-    <section className="relative  overflow-hidden py-36  sm:py-32">
+    <section className="relative  overflow-hidden pt-36  sm:pt-36">
       
 
       <div className="max-w-7xl mx-auto px-6 text-center relative z-10">

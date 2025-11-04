@@ -40,7 +40,7 @@ export default function FAQ() {
   ];
 
   return (
-    <section className="py-20 ">
+    <section className="py-20  bg-[#edf4f5]">
       <div className="max-w-4xl mx-auto px-6">
         {/* ✅ Header */}
         <div className="text-center mb-12">
@@ -56,7 +56,7 @@ export default function FAQ() {
         </div>
 
         {/* ✅ Highlight Box */}
-        <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-6 mb-10 shadow-sm">
+        <div className="border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] rounded-2xl p-6 mb-10 shadow-sm">
           <h3 className="font-bold text-lg text-emerald-700 mb-2">
             Waa maxay Xirfadbare?
           </h3>
@@ -80,11 +80,11 @@ export default function FAQ() {
           {faqs.map((item, i) => (
             <div
               key={i}
-              className="border border-gray-200 rounded-xl bg-gray-50 hover:bg-white hover:shadow-sm transition"
+              className="border border-gray-200 hover:border-emerald-400 cusrpo bg-[#edf4f5] rounded-md hover:shadow-sm transition"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex justify-between items-center px-6 py-4 text-left text-gray-800 font-medium"
+                className="w-full flex justify-between items-center px-6 py-4 cursor-pointer text-left text-gray-800 font-medium"
               >
                 <span>{item.q}</span>
                 {openIndex === i ? (

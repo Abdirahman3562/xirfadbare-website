@@ -25,7 +25,7 @@ export default function Categories({
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {categories.map((cat) => {
             const Card = (
-              <div className="rounded-2xl border bg-white px-5 py-4 text-left shadow hover:shadow-lg hover:-translate-y-0.5 transition">
+              <div className="rounded-2xl bg-[#edf4f5] border border-gray-200 hover:border-emerald-400 px-5 py-4 text-left shadow hover:shadow-lg hover:-translate-y-0.5 transition">
                 <p className="text-lg font-semibold text-slate-800">{cat}</p>
                 <p className="text-sm text-gray-500 mt-1">See courses →</p>
               </div>

@@ -20,9 +20,9 @@ export default function HowItWorks() {
               key={i}
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 150 }}
-              className="rounded-2xl bg-white p-6 shadow hover:shadow-lg transition"
+              className="rounded-2xl bg-[#edf4f5] border border-gray-200 hover:border-emerald-400 p-6 shadow hover:shadow-lg transition"
             >
-              <div className="w-10 h-10 grid place-content-center rounded-full bg-indigo-600 text-white font-bold">
+              <div className="w-10 h-10 grid place-content-center rounded-full bg-emerald-600 text-white font-bold">
                 {i + 1}
               </div>
               <h3 className="mt-4 font-bold text-lg text-gray-800">{s.t}</h3>

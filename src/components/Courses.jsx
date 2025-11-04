@@ -6,30 +6,35 @@ function Courses({ IsHome }) {
 
   useEffect(() => {
     const fetchCourses = async () => {
+      // ✅ sax endpoint: /courses (ma aha /course)
       const apiURL = IsHome
-        ? "http://localhost:3000/course?_limit=3"
-        : "http://localhost:3000/course";
+        ? "http://localhost:3000/courses?_limit=3"
+        : "http://localhost:3000/courses";
 
       try {
         const res = await fetch(apiURL);
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch: ${res.status}`);
+        }
+
         const data = await res.json();
         setCourses(data);
       } catch (error) {
-        console.log(error);
+        console.error("❌ Failed to fetch courses:", error);
       }
     };
+
     fetchCourses();
   }, [IsHome]);
 
   return (
-    <section className=" px-6 py-20">
-       
+    <section className="px-6 py-20">
       <div className="max-w-7xl mx-auto">
-        <Header 
+        <Header
           title={IsHome ? "Featured Courses" : "All Courses"}
-          
           cta={IsHome ? { href: "/courses", label: "View All" } : null}
-          center={!IsHome} 
+          center={!IsHome}
         />
 
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -49,21 +54,20 @@ function Courses({ IsHome }) {
 }
 
 function Header({ title, cta, center, IsHome }) {
-  // dynamic classes for title
   const titleClasses = IsHome
-    ? "text-3xl md:text-3xl lg:text-3xl  font-extrabold text-[#00cc8f] drop-shadow-sm"
-    : "md:text-3xl lg:text-3xl text-3xl  font-bold text-[#00cc8f]";
+    ? "text-3xl md:text-3xl lg:text-3xl font-extrabold text-[#00cc8f] drop-shadow-sm"
+    : "md:text-3xl lg:text-3xl text-3xl font-bold text-[#00cc8f]";
 
   return (
     <div
       className={`flex ${
-        center ? "flex-col items-center text-center mt-10" : "items-end justify-between"
+        center
+          ? "flex-col items-center text-center mt-10"
+          : "items-end justify-between"
       }`}
     >
       <div>
-        <h2 className={`${titleClasses} ${center ? "mb-3" : ""}`}>
-          {title}
-        </h2>
+        <h2 className={`${titleClasses} ${center ? "mb-3" : ""}`}>{title}</h2>
         <div
           className={`h-1 w-24 bg-[#00cc8f] rounded-full ${
             center ? "mx-auto" : ""
@@ -74,7 +78,7 @@ function Header({ title, cta, center, IsHome }) {
       {!center && cta && (
         <a
           href={cta.href}
-          className="hidden sm:inline-block bg-[#00cc8f] px-10 py-1 text-white rounded-md font-semibold transition"
+          className="hidden sm:inline-block bg-[#00cc8f] px-10 py-1 text-white rounded-md font-semibold transition hover:bg-[#00b57f]"
         >
           {cta.label} →
         </a>
@@ -82,6 +86,5 @@ function Header({ title, cta, center, IsHome }) {
     </div>
   );
 }
-
 
 export default Courses;

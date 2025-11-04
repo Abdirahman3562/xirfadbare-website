@@ -19,19 +19,8 @@ function HomePage() {
       
 
       {/* 1️⃣ Hero Section */}
-      <Herro
-        title={
-          <>
-            Become a <span className="text-[#00cc8f]">Full-Stack</span> Engineer
-            <br className="hidden md:block" /> the{" "}
-            <span className="text-indigo-600">smart way</span>
-          </>
-        }
-        subtitle="Hands-on projects, mentor feedback, and job-ready skills."
-        primaryCta={{ label: "Explore Courses", to: "/courses" }}
-        secondaryCta={{ label: "How it works", to: "#how-it-works" }}
-        showBlobs={true}
-      />
+            <Herro /> {/* or <Hero slides={mySlides} intervalMs={7000} /> */}
+
 
       {/* 2️⃣ Trust Bar (Statistics) */}
       <TrustBar />

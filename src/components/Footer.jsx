@@ -13,8 +13,8 @@ export default function Footer() {
       <div className="relative max-w-7xl mx-auto px-6 grid gap-10 md:grid-cols-4 z-10">
         {/* 1️⃣ Brand & About */}
         <div>
-          <Link to="/" className="text-2xl font-extrabold text-gray-900">
-            Xirfadbare<span className="text-[#00cc8f]">.</span>
+          <Link to="/" className="text-2xl font-extrabold text-emerald-600">
+            Xirfadbare<span className="text-emerald-600">.</span>
           </Link>
           <p className="mt-4 text-sm leading-relaxed text-gray-700">
             Xirfadbare waa madal waxbarasho casri ah oo kaa caawisa inaad barato
