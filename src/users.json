@@ -1,0 +1,13 @@
+{
+  "users": [
+    {
+      "id": "0fcb",
+      "firstName": "username",
+      "lastName": "Mohamed",
+      "email": "abdirahmaanmoha2022@gmail.com",
+      "phone": "+252619537487",
+      "password": "1111",
+      "image": "blob:http://localhost:5173/74a18ac7-4f53-40fc-b885-8ee269d85cab"
+    }
+  ]
+}
