@@ -43,15 +43,14 @@ function CourseCard({ course }) {
   const instructorTitle = instructor.name || "Instructor";
   const initials = useMemo(() => {
     const parts = instructorTitle.trim().split(" ").filter(Boolean);
-    return parts.slice(0, 2).map(p => p[0]?.toUpperCase() || "").join("");
+    return parts
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() || "")
+      .join("");
   }, [instructorTitle]);
 
   return (
-    <div
-
-      className="group relative bg-[#edf4f5] border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
-    >     
-
+    <div className="group relative bg-[#edf4f5] border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
       {/* Thumbnail */}
       <div className="relative h-52 w-full overflow-hidden z-0">
         <img
@@ -68,8 +67,10 @@ function CourseCard({ course }) {
 
       {/* Info */}
       <div className="relative z-20 p-6">
-        <Link           to={`/courses/${course.id}`}
- className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition">
+        <Link
+          to={`/courses/${course.slug}`}
+          className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition"
+        >
           {course.title}
         </Link>
 
@@ -101,7 +102,10 @@ function CourseCard({ course }) {
               {instructorTitle}
             </p>
             {instructor.instructorTitle && (
-              <p className="text-xs bg-[#edf4f5] text-emerald-600 font-semibold px-2 py-1 text-center rounded-full shadow-sm truncate" title={instructor.instructorTitle}>
+              <p
+                className="text-xs bg-[#edf4f5] text-emerald-600 font-semibold px-2 py-1 text-center rounded-full shadow-sm truncate"
+                title={instructor.instructorTitle}
+              >
                 {instructor.instructorTitle}
               </p>
             )}
@@ -160,7 +164,7 @@ function CourseCard({ course }) {
         <div className="border-t border-gray-100 mb-4"></div>
 
         <Link
-          to={`/courses/${course.id}`}
+          to={`/courses/${course.slug}`}
           className="block text-center bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-full transition duration-300 transform hover:-translate-y-0.5 relative z-30"
         >
           View Details →

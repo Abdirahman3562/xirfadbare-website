@@ -1,15 +1,15 @@
 import { FaQ } from "react-icons/fa6";
-import Categories from "../components/Categories";
-import Courses from "../components/Courses";
-import CTABanner from "../components/CTABanner";
-import Herro from "../components/Herro";
-import HowItWorks from "../components/HowItWorks";
-import Outcomes from "../components/Outcomes";
-import Testimonials from "../components/Testimonials";
-import TopInstructors from "../components/TopInstructors";
-import TrustBar from "../components/TrustBar";
-import ViewAllCourses from "../components/ViewAllCourses";
-import FAQ from "../components/FAQ";
+import Categories from "../../../components/Home/Categories";
+import Courses from "../../../components/course/Courses";
+import CTABanner from "../../../components/Home/CTABanner";
+import Herro from "../../../components/Home/Herro";
+import HowItWorks from "../../../components/Home/HowItWorks";
+import Outcomes from "../../../components/Home/Outcomes";
+import Testimonials from "../../../components/Home/Testimonials";
+import TopInstructors from "../../../components/Home/TopInstructors";
+import TrustBar from "../../../components/Home/TrustBar";
+import ViewAllCourses from "../../../components/Home/ViewAllCourses";
+import FAQ from "../../../components/Home/FAQ";
 
 function HomePage() {
   return (

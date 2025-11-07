@@ -94,7 +94,7 @@ function Nav() {
   };
 
   const initials = (user?.firstName?.[0] || "") + (user?.lastName?.[0] || "");
-  const avatarInitials = (initials || "U").toUpperCase();
+  const avatar = user?.image || localStorage.getItem("profileImage");
 
   const linkClass = ({ isActive }) =>
     `relative px-3 py-2 font-medium transition-all duration-200 ease-in-out ${
@@ -112,7 +112,7 @@ function Nav() {
             <img
               src={logo}
               alt="Logo"
-              className="lg:w-[20rem] md:w-[20rem] w-[500px] mb-4 h-auto object-contain"
+              className="w-32 md:w-48 lg:w-64 h-auto object-contain"
             />
           </NavLink>
 
@@ -126,6 +126,9 @@ function Nav() {
             </NavLink>
             <NavLink to="/about" className={linkClass}>
               About
+            </NavLink>
+            <NavLink to="/blog" className={linkClass}>
+              Blog
             </NavLink>
             <NavLink to="/contact" className={linkClass}>
               Contact
@@ -172,9 +175,17 @@ function Nav() {
                   onClick={() => setOpenProfile(!openProfile)}
                   className="flex items-center gap-2"
                 >
-                  <div className="h-8 w-8 flex  cursor-pointer items-center justify-center bg-emerald-100 rounded-full text-emerald-700 font-bold">
-                    {avatarInitials}
-                  </div>
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt="User avatar"
+                      className="h-8 w-8 rounded-full object-cover border border-emerald-300"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 flex items-center justify-center bg-emerald-100 rounded-full text-emerald-700 font-bold">
+                      {initials}
+                    </div>
+                  )}
                 </button>
                 {openProfile && (
                   <div className="absolute right-0 mt-2 w-64 bg-[#edf4f5] border border-gray-200  rounded-xl shadow-lg   p-3 z-50">
@@ -189,8 +200,7 @@ function Nav() {
                     <div className="h-px  bg-gray-200 my-2 m" />
                     <Link
                       to="/dashboard/student"
-                        onClick={() => setOpenProfile(false)}  // ✅ sax
-
+                      onClick={() => setOpenProfile(false)} // ✅ sax
                       className=" cursor-pointer w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-600 font-medium"
                     >
                       <LayoutDashboard size={18} />
@@ -226,9 +236,22 @@ function Nav() {
               <>
                 <button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="h-8 w-8 flex items-center justify-center bg-emerald-100 rounded-full text-emerald-700 font-bold"
+                  className="flex items-center gap-2 cursor-pointer"
                 >
-                  {avatarInitials}
+                  {avatar &&
+                  avatar !== "null" &&
+                  avatar !== "undefined" &&
+                  avatar.trim() !== "" ? (
+                    <img
+                      src={avatar}
+                      alt="User avatar"
+                      className="h-8 w-8 rounded-full object-cover border border-emerald-300"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 flex items-center justify-center bg-emerald-100 rounded-full text-emerald-700 font-bold border border-emerald-300">
+                      {initials || "U"}
+                    </div>
+                  )}
                 </button>
               </>
             ) : (
@@ -324,55 +347,87 @@ function Nav() {
 
       {/* Sidebar */}
       {sidebarOpen && (
-        <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 z-[1000] flex flex-col">
+        <aside className="fixed  lg:hidden md:hidden left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 z-[1000] flex flex-col">
           <div className="flex-1 overflow-y-auto py-20">
             <nav className="px-4 text-sm">
-              {/* OVERVIEW */}
+              {/* Overview */}
               <div className="mt-2">
                 <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
                   Overview
                 </p>
-                <button className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-600 font-medium">
+                <NavLink
+                  to="/dashboard/student"
+                  className={({ isActive }) =>
+                    `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                      isActive
+                        ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                        : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                    }`
+                  }
+                >
                   <LayoutDashboard size={18} />
                   Dashboard
-                </button>
+                </NavLink>
               </div>
 
-              {/* LEARNING */}
+              {/* Learning */}
               <div className="mt-3">
                 <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
                   Learning
                 </p>
-                <button className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                <NavLink
+                  to="/dashboard/courses"
+                  className={({ isActive }) =>
+                    `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                      isActive
+                        ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                        : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                    }`
+                  }
+                >
                   <BookOpen size={18} />
                   My Courses
-                </button>
+                </NavLink>
               </div>
 
-              {/* PAYMENTS */}
+              {/* Payments */}
               <div className="mt-3">
                 <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
                   Payments
                 </p>
-                <button className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                <NavLink
+                  to="/dashboard/orders"
+                  className={({ isActive }) =>
+                    `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                      isActive
+                        ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                        : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                    }`
+                  }
+                >
                   <FileText size={18} />
                   Orders
-                </button>
+                </NavLink>
               </div>
 
-              {/* ACCOUNT */}
+              {/* Account */}
               <div className="mt-3">
                 <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
                   Account
                 </p>
-                <button className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+                <NavLink
+                  to="/dashboard/profile"
+                  className={({ isActive }) =>
+                    `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                      isActive
+                        ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                        : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                    }`
+                  }
+                >
                   <User size={18} />
                   Profile
-                </button>
-                <button className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 transition">
-                  <Settings size={18} />
-                  Settings
-                </button>
+                </NavLink>
               </div>
             </nav>
           </div>
@@ -380,7 +435,7 @@ function Nav() {
           <div className="p-4 border-t border-gray-200">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 bg-red-500 text-white px-4 py-1.5 rounded-md hover:bg-red-600 transition w-full"
+              className="flex items-center gap-2 bg-[#edf4f5] text-emerald-600 px-4 py-1.5 rounded-md hover:bg-red-600 transition w-full"
             >
               <LogOut className="w-4 h-4" /> Logout
             </button>

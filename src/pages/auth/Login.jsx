@@ -138,7 +138,7 @@ const Login = () => {
 
               <div className="flex justify-end mt-2">
                 <Link
-                  to="/forgot-password"
+                  to="/auth/forgot-password"
                   className="text-sm text-emerald-600 hover:underline"
                 >
                   Forgot password?
@@ -174,7 +174,7 @@ const Login = () => {
           <div className="text-center mt-6">
             <p className="text-sm text-gray-500">
               New to Xirfadbare?{" "}
-              <Link to="/signup" className="text-emerald-600 hover:underline">
+              <Link to="/auth/signup" className="text-emerald-600 hover:underline">
                 Sign up
               </Link>
             </p>

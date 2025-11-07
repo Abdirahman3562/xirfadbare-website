@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaChevronDown,
   FaChevronUp,
@@ -9,16 +9,49 @@ import {
   FaArrowRight,
   FaLock,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { getFullCourseDetails } from "../../api/courseService"; // ✅ soo saar xogta API-ga
 
-export default function Curriculum({
-  level,
-  curriculum,
-  learningOutcomes,
-  price,
-}) {
+export default function Curriculum({ courseId }) {
+  const [course, setCourse] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [openSections, setOpenSections] = useState({});
-  const isPaid = Number(price) > 0; // ✅ paid detection sax ah
+  const navigate = useNavigate();
 
+  useEffect(() => {
+    async function fetchCourse() {
+      try {
+        const data = await getFullCourseDetails(courseId);
+        setCourse(data);
+      } catch (err) {
+        console.error("❌ Error fetching curriculum:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (courseId) fetchCourse();
+  }, [courseId]);
+
+  if (loading) {
+    return (
+      <div className="text-center py-10 text-emerald-600 font-semibold">
+        Loading curriculum...
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="text-center py-10 text-red-500 font-semibold">
+        Curriculum data not found 😕
+      </div>
+    );
+  }
+
+  const { curriculum = [], learningOutcomes = [], price, level } = course;
+  const isPaid = Number(price) > 0;
+
+  // 🔹 Toggle sections
   const toggleSection = (index) =>
     setOpenSections((prev) => ({ ...prev, [index]: !prev[index] }));
 
@@ -31,26 +64,31 @@ export default function Curriculum({
 
   const allOpen = Object.values(openSections).every(Boolean);
 
+  // 🔹 Helper: duration calculation
   const calcSectionDuration = (lessons) => {
     let s = 0;
     lessons.forEach((l) => {
       if (!l.duration) return;
       const [m, sec] = l.duration.split(":").map(Number);
-      s += m * 60 + sec;
+      s += (m || 0) * 60 + (sec || 0);
     });
     const min = Math.floor(s / 60);
     const sec = s % 60;
     return `${min}:${sec.toString().padStart(2, "0")}`;
   };
 
-  const totalLessons = curriculum.reduce((sum, s) => sum + s.lessons.length, 0);
+  const totalLessons = curriculum.reduce(
+    (sum, s) => sum + (s.lessons?.length || 0),
+    0
+  );
+
   const totalDuration = (() => {
     let s = 0;
     curriculum.forEach((sec) =>
-      sec.lessons.forEach((l) => {
+      sec.lessons?.forEach((l) => {
         if (!l.duration) return;
         const [m, sec] = l.duration.split(":").map(Number);
-        s += m * 60 + sec;
+        s += (m || 0) * 60 + (sec || 0);
       })
     );
     const min = Math.floor(s / 60);
@@ -61,7 +99,7 @@ export default function Curriculum({
 
   return (
     <div className="bg-[#edf4f5] mt-10 p-8 rounded-2xl shadow-lg border border-gray-100">
-      {/* Summary Boxes */}
+      {/* ✅ Summary Boxes */}
       <div className="grid sm:grid-cols-3 gap-4 mb-8 text-center">
         <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5]">
           <FaClock className="text-emerald-500 text-2xl mx-auto mb-2" />
@@ -82,7 +120,7 @@ export default function Curriculum({
         </div>
       </div>
 
-      {/* Curriculum Header */}
+      {/* ✅ Curriculum Header */}
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-xl font-bold text-emerald-600">
           Course Curriculum ({curriculum.length} Sections)
@@ -95,7 +133,7 @@ export default function Curriculum({
         </button>
       </div>
 
-      {/* Sections */}
+      {/* ✅ Sections */}
       <div className="space-y-4 mb-8">
         {curriculum.map((section, index) => {
           const sectionDuration = calcSectionDuration(section.lessons);
@@ -113,7 +151,7 @@ export default function Curriculum({
                     {index + 1}
                   </span>
 
-                  {/* 👉 Titles & duration */}
+                  {/* Titles & duration */}
                   <div className="flex flex-col">
                     <h3 className="font-semibold text-gray-800 group-hover:text-emerald-400">
                       {section.title}
@@ -161,7 +199,7 @@ export default function Curriculum({
         })}
       </div>
 
-      {/* CTA */}
+      {/* ✅ CTA Section */}
       <div className="border border-gray-200 hover:border-emerald-400 rounded-xl p-6 text-gray-800">
         <div className="flex items-start gap-3 mb-4">
           <div className="bg-emerald-100 text-emerald-600 p-3 rounded-full">
@@ -189,7 +227,18 @@ export default function Curriculum({
 
         <div className="border-t border-gray-100 pt-4">
           {isPaid ? (
-            <button className="w-full bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition">
+            <button
+              onClick={() => {
+                if (course?.title) {
+                  navigate(
+                    `/payment/${course.title
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")}`
+                  );
+                }
+              }}
+              className="w-full bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition"
+            >
               Buy Course To Get Full Access <FaArrowRight />
             </button>
           ) : (

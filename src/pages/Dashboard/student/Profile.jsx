@@ -1,13 +1,13 @@
 import { ChevronRight, Home } from "lucide-react";
 import { useState, useEffect } from "react";
 import { FaCamera } from "react-icons/fa6";
-import { toast } from "react-toastify"; 
-import "react-toastify/dist/ReactToastify.css"; 
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Profile() {
-  const [user, setUser] = useState(null);  
-  const [image, setImage] = useState(null); 
-  const [isEditing, setIsEditing] = useState(false);  
+  const [user, setUser] = useState(null);
+  const [image, setImage] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -21,16 +21,16 @@ export default function Profile() {
     fetch("http://localhost:5000/users")
       .then((res) => res.json())
       .then((data) => {
-        const currentUser = data[0]; 
+        const currentUser = data[0];
         setUser(currentUser);
-        setFormData({ ...currentUser }); 
+        setFormData({ ...currentUser });
 
         // Check if the image is saved in localStorage
         const storedImage = localStorage.getItem("profileImage");
         if (storedImage) {
-          setImage(storedImage);  // Set image from localStorage
+          setImage(storedImage); // Set image from localStorage
         } else if (currentUser?.image) {
-          setImage(currentUser.image);  // Use default image from backend if available
+          setImage(currentUser.image); // Use default image from backend if available
         }
       })
       .catch((err) => console.error("Error fetching user:", err));
@@ -38,16 +38,19 @@ export default function Profile() {
 
   // Handle image change (for user profile picture)
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const imgUrl = URL.createObjectURL(file);  
-      setImage(imgUrl);  
-      setFormData({ ...formData, image: imgUrl });  
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result;
+      setImage(base64);
+      setFormData({ ...formData, image: base64 });
+      localStorage.setItem("profileImage", base64);
+    };
+    reader.readAsDataURL(file);
+  }
+};
 
-      // Store the image URL in localStorage
-      localStorage.setItem("profileImage", imgUrl);  // Store image in localStorage
-    }
-  };
 
   const getInitials = (first, last) => {
     if (!first && !last) return "SU";
@@ -60,35 +63,43 @@ export default function Profile() {
   };
 
   const handleSave = async (e) => {
-    e.preventDefault();  
+  e.preventDefault();
+  try {
+    const res = await fetch(`http://localhost:5000/users/${user.id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
 
-    try {
-      const res = await fetch(`http://localhost:5000/users/${user.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+    if (res.ok) {
+      // ✅ 1. Cusbooneysii xogta user-ka ee gudaha state
+      setUser(formData);
 
-      if (res.ok) {
-        toast.success("Profile updated successfully!");  
-        setUser(formData);  
-        setImage(formData.image || image);  
-        setIsEditing(false);  
-      } else {
-        toast.error("❌ Error updating profile!");
+      // ✅ 2. Kaydi xogta saxda ah ee Nav uu akhriyo
+      localStorage.setItem("loggedInUser", JSON.stringify(formData));
+
+      // ✅ 3. Haddii image cusub la upload gareeyay
+      if (formData.image) {
+        localStorage.setItem("profileImage", formData.image);
       }
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      toast.error("Failed to update profile. Please try again.");
+
+      // ✅ 4. Ogeysii Nav in user la update gareeyay
+      window.dispatchEvent(new Event("userLogin"));
+
+      toast.success("Profile updated successfully!");
+      setIsEditing(false);
+    } else {
+      toast.error("Error updating profile!");
     }
-  };
+  } catch (error) {
+    toast.error("Failed to update profile. Please try again.");
+  }
+};
 
   const handleCancel = () => {
-    setFormData({ ...user });  
-    setImage(user.image || null);  
-    setIsEditing(false);  
+    setFormData({ ...user });
+    setImage(user.image || null);
+    setIsEditing(false);
   };
 
   if (!user) {
@@ -138,8 +149,8 @@ export default function Profile() {
               <input
                 type="file"
                 id="profile-photo"
-                onChange={handleImageChange}
                 accept="image/*"
+                onChange={handleImageChange}
                 className="hidden"
               />
             </div>

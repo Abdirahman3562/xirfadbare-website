@@ -8,13 +8,18 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server:users": "json-server --watch src/users.json --port 5000 --host 0.0.0.0",
-    "server:courses": "json-server --watch src/Courses.json --port 3000 --host 0.0.0.0",
-      "start:all": "concurrently \"npm run server:users\" \"npm run server:courses\" \"npm run dev\""
-
+    "server:users": "json-server --watch src/data/users.json --port 5000 --host 0.0.0.0",
+    "server:courses": "json-server --watch src/data/courses.json --port 3000 --host 0.0.0.0",
+    "server:blogs": "json-server --watch src/data/blogs.json --port 4000 --host 0.0.0.0",
+    "server:authors": "json-server --watch src/data/authors.json --port 4001 --host 0.0.0.0",
+    "server:instructors": "json-server --watch src/data/instructors.json --port 4002 --host 0.0.0.0",
+    "server:curriculum": "json-server --watch src/data/curriculum.json --port 4003 --host 0.0.0.0",
+    "server:lessons": "json-server --watch src/data/lessons.json --port 4004 --host 0.0.0.0",
+    "start:all": "concurrently \"npm run server:users\" \"npm run server:courses\" \"npm run server:blogs\" \"npm run server:authors\" \"npm run server:instructors\" \"npm run server:curriculum\" \"npm run server:lessons\" \"npm run dev\""
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.16",
+    "axios": "^1.13.2",
     "framer-motion": "^12.23.24",
     "json-server": "^1.0.0-beta.3",
     "lucide-react": "^0.552.0",
@@ -23,6 +28,7 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.9.5",
     "react-toastify": "^11.0.5",
+    "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.16"
   },
   "devDependencies": {

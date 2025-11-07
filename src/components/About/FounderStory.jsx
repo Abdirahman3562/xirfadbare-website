@@ -1,6 +1,6 @@
 import React from "react";
 import { Quote } from "lucide-react";
-import founderceo from "../assets/founderceo.png"
+import founderceo from "../../assets/founderceo.png"
 export default function FounderStory() {
   return (
     <section className="py-16 bg-gray-50">

@@ -1,0 +1,15 @@
+{
+  "curriculum": [
+    { "id": 1, "courseId": 1, "title": "Web And The Internet" },
+    { "id": 2, "courseId": 1, "title": "Environment Setup" },
+    { "id": 3, "courseId": 1, "title": "HTML Basics" },
+    { "id": 4, "courseId": 1, "title": "More on HTML Basics" },
+    { "id": 5, "courseId": 1, "title": "HTML Forms" },
+
+    { "id": 6, "courseId": 2, "title": "Introduction to CSS" },
+    { "id": 7, "courseId": 2, "title": "Selectors and Properties" },
+    { "id": 8, "courseId": 2, "title": "Box Model and Layouts" },
+    { "id": 9, "courseId": 2, "title": "Flexbox and Grid" },
+    { "id": 10, "courseId": 2, "title": "Responsive Design and Animations" }
+  ]
+}

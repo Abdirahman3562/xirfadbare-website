@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaCamera } from "react-icons/fa6";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,6 +16,7 @@ const Signup = () => {
     phone: "",
     password: "",
     confirmPassword: "",
+    image: ""
   });
 
   const navigate = useNavigate();
@@ -203,6 +205,13 @@ const Signup = () => {
               </button>
             </div>
 
+
+
+            
+
+
+            
+
             {/* Confirm Password */}
             <div className="relative">
               <label className="block text-gray-700 mb-1 font-medium">
@@ -230,6 +239,10 @@ const Signup = () => {
                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
+
+
+            
+                      
 
             {/* Terms */}
             <div className="flex items-start gap-2">
