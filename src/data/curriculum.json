@@ -10,6 +10,54 @@
     { "id": 7, "courseId": 2, "title": "Selectors and Properties" },
     { "id": 8, "courseId": 2, "title": "Box Model and Layouts" },
     { "id": 9, "courseId": 2, "title": "Flexbox and Grid" },
-    { "id": 10, "courseId": 2, "title": "Responsive Design and Animations" }
+    { "id": 10, "courseId": 2, "title": "Responsive Design and Animations" },
+
+    { "id": 11, "courseId": 3, "title": "Introduction to JavaScript" },
+    { "id": 12, "courseId": 3, "title": "Variables and Data Types" },
+    { "id": 13, "courseId": 3, "title": "Functions and Scope" },
+    { "id": 14, "courseId": 3, "title": "DOM Manipulation" },
+    { "id": 15, "courseId": 3, "title": "Events and User Interaction" },
+
+    { "id": 16, "courseId": 4, "title": "Introduction to React" },
+    { "id": 17, "courseId": 4, "title": "Components and Props" },
+    { "id": 18, "courseId": 4, "title": "State and Lifecycle" },
+    { "id": 19, "courseId": 4, "title": "Hooks in React" },
+    { "id": 20, "courseId": 4, "title": "Routing and Deployment" },
+
+    { "id": 21, "courseId": 5, "title": "Introduction to Node.js" },
+    { "id": 22, "courseId": 5, "title": "Modules and NPM" },
+    { "id": 23, "courseId": 5, "title": "Building APIs with Express" },
+    { "id": 24, "courseId": 5, "title": "Middleware and Routing" },
+    { "id": 25, "courseId": 5, "title": "Connecting MongoDB and Deployment" },
+
+    { "id": 26, "courseId": 6, "title": "Getting Started with Python" },
+    { "id": 27, "courseId": 6, "title": "Data Types and Variables" },
+    { "id": 28, "courseId": 6, "title": "Loops and Functions" },
+    { "id": 29, "courseId": 6, "title": "Modules and Packages" },
+    { "id": 30, "courseId": 6, "title": "File Handling and Automation" },
+
+    { "id": 31, "courseId": 7, "title": "Introduction to Full-Stack Development" },
+    { "id": 32, "courseId": 7, "title": "Frontend Integration" },
+    { "id": 33, "courseId": 7, "title": "Backend Development" },
+    { "id": 34, "courseId": 7, "title": "Connecting Frontend and Backend" },
+    { "id": 35, "courseId": 7, "title": "Deploying Full-Stack Applications" },
+
+    { "id": 36, "courseId": 8, "title": "Introduction to UI/UX" },
+    { "id": 37, "courseId": 8, "title": "Design Principles and Color Theory" },
+    { "id": 38, "courseId": 8, "title": "Wireframing and Prototyping" },
+    { "id": 39, "courseId": 8, "title": "Design Tools (Figma, XD)" },
+    { "id": 40, "courseId": 8, "title": "User Testing and Feedback" },
+
+    { "id": 41, "courseId": 9, "title": "Introduction to Databases" },
+    { "id": 42, "courseId": 9, "title": "SQL Basics: SELECT and WHERE" },
+    { "id": 43, "courseId": 9, "title": "Joins and Relationships" },
+    { "id": 44, "courseId": 9, "title": "Database Design and Normalization" },
+    { "id": 45, "courseId": 9, "title": "Advanced Queries and Optimization" },
+
+    { "id": 46, "courseId": 10, "title": "Introduction to Web Hosting" },
+    { "id": 47, "courseId": 10, "title": "Domain and DNS Configuration" },
+    { "id": 48, "courseId": 10, "title": "Deploying Static Websites" },
+    { "id": 49, "courseId": 10, "title": "Deploying Full-Stack Apps" },
+    { "id": 50, "courseId": 10, "title": "CI/CD and Cloud Security" }
   ]
 }

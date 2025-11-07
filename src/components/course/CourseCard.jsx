@@ -53,11 +53,13 @@ function CourseCard({ course }) {
     <div className="group relative bg-[#edf4f5] border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
       {/* Thumbnail */}
       <div className="relative h-52 w-full overflow-hidden z-0">
-        <img
-          src={course.thumbnail || "/default-course.jpg"}
-          alt={course.title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-        />
+        <Link to={`/courses/${course.slug}`}>
+          <img
+            src={course.thumbnail || "/default-course.jpg"}
+            alt={course.title}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+        </Link>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none"></div>
 
         <span className="absolute top-3 right-3 bg-white/90 text-emerald-600 text-xs font-semibold px-3 py-1 rounded-full shadow">

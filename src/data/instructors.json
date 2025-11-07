@@ -3,14 +3,14 @@
     {
       "id": 1,
       "name": "Abdirahmaan Yusuf",
-      "instructorTitle": "Web Developer",
+      "instructorTitle": "Frontend Developer",
       "description": "A passionate frontend instructor who simplifies web technologies for Somali learners.",
-      "contactEmail": "xirfadbare@gmail.com",
-      "contactPhone": "776655",
+      "contactEmail": "abdirahmaan@example.com",
+      "contactPhone": "771100",
       "students": 854,
       "courses": 5,
-      "reviews": 2,
-      "meetings": 0,
+      "reviews": 12,
+      "meetings": 4,
       "education": [
         "Bachelor in Computer Application",
         "MBA in Management Information Systems"
@@ -20,48 +20,216 @@
         "ICT Assistant 2020 - 2021",
         "Co-Founder & CTO 2023 - Now"
       ],
-      "about": "Abdirahmaan Yusuf waa baraha web-ka hore u taagan, isagoo xooga saaraya fududeynta fahamka teknoolojiyadda iyo barashada dhismaha bogagga internetka. Wuxuu diiradda saaraa HTML, CSS, iyo JavaScript si uu ardayda ugu fududeeyo fahamka dhabta ah ee frontend development-ka.",
-      "skills": [
-        "HTML",
-        "CSS",
-        "JavaScript",
-        "React",
-        "TailwindCSS",
-        "Git & GitHub"
-      ],
-      "image": "data:image/jpeg;base64,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" 
+      "about": "Abdirahmaan waa macallin hore u taagan oo ku xeeldheer HTML, CSS, iyo JavaScript. Wuxuu xooga saaraa dhisidda xirfadaha aasaasiga ah ee frontend-ka si ardaydu ay si fudud u fahmaan sida web-ku u shaqeeyo.",
+      "skills": ["HTML", "CSS", "JavaScript", "React", "TailwindCSS"],
+      "image": "https://randomuser.me/api/portraits/men/1.jpg"
     },
     {
       "id": 2,
       "name": "Samafale Mohamed",
       "instructorTitle": "Fullstack Developer",
-      "description": "A passionate fullstack instructor who guides Somali learners through modern technologies.",
-      "contactEmail": "xirfadbare@gmail.com",
-      "contactPhone": "776655",
-      "students": 854,
-      "courses": 5,
-      "reviews": 2,
-      "meetings": 0,
+      "description": "A fullstack instructor guiding Somali learners through modern technologies.",
+      "contactEmail": "samafale@example.com",
+      "contactPhone": "772211",
+      "students": 920,
+      "courses": 7,
+      "reviews": 5,
+      "meetings": 2,
       "education": [
-        "Bachelor in Computer Application",
-        "MBA in Management Information Systems"
+        "BSc in Computer Science",
+        "MSc in Software Engineering"
       ],
       "experience": [
-        "UI/UX Designer 2019 - 2020",
-        "ICT Assistant 2020 - 2021",
-        "Co-Founder & CTO 2023 - Now"
+        "Frontend Developer 2018 - 2019",
+        "Backend Engineer 2020 - 2022",
+        "Fullstack Lead 2023 - Now"
       ],
-      "about": "Samafale Mohamed waa baraha Fullstack ah oo khibrad ballaaran u leh dhismaha codsiyada casriga ah. Wuxuu ardayda barayaa frontend iyo backend development isagoo adeegsanaya React, Node.js, iyo MongoDB si ay u dhisaan apps dhamaystiran oo shaqeeya.",
-      "skills": [
-        "HTML",
-        "CSS",
-        "JavaScript",
-        "React",
-        "Node.js",
-        "MongoDB",
-        "Express.js"
+      "about": "Samafale waa macallin Fullstack ah oo baraya Node.js, Express, iyo React si uu ardayda uga dhigo kuwa dhisa codsiyo dhamaystiran.",
+      "skills": ["JavaScript", "React", "Node.js", "MongoDB", "Express.js"],
+      "image": "https://randomuser.me/api/portraits/men/2.jpg"
+    },
+    {
+      "id": 3,
+      "name": "Khadra Ahmed",
+      "instructorTitle": "UI/UX Designer",
+      "description": "Creative designer focusing on user experience and modern interfaces.",
+      "contactEmail": "khadra@example.com",
+      "contactPhone": "773322",
+      "students": 610,
+      "courses": 3,
+      "reviews": 8,
+      "meetings": 1,
+      "education": [
+        "Bachelor in Graphic Design",
+        "Certificate in UX Research"
       ],
-      "image": "data:image/jpeg;base64,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"
+      "experience": [
+        "Graphic Designer 2017 - 2019",
+        "UX Researcher 2020 - 2022"
+      ],
+      "about": "Khadra waa naqshadeeye ku takhasustay Figma, UX, iyo prototyping, iyadoo diiradda saarta naqshadaha isticmaale-saaxiibka ah.",
+      "skills": ["Figma", "Adobe XD", "Prototyping", "UX Research", "Wireframing"],
+      "image": "https://randomuser.me/api/portraits/women/3.jpg"
+    },
+    {
+      "id": 4,
+      "name": "Mohamed Ali",
+      "instructorTitle": "Backend Developer",
+      "description": "Specialist in backend development and database management.",
+      "contactEmail": "mohamed@example.com",
+      "contactPhone": "774433",
+      "students": 740,
+      "courses": 4,
+      "reviews": 6,
+      "meetings": 3,
+      "education": [
+        "BSc in Information Technology",
+        "Diploma in Cloud Computing"
+      ],
+      "experience": [
+        "Database Administrator 2018 - 2020",
+        "Backend Developer 2021 - Now"
+      ],
+      "about": "Mohamed wuxuu barayaa Node.js, SQL, iyo API development si ardaydu u bartaan xagga server-ka iyo kaydinta xogta.",
+      "skills": ["Node.js", "Express", "SQL", "PostgreSQL", "API Development"],
+      "image": "https://randomuser.me/api/portraits/men/4.jpg"
+    },
+    {
+      "id": 5,
+      "name": "Ayaan Abdullahi",
+      "instructorTitle": "Python Developer",
+      "description": "Expert Python developer and data enthusiast.",
+      "contactEmail": "ayaan@example.com",
+      "contactPhone": "775544",
+      "students": 650,
+      "courses": 5,
+      "reviews": 9,
+      "meetings": 2,
+      "education": [
+        "Bachelor in Computer Science",
+        "Professional Python Certification"
+      ],
+      "experience": [
+        "Data Analyst 2019 - 2021",
+        "Python Developer 2021 - Now"
+      ],
+      "about": "Ayaan waa baraya Python-ka, automation, iyo Django framework, iyadoo diiradda saarta codsiyada backend-ka iyo xogta.",
+      "skills": ["Python", "Flask", "Django", "Pandas", "APIs"],
+      "image": "https://randomuser.me/api/portraits/women/5.jpg"
+    },
+    {
+      "id": 6,
+      "name": "Yusuf Omar",
+      "instructorTitle": "Cybersecurity Expert",
+      "description": "Security-focused instructor with ethical hacking expertise.",
+      "contactEmail": "yusuf@example.com",
+      "contactPhone": "776655",
+      "students": 480,
+      "courses": 3,
+      "reviews": 7,
+      "meetings": 1,
+      "education": [
+        "Bachelor in Network Security",
+        "Certified Ethical Hacker (CEH)"
+      ],
+      "experience": [
+        "Security Analyst 2018 - 2021",
+        "Cybersecurity Consultant 2022 - Now"
+      ],
+      "about": "Yusuf wuxuu barayaa ilaalinta amniga, hacking-ka sharci ah, iyo farsamooyinka difaaca nidaamyada.",
+      "skills": ["Networking", "Linux", "Firewalls", "Penetration Testing", "Ethical Hacking"],
+      "image": "https://randomuser.me/api/portraits/men/6.jpg"
+    },
+    {
+      "id": 7,
+      "name": "Hodan Warsame",
+      "instructorTitle": "Data Analyst",
+      "description": "Data-driven instructor passionate about analytics and visualization.",
+      "contactEmail": "hodan@example.com",
+      "contactPhone": "777766",
+      "students": 530,
+      "courses": 4,
+      "reviews": 5,
+      "meetings": 2,
+      "education": [
+        "BSc in Statistics",
+        "Google Data Analytics Certification"
+      ],
+      "experience": [
+        "Business Analyst 2019 - 2021",
+        "Data Analyst 2021 - Now"
+      ],
+      "about": "Hodan waxay baraysaa Excel, Power BI, iyo Python si loo fahmo xogta iyo go’aan qaadashada xog ku saleysan.",
+      "skills": ["Excel", "SQL", "Power BI", "Python", "Data Visualization"],
+      "image": "https://randomuser.me/api/portraits/women/7.jpg"
+    },
+    {
+      "id": 8,
+      "name": "Ali Hassan",
+      "instructorTitle": "Mobile App Developer",
+      "description": "Expert in Android and iOS app development.",
+      "contactEmail": "ali@example.com",
+      "contactPhone": "778877",
+      "students": 410,
+      "courses": 3,
+      "reviews": 6,
+      "meetings": 3,
+      "education": [
+        "BSc in Software Engineering",
+        "Mobile App Development Certification"
+      ],
+      "experience": [
+        "Android Developer 2019 - 2021",
+        "Flutter Developer 2021 - Now"
+      ],
+      "about": "Ali wuxuu diiradda saarayaa dhisidda barnaamijyo casri ah oo mobile ah isagoo isticmaalaya Flutter iyo React Native.",
+      "skills": ["Flutter", "React Native", "Dart", "Firebase", "UI Design"],
+      "image": "https://randomuser.me/api/portraits/men/8.jpg"
+    },
+    {
+      "id": 9,
+      "name": "Fatima Noor",
+      "instructorTitle": "DevOps Engineer",
+      "description": "Teaches automation, deployment, and cloud technologies.",
+      "contactEmail": "fatima@example.com",
+      "contactPhone": "779988",
+      "students": 460,
+      "courses": 4,
+      "reviews": 4,
+      "meetings": 2,
+      "education": [
+        "Bachelor in Computer Networks",
+        "AWS Certified Cloud Practitioner"
+      ],
+      "experience": [
+        "System Administrator 2018 - 2020",
+        "DevOps Engineer 2021 - Now"
+      ],
+      "about": "Fatima waxay baraysaa CI/CD pipelines, Docker, iyo AWS si ardaydu u bartaan sida loo maamulo software-ka casriga ah.",
+      "skills": ["AWS", "Docker", "Kubernetes", "CI/CD", "Linux"],
+      "image": "https://randomuser.me/api/portraits/women/9.jpg"
+    },
+    {
+      "id": 10,
+      "name": "Omar Farah",
+      "instructorTitle": "AI & Machine Learning Engineer",
+      "description": "AI instructor passionate about deep learning and neural networks.",
+      "contactEmail": "omar@example.com",
+      "contactPhone": "770099",
+      "students": 390,
+      "courses": 3,
+      "reviews": 5,
+      "meetings": 1,
+      "education": [
+        "BSc in Artificial Intelligence",
+        "MSc in Machine Learning"
+      ],
+      "experience": [
+        "ML Engineer 2020 - Now"
+      ],
+      "about": "Omar waa injineer AI ah oo diiradda saaraya barashada mashiinka, TensorFlow, iyo codsiyada caqliga macmalka ah.",
+      "skills": ["Python", "TensorFlow", "Pandas", "Data Science", "Machine Learning"],
+      "image": "https://randomuser.me/api/portraits/men/10.jpg"
     }
   ]
 }
