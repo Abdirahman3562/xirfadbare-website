@@ -1,36 +1,165 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import {
   FaEnvelope,
   FaUserPlus,
+  FaUserGraduate,
+  FaBookOpen,
+  FaStar,
+  FaRegStar,
+  FaCalendarAlt,
 } from "react-icons/fa";
-import InstructorTabs from "../../../components/instructor/InstructorTabs"; // ✅ import tabs component
+import InstructorTabs from "../../../components/instructor/InstructorTabs";
+import { Toaster, toast } from "react-hot-toast";
 
 export default function InstructorDetails() {
   const { slug } = useParams();
   const [instructor, setInstructor] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [averageRating, setAverageRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+  const [totalCourses, setTotalCourses] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const dropdownRef = useRef(null);
+
+  const currentUser = JSON.parse(localStorage.getItem("loggedInUser"));
 
   useEffect(() => {
-    const fetchInstructor = async () => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    const fetchInstructorDetails = async () => {
       try {
         const res = await fetch("http://localhost:4002/instructors");
-        if (!res.ok) throw new Error("Failed to fetch instructors");
         const data = await res.json();
-
         const found = data.find(
           (i) => i.name.toLowerCase().replace(/\s+/g, "-") === slug
         );
-        setInstructor(found || null);
-      } catch (error) {
-        console.error("❌ Error fetching instructor:", error);
+
+        if (!found) {
+          setInstructor(null);
+          return;
+        }
+
+        // ✅ Calculate average rating
+        if (found.reviews && found.reviews.length > 0) {
+          const total = found.reviews.reduce((sum, r) => sum + r.rating, 0);
+          const avg = total / found.reviews.length;
+          setAverageRating(avg.toFixed(1));
+          setTotalReviews(found.reviews.length);
+        }
+
+        // ✅ Fetch courses count (safe version)
+        let courseCount = 0;
+        try {
+          const courseRes = await fetch("http://localhost:3000/courses");
+          if (courseRes.ok) {
+            const coursesData = await courseRes.json();
+            const instructorCourses = coursesData.filter(
+              (c) => String(c.instructorId) === String(found.id)
+            );
+            courseCount = instructorCourses.length;
+          } else {
+            console.warn("⚠️ Courses API not responding, using fallback.");
+            courseCount = found.courses || 0;
+          }
+        } catch {
+          console.warn("⚠️ Could not fetch courses. Using fallback value.");
+          courseCount = found.courses || 0;
+        }
+        setTotalCourses(courseCount);
+
+        // ✅ Check follow status
+        if (currentUser && found.followersList?.includes(currentUser.id)) {
+          setIsFollowing(true);
+        }
+
+        setInstructor(found);
+      } catch (err) {
+        console.error("❌ Error loading instructor:", err);
+        toast.error("Failed to load instructor data!");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchInstructor();
-  }, [slug]);
+    fetchInstructorDetails();
+  }, [slug, currentUser]);
+
+  // ✅ Follow / Unfollow Logic (preserves old followers)
+  const handleFollow = async () => {
+    if (!currentUser) {
+      toast.error("Please login to follow this instructor!", {
+        position: "top-right",
+      });
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `http://localhost:4002/instructors/${instructor.id}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch instructor data");
+      const freshInstructor = await res.json();
+
+      const currentFollowers = Array.isArray(freshInstructor.followersList)
+        ? [...freshInstructor.followersList]
+        : [];
+
+      let newFollowersList = [...currentFollowers];
+
+      if (currentFollowers.includes(currentUser.id)) {
+        // ❌ Unfollow
+        newFollowersList = currentFollowers.filter(
+          (id) => id !== currentUser.id
+        );
+        setIsFollowing(false);
+        toast("You unfollowed this instructor 👋", { position: "top-right" });
+      } else {
+        // ✅ Follow
+        newFollowersList = [...new Set([...currentFollowers, currentUser.id])];
+        setIsFollowing(true);
+        toast.success("You are now following this instructor ✅", {
+          position: "top-right",
+        });
+      }
+
+      const updatedInstructor = {
+        ...freshInstructor,
+        followersList: newFollowersList,
+        followers:
+          (freshInstructor.followers || 0) +
+          (newFollowersList.length - currentFollowers.length),
+      };
+
+      const updateRes = await fetch(
+        `http://localhost:4002/instructors/${instructor.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedInstructor),
+        }
+      );
+
+      if (!updateRes.ok) throw new Error("Failed to update instructor");
+
+      setInstructor(updatedInstructor);
+    } catch (err) {
+      console.error("❌ Follow action failed:", err);
+      toast.error("Something went wrong. Try again later.", {
+        position: "top-right",
+      });
+    }
+  };
 
   if (loading)
     return (
@@ -46,115 +175,151 @@ export default function InstructorDetails() {
       </div>
     );
 
+  const dynamicStats = [
+    {
+      key: "students",
+      icon: <FaUserGraduate className="text-emerald-500 text-2xl" />,
+      label: "Students",
+      value: instructor.students || 0,
+    },
+    {
+      key: "courses",
+      icon: <FaBookOpen className="text-emerald-500 text-2xl" />,
+      label: "Courses",
+      value: totalCourses,
+    },
+    {
+      key: "reviews",
+      icon: <FaStar className="text-emerald-500 text-2xl" />,
+      label: "Reviews",
+      value: totalReviews,
+    },
+  ];
+
   return (
-   <div className="min-h-screen  relative -mt-20">
-  {/* ✅ Background Hero Section */}
-  <div
-    className="relative h-[400px] bg-cover bg-center"
-    style={{
-      backgroundImage: `url(${
-        instructor.coverImage ||
-        "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80"
-      })`,
-    }}
-  >
-    <div className="absolute inset-0 bg-black/40"></div>
-  </div>
+    <div className="min-h-screen relative -mt-20">
+      <Toaster position="top-right" reverseOrder={false} />
 
-  {/* ✅ Profile Content Card */}
-  <div className="relative z-10 max-w-3xl mx-auto mb-10 bg-[#edf4f5] rounded-2xl shadow-lg overflow-hidden border border-gray-100  -mt-24 p-6">
-    {/* Header Section */}
-    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-      {/* Profile Info */}
-      <div className="flex items-center gap-6">
-        <img
-          src={instructor.image}
-          alt={instructor.name}
-          className="w-28 h-28 object-cover rounded-full border-4 border-white shadow-md"
-        />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800">
-            {instructor.name}
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            {instructor.instructorTitle}
-          </p>
+      {/* ✅ Hero Section */}
+      <div
+        className="relative h-[400px] bg-cover bg-center z-10"
+        style={{
+          backgroundImage: `url(${
+            instructor.coverImage ||
+            "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80"
+          })`,
+        }}
+      >
+        <div className="absolute inset-0 bg-black/40 pointer-events-none"></div>
+      </div>
 
-          {/* Rating */}
-          <div className="flex items-center gap-2 mt-1 text-yellow-500">
-            {[...Array(5)].map((_, i) => (
-              <svg
-                key={i}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="w-4 h-4"
+      {/* ✅ Card Section */}
+      <div className="relative z-20 max-w-3xl mx-auto mb-10 bg-[#edf4f5] rounded-2xl shadow-lg border border-gray-100 -mt-24 p-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-6">
+            <img
+              src={instructor.image}
+              alt={instructor.name}
+              className="w-28 h-28 object-cover rounded-full border-4 border-white shadow-md"
+            />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">
+                {instructor.name}
+              </h1>
+              <p className="text-gray-500 text-sm mt-1">
+                {instructor.instructorTitle}
+              </p>
+
+              {/* ✅ Rating & Followers */}
+              <div className="flex flex-col md:flex-row lg:flex-row lg:items-center">
+                <div className="flex mt-2 mb-1">
+                  {[...Array(5)].map((_, i) =>
+                    i < Math.round(averageRating) ? (
+                      <FaStar key={i} className="text-emerald-500 w-4 h-4" />
+                    ) : (
+                      <FaRegStar key={i} className="text-emerald-200 w-4 h-4" />
+                    )
+                  )}
+                  <span className="text-gray-800 text-sm ml-1 font-medium">
+                    {averageRating} / 5
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-600 text-sm ml-2">
+                    ({instructor.followers || 0} Followers)
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ✅ Follow / Unfollow Buttons */}
+          {/* ✅ Follow / Unfollow Buttons with Dropdown */}
+          <div className="flex gap-3 mt-6 md:mt-0 relative" ref={dropdownRef}>
+            {!isFollowing ? (
+              <button
+                onClick={handleFollow}
+                className="bg-emerald-600 text-white px-5 py-2 rounded-full flex items-center text-sm cursor-pointer font-medium shadow hover:scale-105 transition-transform duration-200"
               >
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.974a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.286 3.974c.3.921-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.176 0l-3.385 2.46c-.784.57-1.838-.197-1.539-1.118l1.286-3.974a1 1 0 00-.364-1.118L2.045 9.4c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.95-.69l1.288-3.973z" />
-              </svg>
-            ))}
-            <span className="text-gray-600 text-sm ml-1 font-medium">
-              4.8 ({instructor.followers || 65} Followers)
-            </span>
+                <FaUserPlus className="inline mr-2" />
+                Follow
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="bg-gray-300 text-gray-700 px-5 py-2 rounded-full flex items-center text-sm cursor-pointer font-medium shadow hover:scale-105 transition-transform duration-200"
+                >
+                  <FaUserPlus className="inline mr-2" />
+                  Following
+                </button>
+
+                {showDropdown && (
+                  <div className="absolute right-0 mt-12 w-40 bg-white border border-gray-200 rounded-xl shadow-lg animate-fadeIn">
+                    <button
+                      onClick={async () => {
+                        await handleFollow(); // samee unfollow API logic
+                        setIsFollowing(false); // 💥 isla markiiba beddel UI-ga
+                        setShowDropdown(false); // 💥 xiro dropdown
+                      }}
+                      className="block w-full cursor-pointer text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-t-xl"
+                    >
+                      Unfollow
+                    </button>
+                    <button
+                      onClick={() => setShowDropdown(false)}
+                      className="block w-full cursor-pointer text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-b-xl"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+
+            <button className="border border-emerald-500 cursor-pointer text-emerald-700 flex items-center px-5 py-2 rounded-full text-sm font-medium hover:bg-emerald-50 transition">
+              <FaEnvelope className="inline mr-2 text-emerald-500" />
+              Send Message
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Buttons */}
-      <div className="flex gap-3 mt-6 md:mt-0 ">
-        <button className="bg-emerald-600 cursor-pointer text-white px-5 py-2 rounded-full flex items-center text-sm font-medium shadow hover:opacity-90 transition">
-          <FaUserPlus className="inline mr-2" />
-          Follow
-        </button>
-        <button className="border border-gray-300 cursor-pointer flex items-center text-gray-700 px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition">
-          <FaEnvelope className="inline mr-2" />
-          Send Message
-        </button>
-      </div>
-    </div>
-
-    {/* Stats Section */}
-    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 ">
-      {[
-        {
-          icon: "🎓",
-          label: "Students",
-          value: instructor.students || 0,
-          color: "text-orange-500",
-        },
-        {
-          icon: "📘",
-          label: "Courses",
-          value: instructor.courses || 0,
-          color: "text-blue-500",
-        },
-        {
-          icon: "⭐",
-          label: "Reviews",
-          value: instructor.reviews || 0,
-          color: "text-green-500",
-        },
-        {
-          icon: "📅",
-          label: "Meetings",
-          value: instructor.meetings || 0,
-          color: "text-purple-500",
-        },
-      ].map((stat, i) => (
-        <div
-          key={i}
-          className="flex flex-col items-center justify-center border border-gray-200 hover:border-emerald-400 rounded-xl py-2 hover:shadow-md transition"
-        >
-          <div className={`text-2xl ${stat.color}`}>{stat.icon}</div>
-          <p className="font-bold text-gray-800">{stat.value}</p>
-          <p className="text-sm text-gray-500">{stat.label}</p>
+        {/* ✅ Stats Section */}
+        <div className="grid grid-cols-3 sm:grid-cols-3 gap-4 mt-8">
+          {dynamicStats.map((stat, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center justify-center border border-emerald-200 hover:border-emerald-400 rounded-xl py-3 hover:shadow-md transition"
+            >
+              {stat.icon}
+              <p className="font-bold text-gray-800 mt-1">{stat.value}</p>
+              <p className="text-sm text-gray-500">{stat.label}</p>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
 
-    {/* ✅ Tabs Section */}
-    <InstructorTabs instructor={instructor} />
-  </div>
-</div>
+        <InstructorTabs instructor={instructor} />
+      </div>
+    </div>
   );
 }

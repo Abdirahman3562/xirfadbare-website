@@ -1,22 +1,25 @@
 import React, { useState } from "react";
 import { FaUserGraduate, FaBook } from "react-icons/fa";
+import InstructorCourses from "./InstructorCourses";
+import { useParams } from "react-router-dom";
+import Reviews from "./Reviews";
 
 export default function InstructorTabs({ instructor }) {
   const [activeTab, setActiveTab] = useState("about");
+  const { slug } = useParams();
 
   const tabs = [
     { id: "about", label: "About" },
     { id: "courses", label: "Courses" },
     { id: "articles", label: "Articles" },
-    { id: "forum", label: "Forum" },
-    { id: "badges", label: "Badges" },
-    { id: "meeting", label: "Reserve a meeting" },
+    { id: "reviews", label: "Reviews" },
+  
   ];
 
   return (
     <div className="border-t border-gray-100">
       {/* Tabs Header */}
-      <div className="flex flex-wrap justify-center gap-6 py-4 text-gray-600 font-medium text-sm">
+      <div className="flex flex-wrap  border-b border-gray-300 justify-center gap-6 py-4 text-gray-600 font-medium text-sm">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -100,19 +103,7 @@ export default function InstructorTabs({ instructor }) {
 
         {/* ✅ Courses Tab */}
         {activeTab === "courses" && (
-          <div>
-            <h2 className="text-base font-semibold text-gray-800 mb-3">
-              Instructor’s Courses
-            </h2>
-            <p className="text-gray-600">
-              {instructor.name} currently teaches{" "}
-              <span className="font-semibold text-emerald-600">
-                {instructor.courses || 0}
-              </span>{" "}
-              courses. Soon this section will list all the courses created by
-              this instructor.
-            </p>
-          </div>
+      <InstructorCourses instructorSlug={slug} />
         )}
 
         {/* ✅ Articles Tab */}
@@ -128,39 +119,12 @@ export default function InstructorTabs({ instructor }) {
         )}
 
         {/* ✅ Forum Tab */}
-        {activeTab === "forum" && (
-          <div>
-            <h2 className="text-base font-semibold text-gray-800 mb-3">
-              Forum
-            </h2>
-            <p className="text-gray-600">
-              Community discussions by this instructor will appear here.
-            </p>
-          </div>
+        {activeTab === "reviews" && (
+          <Reviews/>
         )}
 
-        {/* ✅ Badges Tab */}
-        {activeTab === "badges" && (
-          <div>
-            <h2 className="text-base font-semibold text-gray-800 mb-3">
-              Badges
-            </h2>
-            <p className="text-gray-600">No badges earned yet.</p>
-          </div>
-        )}
+     
 
-        {/* ✅ Meeting Tab */}
-        {activeTab === "meeting" && (
-          <div>
-            <h2 className="text-base font-semibold text-gray-800 mb-3">
-              Reserve a Meeting
-            </h2>
-            <p className="text-gray-600">
-              You can request a meeting session with{" "}
-              <span className="font-semibold">{instructor.name}</span> soon.
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

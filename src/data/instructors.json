@@ -1,7 +1,7 @@
 {
   "instructors": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Abdirahmaan Yusuf",
       "instructorTitle": "Frontend Developer",
       "description": "A passionate frontend instructor who simplifies web technologies for Somali learners.",
@@ -9,8 +9,9 @@
       "contactPhone": "771100",
       "students": 854,
       "courses": 5,
-      "reviews": 12,
-      "meetings": 4,
+      "isAuthor": true,
+      "authorId": 1,
+      "followers": 1001,
       "education": [
         "Bachelor in Computer Application",
         "MBA in Management Information Systems"
@@ -22,10 +23,28 @@
       ],
       "about": "Abdirahmaan waa macallin hore u taagan oo ku xeeldheer HTML, CSS, iyo JavaScript. Wuxuu xooga saaraa dhisidda xirfadaha aasaasiga ah ee frontend-ka si ardaydu ay si fudud u fahmaan sida web-ku u shaqeeyo.",
       "skills": ["HTML", "CSS", "JavaScript", "React", "TailwindCSS"],
-      "image": "https://randomuser.me/api/portraits/men/1.jpg"
+      "image": "https://randomuser.me/api/portraits/men/1.jpg",
+      "reviews": [
+        {
+          "student": "Ali",
+          "rating": 5,
+          "comment": "Instructor fiican oo sharaxaad fudud bixiya."
+        },
+        {
+          "student": "Hodan",
+          "rating": 4,
+          "comment": "Casharada waa faahfaahsan oo waxtar leh."
+        },
+        {
+          "student": "Yusuf",
+          "rating": 3,
+          "comment": "Waxaan rabaa in uu examples badan ku daro."
+        }
+      ],
+      "followersList": ["0fcb"]
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Samafale Mohamed",
       "instructorTitle": "Fullstack Developer",
       "description": "A fullstack instructor guiding Somali learners through modern technologies.",
@@ -33,12 +52,8 @@
       "contactPhone": "772211",
       "students": 920,
       "courses": 7,
-      "reviews": 5,
-      "meetings": 2,
-      "education": [
-        "BSc in Computer Science",
-        "MSc in Software Engineering"
-      ],
+      "followers": 200,
+      "education": ["BSc in Computer Science", "MSc in Software Engineering"],
       "experience": [
         "Frontend Developer 2018 - 2019",
         "Backend Engineer 2020 - 2022",
@@ -46,10 +61,28 @@
       ],
       "about": "Samafale waa macallin Fullstack ah oo baraya Node.js, Express, iyo React si uu ardayda uga dhigo kuwa dhisa codsiyo dhamaystiran.",
       "skills": ["JavaScript", "React", "Node.js", "MongoDB", "Express.js"],
-      "image": "https://randomuser.me/api/portraits/men/2.jpg"
+      "image": "https://randomuser.me/api/portraits/men/2.jpg",
+      "reviews": [
+        {
+          "student": "Fatima",
+          "rating": 5,
+          "comment": "Sharaxaad cad, iyo tusaalooyin casri ah."
+        },
+        {
+          "student": "Omar",
+          "rating": 5,
+          "comment": "Instructor aad u dulqaad badan."
+        },
+        {
+          "student": "Khadra",
+          "rating": 4,
+          "comment": "Mararka qaar tempo-ku waa degdeg."
+        }
+      ],
+      "followersList": ["0fcb"]
     },
     {
-      "id": 3,
+      "id": "3",
       "name": "Khadra Ahmed",
       "instructorTitle": "UI/UX Designer",
       "description": "Creative designer focusing on user experience and modern interfaces.",
@@ -57,22 +90,46 @@
       "contactPhone": "773322",
       "students": 610,
       "courses": 3,
-      "reviews": 8,
-      "meetings": 1,
-      "education": [
-        "Bachelor in Graphic Design",
-        "Certificate in UX Research"
-      ],
+      "followers": 480,
+      "education": ["Bachelor in Graphic Design", "Certificate in UX Research"],
       "experience": [
         "Graphic Designer 2017 - 2019",
         "UX Researcher 2020 - 2022"
       ],
       "about": "Khadra waa naqshadeeye ku takhasustay Figma, UX, iyo prototyping, iyadoo diiradda saarta naqshadaha isticmaale-saaxiibka ah.",
-      "skills": ["Figma", "Adobe XD", "Prototyping", "UX Research", "Wireframing"],
-      "image": "https://randomuser.me/api/portraits/women/3.jpg"
+      "skills": [
+        "Figma",
+        "Adobe XD",
+        "Prototyping",
+        "UX Research",
+        "Wireframing"
+      ],
+      "image": "https://randomuser.me/api/portraits/women/3.jpg",
+      "reviews": [
+        {
+          "student": "Yusuf",
+          "rating": 5,
+          "comment": "Design thinking aad u fiican."
+        },
+        {
+          "student": "Ayaan",
+          "rating": 4,
+          "comment": "Ku fiican Figma!"
+        },
+        {
+          "student": "Ali",
+          "rating": 4,
+          "comment": "Sharaxaad sahlan oo muuqaal ah."
+        },
+        {
+          "student": "Ali",
+          "rating": 4,
+          "comment": "Sharaxaad sahlan oo muuqaal ah."
+        }
+      ]
     },
     {
-      "id": 4,
+      "id": "4",
       "name": "Mohamed Ali",
       "instructorTitle": "Backend Developer",
       "description": "Specialist in backend development and database management.",
@@ -80,8 +137,7 @@
       "contactPhone": "774433",
       "students": 740,
       "courses": 4,
-      "reviews": 6,
-      "meetings": 3,
+      "followers": 410,
       "education": [
         "BSc in Information Technology",
         "Diploma in Cloud Computing"
@@ -92,10 +148,27 @@
       ],
       "about": "Mohamed wuxuu barayaa Node.js, SQL, iyo API development si ardaydu u bartaan xagga server-ka iyo kaydinta xogta.",
       "skills": ["Node.js", "Express", "SQL", "PostgreSQL", "API Development"],
-      "image": "https://randomuser.me/api/portraits/men/4.jpg"
+      "image": "https://randomuser.me/api/portraits/men/4.jpg",
+      "reviews": [
+        {
+          "student": "Ayaan",
+          "rating": 5,
+          "comment": "Backend concepts si fiican ayuu u sharraxaa."
+        },
+        {
+          "student": "Omar",
+          "rating": 4,
+          "comment": "DB-ka si fiican ayuu u muujiyey."
+        },
+        {
+          "student": "Fatima",
+          "rating": 5,
+          "comment": "Wuxuu ku fiican yahay API design!"
+        }
+      ]
     },
     {
-      "id": 5,
+      "id": "5",
       "name": "Ayaan Abdullahi",
       "instructorTitle": "Python Developer",
       "description": "Expert Python developer and data enthusiast.",
@@ -103,22 +176,35 @@
       "contactPhone": "775544",
       "students": 650,
       "courses": 5,
-      "reviews": 9,
-      "meetings": 2,
+      "followers": 580,
       "education": [
         "Bachelor in Computer Science",
         "Professional Python Certification"
       ],
-      "experience": [
-        "Data Analyst 2019 - 2021",
-        "Python Developer 2021 - Now"
-      ],
+      "experience": ["Data Analyst 2019 - 2021", "Python Developer 2021 - Now"],
       "about": "Ayaan waa baraya Python-ka, automation, iyo Django framework, iyadoo diiradda saarta codsiyada backend-ka iyo xogta.",
       "skills": ["Python", "Flask", "Django", "Pandas", "APIs"],
-      "image": "https://randomuser.me/api/portraits/women/5.jpg"
+      "image": "https://randomuser.me/api/portraits/women/5.jpg",
+      "reviews": [
+        {
+          "student": "Yusuf",
+          "rating": 5,
+          "comment": "Django si qoto dheer ayey u sharraxdaa."
+        },
+        {
+          "student": "Ali",
+          "rating": 5,
+          "comment": "Instructor tayo sare leh."
+        },
+        {
+          "student": "Hodan",
+          "rating": 4,
+          "comment": "Wanaagsan, laakiin tempo waa gaabis."
+        }
+      ]
     },
     {
-      "id": 6,
+      "id": "6",
       "name": "Yusuf Omar",
       "instructorTitle": "Cybersecurity Expert",
       "description": "Security-focused instructor with ethical hacking expertise.",
@@ -126,8 +212,7 @@
       "contactPhone": "776655",
       "students": 480,
       "courses": 3,
-      "reviews": 7,
-      "meetings": 1,
+      "followers": 460,
       "education": [
         "Bachelor in Network Security",
         "Certified Ethical Hacker (CEH)"
@@ -137,11 +222,34 @@
         "Cybersecurity Consultant 2022 - Now"
       ],
       "about": "Yusuf wuxuu barayaa ilaalinta amniga, hacking-ka sharci ah, iyo farsamooyinka difaaca nidaamyada.",
-      "skills": ["Networking", "Linux", "Firewalls", "Penetration Testing", "Ethical Hacking"],
-      "image": "https://randomuser.me/api/portraits/men/6.jpg"
+      "skills": [
+        "Networking",
+        "Linux",
+        "Firewalls",
+        "Penetration Testing",
+        "Ethical Hacking"
+      ],
+      "image": "https://randomuser.me/api/portraits/men/6.jpg",
+      "reviews": [
+        {
+          "student": "Ali",
+          "rating": 5,
+          "comment": "Hacker sharci ah oo casharadiisu yihiin top-notch!"
+        },
+        {
+          "student": "Fatima",
+          "rating": 4,
+          "comment": "Wuxuu si fiican u fahamsiiyay network security."
+        },
+        {
+          "student": "Omar",
+          "rating": 4,
+          "comment": "Practical labs aad u fiican."
+        }
+      ]
     },
     {
-      "id": 7,
+      "id": "7",
       "name": "Hodan Warsame",
       "instructorTitle": "Data Analyst",
       "description": "Data-driven instructor passionate about analytics and visualization.",
@@ -149,22 +257,32 @@
       "contactPhone": "777766",
       "students": 530,
       "courses": 4,
-      "reviews": 5,
-      "meetings": 2,
-      "education": [
-        "BSc in Statistics",
-        "Google Data Analytics Certification"
-      ],
-      "experience": [
-        "Business Analyst 2019 - 2021",
-        "Data Analyst 2021 - Now"
-      ],
+      "followers": 440,
+      "education": ["BSc in Statistics", "Google Data Analytics Certification"],
+      "experience": ["Business Analyst 2019 - 2021", "Data Analyst 2021 - Now"],
       "about": "Hodan waxay baraysaa Excel, Power BI, iyo Python si loo fahmo xogta iyo go’aan qaadashada xog ku saleysan.",
       "skills": ["Excel", "SQL", "Power BI", "Python", "Data Visualization"],
-      "image": "https://randomuser.me/api/portraits/women/7.jpg"
+      "image": "https://randomuser.me/api/portraits/women/7.jpg",
+      "reviews": [
+        {
+          "student": "Yusuf",
+          "rating": 5,
+          "comment": "Power BI aad bay ugu fiican tahay!"
+        },
+        {
+          "student": "Ayaan",
+          "rating": 4,
+          "comment": "Casharo nadiif ah oo la fahmi karo."
+        },
+        {
+          "student": "Ali",
+          "rating": 5,
+          "comment": "Excel advanced si fiican ayey u sharraxday."
+        }
+      ]
     },
     {
-      "id": 8,
+      "id": "8",
       "name": "Ali Hassan",
       "instructorTitle": "Mobile App Developer",
       "description": "Expert in Android and iOS app development.",
@@ -172,8 +290,7 @@
       "contactPhone": "778877",
       "students": 410,
       "courses": 3,
-      "reviews": 6,
-      "meetings": 3,
+      "followers": 390,
       "education": [
         "BSc in Software Engineering",
         "Mobile App Development Certification"
@@ -184,10 +301,27 @@
       ],
       "about": "Ali wuxuu diiradda saarayaa dhisidda barnaamijyo casri ah oo mobile ah isagoo isticmaalaya Flutter iyo React Native.",
       "skills": ["Flutter", "React Native", "Dart", "Firebase", "UI Design"],
-      "image": "https://randomuser.me/api/portraits/men/8.jpg"
+      "image": "https://randomuser.me/api/portraits/men/8.jpg",
+      "reviews": [
+        {
+          "student": "Hodan",
+          "rating": 5,
+          "comment": "Flutter project fiican baan dhisay!"
+        },
+        {
+          "student": "Fatima",
+          "rating": 4,
+          "comment": "Wuxuu si fiican u sharraxaa architecture."
+        },
+        {
+          "student": "Omar",
+          "rating": 5,
+          "comment": "Instructor aad u xirfad leh."
+        }
+      ]
     },
     {
-      "id": 9,
+      "id": "9",
       "name": "Fatima Noor",
       "instructorTitle": "DevOps Engineer",
       "description": "Teaches automation, deployment, and cloud technologies.",
@@ -195,8 +329,7 @@
       "contactPhone": "779988",
       "students": 460,
       "courses": 4,
-      "reviews": 4,
-      "meetings": 2,
+      "followers": 370,
       "education": [
         "Bachelor in Computer Networks",
         "AWS Certified Cloud Practitioner"
@@ -207,10 +340,27 @@
       ],
       "about": "Fatima waxay baraysaa CI/CD pipelines, Docker, iyo AWS si ardaydu u bartaan sida loo maamulo software-ka casriga ah.",
       "skills": ["AWS", "Docker", "Kubernetes", "CI/CD", "Linux"],
-      "image": "https://randomuser.me/api/portraits/women/9.jpg"
+      "image": "https://randomuser.me/api/portraits/women/9.jpg",
+      "reviews": [
+        {
+          "student": "Yusuf",
+          "rating": 5,
+          "comment": "Docker iyo AWS si fiican ayey u sharraxday."
+        },
+        {
+          "student": "Ali",
+          "rating": 4,
+          "comment": "Wanaagsan, laakin CI/CD qaybta waa dheer."
+        },
+        {
+          "student": "Omar",
+          "rating": 5,
+          "comment": "Instructor khibrad badan leh."
+        }
+      ]
     },
     {
-      "id": 10,
+      "id": "10",
       "name": "Omar Farah",
       "instructorTitle": "AI & Machine Learning Engineer",
       "description": "AI instructor passionate about deep learning and neural networks.",
@@ -218,18 +368,39 @@
       "contactPhone": "770099",
       "students": 390,
       "courses": 3,
-      "reviews": 5,
-      "meetings": 1,
+      "followers": 1,
       "education": [
         "BSc in Artificial Intelligence",
         "MSc in Machine Learning"
       ],
-      "experience": [
-        "ML Engineer 2020 - Now"
-      ],
+      "experience": ["ML Engineer 2020 - Now"],
       "about": "Omar waa injineer AI ah oo diiradda saaraya barashada mashiinka, TensorFlow, iyo codsiyada caqliga macmalka ah.",
-      "skills": ["Python", "TensorFlow", "Pandas", "Data Science", "Machine Learning"],
-      "image": "https://randomuser.me/api/portraits/men/10.jpg"
+      "skills": [
+        "Python",
+        "TensorFlow",
+        "Pandas",
+        "Data Science",
+        "Machine Learning"
+      ],
+      "image": "https://randomuser.me/api/portraits/men/10.jpg",
+      "reviews": [
+        {
+          "student": "Ayaan",
+          "rating": 5,
+          "comment": "AI concepts si fiican ayuu u caddeeyaa."
+        },
+        {
+          "student": "Fatima",
+          "rating": 4,
+          "comment": "Wuxuu leeyahay aqoon aad u qoto dheer."
+        },
+        {
+          "student": "Hodan",
+          "rating": 5,
+          "comment": "Instructor AI ah oo aad u xiiso badan!"
+        }
+      ],
+      "followersList": ["0fcb"]
     }
   ]
 }
