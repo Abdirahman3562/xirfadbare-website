@@ -11,7 +11,7 @@
       "paymentMethod": "EVC Plus",
       "phoneNumber": "365754675467568",
       "totalToPay": 6,
-      "status": "active",
+      "status": "pending",
       "progress": 0,
       "lessonsCompleted": [],
       "lastAccess": null,
@@ -28,7 +28,7 @@
       "paymentMethod": "Cash on Delivery",
       "phoneNumber": "656757858757",
       "totalToPay": 11.25,
-      "status": "pending",
+      "status": "active",
       "progress": 0,
       "lessonsCompleted": [],
       "lastAccess": null,
@@ -45,7 +45,7 @@
       "paymentMethod": "EVC Plus",
       "phoneNumber": "636565653467546",
       "totalToPay": 15,
-      "status": "pending",
+      "status": "active",
       "createdAt": "Nov 9, 2025, 05:09 PM"
     }
   ]

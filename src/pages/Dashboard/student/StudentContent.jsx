@@ -11,8 +11,10 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const StudentContent = () => {
+  const navigate = useNavigate(); 
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -329,6 +331,11 @@ const StudentContent = () => {
                     </div>
 
                     <button
+                       onClick={() => {
+                        if (course.status === "active") {
+                          navigate(`/watch/courses/${course.courseId}`); // ✅ sida Dugsiiye.com
+                        }
+                      }}
                       disabled={course.status === "pending"}
                       className={`mt-6 font-medium px-5 py-2 cursor-pointer rounded-lg text-sm transition self-start shadow-sm flex items-center gap-2 ${
                         course.status === "pending"

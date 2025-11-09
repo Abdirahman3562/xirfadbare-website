@@ -20,22 +20,21 @@
     { "id": 14, "curriculumId": 5, "title": "Form Validation and Accessibility", "duration": "7:45", "videoUrl": "https://www.youtube.com/watch?v=example14" },
     { "id": 15, "curriculumId": 5, "title": "Building a Complete Contact Form", "duration": "9:22", "videoUrl": "https://www.youtube.com/watch?v=example15" },
 
-    { "id": 16, "curriculumId": 6, "title": "What is CSS and How It Works", "duration": "9:12", "videoUrl": "https://www.youtube.com/watch?v=example16" },
-    { "id": 17, "curriculumId": 6, "title": "Ways to Apply CSS (Inline, Internal, External)", "duration": "7:45", "videoUrl": "https://www.youtube.com/watch?v=example17" },
-    { "id": 18, "curriculumId": 6, "title": "CSS Syntax and Selectors Overview", "duration": "6:59", "videoUrl": "https://www.youtube.com/watch?v=example18" },
+    { "id": 16, "curriculumId": 6, "title": "What is CSS and How It Works", "duration": "9:12", "videoUrl": "https://youtu.be/8cu9r7lx58E?si=p4eGUCmKY91yMKXb" },
+    { "id": 17, "curriculumId": 6, "title": "Ways to Apply CSS (Inline, Internal, External)", "duration": "7:45", "videoUrl": "https://youtu.be/bL-E2pm1o8A?si=YF8osLLZ5RV9mQp0" },
+    { "id": 18, "curriculumId": 6, "title": "CSS Syntax and Selectors Overview", "duration": "6:59", "videoUrl": "https://youtu.be/ZNskBxLVOfs?si=a3Ajdb5SKfov0t51" },
 
-    { "id": 19, "curriculumId": 7, "title": "Selectors and Combinators", "duration": "8:10", "videoUrl": "https://www.youtube.com/watch?v=example19" },
-    { "id": 20, "curriculumId": 7, "title": "Colors, Backgrounds, and Borders", "duration": "6:45", "videoUrl": "https://www.youtube.com/watch?v=example20" },
+    { "id": 19, "curriculumId": 7, "title": "Selectors and Combinators", "duration": "8:10", "videoUrl": "https://youtu.be/swZFmJsU54s?si=XmPrRXPAdfdnBUVq" },
+    { "id": 20, "curriculumId": 7, "title": "Colors, Backgrounds, and Borders", "duration": "6:45", "videoUrl": "https://youtu.be/4x4QzlqiB0U?si=MoiK1-xdkrwV39_t" },
 
-    { "id": 21, "curriculumId": 8, "title": "Understanding Box Model", "duration": "10:25", "videoUrl": "https://www.youtube.com/watch?v=example21" },
-    { "id": 22, "curriculumId": 8, "title": "Position, Float, and Display", "duration": "9:50", "videoUrl": "https://www.youtube.com/watch?v=example22" },
+    { "id": 21, "curriculumId": 8, "title": "Understanding Box Model", "duration": "10:25", "videoUrl": "https://youtu.be/rIO5326FgPE?si=A01SmjeJPos4woK0" },
+    { "id": 22, "curriculumId": 8, "title": "Position, Float, and Display", "duration": "9:50", "videoUrl": "https://youtu.be/oJe8G5XT_v4?si=4IKBnWJyNVK96hPR" },
 
-    { "id": 23, "curriculumId": 9, "title": "Flexbox Basics", "duration": "8:40", "videoUrl": "https://www.youtube.com/watch?v=example23" },
-    { "id": 24, "curriculumId": 9, "title": "Grid Layouts", "duration": "9:15", "videoUrl": "https://www.youtube.com/watch?v=example24" },
+    { "id": 23, "curriculumId": 9, "title": "Flexbox Basics", "duration": "8:40", "videoUrl": "https://youtu.be/phWxA89Dy94?si=ka5vHMAFeWMxKvO9" },
+    { "id": 24, "curriculumId": 9, "title": "Grid Layouts", "duration": "9:15", "videoUrl": "https://youtu.be/eHaZlFcGl6k?si=XPW2YuD6CGQRXAhl" },
 
-    { "id": 25, "curriculumId": 10, "title": "Responsive Design with Media Queries", "duration": "8:33", "videoUrl": "https://www.youtube.com/watch?v=example25" },
-    { "id": 26, "curriculumId": 10, "title": "CSS Animations and Transitions", "duration": "10:21", "videoUrl": "https://www.youtube.com/watch?v=example26" },
-
+    { "id": 25, "curriculumId": 10, "title": "Responsive Design with Media Queries", "duration": "8:33", "videoUrl": "https://youtu.be/n9yI6fjkrfE?si=dBbHWeOFev-KQHaX" },
+    { "id": 26, "curriculumId": 10, "title": "CSS Animations and Transitions", "duration": "10:21", "videoUrl": "https://youtu.be/xdap5e3-DwM?si=HN8IMXDUwgdLGeCH" },
     { "id": 27, "curriculumId": 11, "title": "JavaScript Overview", "duration": "9:14", "videoUrl": "https://www.youtube.com/watch?v=example27" },
     { "id": 28, "curriculumId": 12, "title": "Variables and Constants", "duration": "6:52", "videoUrl": "https://www.youtube.com/watch?v=example28" },
     { "id": 29, "curriculumId": 13, "title": "Functions Explained", "duration": "7:48", "videoUrl": "https://www.youtube.com/watch?v=example29" },

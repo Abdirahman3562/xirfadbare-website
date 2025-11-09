@@ -26,6 +26,7 @@ import SinglePostPage from "./pages/webpages/Blog/SinglePostPage";
 import AuthorPage from "./pages/webpages/Author/AuthorPage";
 import InstructorDetails from "./pages/webpages/instructor/InstructorDetails";
 import Reviews from "./components/instructor/Reviews";
+import CourseDashboard from "./pages/Dashboard/student/CourseDashboard";
 
 function App() {
   const location = useLocation();
@@ -67,6 +68,10 @@ function App() {
             <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
+
+        {/* Course Dashboard page OUTSIDE the layout */}
+        <Route path="/watch/courses/:id" element={<CourseDashboard />} />
+
       </Routes>
 
       <ToastContainer position="top-center" autoClose={3000} />
