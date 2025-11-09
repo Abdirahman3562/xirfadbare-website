@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { FaCheckCircle, FaClock, FaGraduationCap } from "react-icons/fa";
+import { FaCheckCircle, FaClock, FaGraduationCap, FaUserGraduate } from "react-icons/fa";
 import {
   getFullCourseDetails,
   getFullCourseDetailsBySlug,
@@ -53,7 +53,10 @@ function PaymentPage() {
   const getInitials = (name) => {
     if (!name) return "?";
     const parts = name.split(" ");
-    return parts.map((p) => p[0]).join("").toUpperCase();
+    return parts
+      .map((p) => p[0])
+      .join("")
+      .toUpperCase();
   };
 
   // Coupon
@@ -98,7 +101,7 @@ function PaymentPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-8 py-10 mt-20 grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* ===== LEFT SIDE ===== */}
-      <div className="lg:col-span-1 bg-white shadow-md rounded-2xl border border-gray-100 overflow-hidden">
+      <div className="lg:col-span-1  shadow-md rounded-2xl border border-gray-100 overflow-hidden">
         <img
           src={course.thumbnail}
           alt={course.title}
@@ -110,18 +113,29 @@ function PaymentPage() {
             {course.title}
           </h2>
 
-          <div className="flex flex-wrap text-sm text-gray-600 mt-3 gap-x-3 gap-y-2">
+          <div className="flex flex-wrap text-sm text-emerald-500 mt-3 gap-x-2 gap-y-2">
+            {/* Duration */}
             <p className="flex items-center">
               <FaClock className="mr-1 text-emerald-500" />
               {course.totalDuration || "N/A"}
             </p>
+
+            {/* Sections */}
             <p className="flex items-center">
               <FaGraduationCap className="mr-1 text-emerald-500" />
               {course.curriculum?.length || 0} sections
             </p>
+
+            {/* Type */}
             <p className="flex items-center">
               <FaCheckCircle className="mr-1 text-emerald-500" />
               {course.type || "Course"}
+            </p>
+
+            {/* ✅ Students Enrolled */}
+            <p className="flex items-center">
+              <FaUserGraduate className="mr-1 text-emerald-500" />
+              {course.enrolledCount || 0} enrolled
             </p>
           </div>
 
@@ -228,39 +242,43 @@ function PaymentPage() {
               Payment Method
             </h3>
             <div className="space-y-2 mb-6 relative">
-              {["EVC Plus", "ZAAD Service", "Sahal", "EBIR", "Cash on Delivery"].map(
-                (method, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSelectedMethod(method)}
-                    className={`w-full relative border rounded-lg cursor-pointer p-3 pl-4 text-left text-sm transition flex flex-col ${
+              {[
+                "EVC Plus",
+                "ZAAD Service",
+                "Sahal",
+                "EBIR",
+                "Cash on Delivery",
+              ].map((method, i) => (
+                <button
+                  key={i}
+                  onClick={() => setSelectedMethod(method)}
+                  className={`w-full relative border rounded-lg cursor-pointer p-3 pl-4 text-left text-sm transition flex flex-col ${
+                    selectedMethod === method
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-gray-200 hover:border-emerald-300"
+                  }`}
+                >
+                  <span
+                    className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 ${
                       selectedMethod === method
-                        ? "border-emerald-500 bg-emerald-50"
-                        : "border-gray-200 hover:border-emerald-300"
-                    }`}
+                        ? "border-emerald-500"
+                        : "border-gray-300"
+                    } flex items-center justify-center`}
                   >
-                    <span
-                      className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 ${
-                        selectedMethod === method
-                          ? "border-emerald-500"
-                          : "border-gray-300"
-                      } flex items-center justify-center`}
-                    >
-                      {selectedMethod === method && (
-                        <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
-                      )}
-                    </span>
-                    <div className="font-medium text-gray-800 flex items-center gap-2">
-                      {method}
-                    </div>
-                    <div className="text-gray-500 text-xs">
-                      {method === "Cash on Delivery"
-                        ? "Pay when you receive"
-                        : `Pay with ${method} mobile money`}
-                    </div>
-                  </button>
-                )
-              )}
+                    {selectedMethod === method && (
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                    )}
+                  </span>
+                  <div className="font-medium text-gray-800 flex items-center gap-2">
+                    {method}
+                  </div>
+                  <div className="text-gray-500 text-xs">
+                    {method === "Cash on Delivery"
+                      ? "Pay when you receive"
+                      : `Pay with ${method} mobile money`}
+                  </div>
+                </button>
+              ))}
             </div>
 
             <div className="mb-4">

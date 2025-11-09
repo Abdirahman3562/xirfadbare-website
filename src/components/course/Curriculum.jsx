@@ -8,6 +8,7 @@ import {
   FaCheckCircle,
   FaArrowRight,
   FaLock,
+  FaUserGraduate,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { getFullCourseDetails } from "../../api/courseService"; // ✅ soo saar xogta API-ga
@@ -100,24 +101,41 @@ export default function Curriculum({ courseId }) {
   return (
     <div className="bg-[#edf4f5] mt-10 p-8 rounded-2xl shadow-lg border border-gray-100">
       {/* ✅ Summary Boxes */}
-      <div className="grid sm:grid-cols-3 gap-4 mb-8 text-center">
-        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5]">
+      <div className="grid sm:grid-cols-4 gap-4 mb-8 text-center">
+
+      {/* ✅ Students Enrolled (Box Afraad) */}
+        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] transition">
+          <FaUserGraduate className="text-emerald-500 text-2xl mx-auto mb-2" />
+          <p className="text-xl font-semibold text-gray-800">
+            {course.enrolledCount || 0}
+          </p>
+          <p className="text-gray-500 text-sm">Students Enrolled</p>
+        </div>
+
+
+
+        {/* Total Duration */}
+        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] transition">
           <FaClock className="text-emerald-500 text-2xl mx-auto mb-2" />
           <p className="text-xl font-semibold text-gray-800">{totalDuration}</p>
           <p className="text-gray-500 text-sm">Total Duration</p>
         </div>
 
-        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5]">
+        {/* Video Lessons */}
+        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] transition">
           <FaPlayCircle className="text-emerald-500 text-2xl mx-auto mb-2" />
           <p className="text-xl font-semibold text-gray-800">{totalLessons}</p>
           <p className="text-gray-500 text-sm">Video Lessons</p>
         </div>
 
-        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5]">
+        {/* Skill Level */}
+        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] transition">
           <FaSignal className="text-emerald-500 text-2xl mx-auto mb-2" />
           <p className="text-xl font-semibold text-gray-800">{level}</p>
           <p className="text-gray-500 text-sm">Skill Level</p>
         </div>
+
+       
       </div>
 
       {/* ✅ Curriculum Header */}

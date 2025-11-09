@@ -230,6 +230,9 @@ export default function InstructorDetails() {
                 {instructor.instructorTitle}
               </p>
 
+                <p className="text-black bg-emerald-200 rounded-md w-[80px] pl-2">{instructor.title || "Instructor"}</p>
+
+
               {/* ✅ Rating & Followers */}
               <div className="flex flex-col md:flex-row lg:flex-row lg:items-center">
                 <div className="flex mt-2 mb-1">
@@ -297,10 +300,13 @@ export default function InstructorDetails() {
               </>
             )}
 
-            <button className="border border-emerald-500 cursor-pointer text-emerald-700 flex items-center px-5 py-2 rounded-full text-sm font-medium hover:bg-emerald-50 transition">
+            <a href={`https://wa.me/${instructor.contactPhone}`} target="_blank"
+             className="border border-emerald-500 cursor-pointer text-emerald-700 flex items-center px-5 py-2 rounded-full text-sm font-medium hover:bg-emerald-50 transition">
               <FaEnvelope className="inline mr-2 text-emerald-500" />
-              Send Message
-            </button>
+        
+                Send Message
+          
+            </a>
           </div>
         </div>
 

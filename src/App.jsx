@@ -57,9 +57,6 @@ function App() {
         <Route path="/auth/signup" element={<Signup />} />
         <Route path="/auth/forgot-password" element={<ForgotPassword />} />
         <Route path="/payment/:id" element={<PaymentPage />} />
-      
-
-
 
         {/* Protected routes for dashboard */}
         <Route element={<ProtectedRoute />}>

@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useMemo } from "react";
+import { FaUserGraduate } from "react-icons/fa6";
 
 function CourseCard({ course }) {
   const navigate = useNavigate();
@@ -116,6 +117,13 @@ function CourseCard({ course }) {
 
         {/* Lessons + Duration */}
         <div className="flex justify-between text-sm text-gray-700 mb-4">
+          <div className="flex gap-1 items-center">
+            <FaUserGraduate className="text-emerald-500 text-[13px]" />
+            <span className="text-gray-700 font-medium ml-1">
+              {course.enrolledCount}
+            </span>
+            <span className="text-gray-500 text-sm">Enrolled</span>
+          </div>
           <div className="flex items-center gap-2">
             <FaPlayCircle className="text-emerald-500" />
             <span>{totalLessons} Lessons</span>
