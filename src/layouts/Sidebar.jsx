@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import {
   BookOpen,
   LayoutDashboard,
@@ -25,13 +25,19 @@ const Sidebar = () => {
             <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
               Overview
             </p>
-            <Link
-              to="/dashboard/student"
-              className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-600 font-medium"
+            <NavLink
+                  to="/dashboard/student"
+              className={({ isActive }) =>
+                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  isActive
+                    ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                    : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                }`
+              }
             >
               <LayoutDashboard size={18} />
               Dashboard
-            </Link>
+            </NavLink>
           </div>
 
           {/* Learning */}
@@ -39,13 +45,19 @@ const Sidebar = () => {
             <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
               Learning
             </p>
-            <Link
+            <NavLink
               to="/dashboard/courses"
-              className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 transition"
+              className={({ isActive }) =>
+                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  isActive
+                    ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                    : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                }`
+              }
             >
               <BookOpen size={18} />
               My Courses
-            </Link>
+            </NavLink>
           </div>
 
           {/* Payments */}
@@ -53,13 +65,19 @@ const Sidebar = () => {
             <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
               Payments
             </p>
-            <Link
+            <NavLink
               to="/dashboard/orders"
-
-            className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 transition">
+              className={({ isActive }) =>
+                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  isActive
+                    ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                    : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                }`
+              }
+            >
               <FileText size={18} />
               Orders
-            </Link>
+            </NavLink>
           </div>
 
           {/* Account */}
@@ -67,14 +85,19 @@ const Sidebar = () => {
             <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
               Account
             </p>
-            <Link
+            <NavLink
               to="/dashboard/profile"
-              className="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-700 transition"
+              className={({ isActive }) =>
+                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  isActive
+                    ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                    : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                }`
+              }
             >
               <User size={18} />
               Profile
-            </Link>
-           
+            </NavLink>
           </div>
         </nav>
       </div>

@@ -179,7 +179,7 @@ function Nav() {
                     <img
                       src={avatar}
                       alt="User avatar"
-                      className="h-8 w-8 rounded-full object-cover border border-emerald-300"
+                      className="h-8 w-8 cursor-pointer rounded-full object-cover border border-emerald-300"
                     />
                   ) : (
                     <div className="h-8 w-8 flex items-center justify-center bg-emerald-100 rounded-full text-emerald-700 font-bold">

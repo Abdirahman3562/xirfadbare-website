@@ -1,6 +1,12 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { FaCheckCircle, FaClock, FaGraduationCap, FaUserGraduate } from "react-icons/fa";
+import toast, { Toaster } from "react-hot-toast";
+import {
+  FaCheckCircle,
+  FaClock,
+  FaGraduationCap,
+  FaUserGraduate,
+} from "react-icons/fa";
 import {
   getFullCourseDetails,
   getFullCourseDetailsBySlug,
@@ -16,10 +22,13 @@ function PaymentPage() {
   const [selectedTab, setSelectedTab] = useState("local");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
+  const navigate = useNavigate();
 
-  const websiteDiscount = 0.25; // 25% default discount
+  const websiteDiscount = 0.25;
   const totalDiscount = websiteDiscount + appliedDiscount;
-  const totalPrice = selectedPlan?.price || course?.price || 0;
+  const totalPrice = Number(
+    selectedPlan?.price || course?.price?.amount || course?.price || 0
+  );
   const finalPrice = (totalPrice * (1 - totalDiscount)).toFixed(2);
 
   // ✅ Fetch course (auto detect slug or id)
@@ -75,6 +84,109 @@ function PaymentPage() {
     }
   };
 
+  useEffect(() => {
+    const user = getLoggedInUser();
+    if (!user) {
+      toast.error("Please login to continue.");
+      navigate("/auth/login");
+    }
+  }, []);
+
+  // helper function
+  const getLoggedInUser = () => {
+    try {
+      const userData = localStorage.getItem("loggedInUser");
+      if (!userData) return null;
+      return JSON.parse(userData);
+    } catch (err) {
+      console.error("Error parsing logged-in user:", err);
+      return null;
+    }
+  };
+
+  // save paymen details
+
+  const handlePayment = async () => {
+  const user = getLoggedInUser();
+  if (!user) {
+    toast.error("Please login first to complete your order.");
+    return;
+  }
+
+  // ✅ Validation: Payment method lama xulan
+  if (!selectedMethod) {
+    toast.error("Please select a payment method.");
+    return;
+  }
+
+  // ✅ Validation: Phone lama buuxin ama waa mid khaldan
+  if (!phone.trim()) {
+    toast.error("Please enter your phone number.");
+    return;
+  }
+  if (!/^[0-9]{8,15}$/.test(phone)) {
+    toast.error("Invalid phone number format. Use 8–15 digits.");
+    return;
+  }
+
+  // 🟢 HALKAN dhig check-ka order duplicate ka hor intaadan POST dirin
+  const existingOrder = await fetch(
+    `http://localhost:4010/orders?userId=${user.id}&courseId=${course.id}`
+  );
+  const data = await existingOrder.json();
+
+  if (data.length > 0) {
+    toast.error("You already ordered this course.");
+    return;
+  }
+
+  // ✅ order data
+  const orderData = {
+  userId: user.id,
+  userName: `${user.firstName} ${user.lastName || ""}`,
+  userEmail: user.email,
+  courseTitle: course.title,
+  courseId: course.id,
+  paymentType: selectedTab === "local" ? "Local Payment" : "Online Payment",
+  paymentMethod: selectedMethod,
+  phoneNumber: phone,
+  totalToPay: Number(finalPrice),
+
+  // 🟢 Status cusub
+  status: "pending", // default marka order la sameeyo
+
+  // 🟢 Waqti la akhriyi karo
+  createdAt: new Date().toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  }),
+};
+
+
+  try {
+    const res = await fetch("http://localhost:4010/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData),
+    });
+
+    if (res.ok) {
+      toast.success("✅ Order placed successfully!");
+      setTimeout(() => navigate("/dashboard/orders"), 1500);
+    } else {
+      toast.error("❌ Failed to save order on server!");
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("Server error while saving order!");
+  }
+};
+
+
   // Calculate duration per section
   const calculateSectionDuration = (lessons) => {
     if (!lessons) return "0m";
@@ -100,6 +212,8 @@ function PaymentPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 lg:px-8 py-10 mt-20 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <Toaster position="top-right" reverseOrder={false} />
+
       {/* ===== LEFT SIDE ===== */}
       <div className="lg:col-span-1  shadow-md rounded-2xl border border-gray-100 overflow-hidden">
         <img
@@ -285,13 +399,34 @@ function PaymentPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Phone Number
               </label>
-              <input
-                type="text"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="E.g. 612345678"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400"
-              />
+              {selectedTab === "local" && (
+                <div className="mb-4">
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ""); // tirada kaliya
+                      if (value.length <= 15) setPhone(value);
+                    }}
+                    placeholder="E.g. 612345678"
+                    required={selectedTab === "local"} // ✅ required oo kaliya marka local
+                    className={`w-full border rounded-lg px-3 py-2 focus:outline-none transition ${
+                      selectedTab === "local" &&
+                      phone.length > 0 &&
+                      (phone.length < 8 || phone.length > 15)
+                        ? "border-red-500 focus:border-red-500"
+                        : "border-gray-300 focus:border-emerald-400"
+                    }`}
+                  />
+                  {selectedTab === "local" &&
+                    phone.length > 0 &&
+                    (phone.length < 8 || phone.length > 15) && (
+                      <p className="text-red-500 text-xs mt-1">
+                        Phone number must be 8–15 digits.
+                      </p>
+                    )}
+                </div>
+              )}
             </div>
           </>
         )}
@@ -352,7 +487,19 @@ function PaymentPage() {
           </div>
         </div>
 
-        <button className="mt-2 w-full bg-emerald-500 text-white font-medium py-3 rounded-lg hover:bg-emerald-600 transition">
+        <button
+          onClick={handlePayment}
+          disabled={
+            selectedTab === "local" &&
+            (!selectedMethod || phone.length < 8 || phone.length > 15)
+          }
+          className={`mt-2 w-full font-medium py-3 rounded-lg transition ${
+            selectedTab === "local" &&
+            (!selectedMethod || phone.length < 8 || phone.length > 15)
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-emerald-500 text-white hover:bg-emerald-600"
+          }`}
+        >
           Pay ${finalPrice} Now
         </button>
       </div>

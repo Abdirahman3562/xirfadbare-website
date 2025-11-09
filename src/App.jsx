@@ -61,11 +61,9 @@ function App() {
         {/* Protected routes for dashboard */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<StudentLayout />}>
-            <Route path="student" element={<Student />} />{" "}
-            {/* Student content */}
-            <Route path="courses" element={<Courses />} />{" "}
-            {/* My courses page */}
-            <Route path="orders" element={<Orders />} /> {/* My courses page */}
+            <Route path="student" element={<Student />} />
+            <Route path="courses" element={<Courses />} />
+            <Route path="orders" element={<Orders />} />
             <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
