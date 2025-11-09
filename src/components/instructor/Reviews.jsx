@@ -5,104 +5,79 @@ import {
   FaUserCircle,
   FaLock,
   FaCommentDots,
-  FaSignInAlt,
 } from "react-icons/fa";
 
+/* ----------------------------------------------------------------
+   ✅ Helper Function
+------------------------------------------------------------------ */
+const generateSlug = (name) =>
+  name.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
+
+/* ----------------------------------------------------------------
+   ✅ REVIEWS PAGE COMPONENT
+------------------------------------------------------------------ */
 export default function Reviews() {
-  const { instructorSlug } = useParams(); // URL e.g. /instructor/khadra-ahmed
+  const { instructorSlug } = useParams(); // e.g. /instructor/khadra-ahmed
   const [instructor, setInstructor] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch instructor sax ah (by slug or id)
- useEffect(() => {
-    const fetchInstructor = async () => {
-      try {
-        const instructorRes = await fetch("http://localhost:4002/instructors");
-        const instructorData = await instructorRes.json();
+  /* ✅ Load logged user from localStorage */
+  useEffect(() => {
+    const stored = localStorage.getItem("loggedInUser");
+    if (stored) setUser(JSON.parse(stored));
+  }, []);
 
-        const foundInstructor = instructorData.find(
+  /* ✅ Fetch Instructor info and reviews */
+  useEffect(() => {
+    const fetchInstructorAndReviews = async () => {
+      try {
+        // 1️⃣ Get all instructors
+        const instructorRes = await fetch("http://localhost:4002/instructors");
+        const instructors = await instructorRes.json();
+
+        // 2️⃣ Find instructor by slug
+        const found = instructors.find(
           (i) => i.name.toLowerCase().replace(/\s+/g, "-") === instructorSlug
         );
 
-        if (!foundInstructor) {
+        if (!found) {
           setInstructor(null);
           setLoading(false);
           return;
         }
 
-        setInstructor(foundInstructor);
+        setInstructor(found);
 
-        const courseRes = await fetch("http://localhost:3000/courses");
-        const courseData = await courseRes.json();
+        // 🟢 Show in console
+        console.log("Instructor Slug:", generateSlug(found.name));
 
-        const instructorCourses = courseData.filter(
-          (c) => String(c.instructorId) === String(foundInstructor.id)
+        // 3️⃣ Get reviews for this instructor
+        const reviewsRes = await fetch(
+          `http://localhost:4005/reviews?instructorId=${found.id}`
         );
-
-        // ✅ Fetch curriculum and lessons durations
-        const detailedCourses = await Promise.all(
-          instructorCourses.map(async (course) => {
-            const curriculumRes = await fetch(
-              `http://localhost:4003/curriculum?courseId=${course.id}`
-            );
-            const curriculum = await curriculumRes.json();
-
-            const lessonData = await Promise.all(
-              curriculum.map(async (c) => {
-                const lessonsRes = await fetch(
-                  `http://localhost:4004/lessons?curriculumId=${c.id}`
-                );
-                const lessons = await lessonsRes.json();
-
-                const totalDuration = lessons.reduce(
-                  (sum, l) => sum + parseDurationToSeconds(l.duration),
-                  0
-                );
-
-                return { lessonCount: lessons.length, totalDuration };
-              })
-            );
-
-            const totalLessons = lessonData.reduce(
-              (a, b) => a + b.lessonCount,
-              0
-            );
-            const totalDuration = lessonData.reduce(
-              (a, b) => a + b.totalDuration,
-              0
-            );
-
-            return { ...course, totalLessons, totalDuration };
-          })
-        );
-
-        setCourses(detailedCourses);
+        const reviewData = await reviewsRes.json();
+        setReviews(reviewData);
       } catch (err) {
-        console.error("❌ Error fetching instructor courses:", err);
+        console.error("❌ Error fetching instructor/reviews:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchInstructor();
+    fetchInstructorAndReviews();
   }, [instructorSlug]);
 
-
-  // ✅ Load user from localStorage
-  useEffect(() => {
-    const storedUser = localStorage.getItem("loggedInUser");
-    setUser(storedUser ? JSON.parse(storedUser) : null);
-  }, []);
-
-  // ✅ Add review handler
-  const handleReviewSubmit = (e) => {
+  /* ✅ Submit review handler */
+  const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    if (!user) return alert("Please sign in to write a review!");
+    if (!user) return alert("Please sign in to leave a review!");
 
     const form = e.target;
+
     const newReview = {
+      instructorId: instructor.id,
       student:
         `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
         user.name ||
@@ -117,12 +92,23 @@ export default function Reviews() {
       createdAt: new Date().toISOString(),
     };
 
-    // ✅ Ku dar review-ga instructor-ka hadda
-    setReviews((prev) => [...prev, newReview]);
-    form.reset();
+    try {
+      // 4️⃣ Save to backend (JSON-server)
+      await fetch("http://localhost:4005/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newReview),
+      });
+
+      // 5️⃣ Update UI immediately
+      setReviews((prev) => [...prev, newReview]);
+      form.reset();
+    } catch (err) {
+      console.error("❌ Error posting review:", err);
+    }
   };
 
-  // ✅ Xisaabi average rating
+  /* ✅ Calculate average rating */
   const averageRating =
     reviews.length > 0
       ? (
@@ -130,32 +116,33 @@ export default function Reviews() {
         ).toFixed(1)
       : 0;
 
+  /* ✅ Loading state */
   if (loading)
     return (
-      <p className="text-center py-8 text-green-600 font-medium">
-        Loading instructor info...
+      <p className="text-center py-10 text-green-600 font-semibold">
+        Loading reviews...
       </p>
     );
 
+  /* ✅ Instructor not found */
   if (!instructor)
     return (
       <p className="text-center text-red-500 py-10">
-        Instructor not found for: {instructorSlug}
+        Instructor not found for slug: {instructorSlug}
       </p>
     );
 
-  // ✅ UI
+  /* ✅ MAIN RENDER */
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 transition hover:shadow-xl">
-      {/* Instructor Info Header */}
+    <div className="max-w-3xl mx-auto bg-white p-6 rounded-2xl shadow-lg border border-gray-100 transition hover:shadow-xl">
+      {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-1">
           Reviews for {instructor.name}
         </h2>
         <p className="text-gray-500">{instructor.title || "Instructor"}</p>
         <p className="text-green-600 mt-2">
-          <FaStar className="inline text-yellow-400" /> Average:{" "}
-          {averageRating} / 5
+          <FaStar className="inline text-yellow-400" /> Average: {averageRating} / 5
         </p>
       </div>
 
@@ -217,6 +204,7 @@ export default function Reviews() {
             onSubmit={handleReviewSubmit}
             className="max-w-xl mx-auto bg-white border border-gray-100 rounded-2xl shadow-md p-6 space-y-5 transition hover:shadow-lg"
           >
+            {/* Name */}
             <div>
               <label className="text-sm font-semibold text-gray-700 mb-1 block">
                 Your Name
@@ -234,6 +222,7 @@ export default function Reviews() {
               />
             </div>
 
+            {/* Rating */}
             <div>
               <label className="text-sm font-semibold text-gray-700 mb-1 block">
                 Rating
@@ -252,6 +241,7 @@ export default function Reviews() {
               </select>
             </div>
 
+            {/* Comment */}
             <div>
               <label className="text-sm font-semibold text-gray-700 mb-1 block">
                 Comment
@@ -265,6 +255,7 @@ export default function Reviews() {
               />
             </div>
 
+            {/* Button */}
             <button
               type="submit"
               className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 rounded-full font-medium transition transform hover:-translate-y-0.5 shadow-md"

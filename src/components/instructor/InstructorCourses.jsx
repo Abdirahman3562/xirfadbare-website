@@ -9,6 +9,8 @@ import {
 } from "react-icons/fa";
 
 const InstructorCourses = ({ instructorSlug }) => {
+
+  
   const [courses, setCourses] = useState([]);
   const [instructor, setInstructor] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,6 +32,8 @@ const InstructorCourses = ({ instructorSlug }) => {
         }
 
         setInstructor(foundInstructor);
+        console.log("Instructor Slug:", generateSlug(foundInstructor.name));
+
 
         const courseRes = await fetch("http://localhost:3000/courses");
         const courseData = await courseRes.json();
@@ -251,6 +255,14 @@ const InstructorCourses = ({ instructorSlug }) => {
 /* ---------------------------------------------
  ✅ Helpers
 ----------------------------------------------*/
+
+
+/* ---------------------------------------------
+ ✅ Helpers
+----------------------------------------------*/
+const generateSlug = (name) =>
+  name.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
+
 const parseDurationToSeconds = (duration) => {
   if (!duration) return 0;
   if (typeof duration === "number") return duration * 60;
@@ -271,6 +283,10 @@ const parseDurationToSeconds = (duration) => {
   const numeric = parseFloat(duration.replace(/[^\d.]/g, ""));
   return isNaN(numeric) ? 0 : numeric * 60;
 };
+
+
+
+
 
 const formatSeconds = (seconds) => {
   if (!seconds || isNaN(seconds)) return "N/A";

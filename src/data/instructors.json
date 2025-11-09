@@ -22,7 +22,13 @@
         "Co-Founder & CTO 2023 - Now"
       ],
       "about": "Abdirahmaan waa macallin hore u taagan oo ku xeeldheer HTML, CSS, iyo JavaScript. Wuxuu xooga saaraa dhisidda xirfadaha aasaasiga ah ee frontend-ka si ardaydu ay si fudud u fahmaan sida web-ku u shaqeeyo.",
-      "skills": ["HTML", "CSS", "JavaScript", "React", "TailwindCSS"],
+      "skills": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "React",
+        "TailwindCSS"
+      ],
       "image": "https://randomuser.me/api/portraits/men/1.jpg",
       "reviews": [
         {
@@ -41,7 +47,9 @@
           "comment": "Waxaan rabaa in uu examples badan ku daro."
         }
       ],
-      "followersList": ["0fcb"]
+      "followersList": [
+        "0fcb"
+      ]
     },
     {
       "id": "2",
@@ -53,14 +61,23 @@
       "students": 920,
       "courses": 7,
       "followers": 200,
-      "education": ["BSc in Computer Science", "MSc in Software Engineering"],
+      "education": [
+        "BSc in Computer Science",
+        "MSc in Software Engineering"
+      ],
       "experience": [
         "Frontend Developer 2018 - 2019",
         "Backend Engineer 2020 - 2022",
         "Fullstack Lead 2023 - Now"
       ],
       "about": "Samafale waa macallin Fullstack ah oo baraya Node.js, Express, iyo React si uu ardayda uga dhigo kuwa dhisa codsiyo dhamaystiran.",
-      "skills": ["JavaScript", "React", "Node.js", "MongoDB", "Express.js"],
+      "skills": [
+        "JavaScript",
+        "React",
+        "Node.js",
+        "MongoDB",
+        "Express.js"
+      ],
       "image": "https://randomuser.me/api/portraits/men/2.jpg",
       "reviews": [
         {
@@ -79,7 +96,9 @@
           "comment": "Mararka qaar tempo-ku waa degdeg."
         }
       ],
-      "followersList": ["0fcb"]
+      "followersList": [
+        "0fcb"
+      ]
     },
     {
       "id": "3",
@@ -91,7 +110,10 @@
       "students": 610,
       "courses": 3,
       "followers": 480,
-      "education": ["Bachelor in Graphic Design", "Certificate in UX Research"],
+      "education": [
+        "Bachelor in Graphic Design",
+        "Certificate in UX Research"
+      ],
       "experience": [
         "Graphic Designer 2017 - 2019",
         "UX Researcher 2020 - 2022"
@@ -126,7 +148,8 @@
           "rating": 4,
           "comment": "Sharaxaad sahlan oo muuqaal ah."
         }
-      ]
+      ],
+      "followersList": []
     },
     {
       "id": "4",
@@ -147,7 +170,13 @@
         "Backend Developer 2021 - Now"
       ],
       "about": "Mohamed wuxuu barayaa Node.js, SQL, iyo API development si ardaydu u bartaan xagga server-ka iyo kaydinta xogta.",
-      "skills": ["Node.js", "Express", "SQL", "PostgreSQL", "API Development"],
+      "skills": [
+        "Node.js",
+        "Express",
+        "SQL",
+        "PostgreSQL",
+        "API Development"
+      ],
       "image": "https://randomuser.me/api/portraits/men/4.jpg",
       "reviews": [
         {
@@ -181,9 +210,18 @@
         "Bachelor in Computer Science",
         "Professional Python Certification"
       ],
-      "experience": ["Data Analyst 2019 - 2021", "Python Developer 2021 - Now"],
+      "experience": [
+        "Data Analyst 2019 - 2021",
+        "Python Developer 2021 - Now"
+      ],
       "about": "Ayaan waa baraya Python-ka, automation, iyo Django framework, iyadoo diiradda saarta codsiyada backend-ka iyo xogta.",
-      "skills": ["Python", "Flask", "Django", "Pandas", "APIs"],
+      "skills": [
+        "Python",
+        "Flask",
+        "Django",
+        "Pandas",
+        "APIs"
+      ],
       "image": "https://randomuser.me/api/portraits/women/5.jpg",
       "reviews": [
         {
@@ -258,10 +296,22 @@
       "students": 530,
       "courses": 4,
       "followers": 440,
-      "education": ["BSc in Statistics", "Google Data Analytics Certification"],
-      "experience": ["Business Analyst 2019 - 2021", "Data Analyst 2021 - Now"],
+      "education": [
+        "BSc in Statistics",
+        "Google Data Analytics Certification"
+      ],
+      "experience": [
+        "Business Analyst 2019 - 2021",
+        "Data Analyst 2021 - Now"
+      ],
       "about": "Hodan waxay baraysaa Excel, Power BI, iyo Python si loo fahmo xogta iyo go’aan qaadashada xog ku saleysan.",
-      "skills": ["Excel", "SQL", "Power BI", "Python", "Data Visualization"],
+      "skills": [
+        "Excel",
+        "SQL",
+        "Power BI",
+        "Python",
+        "Data Visualization"
+      ],
       "image": "https://randomuser.me/api/portraits/women/7.jpg",
       "reviews": [
         {
@@ -300,7 +350,13 @@
         "Flutter Developer 2021 - Now"
       ],
       "about": "Ali wuxuu diiradda saarayaa dhisidda barnaamijyo casri ah oo mobile ah isagoo isticmaalaya Flutter iyo React Native.",
-      "skills": ["Flutter", "React Native", "Dart", "Firebase", "UI Design"],
+      "skills": [
+        "Flutter",
+        "React Native",
+        "Dart",
+        "Firebase",
+        "UI Design"
+      ],
       "image": "https://randomuser.me/api/portraits/men/8.jpg",
       "reviews": [
         {
@@ -339,7 +395,13 @@
         "DevOps Engineer 2021 - Now"
       ],
       "about": "Fatima waxay baraysaa CI/CD pipelines, Docker, iyo AWS si ardaydu u bartaan sida loo maamulo software-ka casriga ah.",
-      "skills": ["AWS", "Docker", "Kubernetes", "CI/CD", "Linux"],
+      "skills": [
+        "AWS",
+        "Docker",
+        "Kubernetes",
+        "CI/CD",
+        "Linux"
+      ],
       "image": "https://randomuser.me/api/portraits/women/9.jpg",
       "reviews": [
         {
@@ -373,7 +435,9 @@
         "BSc in Artificial Intelligence",
         "MSc in Machine Learning"
       ],
-      "experience": ["ML Engineer 2020 - Now"],
+      "experience": [
+        "ML Engineer 2020 - Now"
+      ],
       "about": "Omar waa injineer AI ah oo diiradda saaraya barashada mashiinka, TensorFlow, iyo codsiyada caqliga macmalka ah.",
       "skills": [
         "Python",
@@ -400,7 +464,9 @@
           "comment": "Instructor AI ah oo aad u xiiso badan!"
         }
       ],
-      "followersList": ["0fcb"]
+      "followersList": [
+        "0fcb"
+      ]
     }
   ]
 }

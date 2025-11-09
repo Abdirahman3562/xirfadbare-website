@@ -25,6 +25,7 @@ import BlogPage from "./pages/webpages/Blog/BlogPage";
 import SinglePostPage from "./pages/webpages/Blog/SinglePostPage";
 import AuthorPage from "./pages/webpages/Author/AuthorPage";
 import InstructorDetails from "./pages/webpages/instructor/InstructorDetails";
+import Reviews from "./components/instructor/Reviews";
 
 function App() {
   const location = useLocation();
@@ -56,6 +57,9 @@ function App() {
         <Route path="/auth/signup" element={<Signup />} />
         <Route path="/auth/forgot-password" element={<ForgotPassword />} />
         <Route path="/payment/:id" element={<PaymentPage />} />
+      
+
+
 
         {/* Protected routes for dashboard */}
         <Route element={<ProtectedRoute />}>
