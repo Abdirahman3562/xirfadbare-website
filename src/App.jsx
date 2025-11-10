@@ -35,7 +35,7 @@ function App() {
 
   const hideFooter =
     location.pathname.startsWith("/dashboard") ||
-    location.pathname === "/auth/signup"|| location.pathname.startsWith("/watch");
+    location.pathname === "/auth/signup"|| location.pathname === "/auth/login"|| location.pathname.startsWith("/watch");
 
   const hideNav = location.pathname.startsWith("/auth");
 
@@ -79,9 +79,9 @@ function App() {
       {/* WhatsApp bubble: visible on all pages */}{" "}
      
       <WhatsAppBubble
-        phone="+252612345678"
+        phone="+252619537487"
         greeting="Assalamu Alaikum! 👋 Waxaan xiiseynayaa barnaamijka."
-        title="Dugsiye Support"
+        title="Xirfadbare Support"
         subtitle="Typically replies instantly"
       />
       {/* Footer only visible if it's not a dashboard route */}

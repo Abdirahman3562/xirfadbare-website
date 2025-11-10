@@ -7,7 +7,7 @@ export default function WhatsAppBubbleFixedRight() {
   const waLink = `https://wa.me/${phone.replace(/\D/g, "")}?text=${encodeURIComponent(greeting)}`;
 
   return (
-    <div className="fixed right-5 bottom-5 z-[9999] flex flex-col items-end">
+    <div className="fixed right-5 bottom-5 z-[9999]  flex flex-col items-end">
       {/* ✅ Chat Box */}
       {open && (
         <div className="mb-3 w-[320px] rounded-2xl shadow-xl bg-white border border-gray-200 animate-in fade-in zoom-in duration-200">
@@ -44,13 +44,13 @@ export default function WhatsAppBubbleFixedRight() {
 
       {/* ✅ WhatsApp Floating Button with Pulse */}
       <div className="relative">
-        {/* Pulse effect */}
-        <span className="absolute inset-0 rounded-full bg-emerald-400 opacity-50 animate-ping"></span>
-
+   {/* Pulse effect added here */}
+        <span className="absolute inset-0 rounded-full bg-emerald-400 opacity-90 animate-ping"></span>
+        <span className="absolute inset-0 rounded-full bg-emerald-400 opacity-80  w-3 h-3 z-10 left-8 top-[-3px]  "></span>
         {/* Main button */}
         <button
           onClick={() => setOpen((v) => !v)}
-          className="relative h-20 w-20 cursor-pointer rounded-full shadow-2xl grid place-items-center bg-emerald-500 hover:bg-emerald-600 transition"
+          className="relative h-12 w-12 cursor-pointer rounded-full shadow-2xl grid place-items-center bg-emerald-500 hover:bg-emerald-600 transition"
           aria-label="WhatsApp chat"
         >
           <svg
