@@ -1,156 +1,231 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, PlayCircle, ArrowRight, Menu, X } from "lucide-react";
-import { FaBookOpen, FaChevronDown, FaChevronUp, FaLock } from "react-icons/fa";
+import {
+  ArrowLeft,
+  PlayCircle,
+  ArrowRight,
+  Menu,
+  X,
+  CheckCircle,
+  Users,
+  MessageCircle,
+} from "lucide-react";
+import { FaBookOpen, FaChevronDown, FaChevronUp } from "react-icons/fa";
+
+
 
 const CourseDashboard = () => {
-  const { id } = useParams();
+  const { courseSlug, lessonSlug } = useParams();
   const navigate = useNavigate();
 
+  // Data
   const [course, setCourse] = useState(null);
-  const [curriculum, setCurriculum] = useState([]);
-  const [lessons, setLessons] = useState([]);
+  const [curriculum, setCurriculum] = useState([]); // sections with lessons[]
+  const [lessons, setLessons] = useState([]); // all lessons (flat)
+
+  // UI / state
   const [currentLesson, setCurrentLesson] = useState(null);
-  const [completedLessons, setCompletedLessons] = useState([]); // ✅ array
+  const [completedLessons, setCompletedLessons] = useState([]); // [lessonId]
   const [loading, setLoading] = useState(true);
-  const [openSections, setOpenSections] = useState({});
-  const [showLessons, setShowLessons] = useState(false);
+  const [openSections, setOpenSections] = useState({}); // { [index]: bool }
+  const [showLessons, setShowLessons] = useState(false); // mobile
   const [showAlert, setShowAlert] = useState(false);
 
-  // ✅ Fetch course + restore local progress
-  useEffect(() => {
-    const fetchCourseData = async () => {
-      try {
-        setLoading(true);
-
-        const resCourse = await fetch(`http://localhost:3000/courses?id=${id}`);
-        const dataCourse = await resCourse.json();
-        const courseInfo = dataCourse[0];
-
-        const resCurriculum = await fetch(
-          `http://localhost:4003/curriculum?courseId=${id}`
-        );
-        const dataCurriculum = await resCurriculum.json();
-
-        const resLessons = await fetch("http://localhost:4004/lessons");
-        const allLessons = await resLessons.json();
-
-        const grouped = dataCurriculum.map((section) => {
-          const sectionLessons = allLessons.filter(
-            (lesson) => String(lesson.curriculumId) === String(section.id)
-          );
-          return { ...section, lessons: sectionLessons };
-        });
-
-        setCourse(courseInfo);
-        setCurriculum(grouped);
-        setLessons(allLessons);
-
-        // ✅ Restore local storage progress
-        const saved = JSON.parse(localStorage.getItem(`progress_${id}`));
-        if (saved) {
-          setCompletedLessons(saved.completedLessons || []);
-          const lesson = allLessons.find((l) => l.id === saved.currentLesson);
-          setCurrentLesson(lesson || grouped[0]?.lessons[0]);
-        } else if (grouped[0]?.lessons?.length > 0) {
-          setCurrentLesson(grouped[0].lessons[0]);
-        }
-      } catch (err) {
-        console.error("❌ Error loading course data:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourseData();
-  }, [id]);
-
-  // ✅ Save progress locally
-  useEffect(() => {
-    if (currentLesson) {
-      localStorage.setItem(
-        `progress_${id}`,
-        JSON.stringify({
-          completedLessons,
-          currentLesson: currentLesson.id,
-        })
-      );
-    }
-  }, [completedLessons, currentLesson, id]);
-
-  // ✅ Progress calculation
-  const totalLessonsCount = curriculum.reduce(
-    (sum, section) => sum + section.lessons.length,
-    0
+  // Helpers
+  const allLessonIds = useMemo(
+    () => curriculum.flatMap((s) => s.lessons.map((l) => l.id)),
+    [curriculum]
   );
+
+  const totalLessonsCount = useMemo(
+    () => curriculum.reduce((sum, s) => sum + s.lessons.length, 0),
+    [curriculum]
+  );
+
   const completedLessonsCount = completedLessons.length;
+
   const progress =
     totalLessonsCount > 0
       ? Math.round((completedLessonsCount / totalLessonsCount) * 100)
       : 0;
 
+  // Helper function (ku dar meel sare, ka hor useEffect)
+  const slugify = (text) =>
+    text
+      ?.toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]+/g, "");
+
+
+
+  // -----------------------------
+  // Fetch course + curriculum + lessons
+  // -----------------------------
+ // 🚨 function fetchCourseData meel sare dhig
+const fetchCourseData = async () => {
+  try {
+    setLoading(true);
+
+    const resCourse = await fetch(`http://localhost:3000/courses`);
+    const allCourses = await resCourse.json();
+
+    const courseInfo =
+      allCourses.find((c) => slugify(c.title) === courseSlug) || null;
+    if (!courseInfo) {
+      navigate("/dashboard/student", { replace: true });
+      return;
+    }
+
+    // ✅ Hubi in order uu active yahay
+    const resOrders = await fetch("http://localhost:4010/orders");
+    const orders = await resOrders.json();
+
+    const user =
+      JSON.parse(localStorage.getItem("loggedInUser")) ||
+      JSON.parse(localStorage.getItem("user"));
+    const userId = user?.id || user?._id || user?.uid;
+
+    const hasAccess = orders.some(
+      (o) =>
+        String(o.userId) === String(userId) &&
+        String(o.courseId) === String(courseInfo.id) &&
+        o.status === "active"
+    );
+
+    if (!hasAccess) {
+      navigate("/dashboard/student", { replace: true });
+      return;
+    }
+
+    // ✅ Fetch curriculum
+    const resCurriculum = await fetch(
+      `http://localhost:4003/curriculum?courseId=${courseInfo.id}`
+    );
+    const dataCurriculum = await resCurriculum.json();
+
+    // ✅ Fetch lessons
+    const resLessons = await fetch("http://localhost:4004/lessons");
+    const allLessonsRaw = await resLessons.json();
+    const allLessons = allLessonsRaw.map((l) => ({
+      ...l,
+      slug: l.slug || slugify(l.title),
+    }));
+
+    // ✅ Group lessons
+    const grouped = dataCurriculum.map((section) => {
+      const sectionLessons = allLessons.filter(
+        (lesson) => String(lesson.curriculumId) === String(section.id)
+      );
+      return { ...section, lessons: sectionLessons };
+    });
+
+    setCourse(courseInfo);
+    setCurriculum(grouped);
+    setLessons(allLessons);
+
+    // ✅ Progress
+    const saved = JSON.parse(localStorage.getItem(`progress_${courseSlug}`));
+    const savedCompleted = saved?.completedLessons ?? [];
+    const savedCurrentId = saved?.currentLesson;
+    setCompletedLessons(savedCompleted);
+
+    // ✅ Initial lesson
+    let initial =
+      allLessons.find((l) => slugify(l.title) === lessonSlug) ||
+      allLessons.find((l) => l.id === savedCurrentId) ||
+      grouped?.[0]?.lessons?.[0] ||
+      null;
+
+    setCurrentLesson(initial);
+    if (!lessonSlug && initial) {
+      navigate(
+        `/watch/courses/${courseSlug}/lessons/${slugify(initial.title)}`,
+        { replace: true }
+      );
+    }
+  } catch (err) {
+    console.error("❌ Error fetching course data:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+  useEffect(() => {
+  const user =
+    JSON.parse(localStorage.getItem("loggedInUser")) ||
+    JSON.parse(localStorage.getItem("user"));
+
+  if (!user) {
+    navigate("/auth/login", { replace: true });
+    return;
+  }
+
+  fetchCourseData();
+}, [courseSlug, lessonSlug, navigate]);
+
+
+// -----------------------------
+// Persist progress for this course
+// -----------------------------
+useEffect(() => {
+  if (!currentLesson) return;
+
+  const now = new Date().toISOString();
+
+  const savedData = {
+  completedLessons,
+  currentLesson: currentLesson.id,
+  lastAccess: {
+    lessonId: currentLesson.id,
+    lessonTitle: currentLesson.title,
+  },
+};
+
+  localStorage.setItem(`progress_${courseSlug}`, JSON.stringify(savedData));
+}, [completedLessons, currentLesson, courseSlug]);
+
+
+  // -----------------------------
+  // Auto open active lesson's section (and close others)
+  // -----------------------------
+  useEffect(() => {
+    if (!currentLesson || !curriculum.length) return;
+
+    const sectionIndex = curriculum.findIndex((section) =>
+      section.lessons.some((lesson) => lesson.id === currentLesson.id)
+    );
+
+    if (sectionIndex !== -1) {
+      setOpenSections(() => {
+        const next = {};
+        for (let i = 0; i < curriculum.length; i++)
+          next[i] = i === sectionIndex;
+        return next;
+      });
+    }
+  }, [currentLesson, curriculum]);
+
+  // -----------------------------
+  // UI helpers
+  // -----------------------------
   const toggleSection = (index) =>
     setOpenSections((prev) => ({ ...prev, [index]: !prev[index] }));
 
-  const calcSectionDuration = (lessons) => {
-    const totalMinutes = lessons.reduce((sum, lesson) => {
+  const calcSectionDuration = (ls) => {
+    const totalMinutes = ls.reduce((sum, lesson) => {
       const duration = lesson.duration?.split(":") || ["0", "0"];
       const minutes = parseInt(duration[0]) || 0;
       return sum + minutes;
     }, 0);
-    return `${lessons.length} lessons • ${totalMinutes} min`;
+    return `${ls.length} lessons • ${totalMinutes} min`;
   };
 
-  if (loading)
-    return (
-      <div className="flex items-center justify-center h-screen text-gray-600">
-        Loading course content...
-      </div>
-    );
-
-  if (!course)
-    return (
-      <div className="flex items-center justify-center h-screen text-red-500">
-        Course not found!
-      </div>
-    );
-
-  const isPaid = course.status === "locked";
-
-  // ✅ Mark as Completed
-  const handleMarkAsCompleted = () => {
-    if (!currentLesson) return;
-
-    // ha dhameyn haddii uu horey u dhammaaday
-    if (completedLessons.includes(currentLesson.id)) return;
-
-    const updated = [...completedLessons, currentLesson.id];
-    setCompletedLessons(updated);
-    setShowAlert(true);
-    setTimeout(() => setShowAlert(false), 2000);
-
-    // ✅ Next lesson
-    const allLessonIds = curriculum.flatMap((s) => s.lessons.map((l) => l.id));
-    const currentIndex = allLessonIds.indexOf(currentLesson.id);
-    const nextLessonId = allLessonIds[currentIndex + 1];
-    if (nextLessonId) {
-      const nextLesson = lessons.find((l) => l.id === nextLessonId);
-      setCurrentLesson(nextLesson);
-    }
-
-    // ✅ Optional backend update
-    fetch(`http://localhost:3000/courses/${course.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ completedLessons: updated }),
-    });
-  };
-
-  // helper function
   const formatVideoUrl = (url) => {
-    if (!url) return "https://www.youtube.com/embed/dQw4w9WgXcQ"; // default
+    if (!url) return "https://www.youtube.com/embed/dQw4w9WgXcQ";
     if (url.includes("youtu.be/")) {
-      // short link
       const videoId = url.split("youtu.be/")[1].split("?")[0];
       return `https://www.youtube.com/embed/${videoId}`;
     }
@@ -158,19 +233,124 @@ const CourseDashboard = () => {
       const videoId = url.split("watch?v=")[1].split("&")[0];
       return `https://www.youtube.com/embed/${videoId}`;
     }
-    if (url.includes("embed/")) {
-      // already embed format
-      return url;
-    }
-    return url; // fallback
+    if (url.includes("embed/")) return url;
+    return url;
   };
+
+  // -----------------------------
+  // Navigation (prev/next)
+  // -----------------------------
+  const goToLesson = (lesson) => {
+    if (!lesson) return;
+    setCurrentLesson(lesson);
+    const lessonSlug = lesson.slug ? lesson.slug : slugify(lesson.title);
+    navigate(`/watch/courses/${courseSlug}/lessons/${lessonSlug}`);
+  };
+
+  const goPrev = () => {
+    if (!currentLesson) return;
+    const idx = allLessonIds.indexOf(currentLesson.id);
+    const prevId = allLessonIds[idx - 1];
+    const prev = lessons.find((l) => l.id === prevId) || null;
+    if (prev) goToLesson(prev);
+  };
+
+  const goNext = () => {
+    if (!currentLesson) return;
+    const idx = allLessonIds.indexOf(currentLesson.id);
+    const nextId = allLessonIds[idx + 1];
+    const next = lessons.find((l) => l.id === nextId) || null;
+    if (next) goToLesson(next);
+  };
+
+  // 🟢 Next button: Move to next lesson only (no completion)
+  const goNextLessonOnly = () => {
+    if (!currentLesson) return;
+    const idx = allLessonIds.indexOf(currentLesson.id);
+    const nextId = allLessonIds[idx + 1];
+    const nextLesson = lessons.find((l) => l.id === nextId);
+    if (nextLesson) {
+      goToLesson(nextLesson);
+    }
+  };
+
+  // -----------------------------
+  // Mark as Completed (and auto-next)
+  // -----------------------------
+  const handleMarkAsCompleted = async () => {
+    if (!currentLesson) return;
+
+    // already done? just move to next lesson
+    if (completedLessons.includes(currentLesson.id)) {
+      goNext();
+      return;
+    }
+
+    const updated = [...completedLessons, currentLesson.id];
+    setCompletedLessons(updated);
+
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 1400);
+
+    // auto go next if exists
+    const idx = allLessonIds.indexOf(currentLesson.id);
+    const nextId = allLessonIds[idx + 1];
+    if (nextId) {
+      const nextLesson = lessons.find((l) => l.id === nextId);
+      if (nextLesson) goToLesson(nextLesson);
+    }
+
+    // optional backend sync
+    try {
+      if (course?.id) {
+        await fetch(`http://localhost:3000/courses/${course.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ completedLessons: updated }),
+        });
+      }
+    } catch {
+      // ignore (local progress still ok)
+    }
+  };
+
+  useEffect(() => {
+    if (!lessonSlug || !lessons.length) return;
+
+    const nextLesson =
+      lessons.find((l) => slugify(l.title) === lessonSlug) || null;
+
+    if (nextLesson) {
+      setCurrentLesson(nextLesson);
+    }
+  }, [lessonSlug, lessons]);
+  // -----------------------------
+  // Loading / not found
+  // -----------------------------
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-gray-600">
+        Loading course content...
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className="flex items-center justify-center h-screen text-red-500">
+        Course not found!
+      </div>
+    );
+  }
+
+  const isPaid = course.status === "locked"; // if you need to lock future lessons
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex flex-col relative">
-      {/* ✅ Alert */}
+      {/* Alert */}
       {showAlert && (
         <div className="fixed top-20 right-5 bg-emerald-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
-          ✅ Lesson marked as completed!
+          Lesson marked as completed!
         </div>
       )}
 
@@ -186,13 +366,29 @@ const CourseDashboard = () => {
           </button>
         </div>
 
+        
+
         <div className="flex items-center gap-3">
           <button
             onClick={handleMarkAsCompleted}
-            className="hidden sm:block bg-emerald-500 text-white px-3 py-1.5 rounded-md hover:bg-emerald-600 text-xs sm:text-sm"
+            disabled={completedLessons.includes(currentLesson?.id)}
+            className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-medium transition
+              ${
+                completedLessons.includes(currentLesson?.id)
+                  ? "bg-emerald-200 text-emerald-900 cursor-not-allowed"
+                  : "bg-emerald-500 hover:bg-emerald-600 text-white"
+              }`}
           >
-            Mark as Completed
+            {completedLessons.includes(currentLesson?.id) ? (
+              <>
+                <CheckCircle className="w-5 h-5 text-emerald-900" />
+                Completed
+              </>
+            ) : (
+              "Mark as Completed"
+            )}
           </button>
+
           <button
             onClick={() => setShowLessons(true)}
             className="block lg:hidden text-gray-700 hover:text-emerald-600"
@@ -206,9 +402,11 @@ const CourseDashboard = () => {
       <main className="flex flex-1 pt-[72px] mt-12 bg-[#edf4f5]">
         {/* SIDEBAR */}
         <aside
-          className="hidden lg:block scrollbar-hide w-[500px] border-r border-[#d6dedf] bg-[#edf4f5] 
-             p-5 sticky top-[90px] self-start max-h-[calc(100vh-100px)] overflow-y-auto scrollbar-thin scrollbar-thumb-emerald-400 scrollbar-track-gray-100"
+          className="hidden lg:block scrollbar-hide w-[500px] border-r border-[#d6dedf] bg-[#edf4f5]
+           p-5 sticky top-[90px] self-start max-h-[calc(100vh-100px)] overflow-y-auto
+           scrollbar-thin scrollbar-thumb-emerald-400 scrollbar-track-gray-100"
         >
+          {/* Progress card */}
           <div className="bg-[#edf4f5] mt-2 shadow-sm rounded-xl p-7 mb-6 border border-gray-100">
             <h1 className="text-lg sm:text-xl font-semibold text-[#0f172a] mb-1">
               {course.title}
@@ -227,7 +425,7 @@ const CourseDashboard = () => {
               <div
                 className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
-              ></div>
+              />
             </div>
             <p className="text-xs text-gray-500">
               {completedLessonsCount} of {totalLessonsCount} lessons completed
@@ -240,7 +438,7 @@ const CourseDashboard = () => {
               const sectionDuration = calcSectionDuration(section.lessons);
               return (
                 <div
-                  key={index}
+                  key={section.id ?? index}
                   className="group border border-gray-200 rounded-xl hover:border-emerald-400 hover:bg-emerald-50/40 transition"
                 >
                   <button
@@ -273,33 +471,38 @@ const CourseDashboard = () => {
                         const isCompleted = completedLessons.includes(
                           lesson.id
                         );
+                        const isActive = currentLesson?.id === lesson.id;
                         return (
                           <div
                             key={lesson.id}
-                            onClick={() => !isPaid && setCurrentLesson(lesson)}
-                            className={`flex justify-between items-center border rounded-lg p-2 transition duration-300 
+                            onClick={() => goToLesson(lesson)}
+                            className={`flex justify-between items-center border rounded-lg p-2 transition duration-300 cursor-pointer
                               ${
-                                isCompleted
+                                isActive
+                                  ? "bg-emerald-100 border-emerald-500"
+                                  : isCompleted
                                   ? "bg-emerald-50 border-emerald-300"
                                   : "border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/50"
-                              } ${
-                              isPaid
-                                ? "cursor-not-allowed opacity-80"
-                                : "cursor-pointer"
-                            }`}
+                              }`}
                           >
                             <div className="flex items-center gap-2 text-gray-700 text-sm">
-                              {isCompleted ? (
+                              {isActive ? (
+                                <span className="text-emerald-600 font-bold">
+                                  ▶
+                                </span>
+                              ) : isCompleted ? (
                                 <span className="text-emerald-500 font-bold">
                                   ✔
                                 </span>
                               ) : (
-                                <PlayCircle className="text-emerald-500 text-xs" />
+                                <PlayCircle className="text-emerald-500 w-4 h-4" />
                               )}
                               <span
                                 className={
                                   isCompleted
                                     ? "line-through text-gray-400"
+                                    : isActive
+                                    ? "font-semibold text-emerald-700"
                                     : ""
                                 }
                               >
@@ -328,34 +531,58 @@ const CourseDashboard = () => {
               src={formatVideoUrl(currentLesson?.videoUrl)}
               title="Lesson Player"
               allowFullScreen
-            ></iframe>
+            />
+            {/* Lesson title below the video */}
+            <div className="p-4 border-t border-gray-100 bg-[#edf4f5]">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+                {currentLesson?.title || "Select a lesson to start learning"}
+              </h2>
+            </div>
           </div>
 
-          <div className="flex justify-between items-center mb-20">
+          <div className="flex justify-between items-center mb-10">
             <button
               disabled={!currentLesson}
-              onClick={() => {
-                const allIds = curriculum.flatMap((s) =>
-                  s.lessons.map((l) => l.id)
-                );
-                const currentIndex = allIds.indexOf(currentLesson.id);
-                const prevLesson =
-                  lessons.find((l) => l.id === allIds[currentIndex - 1]) ||
-                  null;
-                if (prevLesson) setCurrentLesson(prevLesson);
-              }}
-              className="flex items-center px-5 py-2 rounded-md text-sm font-medium bg-gray-200 hover:bg-gray-300"
+              onClick={goPrev}
+              className="flex items-center px-5 py-2 rounded-md text-sm font-medium bg-gray-200 hover:bg-gray-300 disabled:opacity-60"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Previous
             </button>
 
             <button
-              onClick={handleMarkAsCompleted}
+              onClick={goNextLessonOnly}
               className="flex items-center px-5 py-2 rounded-md text-sm font-medium bg-emerald-500 hover:bg-emerald-600 text-white"
             >
               Next <ArrowRight className="w-4 h-4 ml-2" />
             </button>
           </div>
+
+          {/* Course Community Section */}
+          {course?.communityLink && (
+            <div className="bg-[#edf4f5] border border-gray-200 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Users className="w-5 h-5 text-emerald-600" />
+                <h3 className="font-semibold text-gray-800 text-base">
+                  Course Community
+                </h3>
+              </div>
+              <p className="text-gray-600 text-sm mb-3">Join our community</p>
+
+              <a
+                href={course.communityLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-emerald-50 text-emerald-700 font-medium px-4 py-3 rounded-lg hover:bg-emerald-100 transition"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Join WhatsApp Group
+              </a>
+
+              <p className="text-xs text-gray-500 mt-2">
+                Connect with other students and get help from instructors.
+              </p>
+            </div>
+          )}
         </section>
       </main>
 
@@ -371,38 +598,38 @@ const CourseDashboard = () => {
               </button>
             </div>
 
-             <div className="bg-[#edf4f5] mt-2 shadow-sm rounded-xl p-7 mb-6 border border-gray-100">
-            <h1 className="text-lg sm:text-xl font-semibold text-[#0f172a] mb-1">
-              {course.title}
-            </h1>
-            <div className="flex items-center text-sm text-gray-600 mb-3">
-              <span className="flex items-center gap-1">
-                <FaBookOpen className="text-emerald-500 w-4 h-4" />
-                {totalLessonsCount} Lessons
-              </span>
-              <span className="mx-2 text-gray-300">|</span>
-              <span className="font-medium text-emerald-600">
-                {progress}% Complete
-              </span>
+            <div className="bg-[#edf4f5] mt-2 shadow-sm rounded-xl p-7 mb-6 border border-gray-100">
+              <h1 className="text-lg sm:text-xl font-semibold text-[#0f172a] mb-1">
+                {course.title}
+              </h1>
+              <div className="flex items-center text-sm text-gray-600 mb-3">
+                <span className="flex items-center gap-1">
+                  <FaBookOpen className="text-emerald-500 w-4 h-4" />
+                  {totalLessonsCount} Lessons
+                </span>
+                <span className="mx-2 text-gray-300">|</span>
+                <span className="font-medium text-emerald-600">
+                  {progress}% Complete
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mb-2 overflow-hidden">
+                <div
+                  className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-xs text-gray-500">
+                {completedLessonsCount} of {totalLessonsCount} lessons completed
+              </p>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-2 overflow-hidden">
-              <div
-                className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-            <p className="text-xs text-gray-500">
-              {completedLessonsCount} of {totalLessonsCount} lessons completed
-            </p>
-          </div>
 
-            {/* 👉 Copy same accordion as desktop sidebar */}
+            {/* Same accordion as desktop */}
             <div className="space-y-4">
               {curriculum.map((section, index) => {
                 const sectionDuration = calcSectionDuration(section.lessons);
                 return (
                   <div
-                    key={index}
+                    key={section.id ?? index}
                     className="group border border-gray-200 rounded-xl hover:border-emerald-400 hover:bg-emerald-50/40 transition"
                   >
                     <button
@@ -435,31 +662,48 @@ const CourseDashboard = () => {
                           const isCompleted = completedLessons.includes(
                             lesson.id
                           );
+                          const isActive = currentLesson?.id === lesson.id;
                           return (
                             <div
                               key={lesson.id}
                               onClick={() => {
                                 setCurrentLesson(lesson);
-                                setShowLessons(false); // close after selecting
+                                const lessonSlug = lesson.slug
+                                  ? lesson.slug
+                                  : slugify(lesson.title);
+                                navigate(
+                                  `/watch/courses/${courseSlug}/lessons/${lessonSlug}`
+                                );
+
+                                setShowLessons(false);
                               }}
-                              className={`flex justify-between items-center border rounded-lg p-2 transition duration-300 ${
-                                isCompleted
-                                  ? "bg-emerald-50 border-emerald-300"
-                                  : "border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/50"
-                              } cursor-pointer`}
+                              className={`flex justify-between items-center border rounded-lg p-2 transition duration-300 cursor-pointer
+                                ${
+                                  isActive
+                                    ? "bg-emerald-100 border-emerald-500"
+                                    : isCompleted
+                                    ? "bg-emerald-50 border-emerald-300"
+                                    : "border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/50"
+                                }`}
                             >
                               <div className="flex items-center gap-2 text-gray-700 text-sm">
-                                {isCompleted ? (
+                                {isActive ? (
+                                  <span className="text-emerald-600 font-bold">
+                                    ▶
+                                  </span>
+                                ) : isCompleted ? (
                                   <span className="text-emerald-500 font-bold">
                                     ✔
                                   </span>
                                 ) : (
-                                  <PlayCircle className="text-emerald-500 text-xs" />
+                                  <PlayCircle className="text-emerald-500 w-4 h-4" />
                                 )}
                                 <span
                                   className={
                                     isCompleted
                                       ? "line-through text-gray-400"
+                                      : isActive
+                                      ? "font-semibold text-emerald-700"
                                       : ""
                                   }
                                 >
@@ -484,11 +728,13 @@ const CourseDashboard = () => {
           <div
             onClick={() => setShowLessons(false)}
             className="flex-1 bg-transparent"
-          ></div>
+          />
         </div>
       )}
     </div>
   );
 };
+
+
 
 export default CourseDashboard;

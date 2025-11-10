@@ -17,24 +17,43 @@ export default function Profile() {
   });
 
   // Fetch user data on page load
-  useEffect(() => {
-    fetch("http://localhost:5000/users")
-      .then((res) => res.json())
-      .then((data) => {
-        const currentUser = data[0];
+ useEffect(() => {
+  const loggedUser =
+    JSON.parse(localStorage.getItem("loggedInUser")) ||
+    JSON.parse(localStorage.getItem("user"));
+
+  if (!loggedUser) {
+    console.warn("⚠️ No logged-in user found!");
+    return;
+  }
+
+  // Fetch users and find the correct one by ID or email
+  fetch("http://localhost:5000/users")
+    .then((res) => res.json())
+    .then((data) => {
+      const currentUser = data.find(
+        (u) =>
+          String(u.id) === String(loggedUser.id) ||
+          u.email === loggedUser.email
+      );
+
+      if (currentUser) {
         setUser(currentUser);
         setFormData({ ...currentUser });
 
-        // Check if the image is saved in localStorage
         const storedImage = localStorage.getItem("profileImage");
         if (storedImage) {
-          setImage(storedImage); // Set image from localStorage
+          setImage(storedImage);
         } else if (currentUser?.image) {
-          setImage(currentUser.image); // Use default image from backend if available
+          setImage(currentUser.image);
         }
-      })
-      .catch((err) => console.error("Error fetching user:", err));
-  }, []);
+      } else {
+        console.warn("⚠️ Logged-in user not found in database!");
+      }
+    })
+    .catch((err) => console.error("Error fetching user:", err));
+}, []);
+
 
   // Handle image change (for user profile picture)
   const handleImageChange = (e) => {

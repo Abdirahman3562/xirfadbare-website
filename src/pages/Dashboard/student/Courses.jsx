@@ -15,6 +15,13 @@ import { Link } from "react-router-dom";
 export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  // ✅ Helper function: samee slug si aad ugu keydiso/akhri karto localStorage
+  const slugify = (text) =>
+    text
+      ?.toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]+/g, "");
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -67,6 +74,21 @@ export default function Courses() {
                 curriculumIds.map(String).includes(String(lesson.curriculumId))
               );
 
+              // ✅ Read local progress if exists
+              const courseSlug = slugify(course?.title || "");
+              const localProgress = JSON.parse(
+                localStorage.getItem(`progress_${courseSlug}`)
+              );
+
+              // ✅ Extract progress + lastAccess
+              const completedLessons = localProgress?.completedLessons || [];
+              const totalLessons = lessons.length || 0;
+              const progress =
+                totalLessons > 0
+                  ? Math.round((completedLessons.length / totalLessons) * 100)
+                  : 0;
+              const lastAccess = localProgress?.lastAccess || null;
+
               return {
                 ...order,
                 title: course?.title || order.courseTitle,
@@ -76,8 +98,9 @@ export default function Courses() {
                 image:
                   course?.thumbnail ||
                   "https://i.ibb.co/Yk2JmWv/default-course.jpg",
-                lessonsCount: lessons.length || 0,
-                progress: Number(order.progress) || 0,
+                lessonsCount: totalLessons,
+                progress, // ✅ sax, wuxuu ka imaanayaa localStorage
+                lastAccess, // ✅ waqtigii ugu dambeeyay ee uu user-ku furay
               };
             } catch {
               return {
@@ -104,15 +127,40 @@ export default function Courses() {
   }, []);
 
   // 📊 Stats
-  const activeCourses = courses.filter((c) => c.status === "active").length;
+  const activeCourses = courses.filter((c) => Number(c.progress) < 100).length;
   const completedCourses = courses.filter(
-    (c) => c.status === "completed"
+    (c) => Number(c.progress) >= 100
   ).length;
+
+  // ✅ Celceliska horumarka guud
   const avgProgress = courses.length
-    ? Math.round(
-        courses.reduce((sum, c) => sum + (c.progress || 0), 0) / courses.length
+    ? Math.min(
+        Math.round(
+          courses.reduce((sum, c) => sum + (c.progress || 0), 0) /
+            courses.length
+        ),
+        100
       )
     : 0;
+
+  // 🎯 User Level Calculation (Dynamic)
+  const userLevel =
+    avgProgress >= 80
+      ? "Advanced"
+      : avgProgress >= 50
+      ? "Intermediate"
+      : avgProgress > 0
+      ? "Beginner"
+      : "Not Started";
+
+  const levelColor =
+    userLevel === "Advanced"
+      ? "text-emerald-600"
+      : userLevel === "Intermediate"
+      ? "text-yellow-600"
+      : userLevel === "Beginner"
+      ? "text-blue-600"
+      : "text-gray-600";
 
   return (
     <div className="flex-1 overflow-y-auto p-8 space-y-8 mt-20">
@@ -142,15 +190,19 @@ export default function Courses() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Level */}
+          {/* Dynamic User Level */}
           <div className="relative overflow-hidden rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-emerald-100/40 p-5 flex flex-col justify-between shadow-sm">
             <div>
-              <h3 className="text-emerald-600 font-semibold text-lg">
-                No Level
+              <h3 className={`${levelColor} font-semibold text-lg`}>
+                {userLevel}
               </h3>
-              <p className="text-gray-700 font-medium">Not Assigned</p>
+              <p className="text-gray-700 font-medium">
+                {userLevel === "Not Started"
+                  ? "Start learning today"
+                  : "Current Learning Level"}
+              </p>
               <p className="text-sm text-gray-500 mt-2">
-                Current Learning Level
+                {avgProgress}% overall progress
               </p>
             </div>
             <div className="absolute top-4 right-4 bg-emerald-100 p-2 rounded-full">
@@ -178,7 +230,7 @@ export default function Courses() {
               Completed Courses
             </h3>
             <p className="text-sm text-gray-500 mt-1">
-              {avgProgress}% avg progress
+              {completedCourses} completed · {avgProgress}% avg progress
             </p>
             <div className="absolute top-4 right-4 bg-emerald-50 p-2 rounded-full">
               <Settings className="w-5 h-5 text-emerald-600" />
@@ -206,10 +258,10 @@ export default function Courses() {
         ) : (
           <div className="flex flex-col space-y-6">
             {courses.map((course) => {
-              const progressValue = Number(course.progress) || 0;
+              const progressValue = Math.min(Number(course.progress) || 0, 100);
               const totalLessons = Number(course.lessonsCount) || 0;
               const done = Math.round((progressValue / 100) * totalLessons);
-              const remaining = totalLessons - done;
+              const remaining = Math.max(totalLessons - done, 0);
 
               return (
                 <div
@@ -224,12 +276,20 @@ export default function Courses() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     {/* Badge */}
-                    {course.status === "active" && (
+                    {course.progress < 100 && (
                       <span className="absolute top-3 left-3 bg-emerald-500 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
                         <PlayCircle size={13} />
                         In Progress
                       </span>
                     )}
+
+                    {course.progress === 100 && (
+                      <span className="absolute top-3 left-3 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
+                        <CheckCircle size={13} />
+                        Completed
+                      </span>
+                    )}
+
                     {course.status === "pending" && (
                       <span className="absolute top-3 left-3 bg-yellow-500 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
                         <Clock size={13} />
@@ -314,12 +374,15 @@ export default function Courses() {
                       </div>
                     </div>
 
-                    {/* Button with icons */}
-                    <button
-                      disabled={course.status === "pending"}
+                    <Link
+                      to={`/watch/courses/${slugify(
+                        course.title
+                      )}/lessons/${slugify(
+                        course.lastAccess?.lessonTitle || "introduction"
+                      )}`}
                       className={`mt-6 font-medium px-5 py-2 rounded-lg text-sm transition self-start shadow-sm flex items-center gap-2 ${
                         course.status === "pending"
-                          ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                          ? "bg-gray-300 text-gray-600 cursor-not-allowed pointer-events-none"
                           : "bg-emerald-500 text-white hover:bg-emerald-600"
                       }`}
                     >
@@ -334,7 +397,7 @@ export default function Courses() {
                           Continue Learning
                         </>
                       )}
-                    </button>
+                    </Link>
                   </div>
                 </div>
               );

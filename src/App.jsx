@@ -42,7 +42,6 @@ function App() {
     <>
       {!hideNav && <Nav />}
       <ScrollToTop />
-
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/courses" element={<CoursesPage />} />
@@ -70,20 +69,20 @@ function App() {
         </Route>
 
         {/* Course Dashboard page OUTSIDE the layout */}
-        <Route path="/watch/courses/:id" element={<CourseDashboard />} />
-
+        <Route
+          path="/watch/courses/:courseSlug/lessons/:lessonSlug?"
+          element={<CourseDashboard />}
+        />
       </Routes>
-
       <ToastContainer position="top-center" autoClose={3000} />
-
-      {/* WhatsApp bubble: visible on all pages */}
+      {/* WhatsApp bubble: visible on all pages */}{" "}
+     
       <WhatsAppBubble
         phone="+252612345678"
         greeting="Assalamu Alaikum! 👋 Waxaan xiiseynayaa barnaamijka."
         title="Dugsiye Support"
         subtitle="Typically replies instantly"
       />
-
       {/* Footer only visible if it's not a dashboard route */}
       {!hideFooter && <Footer />}
     </>

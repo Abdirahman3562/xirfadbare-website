@@ -11,17 +11,22 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
-const StudentContent = () => {
-  const navigate = useNavigate(); 
+export default function StudentContent() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  // ✅ Helper function: samee slug si aad ugu keydiso/akhri karto localStorage
+  const slugify = (text) =>
+    text
+      ?.toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]+/g, "");
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // ✅ Hel user-kii login-garay
+        // ✅ Hel user-ka login-garay
         const user =
           JSON.parse(localStorage.getItem("loggedInUser")) ||
           JSON.parse(localStorage.getItem("user"));
@@ -34,11 +39,9 @@ const StudentContent = () => {
           return;
         }
 
-        // ✅ Hel orders-ka
+        // ✅ Hel orders oo filter garee user-kan
         const res = await fetch("http://localhost:4010/orders");
         const orders = await res.json();
-
-        // ✅ Filter user-kan keliya
         const userOrders = orders.filter(
           (order) => String(order.userId) === String(userId)
         );
@@ -49,7 +52,7 @@ const StudentContent = () => {
           return;
         }
 
-        // ✅ Enrich courses
+        // ✅ Ku dar xogta course + lessons
         const enrichedCourses = await Promise.all(
           userOrders.map(async (order) => {
             try {
@@ -65,19 +68,26 @@ const StudentContent = () => {
               const curriculum = await resCurriculum.json();
               const curriculumIds = curriculum.map((c) => c.id);
 
-              // ✅ Hel casharada saxda ah
-              let lessons = [];
-              try {
-                const resLessons = await fetch("http://localhost:4004/lessons");
-                const allLessons = await resLessons.json();
-                lessons = allLessons.filter((lesson) =>
-                  curriculumIds
-                    .map(String)
-                    .includes(String(lesson.curriculumId))
-                );
-              } catch (err) {
-                console.error("⚠️ Error fetching lessons:", err);
-              }
+              const resLessons = await fetch("http://localhost:4004/lessons");
+              const allLessons = await resLessons.json();
+              const lessons = allLessons.filter((lesson) =>
+                curriculumIds.map(String).includes(String(lesson.curriculumId))
+              );
+
+              // ✅ Read local progress if exists
+              const courseSlug = slugify(course?.title || "");
+              const localProgress = JSON.parse(
+                localStorage.getItem(`progress_${courseSlug}`)
+              );
+
+              // ✅ Extract progress + lastAccess
+              const completedLessons = localProgress?.completedLessons || [];
+              const totalLessons = lessons.length || 0;
+              const progress =
+                totalLessons > 0
+                  ? Math.round((completedLessons.length / totalLessons) * 100)
+                  : 0;
+              const lastAccess = localProgress?.lastAccess || null;
 
               return {
                 ...order,
@@ -88,11 +98,11 @@ const StudentContent = () => {
                 image:
                   course?.thumbnail ||
                   "https://i.ibb.co/Yk2JmWv/default-course.jpg",
-                lessonsCount: lessons.length || 0,
-                progress: Number(order.progress) || 0, // ✅ Hubi in uu number yahay
+                lessonsCount: totalLessons,
+                progress, // ✅ sax, wuxuu ka imaanayaa localStorage
+                lastAccess, // ✅ waqtigii ugu dambeeyay ee uu user-ku furay
               };
-            } catch (err) {
-              console.error("⚠️ Error enriching course:", err);
+            } catch {
               return {
                 ...order,
                 title: order.courseTitle,
@@ -117,26 +127,46 @@ const StudentContent = () => {
   }, []);
 
   // 📊 Stats
-  const activeCourses = courses.filter((c) => c.status === "active").length;
-  const pendingCourses = courses.filter((c) => c.status === "pending").length;
-  const completedCourses = courses.filter(
-    (c) => c.status === "completed"
-  ).length;
+  const activeCourses = courses.filter((c) => Number(c.progress) < 100).length;
+const completedCourses = courses.filter((c) => Number(c.progress) >= 100).length;
 
+
+  // ✅ Celceliska horumarka guud
   const avgProgress = courses.length
-    ? Math.round(
-        courses.reduce((sum, c) => sum + (c.progress || 0), 0) / courses.length
+    ? Math.min(
+        Math.round(
+          courses.reduce((sum, c) => sum + (c.progress || 0), 0) /
+            courses.length
+        ),
+        100
       )
     : 0;
+
+  // 🎯 User Level Calculation (Dynamic)
+  const userLevel =
+    avgProgress >= 80
+      ? "Advanced"
+      : avgProgress >= 50
+      ? "Intermediate"
+      : avgProgress > 0
+      ? "Beginner"
+      : "Not Started";
+
+  const levelColor =
+    userLevel === "Advanced"
+      ? "text-emerald-600"
+      : userLevel === "Intermediate"
+      ? "text-yellow-600"
+      : userLevel === "Beginner"
+      ? "text-blue-600"
+      : "text-gray-600";
 
   return (
     <div className="flex-1 overflow-y-auto p-8 space-y-8 mt-20">
       {/* Breadcrumb */}
       <div className="flex gap-1 items-center">
-        <Link to="/dashboard/student">
-          <Home className="w-5 h-5 text-emerald-600 cursor-pointer" />
-        </Link>
-        <ChevronRight className="w-5 h-5 font-bold text-emerald-600" />
+        <Home className="w-5 h-5 text-emerald-600" />
+        <ChevronRight className="w-5 h-5 text-emerald-600" />
         <span className="text-lg font-semibold mb-1 text-gray-700">
           Student
         </span>
@@ -147,7 +177,7 @@ const StudentContent = () => {
         Welcome to your dashboard.
       </p>
 
-      {/* Stats Section */}
+      {/* Stats */}
       <section>
         <h1 className="text-2xl font-semibold mb-2">Student Dashboard</h1>
         <p className="text-gray-500 text-sm mb-6">
@@ -155,15 +185,19 @@ const StudentContent = () => {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Level */}
+          {/* Dynamic User Level */}
           <div className="relative overflow-hidden rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-emerald-100/40 p-5 flex flex-col justify-between shadow-sm">
             <div>
-              <h3 className="text-emerald-600 font-semibold text-lg">
-                No Level
+              <h3 className={`${levelColor} font-semibold text-lg`}>
+                {userLevel}
               </h3>
-              <p className="text-gray-700 font-medium">Not Assigned</p>
+              <p className="text-gray-700 font-medium">
+                {userLevel === "Not Started"
+                  ? "Start learning today"
+                  : "Current Learning Level"}
+              </p>
               <p className="text-sm text-gray-500 mt-2">
-                Current Learning Level
+                {avgProgress}% overall progress
               </p>
             </div>
             <div className="absolute top-4 right-4 bg-emerald-100 p-2 rounded-full">
@@ -171,21 +205,21 @@ const StudentContent = () => {
             </div>
           </div>
 
-          {/* Active & Pending */}
+          {/* Active Courses */}
           <div className="relative bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
             <h3 className="text-2xl font-semibold text-emerald-600">
               {activeCourses}
             </h3>
             <p className="text-gray-700 font-medium">Active Courses</p>
             <p className="text-sm text-gray-500 mt-1">
-              {pendingCourses} Pending
+              {completedCourses} completed
             </p>
             <div className="absolute top-4 right-4 bg-emerald-50 p-2 rounded-full">
               <BookOpen className="w-5 h-5 text-emerald-600" />
             </div>
           </div>
 
-          {/* Completed */}
+          {/* Completed Courses */}
           <div className="relative bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800">
               Completed Courses
@@ -211,9 +245,7 @@ const StudentContent = () => {
         </p>
 
         {loading ? (
-          <div className="p-6 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 text-center">
-            <p>Loading your courses...</p>
-          </div>
+          <p>Loading...</p>
         ) : courses.length === 0 ? (
           <div className="p-6 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 text-center">
             <p>No courses found for your account.</p>
@@ -221,12 +253,10 @@ const StudentContent = () => {
         ) : (
           <div className="flex flex-col space-y-6">
             {courses.map((course) => {
-              const progressValue = Number(course.progress) || 0;
+              const progressValue = Math.min(Number(course.progress) || 0, 100);
               const totalLessons = Number(course.lessonsCount) || 0;
-              const lessonsDone = Math.round(
-                (progressValue / 100) * totalLessons
-              );
-              const remaining = totalLessons - lessonsDone;
+              const done = Math.round((progressValue / 100) * totalLessons);
+              const remaining = Math.max(totalLessons - done, 0);
 
               return (
                 <div
@@ -240,16 +270,25 @@ const StudentContent = () => {
                       alt={course.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
-                    {course.status === "active" && (
+                    {/* Badge */}
+                    {course.progress < 100 && (
                       <span className="absolute top-3 left-3 bg-emerald-500 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
                         <PlayCircle size={13} />
                         In Progress
                       </span>
                     )}
+
+                    {course.progress === 100 && (
+                      <span className="absolute top-3 left-3 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
+                        <CheckCircle size={13} />
+                        Completed
+                      </span>
+                    )}
+
                     {course.status === "pending" && (
                       <span className="absolute top-3 left-3 bg-yellow-500 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
                         <Clock size={13} />
-                        Pending Approval
+                        Pending
                       </span>
                     )}
                   </div>
@@ -287,7 +326,7 @@ const StudentContent = () => {
                       <div className="flex justify-between text-xs text-gray-500 mt-2">
                         <span className="flex gap-2 items-center">
                           <BookOpen className="w-4 h-4 text-emerald-600 mt-1" />
-                          {lessonsDone} of {totalLessons} lessons
+                          {done} of {totalLessons} lessons
                         </span>
                         <span>{remaining} remaining</span>
                       </div>
@@ -330,16 +369,15 @@ const StudentContent = () => {
                       </div>
                     </div>
 
-                    <button
-                       onClick={() => {
-                        if (course.status === "active") {
-                          navigate(`/watch/courses/${course.courseId}`); // ✅ sida Dugsiiye.com
-                        }
-                      }}
-                      disabled={course.status === "pending"}
-                      className={`mt-6 font-medium px-5 py-2 cursor-pointer rounded-lg text-sm transition self-start shadow-sm flex items-center gap-2 ${
+                    <Link
+                      to={`/watch/courses/${slugify(
+                        course.title
+                      )}/lessons/${slugify(
+                        course.lastAccess?.lessonTitle || "introduction"
+                      )}`}
+                      className={`mt-6 font-medium px-5 py-2 rounded-lg text-sm transition self-start shadow-sm flex items-center gap-2 ${
                         course.status === "pending"
-                          ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                          ? "bg-gray-300 text-gray-600 cursor-not-allowed pointer-events-none"
                           : "bg-emerald-500 text-white hover:bg-emerald-600"
                       }`}
                     >
@@ -354,7 +392,7 @@ const StudentContent = () => {
                           Continue Learning
                         </>
                       )}
-                    </button>
+                    </Link>
                   </div>
                 </div>
               );
@@ -364,6 +402,4 @@ const StudentContent = () => {
       </section>
     </div>
   );
-};
-
-export default StudentContent;
+}
