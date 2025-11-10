@@ -355,7 +355,7 @@ useEffect(() => {
       )}
 
       {/* HEADER */}
-      <header className="flex mt-15 items-center justify-between px-4 py-2 pt-10 bg-[#edf4f5] shadow-sm fixed top-0 left-0 w-full z-40">
+      <header className="flex mt-15 items-center justify-between px-4 py-2 pt-5 bg-[#edf4f5] shadow-sm fixed top-0 left-0 w-full z-40">
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate("/dashboard/student")}

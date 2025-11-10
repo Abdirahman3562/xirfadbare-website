@@ -35,7 +35,8 @@ function App() {
 
   const hideFooter =
     location.pathname.startsWith("/dashboard") ||
-    location.pathname === "/auth/signup";
+    location.pathname === "/auth/signup"|| location.pathname.startsWith("/watch");
+
   const hideNav = location.pathname.startsWith("/auth");
 
   return (
