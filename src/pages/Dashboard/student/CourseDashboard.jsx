@@ -173,16 +173,17 @@ const fetchCourseData = async () => {
 useEffect(() => {
   if (!currentLesson) return;
 
-  const now = new Date().toISOString();
+  const now = new Date().toISOString(); // waqtiga hadda
 
   const savedData = {
-  completedLessons,
-  currentLesson: currentLesson.id,
-  lastAccess: {
-    lessonId: currentLesson.id,
-    lessonTitle: currentLesson.title,
-  },
-};
+    completedLessons,
+    currentLesson: currentLesson.id,
+    lastAccess: {
+      lessonId: currentLesson.id,
+      lessonTitle: currentLesson.title,
+      date: now, // ✅ waqtigii ugu dambeeyay ee cashirkan la daawaday
+    },
+  };
 
   localStorage.setItem(`progress_${courseSlug}`, JSON.stringify(savedData));
 }, [completedLessons, currentLesson, courseSlug]);

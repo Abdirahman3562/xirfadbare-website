@@ -128,8 +128,9 @@ export default function StudentContent() {
 
   // 📊 Stats
   const activeCourses = courses.filter((c) => Number(c.progress) < 100).length;
-const completedCourses = courses.filter((c) => Number(c.progress) >= 100).length;
-
+  const completedCourses = courses.filter(
+    (c) => Number(c.progress) >= 100
+  ).length;
 
   // ✅ Celceliska horumarka guud
   const avgProgress = courses.length
@@ -356,8 +357,10 @@ const completedCourses = courses.filter((c) => Number(c.progress) >= 100).length
                               Last access
                             </p>
                             <p className="text-[14px] font-semibold text-gray-800">
-                              {progressValue > 0
-                                ? new Date().toLocaleDateString("en-US", {
+                              {course.lastAccess?.date
+                                ? new Date(
+                                    course.lastAccess.date
+                                  ).toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",
                                     year: "numeric",

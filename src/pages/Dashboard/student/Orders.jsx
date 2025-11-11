@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { FaShoppingCart } from "react-icons/fa";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -178,21 +179,18 @@ export default function Orders() {
         )}
 
         {!loading && orders.length === 0 && (
-          <div className="flex flex-col justify-center items-center h-[60vh]">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
-              alt="no orders"
-              className="w-48 mb-6 opacity-80"
-            />
-            <h1 className="text-2xl font-semibold text-gray-700">
+          <div className="border border-gray-200 rounded-md bg-white py-10 flex flex-col items-center justify-center text-center">
+            <h2 className="text-[16px] font-semibold text-gray-800">
               No orders found
-            </h1>
-            <p className="text-gray-500 mt-2">
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
               You haven't placed any orders yet.
             </p>
+
             <button
               onClick={() => (window.location.href = "/courses")}
-              className="mt-6 px-6 py-3 bg-emerald-500 text-white font-semibold rounded-lg shadow-md hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              className="mt-4 px-4 py-2 text-sm font-semibold rounded-md text-white
+                   bg-emerald-500 cursor-pointer hover:bg-emerald-600 transition-colors duration-300"
             >
               Browse Courses
             </button>

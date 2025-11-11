@@ -18,6 +18,12 @@ function CourseCard({ course }) {
         0
       )
     : 0;
+    
+
+
+
+
+    
 
   const calcTotalDuration = () => {
     if (!Array.isArray(course.curriculum)) return null;

@@ -361,8 +361,10 @@ export default function Courses() {
                               Last access
                             </p>
                             <p className="text-[14px] font-semibold text-gray-800">
-                              {progressValue > 0
-                                ? new Date().toLocaleDateString("en-US", {
+                              {course.lastAccess?.date
+                                ? new Date(
+                                    course.lastAccess.date
+                                  ).toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",
                                     year: "numeric",
