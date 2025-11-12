@@ -1,7 +1,7 @@
 import { ChevronRight, Home } from "lucide-react";
 import { useState, useEffect } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import { FaCamera } from "react-icons/fa6";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function Profile() {
@@ -17,59 +17,57 @@ export default function Profile() {
   });
 
   // Fetch user data on page load
- useEffect(() => {
-  const loggedUser =
-    JSON.parse(localStorage.getItem("loggedInUser")) ||
-    JSON.parse(localStorage.getItem("user"));
+  useEffect(() => {
+    const loggedUser =
+      JSON.parse(localStorage.getItem("loggedInUser")) ||
+      JSON.parse(localStorage.getItem("user"));
 
-  if (!loggedUser) {
-    console.warn("⚠️ No logged-in user found!");
-    return;
-  }
+    if (!loggedUser) {
+      console.warn("⚠️ No logged-in user found!");
+      return;
+    }
 
-  // Fetch users and find the correct one by ID or email
-  fetch("http://localhost:5000/users")
-    .then((res) => res.json())
-    .then((data) => {
-      const currentUser = data.find(
-        (u) =>
-          String(u.id) === String(loggedUser.id) ||
-          u.email === loggedUser.email
-      );
+    // Fetch users and find the correct one by ID or email
+    fetch("http://localhost:5000/users")
+      .then((res) => res.json())
+      .then((data) => {
+        const currentUser = data.find(
+          (u) =>
+            String(u.id) === String(loggedUser.id) ||
+            u.email === loggedUser.email
+        );
 
-      if (currentUser) {
-        setUser(currentUser);
-        setFormData({ ...currentUser });
+        if (currentUser) {
+          setUser(currentUser);
+          setFormData({ ...currentUser });
 
-        const storedImage = localStorage.getItem("profileImage");
-        if (storedImage) {
-          setImage(storedImage);
-        } else if (currentUser?.image) {
-          setImage(currentUser.image);
+          const storedImage = localStorage.getItem("profileImage");
+          if (storedImage) {
+            setImage(storedImage);
+          } else if (currentUser?.image) {
+            setImage(currentUser.image);
+          }
+        } else {
+          console.warn("⚠️ Logged-in user not found in database!");
         }
-      } else {
-        console.warn("⚠️ Logged-in user not found in database!");
-      }
-    })
-    .catch((err) => console.error("Error fetching user:", err));
-}, []);
-
+      })
+      .catch((err) => console.error("Error fetching user:", err));
+  }, []);
 
   // Handle image change (for user profile picture)
   const handleImageChange = (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result;
-      setImage(base64);
-      setFormData({ ...formData, image: base64 });
-      localStorage.setItem("profileImage", base64);
-    };
-    reader.readAsDataURL(file);
-  }
-};
-
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result;
+        setImage(base64);
+        setFormData({ ...formData, image: base64 });
+        localStorage.setItem("profileImage", base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const getInitials = (first, last) => {
     if (!first && !last) return "SU";
@@ -82,38 +80,38 @@ export default function Profile() {
   };
 
   const handleSave = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await fetch(`http://localhost:5000/users/${user.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    e.preventDefault();
+    try {
+      const res = await fetch(`http://localhost:5000/users/${user.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    if (res.ok) {
-      // ✅ 1. Cusbooneysii xogta user-ka ee gudaha state
-      setUser(formData);
+      if (res.ok) {
+        // ✅ 1. Cusbooneysii xogta user-ka ee gudaha state
+        setUser(formData);
 
-      // ✅ 2. Kaydi xogta saxda ah ee Nav uu akhriyo
-      localStorage.setItem("loggedInUser", JSON.stringify(formData));
+        // ✅ 2. Kaydi xogta saxda ah ee Nav uu akhriyo
+        localStorage.setItem("loggedInUser", JSON.stringify(formData));
 
-      // ✅ 3. Haddii image cusub la upload gareeyay
-      if (formData.image) {
-        localStorage.setItem("profileImage", formData.image);
+        // ✅ 3. Haddii image cusub la upload gareeyay
+        if (formData.image) {
+          localStorage.setItem("profileImage", formData.image);
+        }
+
+        // ✅ 4. Ogeysii Nav in user la update gareeyay
+        window.dispatchEvent(new Event("userLogin"));
+
+        toast.success("Profile updated successfully!");
+        setIsEditing(false);
+      } else {
+        toast.error("Error updating profile!");
       }
-
-      // ✅ 4. Ogeysii Nav in user la update gareeyay
-      window.dispatchEvent(new Event("userLogin"));
-
-      toast.success("Profile updated successfully!");
-      setIsEditing(false);
-    } else {
-      toast.error("Error updating profile!");
+    } catch (error) {
+      toast.error("Failed to update profile. Please try again.");
     }
-  } catch (error) {
-    toast.error("Failed to update profile. Please try again.");
-  }
-};
+  };
 
   const handleCancel = () => {
     setFormData({ ...user });
@@ -131,6 +129,8 @@ export default function Profile() {
 
   return (
     <div className="flex-1 overflow-y-auto p-8 space-y-8 mt-20">
+            <Toaster position="top-right" reverseOrder={false} />
+
       <div className="flex gap-1 items-center">
         <Home className="w-5 h-5 text-emerald-600" />
         <ChevronRight className="w-5 h-5 text-emerald-600" />

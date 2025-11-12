@@ -24,21 +24,7 @@
         "Build a complete multi-page responsive website using HTML and CSS."
       ],
       "completedLessons": [
-        "2",
-        "3",
-        "4",
-        "5",
-        "1",
-        "6",
-        "7",
-        "8",
-        "9",
-        "10",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15"
+        "1"
       ]
     },
     {
@@ -65,18 +51,12 @@
         "Build a professional portfolio website using HTML and CSS."
       ],
       "completedLessons": [
-        "1",
         "16",
         "17",
         "18",
-        "23",
-        "24",
-        "25",
-        "26",
         "19",
         "20",
-        "21",
-        "22"
+        "21"
       ]
     },
     {
@@ -168,13 +148,6 @@
         "Handle file I/O operations.",
         "Create small automation scripts.",
         "Use Python libraries for data and web apps."
-      ],
-      "completedLessons": [
-        "42",
-        "43",
-        "44",
-        "45",
-        "46"
       ]
     },
     {

@@ -56,7 +56,7 @@
       ],
       "isAuthor": true,
       "authorId": 1,
-      "followers": 1001,
+      "followers": 1002,
       "education": [
         "Bachelor in Computer Application",
         "MBA in Management Information Systems"
@@ -115,7 +115,8 @@
         }
       ],
       "followersList": [
-        "0fcb"
+        "0fcb",
+        "44ff"
       ]
     },
     {

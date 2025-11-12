@@ -15,13 +15,10 @@ import { Link } from "react-router-dom";
 export default function StudentContent() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  // ✅ Helper function: samee slug si aad ugu keydiso/akhri karto localStorage
+
+  // ✅ Helper function si loo sameeyo slug URL
   const slugify = (text) =>
-    text
-      ?.toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w-]+/g, "");
+    text?.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -39,7 +36,7 @@ export default function StudentContent() {
           return;
         }
 
-        // ✅ Hel orders oo filter garee user-kan
+        // ✅ Hel orders ee user-kan
         const res = await fetch("http://localhost:4010/orders");
         const orders = await res.json();
         const userOrders = orders.filter(
@@ -52,42 +49,54 @@ export default function StudentContent() {
           return;
         }
 
-        // ✅ Ku dar xogta course + lessons
+        // ✅ Ku dar xogta course + progress
         const enrichedCourses = await Promise.all(
           userOrders.map(async (order) => {
             try {
+              // Hel course info
               const resCourse = await fetch(
                 `http://localhost:3000/courses?id=${Number(order.courseId)}`
               );
               const courseData = await resCourse.json();
               const course = courseData[0];
 
+              // Hel curriculum
               const resCurriculum = await fetch(
                 `http://localhost:4003/curriculum?courseId=${order.courseId}`
               );
               const curriculum = await resCurriculum.json();
               const curriculumIds = curriculum.map((c) => c.id);
 
+              // Hel lessons
               const resLessons = await fetch("http://localhost:4004/lessons");
               const allLessons = await resLessons.json();
               const lessons = allLessons.filter((lesson) =>
                 curriculumIds.map(String).includes(String(lesson.curriculumId))
               );
 
-              // ✅ Read local progress if exists
-              const courseSlug = slugify(course?.title || "");
-              const localProgress = JSON.parse(
-                localStorage.getItem(`progress_${courseSlug}`)
-              );
+              // ✅ Hel progress ka JSON Server
+              let userProgress = null;
+              try {
+                const resProgress = await fetch(
+                  `http://localhost:4011/userProgress?userId=${userId}&courseId=${order.courseId}`
+                );
+                const progressData = await resProgress.json();
+                userProgress = progressData[0] || null;
+              } catch (err) {
+                console.warn("⚠️ Failed to fetch user progress:", err);
+              }
 
-              // ✅ Extract progress + lastAccess
-              const completedLessons = localProgress?.completedLessons || [];
+              // ✅ Xisaabi progress
+              const completedLessons = userProgress?.completedLessons || [];
               const totalLessons = lessons.length || 0;
               const progress =
                 totalLessons > 0
-                  ? Math.round((completedLessons.length / totalLessons) * 100)
+                  ? Math.min(
+                      100,
+                      Math.round((completedLessons.length / totalLessons) * 100)
+                    )
                   : 0;
-              const lastAccess = localProgress?.lastAccess || null;
+              const lastAccess = userProgress?.lastAccess || null;
 
               return {
                 ...order,
@@ -99,8 +108,12 @@ export default function StudentContent() {
                   course?.thumbnail ||
                   "https://i.ibb.co/Yk2JmWv/default-course.jpg",
                 lessonsCount: totalLessons,
-                progress, // ✅ sax, wuxuu ka imaanayaa localStorage
-                lastAccess, // ✅ waqtigii ugu dambeeyay ee uu user-ku furay
+                progress:
+                  (!userProgress && order.status === "pending") ||
+                  order.status === "pending"
+                    ? 0
+                    : progress,
+                lastAccess: order.status === "pending" ? null : lastAccess,
               };
             } catch {
               return {
@@ -127,12 +140,17 @@ export default function StudentContent() {
   }, []);
 
   // 📊 Stats
-  const activeCourses = courses.filter((c) => Number(c.progress) < 100).length;
+  const pendingCourses = courses.filter((c) => c.status === "pending").length;
+  const activeCourses = courses.filter(
+    (c) =>
+      c.status !== "pending" &&
+      Number(c.progress) > 0 &&
+      Number(c.progress) < 100
+  ).length;
   const completedCourses = courses.filter(
-    (c) => Number(c.progress) >= 100
+    (c) => c.status !== "pending" && Number(c.progress) >= 100
   ).length;
 
-  // ✅ Celceliska horumarka guud
   const avgProgress = courses.length
     ? Math.min(
         Math.round(
@@ -143,7 +161,6 @@ export default function StudentContent() {
       )
     : 0;
 
-  // 🎯 User Level Calculation (Dynamic)
   const userLevel =
     avgProgress >= 80
       ? "Advanced"
@@ -186,7 +203,7 @@ export default function StudentContent() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Dynamic User Level */}
+          {/* Level */}
           <div className="relative overflow-hidden rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-emerald-100/40 p-5 flex flex-col justify-between shadow-sm">
             <div>
               <h3 className={`${levelColor} font-semibold text-lg`}>
@@ -206,7 +223,7 @@ export default function StudentContent() {
             </div>
           </div>
 
-          {/* Active Courses */}
+          {/* Active */}
           <div className="relative bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
             <h3 className="text-2xl font-semibold text-emerald-600">
               {activeCourses}
@@ -220,7 +237,7 @@ export default function StudentContent() {
             </div>
           </div>
 
-          {/* Completed Courses */}
+          {/* Completed */}
           <div className="relative bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
             <h3 className="text-lg font-semibold text-gray-800">
               Completed Courses
@@ -272,26 +289,22 @@ export default function StudentContent() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     {/* Badge */}
-                    {course.progress < 100 && (
-                      <span className="absolute top-3 left-3 bg-emerald-500 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
-                        <PlayCircle size={13} />
-                        In Progress
-                      </span>
-                    )}
-
-                    {course.progress === 100 && (
-                      <span className="absolute top-3 left-3 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
-                        <CheckCircle size={13} />
-                        Completed
-                      </span>
-                    )}
-
-                    {course.status === "pending" && (
+                    {course.status === "pending" ? (
                       <span className="absolute top-3 left-3 bg-yellow-500 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
                         <Clock size={13} />
                         Pending
                       </span>
-                    )}
+                    ) : course.progress === 100 ? (
+                      <span className="absolute top-3 left-3 bg-emerald-600 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
+                        <CheckCircle size={13} />
+                        Completed
+                      </span>
+                    ) : course.progress > 0 ? (
+                      <span className="absolute top-3 left-3 bg-emerald-500 text-white text-xs px-3 py-1 rounded-full shadow flex items-center gap-1">
+                        <PlayCircle size={13} />
+                        In Progress
+                      </span>
+                    ) : null}
                   </div>
 
                   {/* Info */}

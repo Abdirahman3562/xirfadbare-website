@@ -12,8 +12,6 @@ import {
 } from "lucide-react";
 import { FaBookOpen, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
-
-
 const CourseDashboard = () => {
   const { courseSlug, lessonSlug } = useParams();
   const navigate = useNavigate();
@@ -42,11 +40,19 @@ const CourseDashboard = () => {
     [curriculum]
   );
 
-  const completedLessonsCount = completedLessons.length;
+  // ✅ Hubi in completedLessons aanu ka badin totalLessonsCount
+  const completedLessonsCount = Math.min(
+    completedLessons.length,
+    totalLessonsCount
+  );
 
+  // ✅ Xisaabi progress-ka adigoo hubinaya inuusan dhaafin 100%
   const progress =
     totalLessonsCount > 0
-      ? Math.round((completedLessonsCount / totalLessonsCount) * 100)
+      ? Math.min(
+          100,
+          Math.round((completedLessonsCount / totalLessonsCount) * 100)
+        )
       : 0;
 
   // Helper function (ku dar meel sare, ka hor useEffect)
@@ -57,137 +63,189 @@ const CourseDashboard = () => {
       .replace(/\s+/g, "-")
       .replace(/[^\w-]+/g, "");
 
-
-
   // -----------------------------
   // Fetch course + curriculum + lessons
   // -----------------------------
- // 🚨 function fetchCourseData meel sare dhig
-const fetchCourseData = async () => {
-  try {
-    setLoading(true);
+  // 🚨 function fetchCourseData meel sare dhig
+  const fetchCourseData = async () => {
+    try {
+      setLoading(true);
 
-    const resCourse = await fetch(`http://localhost:3000/courses`);
-    const allCourses = await resCourse.json();
+      const resCourse = await fetch(`http://localhost:3000/courses`);
+      const allCourses = await resCourse.json();
 
-    const courseInfo =
-      allCourses.find((c) => slugify(c.title) === courseSlug) || null;
-    if (!courseInfo) {
-      navigate("/dashboard/student", { replace: true });
+      const courseInfo =
+        allCourses.find((c) => slugify(c.title) === courseSlug) || null;
+      if (!courseInfo) {
+        navigate("/dashboard/student", { replace: true });
+        return;
+      }
+
+      // ✅ Hubi in order uu active yahay
+      const resOrders = await fetch("http://localhost:4010/orders");
+      const orders = await resOrders.json();
+
+      const user =
+        JSON.parse(localStorage.getItem("loggedInUser")) ||
+        JSON.parse(localStorage.getItem("user"));
+      const userId = user?.id || user?._id || user?.uid;
+
+      const hasAccess = orders.some(
+        (o) =>
+          String(o.userId) === String(userId) &&
+          String(o.courseId) === String(courseInfo.id) &&
+          o.status === "active"
+      );
+
+      if (!hasAccess) {
+        navigate("/dashboard/student", { replace: true });
+        return;
+      }
+
+      // ✅ Fetch curriculum
+      const resCurriculum = await fetch(
+        `http://localhost:4003/curriculum?courseId=${courseInfo.id}`
+      );
+      const dataCurriculum = await resCurriculum.json();
+
+      // ✅ Fetch lessons
+      const resLessons = await fetch("http://localhost:4004/lessons");
+      const allLessonsRaw = await resLessons.json();
+      const allLessons = allLessonsRaw.map((l) => ({
+        ...l,
+        slug: l.slug || slugify(l.title),
+      }));
+
+      // ✅ Group lessons
+      const grouped = dataCurriculum.map((section) => {
+        const sectionLessons = allLessons.filter(
+          (lesson) => String(lesson.curriculumId) === String(section.id)
+        );
+        return { ...section, lessons: sectionLessons };
+      });
+
+      setCourse(courseInfo);
+      setCurriculum(grouped);
+      setLessons(allLessons);
+
+      // ✅ Progress
+      // ✅ Fetch user progress from JSON server
+      const resProgress = await fetch(
+        `http://localhost:4011/userProgress?userId=${userId}&courseId=${courseInfo.id}`
+      );
+      const progressData = await resProgress.json();
+
+      if (progressData.length > 0) {
+        const userProgress = progressData[0];
+        setCompletedLessons(userProgress.completedLessons || []);
+        if (userProgress.currentLesson) {
+          const current = allLessons.find(
+            (l) => String(l.id) === String(userProgress.currentLesson)
+          );
+          if (current) setCurrentLesson(current);
+        }
+      } else {
+        // fallback if no progress found
+        setCompletedLessons([]);
+      }
+
+      // ✅ Initial lesson
+      let initial =
+        allLessons.find((l) => slugify(l.title) === lessonSlug) ||
+        allLessons.find((l) => l.id === savedCurrentId) ||
+        grouped?.[0]?.lessons?.[0] ||
+        null;
+
+      setCurrentLesson(initial);
+      if (!lessonSlug && initial) {
+        navigate(
+          `/watch/courses/${courseSlug}/lessons/${slugify(initial.title)}`,
+          { replace: true }
+        );
+      }
+    } catch (err) {
+      console.error("❌ Error fetching course data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const user =
+      JSON.parse(localStorage.getItem("loggedInUser")) ||
+      JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      navigate("/auth/login", { replace: true });
       return;
     }
 
-    // ✅ Hubi in order uu active yahay
-    const resOrders = await fetch("http://localhost:4010/orders");
-    const orders = await resOrders.json();
+    fetchCourseData();
+  }, [courseSlug, lessonSlug, navigate]);
+
+  // -----------------------------
+  // Persist progress for this course
+  // -----------------------------
+  // ✅ Persist progress to userProgress.json via JSON Server
+  // -----------------------------
+  useEffect(() => {
+    if (!currentLesson) return;
 
     const user =
       JSON.parse(localStorage.getItem("loggedInUser")) ||
       JSON.parse(localStorage.getItem("user"));
     const userId = user?.id || user?._id || user?.uid;
+    if (!userId) return;
 
-    const hasAccess = orders.some(
-      (o) =>
-        String(o.userId) === String(userId) &&
-        String(o.courseId) === String(courseInfo.id) &&
-        o.status === "active"
-    );
+    const now = new Date().toISOString();
 
-    if (!hasAccess) {
-      navigate("/dashboard/student", { replace: true });
-      return;
-    }
+    const savedData = {
+      userId,
+      courseId: course?.id,
+      completedLessons,
+      currentLesson: currentLesson.id,
+      lastAccess: {
+        lessonId: currentLesson.id,
+        lessonTitle: currentLesson.title,
+        date: now,
+      },
+    };
 
-    // ✅ Fetch curriculum
-    const resCurriculum = await fetch(
-      `http://localhost:4003/curriculum?courseId=${courseInfo.id}`
-    );
-    const dataCurriculum = await resCurriculum.json();
+    const syncProgress = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:4011/userProgress?userId=${userId}&courseId=${course?.id}`
+        );
+        const existing = await res.json();
 
-    // ✅ Fetch lessons
-    const resLessons = await fetch("http://localhost:4004/lessons");
-    const allLessonsRaw = await resLessons.json();
-    const allLessons = allLessonsRaw.map((l) => ({
-      ...l,
-      slug: l.slug || slugify(l.title),
-    }));
+        if (existing.length > 0) {
+          // ✅ Update existing progress (include id)
+          await fetch(`http://localhost:4011/userProgress/${existing[0].id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...existing[0],
+              ...savedData, // ✅ ensures completedLessons are updated
+            }),
+          });
+        } else {
+          // ✅ Create new record with unique id
+          await fetch(`http://localhost:4011/userProgress`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: crypto.randomUUID(), // 🆕 generate id
+              ...savedData,
+            }),
+          });
+        }
+      } catch (error) {
+        console.error("❌ Error syncing user progress:", error);
+      }
+    };
 
-    // ✅ Group lessons
-    const grouped = dataCurriculum.map((section) => {
-      const sectionLessons = allLessons.filter(
-        (lesson) => String(lesson.curriculumId) === String(section.id)
-      );
-      return { ...section, lessons: sectionLessons };
-    });
-
-    setCourse(courseInfo);
-    setCurriculum(grouped);
-    setLessons(allLessons);
-
-    // ✅ Progress
-    const saved = JSON.parse(localStorage.getItem(`progress_${courseSlug}`));
-    const savedCompleted = saved?.completedLessons ?? [];
-    const savedCurrentId = saved?.currentLesson;
-    setCompletedLessons(savedCompleted);
-
-    // ✅ Initial lesson
-    let initial =
-      allLessons.find((l) => slugify(l.title) === lessonSlug) ||
-      allLessons.find((l) => l.id === savedCurrentId) ||
-      grouped?.[0]?.lessons?.[0] ||
-      null;
-
-    setCurrentLesson(initial);
-    if (!lessonSlug && initial) {
-      navigate(
-        `/watch/courses/${courseSlug}/lessons/${slugify(initial.title)}`,
-        { replace: true }
-      );
-    }
-  } catch (err) {
-    console.error("❌ Error fetching course data:", err);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
-  useEffect(() => {
-  const user =
-    JSON.parse(localStorage.getItem("loggedInUser")) ||
-    JSON.parse(localStorage.getItem("user"));
-
-  if (!user) {
-    navigate("/auth/login", { replace: true });
-    return;
-  }
-
-  fetchCourseData();
-}, [courseSlug, lessonSlug, navigate]);
-
-
-// -----------------------------
-// Persist progress for this course
-// -----------------------------
-useEffect(() => {
-  if (!currentLesson) return;
-
-  const now = new Date().toISOString(); // waqtiga hadda
-
-  const savedData = {
-    completedLessons,
-    currentLesson: currentLesson.id,
-    lastAccess: {
-      lessonId: currentLesson.id,
-      lessonTitle: currentLesson.title,
-      date: now, // ✅ waqtigii ugu dambeeyay ee cashirkan la daawaday
-    },
-  };
-
-  localStorage.setItem(`progress_${courseSlug}`, JSON.stringify(savedData));
-}, [completedLessons, currentLesson, courseSlug]);
-
+    syncProgress();
+  }, [completedLessons, currentLesson, courseSlug]);
 
   // -----------------------------
   // Auto open active lesson's section (and close others)
@@ -366,8 +424,6 @@ useEffect(() => {
             <span className="text-sm">Back</span>
           </button>
         </div>
-
-        
 
         <div className="flex items-center gap-3">
           <button
@@ -735,7 +791,5 @@ useEffect(() => {
     </div>
   );
 };
-
-
 
 export default CourseDashboard;

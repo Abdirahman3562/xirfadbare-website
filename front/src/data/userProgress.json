@@ -1,0 +1,37 @@
+{
+  "userProgress": [
+    {
+      "id": "621028bf-fa73-4e56-b264-a45040d66685",
+      "userId": "44ff",
+      "courseId": "2",
+      "completedLessons": [
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21"
+      ],
+      "currentLesson": "22",
+      "lastAccess": {
+        "lessonId": "22",
+        "lessonTitle": "Position, Float, and Display",
+        "date": "2025-11-12T14:37:44.849Z"
+      }
+    },
+    {
+      "id": "6bd61b34-f987-4030-9f97-cd1da27b6a07",
+      "userId": "44ff",
+      "courseId": "1",
+      "completedLessons": [
+        "1"
+      ],
+      "currentLesson": "2",
+      "lastAccess": {
+        "lessonId": "2",
+        "lessonTitle": "How the Web Works",
+        "date": "2025-11-12T14:42:25.609Z"
+      }
+    }
+  ]
+}
