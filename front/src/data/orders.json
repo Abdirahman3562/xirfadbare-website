@@ -1,18 +1,5 @@
 {
   "orders": [
-    {
-      "id": "d6a4",
-      "userId": "0fcb",
-      "userName": "Samafale Mohamed",
-      "userEmail": "abdirahmaanmoha2022@gmail.com",
-      "courseTitle": "CSS Mastery Course",
-      "courseId": "2",
-      "paymentType": "Local Payment",
-      "paymentMethod": "ZAAD Service",
-      "phoneNumber": "980890898907907",
-      "totalToPay": 9,
-      "status": "active",
-      "createdAt": "Nov 11, 2025, 09:36 AM"
-    }
+   
   ]
 }
