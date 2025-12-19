@@ -11,6 +11,8 @@ import {
 } from "react-icons/fa";
 import InstructorTabs from "../../../components/instructor/InstructorTabs";
 import { Toaster, toast } from "react-hot-toast";
+import { getInstructorBySlug, updateInstructor } from "../../../api/instructorService";
+import { getAllCourses } from "../../../api/courseService";
 
 export default function InstructorDetails() {
   const { slug } = useParams();
@@ -39,11 +41,7 @@ export default function InstructorDetails() {
   useEffect(() => {
     const fetchInstructorDetails = async () => {
       try {
-        const res = await fetch("http://localhost:4002/instructors");
-        const data = await res.json();
-        const found = data.find(
-          (i) => i.name.toLowerCase().replace(/\s+/g, "-") === slug
-        );
+        const found = await getInstructorBySlug(slug);
 
         if (!found) {
           setInstructor(null);
@@ -58,20 +56,14 @@ export default function InstructorDetails() {
           setTotalReviews(found.reviews.length);
         }
 
-        // ✅ Fetch courses count (safe version)
+        // ✅ Fetch courses count
         let courseCount = 0;
         try {
-          const courseRes = await fetch("http://localhost:3000/courses");
-          if (courseRes.ok) {
-            const coursesData = await courseRes.json();
-            const instructorCourses = coursesData.filter(
-              (c) => String(c.instructorId) === String(found.id)
-            );
-            courseCount = instructorCourses.length;
-          } else {
-            console.warn("⚠️ Courses API not responding, using fallback.");
-            courseCount = found.courses || 0;
-          }
+          const coursesData = await getAllCourses();
+          const instructorCourses = coursesData.filter(
+            (c) => c.instructor && String(c.instructor) === String(found._id)
+          );
+          courseCount = instructorCourses.length;
         } catch {
           console.warn("⚠️ Could not fetch courses. Using fallback value.");
           courseCount = found.courses || 0;
@@ -83,7 +75,11 @@ export default function InstructorDetails() {
           setIsFollowing(true);
         }
 
-        setInstructor(found);
+        // Format instructor data to match frontend expectations
+        setInstructor({
+          ...found,
+          id: found._id
+        });
       } catch (err) {
         console.error("❌ Error loading instructor:", err);
         toast.error("Failed to load instructor data!");
@@ -105,14 +101,8 @@ export default function InstructorDetails() {
     }
 
     try {
-      const res = await fetch(
-        `http://localhost:4002/instructors/${instructor.id}`
-      );
-      if (!res.ok) throw new Error("Failed to fetch instructor data");
-      const freshInstructor = await res.json();
-
-      const currentFollowers = Array.isArray(freshInstructor.followersList)
-        ? [...freshInstructor.followersList]
+      const currentFollowers = Array.isArray(instructor.followersList)
+        ? [...instructor.followersList]
         : [];
 
       let newFollowersList = [...currentFollowers];
@@ -134,25 +124,21 @@ export default function InstructorDetails() {
       }
 
       const updatedInstructor = {
-        ...freshInstructor,
+        ...instructor,
         followersList: newFollowersList,
         followers:
-          (freshInstructor.followers || 0) +
+          (instructor.followers || 0) +
           (newFollowersList.length - currentFollowers.length),
       };
 
-      const updateRes = await fetch(
-        `http://localhost:4002/instructors/${instructor.id}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedInstructor),
-        }
-      );
+      const result = await updateInstructor(instructor._id, updatedInstructor);
 
-      if (!updateRes.ok) throw new Error("Failed to update instructor");
+      if (!result) throw new Error("Failed to update instructor");
 
-      setInstructor(updatedInstructor);
+      setInstructor({
+        ...result,
+        id: result._id
+      });
     } catch (err) {
       console.error("❌ Follow action failed:", err);
       toast.error("Something went wrong. Try again later.", {

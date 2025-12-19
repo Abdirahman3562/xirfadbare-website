@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import CourseCard from "./CourseCard";
+import { API_BASE_URL } from "../../config";
 
 function Courses({ IsHome }) {
   const [courses, setCourses] = useState([]);
 
   useEffect(() => {
     const fetchCourses = async () => {
-      // ✅ sax endpoint: /courses (ma aha /course)
       const apiURL = IsHome
-        ? "http://localhost:3000/courses?_limit=3"
-        : "http://localhost:3000/courses";
+        ? `${API_BASE_URL}/courses?_limit=3`
+        : `${API_BASE_URL}/courses`;
 
       try {
         const res = await fetch(apiURL);
@@ -19,7 +19,7 @@ function Courses({ IsHome }) {
         }
 
         const data = await res.json();
-        setCourses(data);
+        setCourses(IsHome ? data.slice(0, 3) : data);
       } catch (error) {
         console.error("❌ Failed to fetch courses:", error);
       }
@@ -35,12 +35,13 @@ function Courses({ IsHome }) {
           title={IsHome ? "Featured Courses" : "All Courses"}
           cta={IsHome ? { href: "/courses", label: "View All" } : null}
           center={!IsHome}
+          IsHome={IsHome}
         />
 
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {courses.length > 0 ? (
             courses.map((course) => (
-              <CourseCard course={course} key={course.id} />
+              <CourseCard course={course} key={course._id || course.id} />
             ))
           ) : (
             <p className="text-center text-gray-500 col-span-full">

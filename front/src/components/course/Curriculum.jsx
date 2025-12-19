@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   FaChevronDown,
   FaChevronUp,
@@ -11,45 +11,27 @@ import {
   FaUserGraduate,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { getFullCourseDetails } from "../../api/courseService"; // ✅ soo saar xogta API-ga
 
-export default function Curriculum({ courseId }) {
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function Curriculum({
+  level,
+  curriculum = [],
+  learningOutcomes = [],
+  price,
+  courseId,
+  enrolledCount = 0,
+  courseTitle
+}) {
   const [openSections, setOpenSections] = useState({});
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function fetchCourse() {
-      try {
-        const data = await getFullCourseDetails(courseId);
-        setCourse(data);
-      } catch (err) {
-        console.error("❌ Error fetching curriculum:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    if (courseId) fetchCourse();
-  }, [courseId]);
-
-  if (loading) {
+  // ✅ Loading state ma jiro - data props ka timid
+  if (!curriculum || curriculum.length === 0) {
     return (
       <div className="text-center py-10 text-emerald-600 font-semibold">
         Loading curriculum...
       </div>
     );
   }
-
-  if (!course) {
-    return (
-      <div className="text-center py-10 text-red-500 font-semibold">
-        Curriculum data not found 😕
-      </div>
-    );
-  }
-
-  const { curriculum = [], learningOutcomes = [], price, level } = course;
   const isPaid = Number(price) > 0;
 
   // 🔹 Toggle sections
@@ -107,7 +89,7 @@ export default function Curriculum({ courseId }) {
         <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] transition">
           <FaUserGraduate className="text-emerald-500 text-2xl mx-auto mb-2" />
           <p className="text-xl font-semibold text-gray-800">
-            {course.enrolledCount || 0}
+            {enrolledCount || 0}
           </p>
           <p className="text-gray-500 text-sm">Students Enrolled</p>
         </div>
@@ -247,9 +229,9 @@ export default function Curriculum({ courseId }) {
           {isPaid ? (
             <button
               onClick={() => {
-                if (course?.title) {
+                if (courseTitle) {
                   navigate(
-                    `/payment/${course.title
+                    `/payment/${courseTitle
                       .toLowerCase()
                       .replace(/\s+/g, "-")}`
                   );

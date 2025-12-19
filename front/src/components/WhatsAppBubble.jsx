@@ -46,11 +46,11 @@ export default function WhatsAppBubbleFixedRight() {
       <div className="relative">
    {/* Pulse effect added here */}
         <span className="absolute inset-0 rounded-full bg-emerald-400 opacity-90 animate-ping"></span>
-        <span className="absolute inset-0 rounded-full bg-emerald-400 opacity-80  w-3 h-3 z-10 left-8 top-[-3px]  "></span>
+        <span className="absolute inset-0 rounded-full bg-emerald-400 opacity-80  w-3 h-3 z-10 left-14  "></span>
         {/* Main button */}
         <button
           onClick={() => setOpen((v) => !v)}
-          className="relative h-12 w-12 cursor-pointer rounded-full shadow-2xl grid place-items-center bg-emerald-500 hover:bg-emerald-600 transition"
+          className="relative h-20 w-20 cursor-pointer rounded-full shadow-2xl grid place-items-center bg-emerald-500 hover:bg-emerald-600 transition"
           aria-label="WhatsApp chat"
         >
           <svg

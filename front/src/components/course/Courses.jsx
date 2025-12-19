@@ -1,50 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import CourseCard from "./CourseCard";
-import { getFullCourseDetails } from "../../api/courseService"; // ✅ import sax ah
+import { useData } from "../../contexts/DataContext";
 
 function Courses({ IsHome }) {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { courses, loading } = useData();
 
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        // ✅ Hel koorsooyinka asalka ah
-        const res = await fetch(
-          IsHome
-            ? "http://localhost:3000/courses?_limit=3"
-            : "http://localhost:3000/courses"
-        );
+  // ✅ Ku dar limit haddii IsHome yahay - data hore u diyaarsan tahay
+  const displayCourses = IsHome ? courses.slice(0, 3) : courses;
 
-        if (!res.ok) throw new Error("❌ Failed to fetch base courses");
-        const baseCourses = await res.json();
-
-        // ✅ Koorsada walba ku dar xogta buuxda
-        const fullCourses = await Promise.all(
-          baseCourses.map(async (c) => {
-            const details = await getFullCourseDetails(c.id);
-            return details ? details : c; // fallback haddii error yimaado
-          })
-        );
-
-        setCourses(fullCourses);
-      } catch (error) {
-        console.error("❌ Failed to load courses:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourses();
-  }, [IsHome]);
-
-  if (loading) {
-    return (
-      <p className="text-center mt-10 text-gray-500">
-        Koorsooyinka waa la rarayaa...
-      </p>
-    );
-  }
+  // Loading state waxaa maamusha DataProvider (global loader)
 
   return (
     <section className="px-6 py-20">
@@ -56,9 +20,9 @@ function Courses({ IsHome }) {
         />
 
         <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {courses.length > 0 ? (
-            courses.map((course) => (
-              <CourseCard course={course} key={course.id} />
+          {displayCourses.length > 0 ? (
+            displayCourses.map((course) => (
+              <CourseCard course={course} key={course._id || course.id} />
             ))
           ) : (
             <p className="text-center text-gray-500 col-span-full">

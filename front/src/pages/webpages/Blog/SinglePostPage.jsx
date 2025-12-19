@@ -9,15 +9,23 @@ import {
   FaTwitter,
 } from "react-icons/fa";
 import RelatedArticles from "../../../components/Blog/RelatedArticles";
+import { CommentSection } from "../../../components/Comment";
+import { getAllBlogs, getBlogById } from "../../../api/blogService";
+import { useAuth } from "../../../hooks/useAuth";
 
 function SinglePostPage() {
   const { title } = useParams();
+  const { user } = useAuth();
   const [article, setArticle] = useState(null);
   const [articles, setArticles] = useState([]);
   const [author, setAuthor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authorLoading, setAuthorLoading] = useState(false);
   const [authorPosts, setAuthorPosts] = useState([]);
+
+
+  // Helper: create slug
+  const toSlug = (str) => str?.toLowerCase().replace(/\s+/g, "-") ?? "";
 
   // Helper: format date
   const formatDate = (dateString) => {
@@ -29,20 +37,22 @@ function SinglePostPage() {
     });
   };
 
-  // Helper: create slug
-  const toSlug = (str) => str?.toLowerCase().replace(/\s+/g, "-") ?? "";
-
   // 1️⃣ Load all blogs
   useEffect(() => {
     const loadBlogs = async () => {
       try {
         setLoading(true);
-        const res = await fetch("http://localhost:4000/blogs");
-        if (!res.ok) throw new Error("Failed to load blogs");
-        const data = await res.json();
+        const data = await getAllBlogs();
 
-        setArticles(data);
-        const selected = data.find((b) => toSlug(b.title) === title);
+        // Format data to match frontend expectations
+        const formattedData = data.map(blog => ({
+          ...blog,
+          id: blog._id,
+          authorId: blog.author?._id
+        }));
+
+        setArticles(formattedData);
+        const selected = formattedData.find((b) => toSlug(b.title) === title);
         setArticle(selected || null);
       } catch (err) {
         console.error("Error loading article:", err);
@@ -54,41 +64,38 @@ function SinglePostPage() {
     loadBlogs();
   }, [title]);
 
-  // 2️⃣ Load author info once article is found
+  // 2️⃣ Set author info once article is found (author is already populated)
   useEffect(() => {
     if (!article) return;
 
-    const loadAuthor = async () => {
-      try {
-        setAuthorLoading(true);
-        const res = await fetch("http://localhost:4001/authors");
-        if (!res.ok) throw new Error("Failed to load authors");
-        const authors = await res.json();
+    setAuthorLoading(true);
 
-        const matched = authors.find(
-          (a) => Number(a.id) === Number(article.authorId)
-        );
+    if (article.author) {
+      setAuthor({
+        id: article.author._id,
+        username: article.author.username,
+        name: article.author.name,
+        avatar: article.author.avatar,
+        bio: article.author.bio || "No bio available yet.",
+        verified: !!article.author.verified,
+        social: article.author.social || {}
+      });
+    } else {
+      setAuthor(null);
+    }
 
-        setAuthor(matched || null);
-      } catch (err) {
-        console.error("Error loading author:", err);
-        setAuthor(null);
-      } finally {
-        setAuthorLoading(false);
-      }
-    };
-
-    loadAuthor();
+    setAuthorLoading(false);
   }, [article]);
 
   // 3️⃣ Calculate number of posts by this author
   useEffect(() => {
     if (!author || !articles.length) return;
     const posts = articles.filter(
-      (p) => Number(p.authorId) === Number(author.id)
+      (p) => p.author && p.author._id === author.id
     );
     setAuthorPosts(posts);
   }, [author, articles]);
+
 
   // 4️⃣ Related posts (same category)
   const relatedPosts = article
@@ -284,6 +291,12 @@ function SinglePostPage() {
         relatedPosts={relatedPosts}
         currentPostCategory={article.category}
       />
+
+      {/* Comment Section */}
+      <div className="mt-12 max-w-4xl mx-auto">
+        <CommentSection article={article} />
+      </div>
+
     </div>
   );
 }

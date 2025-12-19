@@ -10,10 +10,11 @@ import {
 import {
   getFullCourseDetails,
   getFullCourseDetailsBySlug,
-} from "../../../api/courseService"; // <-- Make sure this path is correct
+} from "../../../api/courseService";
+import { API_BASE_URL } from "../../../config";
 
 function PaymentPage() {
-  const { id } = useParams(); // id could be numeric OR slug
+  const { id } = useParams();
   const [course, setCourse] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState(null);
@@ -35,11 +36,10 @@ function PaymentPage() {
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
-        // detect numeric id
-        const isNumeric = !isNaN(Number(id));
+        const isObjectId = id.length === 24;
 
         let courseData;
-        if (isNumeric) {
+        if (isObjectId) {
           courseData = await getFullCourseDetails(id);
         } else {
           courseData = await getFullCourseDetailsBySlug(id);
@@ -104,87 +104,78 @@ function PaymentPage() {
     }
   };
 
-  // save paymen details
-
+  // save payment details
   const handlePayment = async () => {
-  const user = getLoggedInUser();
-  if (!user) {
-    toast.error("Please login first to complete your order.");
-    return;
-  }
-
-  // ✅ Validation: Payment method lama xulan
-  if (!selectedMethod) {
-    toast.error("Please select a payment method.");
-    return;
-  }
-
-  // ✅ Validation: Phone lama buuxin ama waa mid khaldan
-  if (!phone.trim()) {
-    toast.error("Please enter your phone number.");
-    return;
-  }
-  if (!/^[0-9]{8,15}$/.test(phone)) {
-    toast.error("Invalid phone number format. Use 8–15 digits.");
-    return;
-  }
-
-  // 🟢 HALKAN dhig check-ka order duplicate ka hor intaadan POST dirin
-  const existingOrder = await fetch(
-    `http://localhost:4010/orders?userId=${user.id}&courseId=${course.id}`
-  );
-  const data = await existingOrder.json();
-
-  if (data.length > 0) {
-    toast.error("You already ordered this course.");
-    return;
-  }
-
-  // ✅ order data
-  const orderData = {
-  userId: user.id,
-  userName: `${user.firstName} ${user.lastName || ""}`,
-  userEmail: user.email,
-  courseTitle: course.title,
-  courseId: course.id,
-  paymentType: selectedTab === "local" ? "Local Payment" : "Online Payment",
-  paymentMethod: selectedMethod,
-  phoneNumber: phone,
-  totalToPay: Number(finalPrice),
-
-  // 🟢 Status cusub
-  status: "pending", // default marka order la sameeyo
-
-  // 🟢 Waqti la akhriyi karo
-  createdAt: new Date().toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  }),
-};
-
-
-  try {
-    const res = await fetch("http://localhost:4010/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData),
-    });
-
-    if (res.ok) {
-      toast.success("✅ Order placed successfully!");
-      setTimeout(() => navigate("/dashboard/orders"), 1500);
-    } else {
-      toast.error("❌ Failed to save order on server!");
+    const user = getLoggedInUser();
+    if (!user) {
+      toast.error("Please login first to complete your order.");
+      return;
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Server error while saving order!");
-  }
-};
+
+    if (!selectedMethod) {
+      toast.error("Please select a payment method.");
+      return;
+    }
+
+    if (!phone.trim()) {
+      toast.error("Please enter your phone number.");
+      return;
+    }
+    if (!/^[0-9]{8,15}$/.test(phone)) {
+      toast.error("Invalid phone number format. Use 8–15 digits.");
+      return;
+    }
+
+    // Check for duplicate order
+    try {
+      const existingOrderRes = await fetch(
+        `${API_BASE_URL}/orders/myorders`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        }
+      );
+      const myOrders = await existingOrderRes.json();
+      const duplicate = myOrders.find(o => o.course === course._id);
+
+      if (duplicate) {
+        toast.error("You already ordered this course.");
+        return;
+      }
+
+      const orderData = {
+        courseId: course._id,
+        courseTitle: course.title,
+        paymentType: selectedTab === "local" ? "Local Payment" : "Online Payment",
+        paymentMethod: selectedMethod,
+        phoneNumber: phone,
+        totalToPay: totalPrice,
+        discountApplied: (totalPrice * (websiteDiscount + appliedDiscount)).toFixed(2),
+        finalPrice: Number(finalPrice),
+      };
+
+      const res = await fetch(`${API_BASE_URL}/orders`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (res.ok) {
+        toast.success("✅ Order placed successfully!");
+        setTimeout(() => navigate("/dashboard/orders"), 1500);
+      } else {
+        const errorData = await res.json();
+        toast.error(errorData.message || "❌ Failed to save order!");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Server error while saving order!");
+    }
+  };
 
 
   // Calculate duration per section
@@ -410,7 +401,7 @@ function PaymentPage() {
                     }}
                     placeholder="E.g. 612345678"
                     required={selectedTab === "local"} // ✅ required oo kaliya marka local
-                    className={`w-full border rounded-lg px-3 py-2 focus:outline-none transition ${
+                    className={`w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 ${
                       selectedTab === "local" &&
                       phone.length > 0 &&
                       (phone.length < 8 || phone.length > 15)

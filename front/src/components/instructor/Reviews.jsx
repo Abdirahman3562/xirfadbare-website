@@ -10,6 +10,8 @@ import {
   FaBook,
 } from "react-icons/fa";
 import toast, { Toaster } from "react-hot-toast";
+import { getInstructorBySlug, updateInstructor } from "../../api/instructorService";
+import { getAllCourses } from "../../api/courseService";
 
 /* ----------------------------------------------------------------
    ✅ Helper Function
@@ -85,9 +87,7 @@ export default function Reviews() {
   useEffect(() => {
     const fetchInstructorAndReviews = async () => {
       try {
-        const res = await fetch("http://localhost:4002/instructors");
-        const data = await res.json();
-        const found = data.find((i) => generateSlug(i.name) === slug);
+        const found = await getInstructorBySlug(slug);
 
         if (!found) {
           setInstructor(null);
@@ -95,13 +95,12 @@ export default function Reviews() {
           return;
         }
 
-        const courseRes = await fetch("http://localhost:3000/courses");
-        const allCourses = await courseRes.json();
+        const allCourses = await getAllCourses();
         const instructorCourses = allCourses.filter(
-          (c) => String(c.instructorId) === String(found.id)
+          (c) => c.instructor && String(c.instructor) === String(found._id)
         );
 
-        setInstructor({ ...found, courses: instructorCourses });
+        setInstructor({ ...found, id: found._id, courses: instructorCourses });
         setReviews(found.reviews || []);
       } catch (err) {
         console.error("❌ Error fetching instructor/reviews:", err);
@@ -173,11 +172,7 @@ export default function Reviews() {
 
       const updatedInstructor = { ...instructor, reviews: updatedReviews };
 
-      await fetch(`http://localhost:4002/instructors/${instructor.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedInstructor),
-      });
+      await updateInstructor(instructor.id, updatedInstructor);
 
       setReviews(updatedReviews);
       setExistingReview(newReview);
@@ -332,7 +327,7 @@ export default function Reviews() {
                   ? instructor.courses
                   : []
                 ).map((c) => (
-                  <option key={c.id} value={c.id}>
+                  <option key={c._id || c.id} value={c._id || c.id}>
                     {c.title}
                   </option>
                 ))}

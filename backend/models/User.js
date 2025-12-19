@@ -1,0 +1,37 @@
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+
+const userSchema = mongoose.Schema(
+  {
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    phone: { type: String },
+    password: { type: String, required: true },
+    image: { type: String },
+    role: { type: String, enum: ['student', 'admin'], default: 'student' },
+  },
+  { timestamps: true }
+);
+
+userSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.pre('save', async function() {
+  if (!this.isModified('password')) {
+    return;
+  }
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  } catch (error) {
+    throw error;
+  }
+});
+
+const User = mongoose.model('User', userSchema);
+export default User;
+
+
+

@@ -1,41 +1,12 @@
 import React from "react";
 import { FaQuoteRight, FaStar } from "react-icons/fa";
+import { useData } from "../../contexts/DataContext";
 
 export default function Testimonials() {
-  const testimonials = [
-    {
-      name: "Ayaan Cabdi",
-      role: "Frontend Developer",
-      tag: "Built strong web design skills",
-      img: "https://randomuser.me/api/portraits/women/44.jpg",
-      quote:
-        "Xirfadbare waa goob waxbarasho oo runtii wax ka bedeshay xirfadeyda. Tababarka iyo hagidda macallimiinta ayaa iga dhigay inaan si kalsooni leh u dhiso web apps xirfad leh.",
-    },
-    {
-      name: "Mohamed Abdi",
-      role: "Full Stack Engineer",
-      tag: "From learner to tech professional",
-      img: "https://randomuser.me/api/portraits/men/41.jpg",
-      quote:
-        "Markii aan ku biiray Xirfadbare, waxaan bartay React, Node.js, iyo MongoDB. Waxay i siisay xirfad dhab ah iyo kalsooni aan shaqo ku helo si dhakhso ah.",
-    },
-    {
-      name: "Hodan Yusuf",
-      role: "UI/UX Designer",
-      tag: "Mastered modern design tools",
-      img: "https://randomuser.me/api/portraits/women/31.jpg",
-      quote:
-        "Casharrada Xirfadbare waa kuwo la fahmi karo oo lagu tababaro si wax ku ool ah. Maanta waxaan si xirfad leh u isticmaalaa Figma iyo UX principles-ka casriga ah.",
-    },
-    {
-      name: "Khalid Ahmed",
-      role: "Backend Developer",
-      tag: "Enhanced API and database skills",
-      img: "https://randomuser.me/api/portraits/men/53.jpg",
-      quote:
-        "Xirfadbare waxay i siisay aasaas adag oo ku saabsan backend development. Waxaan bartay Node.js, Express iyo MongoDB, taas oo iga dhigtay mid shaqadiisa si kalsooni leh u qabta.",
-    },
-  ];
+  const { testimonials } = useData();
+
+  // Filter only active testimonials (isActive === true) from database
+  const activeTestimonials = testimonials.filter(t => t.isActive === true);
 
   return (
     <section className="py-20 ">
@@ -49,23 +20,26 @@ export default function Testimonials() {
         </div>
 
         {/* ✅ Testimonials Grid */}
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((t, i) => (
+        {activeTestimonials.length > 0 ? (
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {activeTestimonials.map((t) => (
             <div
-              key={i}
+              key={t._id}
               className="bg-[#edf4f5] border border-gray-200 hover:border-emerald-400 rounded-2xl p-6 shadow-sm hover:shadow-md transition relative "
             >
               {/* ⭐ Stars */}
               <div className="flex gap-1 text-[#00cc8f] mb-3">
-                {[...Array(5)].map((_, idx) => (
+                {[...Array(t.rating || 5)].map((_, idx) => (
                   <FaStar key={idx} />
                 ))}
               </div>
 
               {/* 🏷️ Tag */}
-              <span className="inline-block text-xs font-semibold text-[#00cc8f] bg-emerald-50 px-3 py-1 rounded-full mb-4">
-                {t.tag}
-              </span>
+              {t.tag && (
+                <span className="inline-block text-xs font-semibold text-[#00cc8f] bg-emerald-50 px-3 py-1 rounded-full mb-4">
+                  {t.tag}
+                </span>
+              )}
 
               {/* 💬 Quote */}
               <p className="text-gray-700 italic leading-relaxed relative">
@@ -76,9 +50,12 @@ export default function Testimonials() {
               {/* 👤 Author Info */}
               <div className="flex items-center gap-4 mt-6">
                 <img
-                  src={t.img}
+                  src={t.image || "https://randomuser.me/api/portraits/lego/1.jpg"}
                   alt={t.name}
                   className="w-12 h-12 rounded-full object-cover border-2 border-[#00cc8f]"
+                  onError={(e) => {
+                    e.target.src = "https://randomuser.me/api/portraits/lego/1.jpg";
+                  }}
                 />
                 <div>
                   <h4 className="font-bold text-gray-900">{t.name}</h4>
@@ -86,8 +63,9 @@ export default function Testimonials() {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );

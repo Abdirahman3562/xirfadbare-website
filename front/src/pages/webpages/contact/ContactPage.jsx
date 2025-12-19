@@ -42,12 +42,23 @@ export default function ContactPage() {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      // 👉 Halkaan waxaad ku xidhi kartaa API-gaaga/Email service (EmailJS, form backend, iwm.)
-      console.log("Submitting contact form:", form);
-      setStatus("ok");
-      setForm({ name: "", phone: "", email: "", about: "", message: "" });
-      setTimeout(() => setStatus(null), 3500);
+      const response = await fetch('http://localhost:5000/api/contacts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (response.ok) {
+        setStatus("ok");
+        setForm({ name: "", phone: "", email: "", about: "", message: "" });
+        setTimeout(() => setStatus(null), 3500);
+      } else {
+        throw new Error('Failed to send message');
+      }
     } catch (e) {
+      console.error('Error submitting contact form:', e);
       setStatus("err");
       setTimeout(() => setStatus(null), 3500);
     }

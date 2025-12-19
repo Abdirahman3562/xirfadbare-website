@@ -2,26 +2,16 @@ import { FaCode, FaArrowLeft } from "react-icons/fa6";
 import { Link, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Curriculum from "../../../components/course/Curriculum";
-import { getFullCourseDetailsBySlug } from "../../../api/courseService"; // ✅ isticmaal slug service
+import Testimonials from "../../../components/Home/Testimonials";
+import FAQ from "../../../components/Home/FAQ";
+import { useData } from "../../../contexts/DataContext";
 
 function CourseDetails() {
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const { slug } = useParams(); // 🔥 slug halkii id laga isticmaali lahaa
+  const { getCourseBySlug } = useData();
+  const { slug } = useParams();
 
-  useEffect(() => {
-    async function fetchCourseDetails() {
-      try {
-        const data = await getFullCourseDetailsBySlug(slug);
-        setCourse(data);
-      } catch (error) {
-        console.error("❌ Error fetching course details:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    if (slug) fetchCourseDetails();
-  }, [slug]);
+  // ✅ Hel course-ka si toos ah oo data preloaded ah
+  const course = getCourseBySlug(slug);
 
   // ✅ Update browser tab title
   useEffect(() => {
@@ -29,15 +19,6 @@ function CourseDetails() {
       document.title = `${course.title} | Xirfadbaxe`;
     }
   }, [course]);
-
-  // 🌀 Loading UI
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen text-emerald-600 font-semibold text-xl">
-        Loading course details...
-      </div>
-    );
-  }
 
   // ❌ Error or not found
   if (!course) {
@@ -129,7 +110,9 @@ function CourseDetails() {
             curriculum={course.curriculum}
             learningOutcomes={course.learningOutcomes}
             price={course.price}
-            courseId={course.id}
+            courseId={course._id || course.id}
+            enrolledCount={course.enrolledCount}
+            courseTitle={course.title}
           />
         </main>
 
@@ -199,6 +182,12 @@ function CourseDetails() {
           </div>
         </aside>
       </div>
+
+      {/* ✅ Testimonials Section */}
+      <Testimonials />
+
+      {/* ✅ FAQ Section */}
+      <FAQ />
     </div>
   );
 }

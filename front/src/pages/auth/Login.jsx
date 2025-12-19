@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { API_BASE_URL } from "../../config";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -23,30 +24,29 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const res = await fetch(
-        `http://localhost:5000/users?email=${formData.email}`
-      );
+      const res = await fetch(`${API_BASE_URL}/users/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
       const data = await res.json();
 
-      if (data.length === 0) {
-        toast.error(" No account found with this email!");
+      if (!res.ok) {
+        toast.error(data.message || "Invalid credentials!");
         return;
       }
 
-      const user = data[0];
-
-     if (user.password === formData.password) {
-  localStorage.setItem("loggedInUser", JSON.stringify(user));
-  window.dispatchEvent(new Event("userLogin")); // 🔥 isla markiiba
-  toast.success(`Welcome back, ${user.firstName}!`);
-  navigate("/dashboard/student");
-}
- else {
-        toast.error(" Incorrect password!");
-      }
+      localStorage.setItem("loggedInUser", JSON.stringify(data));
+      window.dispatchEvent(new Event("userLogin"));
+      toast.success(`Welcome back, ${data.firstName}!`);
+      
+      // Redirect to student dashboard
+      navigate("/dashboard/student");
     } catch (err) {
       console.error(err);
-      toast.error(" Server error — is JSON server running?");
+      toast.error("Server error — is the backend running?");
     }
   };
 

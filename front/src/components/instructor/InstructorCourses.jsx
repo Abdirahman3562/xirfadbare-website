@@ -7,6 +7,8 @@ import {
   FaCode,
   FaCalendarAlt,
 } from "react-icons/fa";
+import { getInstructorBySlug } from "../../api/instructorService";
+import { getAllCourses } from "../../api/courseService";
 
 const InstructorCourses = ({ instructorSlug }) => {
 
@@ -18,12 +20,7 @@ const InstructorCourses = ({ instructorSlug }) => {
   useEffect(() => {
     const fetchInstructorCourses = async () => {
       try {
-        const instructorRes = await fetch("http://localhost:4002/instructors");
-        const instructorData = await instructorRes.json();
-
-        const foundInstructor = instructorData.find(
-          (i) => i.name.toLowerCase().replace(/\s+/g, "-") === instructorSlug
-        );
+        const foundInstructor = await getInstructorBySlug(instructorSlug);
 
         if (!foundInstructor) {
           setInstructor(null);
@@ -32,52 +29,33 @@ const InstructorCourses = ({ instructorSlug }) => {
         }
 
         setInstructor(foundInstructor);
-        console.log("Instructor Slug:", generateSlug(foundInstructor.name));
 
-
-        const courseRes = await fetch("http://localhost:3000/courses");
-        const courseData = await courseRes.json();
+        const courseData = await getAllCourses();
 
         const instructorCourses = courseData.filter(
-          (c) => String(c.instructorId) === String(foundInstructor.id)
+          (c) => c.instructor && String(c.instructor) === String(foundInstructor._id)
         );
 
-        // ✅ Fetch curriculum and lessons durations
-        const detailedCourses = await Promise.all(
-          instructorCourses.map(async (course) => {
-            const curriculumRes = await fetch(
-              `http://localhost:4003/curriculum?courseId=${course.id}`
-            );
-            const curriculum = await curriculumRes.json();
+        // ✅ Process courses with curriculum data (already embedded from backend)
+        const detailedCourses = instructorCourses.map((course) => {
+          const totalLessons = (course.curriculum || []).reduce(
+            (sum, section) => sum + (section.lessons?.length || 0),
+            0
+          );
 
-            const lessonData = await Promise.all(
-              curriculum.map(async (c) => {
-                const lessonsRes = await fetch(
-                  `http://localhost:4004/lessons?curriculumId=${c.id}`
-                );
-                const lessons = await lessonsRes.json();
+          const totalDuration = (course.curriculum || []).reduce(
+            (sum, section) =>
+              sum +
+              (section.lessons || []).reduce(
+                (sectionSum, lesson) =>
+                  sectionSum + parseDurationToSeconds(lesson.duration),
+                0
+              ),
+            0
+          );
 
-                const totalDuration = lessons.reduce(
-                  (sum, l) => sum + parseDurationToSeconds(l.duration),
-                  0
-                );
-
-                return { lessonCount: lessons.length, totalDuration };
-              })
-            );
-
-            const totalLessons = lessonData.reduce(
-              (a, b) => a + b.lessonCount,
-              0
-            );
-            const totalDuration = lessonData.reduce(
-              (a, b) => a + b.totalDuration,
-              0
-            );
-
-            return { ...course, totalLessons, totalDuration };
-          })
-        );
+          return { ...course, totalLessons, totalDuration };
+        });
 
         setCourses(detailedCourses);
       } catch (err) {
@@ -124,7 +102,7 @@ const InstructorCourses = ({ instructorSlug }) => {
 
         return (
           <div
-            key={course.id}
+            key={course._id || course.id}
             className="group relative bg-[#edf4f5] border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
           >
             {/* ✅ Thumbnail */}

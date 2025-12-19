@@ -11,6 +11,9 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getMyOrders } from "../../../api/orderService";
+import { getAllCourses } from "../../../api/courseService";
+import { getUserProgress } from "../../../api/userProgressService";
 
 export default function StudentContent() {
   const [courses, setCourses] = useState([]);
@@ -23,25 +26,8 @@ export default function StudentContent() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // ✅ Hel user-ka login-garay
-        const user =
-          JSON.parse(localStorage.getItem("loggedInUser")) ||
-          JSON.parse(localStorage.getItem("user"));
-        const userId = user?.id || user?._id || user?.uid;
-
-        if (!userId) {
-          console.warn("⚠️ No logged-in user found!");
-          setCourses([]);
-          setLoading(false);
-          return;
-        }
-
-        // ✅ Hel orders ee user-kan
-        const res = await fetch("http://localhost:4010/orders");
-        const orders = await res.json();
-        const userOrders = orders.filter(
-          (order) => String(order.userId) === String(userId)
-        );
+        // ✅ Hel orders ee user-kan (backend API)
+        const userOrders = await getMyOrders();
 
         if (userOrders.length === 0) {
           setCourses([]);
@@ -49,80 +35,74 @@ export default function StudentContent() {
           return;
         }
 
+        // ✅ Hel dhammaan courses-ka
+        const allCourses = await getAllCourses();
+
         // ✅ Ku dar xogta course + progress
         const enrichedCourses = await Promise.all(
           userOrders.map(async (order) => {
             try {
-              // Hel course info
-              const resCourse = await fetch(
-                `http://localhost:3000/courses?id=${Number(order.courseId)}`
-              );
-              const courseData = await resCourse.json();
-              const course = courseData[0];
-
-              // Hel curriculum
-              const resCurriculum = await fetch(
-                `http://localhost:4003/curriculum?courseId=${order.courseId}`
-              );
-              const curriculum = await resCurriculum.json();
-              const curriculumIds = curriculum.map((c) => c.id);
-
-              // Hel lessons
-              const resLessons = await fetch("http://localhost:4004/lessons");
-              const allLessons = await resLessons.json();
-              const lessons = allLessons.filter((lesson) =>
-                curriculumIds.map(String).includes(String(lesson.curriculumId))
+              // Hel course info from allCourses
+              const course = allCourses.find(
+                (c) => c._id === order.course || c._id === order.courseId
               );
 
-              // ✅ Hel progress ka JSON Server
+              if (!course) {
+                return {
+                  ...order,
+                  id: order._id,
+                  title: order.courseTitle,
+                  description: "Course details unavailable.",
+                  image: "https://i.ibb.co/Yk2JmWv/default-course.jpg",
+                  lessonsCount: 0,
+                  progress: order.status === "pending" ? 0 : 0,
+                  lastAccess: null,
+                };
+              }
+
+              // ✅ Xisaabi total lessons from curriculum
+              const totalLessons = (course.curriculum || []).reduce(
+                (sum, section) => sum + (section.lessons?.length || 0),
+                0
+              );
+
+              // ✅ Hel progress ka backend API
               let userProgress = null;
               try {
-                const resProgress = await fetch(
-                  `http://localhost:4011/userProgress?userId=${userId}&courseId=${order.courseId}`
-                );
-                const progressData = await resProgress.json();
-                userProgress = progressData[0] || null;
+                const progressData = await getUserProgress(course._id);
+                userProgress = progressData;
               } catch (err) {
                 console.warn("⚠️ Failed to fetch user progress:", err);
               }
 
               // ✅ Xisaabi progress
               const completedLessons = userProgress?.completedLessons || [];
-              const totalLessons = lessons.length || 0;
-              const progress =
-                totalLessons > 0
-                  ? Math.min(
-                      100,
-                      Math.round((completedLessons.length / totalLessons) * 100)
-                    )
-                  : 0;
+              const progress = userProgress?.progress || 0;
               const lastAccess = userProgress?.lastAccess || null;
 
               return {
                 ...order,
-                title: course?.title || order.courseTitle,
-                description:
-                  course?.description ||
-                  "No description available for this course.",
-                image:
-                  course?.thumbnail ||
-                  "https://i.ibb.co/Yk2JmWv/default-course.jpg",
+                id: order._id,
+                title: course.title || order.courseTitle,
+                description: course.description || "No description available for this course.",
+                image: course.thumbnail || "https://i.ibb.co/Yk2JmWv/default-course.jpg",
                 lessonsCount: totalLessons,
-                progress:
-                  (!userProgress && order.status === "pending") ||
-                  order.status === "pending"
-                    ? 0
-                    : progress,
+                progress: order.status === "pending" ? 0 : progress,
                 lastAccess: order.status === "pending" ? null : lastAccess,
+                courseSlug: course.title?.toLowerCase().replace(/\s+/g, "-"),
+                currentLesson: userProgress?.currentLesson,
               };
-            } catch {
+            } catch (error) {
+              console.error("Error processing order:", error);
               return {
                 ...order,
+                id: order._id,
                 title: order.courseTitle,
                 description: "Course details unavailable.",
                 image: "https://i.ibb.co/Yk2JmWv/default-course.jpg",
                 lessonsCount: 0,
                 progress: 0,
+                lastAccess: null,
               };
             }
           })
@@ -278,7 +258,7 @@ export default function StudentContent() {
 
               return (
                 <div
-                  key={course.id}
+                  key={course._id || course.id}
                   className="group relative bg-[#ffffff] border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col md:flex-row"
                 >
                   {/* Thumbnail */}
@@ -386,10 +366,10 @@ export default function StudentContent() {
                     </div>
 
                     <Link
-                      to={`/watch/courses/${slugify(
+                      to={`/watch/courses/${course.courseSlug || slugify(
                         course.title
                       )}/lessons/${slugify(
-                        course.lastAccess?.lessonTitle || "introduction"
+                        course.currentLesson || course.lastAccess?.lessonTitle || "introduction"
                       )}`}
                       className={`mt-6 font-medium px-5 py-2 rounded-lg text-sm transition self-start shadow-sm flex items-center gap-2 ${
                         course.status === "pending"

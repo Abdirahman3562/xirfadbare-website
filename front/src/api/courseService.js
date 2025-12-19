@@ -1,47 +1,19 @@
+import { API_BASE_URL } from '../config';
+
 // ✅ Get course by ID
 export async function getFullCourseDetails(courseId) {
   try {
-    // 1️⃣ Fetch course (using ?id=)
-    const courseRes = await fetch(`http://localhost:3000/courses?id=${courseId}`);
+    const courseRes = await fetch(`${API_BASE_URL}/courses/${courseId}`);
     if (!courseRes.ok) throw new Error(`❌ Course not found (ID: ${courseId})`);
 
-    const courseData = await courseRes.json();
-    const course = courseData[0];
+    const course = await courseRes.json();
     if (!course) throw new Error(`❌ Course data empty (ID: ${courseId})`);
 
-    // 2️⃣ Fetch instructor
-    let instructor = null;
-    if (course.instructorId) {
-      const instructorRes = await fetch(
-        `http://localhost:4002/instructors?id=${course.instructorId}`
-      );
-      if (instructorRes.ok) {
-        const data = await instructorRes.json();
-        instructor = data[0] || null;
-      }
-    }
-
-    // 3️⃣ Fetch curriculum
-    const curriculumRes = await fetch(
-      `http://localhost:4003/curriculum?courseId=${courseId}`
-    );
-    const curriculum = curriculumRes.ok ? await curriculumRes.json() : [];
-
-    // 4️⃣ Fetch lessons per curriculum
-    const curriculumWithLessons = await Promise.all(
-      curriculum.map(async (c) => {
-        const lessonsRes = await fetch(
-          `http://localhost:4004/lessons?curriculumId=${c.id}`
-        );
-        const lessons = lessonsRes.ok ? await lessonsRes.json() : [];
-        return { ...c, lessons };
-      })
-    );
-
-    // 5️⃣ Flatten all lessons
+    // Flatten all lessons
+    const curriculumWithLessons = course.curriculum || [];
     const allLessons = curriculumWithLessons.flatMap((c) => c.lessons || []);
 
-    // 6️⃣ Calculate total duration
+    // Calculate total duration
     let totalSeconds = 0;
     allLessons.forEach((l) => {
       if (l.duration) {
@@ -59,14 +31,11 @@ export async function getFullCourseDetails(courseId) {
           : `${minutes}m`
         : "N/A";
 
-    // ✅ Return everything
     return {
       ...course,
-      instructor,
-      curriculum: curriculumWithLessons,
       lessons: allLessons,
       totalDuration,
-      slug: course.title.toLowerCase().replace(/\s+/g, "-"), // 🔥 add slug here
+      slug: course.title.toLowerCase().replace(/\s+/g, "-"),
     };
   } catch (error) {
     console.error("❌ Error in getFullCourseDetails:", error);
@@ -74,24 +43,30 @@ export async function getFullCourseDetails(courseId) {
   }
 }
 
+// ✅ Get all courses
+export async function getAllCourses() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/courses`);
+    if (!res.ok) throw new Error("Failed to fetch courses");
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("❌ Error in getAllCourses:", error);
+    return [];
+  }
+}
+
 // ✅ Get course by slug (title-based URL)
 export async function getFullCourseDetailsBySlug(slug) {
   try {
-    const res = await fetch(`http://localhost:3000/courses`);
-    if (!res.ok) throw new Error("Failed to fetch courses");
-    const data = await res.json();
+    const courses = await getAllCourses();
 
-    // Find course matching slug
-    const course = data.find(
+    const course = courses.find(
       (c) => c.title.toLowerCase().replace(/\s+/g, "-") === slug
     );
     if (!course) throw new Error(`❌ Course not found for slug: ${slug}`);
 
-    // Fetch full details using ID
-    const fullCourse = await getFullCourseDetails(course.id);
-
-    // 🧠 Add back the slug for navigation consistency
-    return { ...fullCourse, slug };
+    return await getFullCourseDetails(course._id);
   } catch (error) {
     console.error("❌ Error in getFullCourseDetailsBySlug:", error);
     return null;

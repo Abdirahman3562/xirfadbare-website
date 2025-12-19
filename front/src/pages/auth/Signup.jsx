@@ -4,6 +4,7 @@ import { User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCamera } from "react-icons/fa6";
+import { API_BASE_URL } from "../../config";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,19 +35,7 @@ const Signup = () => {
     }
 
     try {
-      // ✅ Check if email already exists
-      const checkRes = await fetch(
-        `http://localhost:5000/users?email=${formData.email}`
-      );
-      const existingUsers = await checkRes.json();
-
-      if (existingUsers.length > 0) {
-        toast.error(" Email already registered! Please sign in instead.");
-        return;
-      }
-
-      // ✅ If not exists, save new user
-      const res = await fetch("http://localhost:5000/users", {
+      const res = await fetch(`${API_BASE_URL}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -58,15 +47,17 @@ const Signup = () => {
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        toast.success(" Signup successful!");
+        toast.success("Signup successful!");
         setTimeout(() => navigate("/auth/login"), 2000);
       } else {
-        toast.error(" Error saving user!");
+        toast.error(data.message || "Error saving user!");
       }
     } catch (err) {
       console.error(err);
-      toast.error(" Server error — make sure JSON server is running!");
+      toast.error("Server error — make sure the backend is running!");
     }
   };
 

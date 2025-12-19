@@ -1,0 +1,99 @@
+import { API_BASE_URL } from '../config';
+
+// ✅ Get user progress for a specific course
+export async function getUserProgress(courseId) {
+  try {
+    const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
+                      JSON.parse(localStorage.getItem('user'));
+    const token = loggedUser?.token;
+    if (!token) throw new Error('No authentication token found');
+
+    const response = await fetch(`${API_BASE_URL}/progress/${courseId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch user progress');
+    const progress = await response.json();
+    return progress;
+  } catch (error) {
+    console.error('Error fetching user progress:', error);
+    return null;
+  }
+}
+
+// ✅ Update user progress for a course
+export async function updateUserProgress(courseId, progressData) {
+  try {
+    const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
+                      JSON.parse(localStorage.getItem('user'));
+    const token = loggedUser?.token;
+    if (!token) throw new Error('No authentication token found');
+
+    const response = await fetch(`${API_BASE_URL}/progress/${courseId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(progressData),
+    });
+
+    if (!response.ok) throw new Error('Failed to update user progress');
+    const progress = await response.json();
+    return progress;
+  } catch (error) {
+    console.error('Error updating user progress:', error);
+    return null;
+  }
+}
+
+// ✅ Get all user progress records
+export async function getAllUserProgress() {
+  try {
+    const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
+                      JSON.parse(localStorage.getItem('user'));
+    const token = loggedUser?.token;
+    if (!token) throw new Error('No authentication token found');
+
+    const response = await fetch(`${API_BASE_URL}/progress`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch user progress');
+    const progressRecords = await response.json();
+    return progressRecords;
+  } catch (error) {
+    console.error('Error fetching all user progress:', error);
+    return [];
+  }
+}
+
+// ✅ Delete user progress for a course
+export async function deleteUserProgress(courseId) {
+  try {
+    const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
+                      JSON.parse(localStorage.getItem('user'));
+    const token = loggedUser?.token;
+    if (!token) throw new Error('No authentication token found');
+
+    const response = await fetch(`${API_BASE_URL}/progress/${courseId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) throw new Error('Failed to delete user progress');
+    return true;
+  } catch (error) {
+    console.error('Error deleting user progress:', error);
+    return false;
+  }
+}

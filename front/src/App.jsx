@@ -4,7 +4,7 @@ import Nav from "./layouts/Nav";
 import CourseDetails from "./pages/webpages/course/CourseDetails";
 import CoursesPage from "./pages/webpages/course/CoursesPage";
 import HomePage from "./pages/webpages/Home/HomePage";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, Navigate } from "react-router-dom";
 import NotFoundPage from "./pages/webpages/NotFound/NotFoundPage";
 import ScrollToTop from "./pages/ScrollToTop";
 import Footer from "./layouts/Footer";
@@ -76,8 +76,7 @@ function App() {
         />
       </Routes>
       <ToastContainer position="top-center" autoClose={3000} />
-      {/* WhatsApp bubble: visible on all pages */}{" "}
-     
+      {/* WhatsApp bubble: visible on all pages */}
       <WhatsAppBubble
         phone="+252619537487"
         greeting="Assalamu Alaikum! 👋 Waxaan xiiseynayaa barnaamijka."

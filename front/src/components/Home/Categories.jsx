@@ -1,10 +1,17 @@
 // src/components/Categories.jsx
 import React from "react";
 import { Link } from "react-router-dom";
+import { useData } from "../../contexts/DataContext";
 
 export default function Categories({
   title = "Browse by Category",
-  categories = [
+  to = (cat) => `/courses?category=${encodeURIComponent(cat)}`, // route generator
+  onSelect, // optional callback instead of Link
+}) {
+  const { categories: dataCategories } = useData();
+
+  // Use preloaded categories or fallback to defaults
+  const categories = dataCategories.length > 0 ? dataCategories : [
     "Frontend",
     "Backend",
     "Full-Stack",
@@ -13,10 +20,7 @@ export default function Categories({
     "Mobile",
     "AI/ML",
     "Data",
-  ],
-  to = (cat) => `/courses?category=${encodeURIComponent(cat)}`, // route generator
-  onSelect, // optional callback instead of Link
-}) {
+  ];
   return (
     <section className="py-16">
       

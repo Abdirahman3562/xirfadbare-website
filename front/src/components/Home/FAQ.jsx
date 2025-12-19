@@ -1,42 +1,34 @@
 import React, { useState } from "react";
 import { FaPlus, FaMinus } from "react-icons/fa";
+import { useData } from "../../contexts/DataContext";
 
 export default function FAQ() {
+  const { faqs: preloadedFaqs } = useData();
   const [openIndex, setOpenIndex] = useState(null);
 
-  const faqs = [
+  // Use preloaded FAQs or fallback to sample data
+  const faqs = preloadedFaqs.length > 0 ? preloadedFaqs : [
     {
-      q: "Sideen uga diiwaan gali karaa koorsooyinka Xirfadbare?",
-      a: "Tag bogga 'Courses', dooro koorsada aad rabto, kadib guji 'Enroll Now'. Waxaad heli doontaa fariin xaqiijin ah iyo tillaabooyinka xiga ee bixinta ama bilaabista koorsada."
+      _id: "sample1",
+      question: "Sideen uga diiwaan gali karaa koorsooyinka Xirfadbare?",
+      answer: "Tag bogga 'Courses', dooro koorsada aad rabto, kadib guji 'Enroll Now'. Waxaad heli doontaa fariin xaqiijin ah iyo tillaabooyinka xiga ee bixinta ama bilaabista koorsada.",
+      category: "enrollment",
+      order: 1,
     },
     {
-      q: "Koorsooyinka Xirfadbare ma bilaash baa mise waa lacag leh?",
-      a: "Xirfadbare waxay bixisaa koorsooyin bilaash ah iyo kuwo premium ah. Koorsooyinka premium waxay bixiyaan waxyaabo dheeraad ah sida hagitaan toos ah, support gaar ah iyo fursado shaqo."
+      _id: "sample2",
+      question: "Koorsooyinka Xirfadbare ma bilaash baa mise waa lacag leh?",
+      answer: "Xirfadbare waxay bixisaa koorsooyin bilaash ah iyo kuwo premium ah. Koorsooyinka premium waxay bixiyaan waxyaabo dheeraad ah sida hagitaan toos ah, support gaar ah iyo fursado shaqo.",
+      category: "pricing",
+      order: 2,
     },
     {
-      q: "Ma heli karaa taageero haddii aan dhibaato kala kulmo koorsada?",
-      a: "Haa, kooxda support-ka ee Xirfadbare ayaa diyaar u ah inay ku caawiso 24/7. Waxaad nala soo xiriiri kartaa email, chat, ama qaybta support-ka ee website-ka."
+      _id: "sample3",
+      question: "Ma heli karaa taageero haddii aan dhibaato kala kulmo koorsada?",
+      answer: "Haa, kooxda support-ka ee Xirfadbare ayaa diyaar u ah inay ku caawiso 24/7. Waxaad nala soo xiriiri kartaa email, chat, ama qaybta support-ka ee website-ka.",
+      category: "support",
+      order: 3,
     },
-    {
-      q: "Macallimiinta Xirfadbare ma yihiin xirfadlayaal dhab ah?",
-      a: "Haa, dhammaan macallimiinta waa khubaro ka tirsan shirkado caan ah oo leh waayo-aragnimo toos ah, waxayna si firfircoon uga shaqeeyaan warshadaha Technology-ga."
-    },
-    {
-      q: "Ma heli karaa shahaado marka aan dhameeyo koorsada?",
-      a: "Haa, dhammaan ardayda dhameeya koorsooyinka waxay helayaan shahaado rasmi ah oo lagu aqoonsan karo shaqooyinka iyo CV-gaaga si xirfad leh."
-    },
-    {
-      q: "Mudo intee le’eg ayay koorsooyinka socdaan?",
-      a: "Koorsooyinka badankood waxay socdaan 4 ilaa 12 toddobaad, iyadoo ku xiran nooca koorsada iyo heerka aqoonta ardayga."
-    },
-    {
-      q: "Ma isticmaali karaa Xirfadbare meel kasta?",
-      a: "Haa, Xirfadbare waa madal online ah. Waxaad ku baran kartaa meel kasta iyo waqti kasta adigoo isticmaalaya kombiyuutar ama mobilkaaga."
-    },
-    {
-      q: "Ma jiraan casharro ku saabsan xirfadaha shaqo raadinta?",
-      a: "Haa, Xirfadbare waxay bixisaa tababaro gaar ah oo kaa caawinaya diyaarinta CV-ga, wareysiyada shaqo, iyo xirfadaha soft skills ee loo baahan yahay suuqa shaqada maanta."
-    }
   ];
 
   return (
@@ -79,14 +71,14 @@ export default function FAQ() {
         <div className="space-y-4">
           {faqs.map((item, i) => (
             <div
-              key={i}
+              key={item._id || i}
               className="border border-gray-200 hover:border-emerald-400 cusrpo bg-[#edf4f5] rounded-md hover:shadow-sm transition"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 className="w-full flex justify-between items-center px-6 py-4 cursor-pointer text-left text-gray-800 font-medium"
               >
-                <span>{item.q}</span>
+                <span>{item.question}</span>
                 {openIndex === i ? (
                   <FaMinus className="text-[#00cc8f]" />
                 ) : (
@@ -96,7 +88,7 @@ export default function FAQ() {
 
               {openIndex === i && (
                 <div className="px-6 pb-4 text-gray-600 border-t border-gray-100">
-                  {item.a}
+                  {item.answer}
                 </div>
               )}
             </div>

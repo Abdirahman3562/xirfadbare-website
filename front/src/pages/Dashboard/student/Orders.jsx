@@ -9,6 +9,7 @@ import {
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { FaShoppingCart } from "react-icons/fa";
+import { API_BASE_URL } from "../../../config";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -39,15 +40,20 @@ export default function Orders() {
     const fetchAllData = async () => {
       try {
         const resOrders = await fetch(
-          `http://localhost:4010/orders?userId=${user.id}`
+          `${API_BASE_URL}/orders/myorders`,
+          {
+            headers: {
+              Authorization: `Bearer ${user.token}`,
+            },
+          }
         );
         const ordersData = await resOrders.json();
 
-        const resCourses = await fetch("http://localhost:3000/courses");
+        const resCourses = await fetch(`${API_BASE_URL}/courses`);
         const coursesData = await resCourses.json();
 
         setOrders(ordersData);
-        setCourses(coursesData.courses || coursesData);
+        setCourses(coursesData);
       } catch (err) {
         console.error(err);
         toast.error("Failed to load orders or courses.");
@@ -59,19 +65,15 @@ export default function Orders() {
     fetchAllData();
   }, []);
 
-  // ✅ Hel slug course-ka iyadoo lagu saleynayo courseId
-  // ✅ Samee slug toos ah adigoo ka dhisaya title-ka course-ka
+  // ✅ Hel slug course-ka iyadoo lagu saleynayo courseId (ObjectId)
   const getCourseSlug = (courseId) => {
-    const course = courses.find((c) => String(c.id) === String(courseId));
+    const course = courses.find((c) => String(c._id) === String(courseId));
     if (!course) return "";
 
-    // magaca kursiga → lowercase + spaces to hyphens
-    const slug = course.title
+    return course.title
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-") // bedel meel kasta oo aan letter/number ahayn
-      .replace(/(^-|-$)/g, ""); // ka saar hyphen hore iyo danbe
-
-    return slug;
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
   };
 
   // ✅ Navigate to course details
@@ -86,7 +88,7 @@ export default function Orders() {
 
   // ✅ Hel image course-ka
   const getCourseImage = (courseId) => {
-    const course = courses.find((c) => String(c.id) === String(courseId));
+    const course = courses.find((c) => String(c._id) === String(courseId));
     return (
       course?.thumbnail || "https://via.placeholder.com/400x200?text=No+Image"
     );
@@ -125,27 +127,27 @@ export default function Orders() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {orders.map((order) => (
               <div
-                key={order.id}
+                key={order._id || order.id}
                 className="border border-gray-200 rounded-xl shadow-sm bg-white hover:shadow-md transition p-4 flex flex-col"
               >
                 {/* ✅ Click image -> go to details page */}
                 <div
                   className="w-full h-40 rounded-lg overflow-hidden mb-4 cursor-pointer"
-                  onClick={() => handleViewCourse(order.courseId)}
+                  onClick={() => handleViewCourse(order.course)}
                 >
                   <img
-                    src={getCourseImage(order.courseId)}
-                    alt={order.courseTitle}
+                    src={getCourseImage(order.course)}
+                    alt={order.courseTitle || order.courseDetails?.title}
                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                   />
                 </div>
 
                 <div className="flex justify-between items-center mb-2">
                   <h2
-                    onClick={() => handleViewCourse(order.courseId)}
+                    onClick={() => handleViewCourse(order.course)}
                     className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-emerald-600"
                   >
-                    {order.courseTitle}
+                    {order.courseTitle || order.courseDetails?.title}
                   </h2>
                   <span
                     className={`text-xs font-semibold px-2 py-1 rounded-full ${
@@ -164,15 +166,31 @@ export default function Orders() {
                 </p>
                 <p className="text-sm text-emerald-600 flex items-center gap-2 mb-1">
                   <Clock className="w-4 h-4 text-emerald-500" />
-                  Date: {order.createdAt}
+                  Date: {new Date(order.createdAt).toLocaleDateString()}
                 </p>
-                <p className="text-sm text-emerald-600 flex items-center gap-2">
+                <div className="text-sm text-emerald-600 flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-emerald-500" />
-                  Total Paid:{" "}
-                  <span className="font-semibold text-emerald-600">
-                    ${order.totalToPay}
-                  </span>
-                </p>
+                  {order.finalPrice ? (
+                    <>
+                      <span>Final Price: </span>
+                      <span className="font-semibold text-emerald-600">
+                        ${order.finalPrice}
+                      </span>
+                      {order.discountApplied > 0 && (
+                        <span className="text-xs text-gray-500 ml-2">
+                          (Saved ${order.discountApplied})
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <span>Total Paid: </span>
+                      <span className="font-semibold text-emerald-600">
+                        ${order.totalToPay}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
             ))}
           </div>

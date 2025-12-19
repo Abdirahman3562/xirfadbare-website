@@ -11,6 +11,9 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { FaBookOpen, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { getAllCourses } from "../../../api/courseService";
+import { getMyOrders } from "../../../api/orderService";
+import { getUserProgress, updateUserProgress } from "../../../api/userProgressService";
 
 const CourseDashboard = () => {
   const { courseSlug, lessonSlug } = useParams();
@@ -66,14 +69,14 @@ const CourseDashboard = () => {
   // -----------------------------
   // Fetch course + curriculum + lessons
   // -----------------------------
-  // 🚨 function fetchCourseData meel sare dhig
   const fetchCourseData = async () => {
     try {
       setLoading(true);
 
-      const resCourse = await fetch(`http://localhost:3000/courses`);
-      const allCourses = await resCourse.json();
+      // ✅ Get all courses from backend
+      const allCourses = await getAllCourses();
 
+      // ✅ Find course by slug
       const courseInfo =
         allCourses.find((c) => slugify(c.title) === courseSlug) || null;
       if (!courseInfo) {
@@ -81,20 +84,13 @@ const CourseDashboard = () => {
         return;
       }
 
-      // ✅ Hubi in order uu active yahay
-      const resOrders = await fetch("http://localhost:4010/orders");
-      const orders = await resOrders.json();
+      // ✅ Check if user has access to this course
+      const userOrders = await getMyOrders();
 
-      const user =
-        JSON.parse(localStorage.getItem("loggedInUser")) ||
-        JSON.parse(localStorage.getItem("user"));
-      const userId = user?.id || user?._id || user?.uid;
-
-      const hasAccess = orders.some(
-        (o) =>
-          String(o.userId) === String(userId) &&
-          String(o.courseId) === String(courseInfo.id) &&
-          o.status === "active"
+      const hasAccess = userOrders.some(
+        (order) =>
+          (order.course === courseInfo._id || order.courseId === courseInfo._id) &&
+          order.status === "active"
       );
 
       if (!hasAccess) {
@@ -102,43 +98,45 @@ const CourseDashboard = () => {
         return;
       }
 
-      // ✅ Fetch curriculum
-      const resCurriculum = await fetch(
-        `http://localhost:4003/curriculum?courseId=${courseInfo.id}`
+      // ✅ Process curriculum data (already embedded in course)
+      const curriculumData = courseInfo.curriculum || [];
+      
+      // ✅ Flatten lessons and preserve section reference
+      const allLessons = curriculumData.flatMap((section) => 
+        (section.lessons || []).map((lesson) => ({
+          ...lesson,
+          sectionId: section._id || section.id,
+        }))
       );
-      const dataCurriculum = await resCurriculum.json();
 
-      // ✅ Fetch lessons
-      const resLessons = await fetch("http://localhost:4004/lessons");
-      const allLessonsRaw = await resLessons.json();
-      const allLessons = allLessonsRaw.map((l) => ({
-        ...l,
-        slug: l.slug || slugify(l.title),
+      // ✅ Add slugs to lessons for navigation
+      const lessonsWithSlugs = allLessons.map((lesson) => ({
+        ...lesson,
+        id: lesson._id || lesson.id,
+        slug: lesson.slug || slugify(lesson.title),
+        curriculumId: lesson.curriculumId || lesson.sectionId
       }));
 
-      // ✅ Group lessons
-      const grouped = dataCurriculum.map((section) => {
-        const sectionLessons = allLessons.filter(
-          (lesson) => String(lesson.curriculumId) === String(section.id)
+      // ✅ Group lessons by curriculum sections
+      const grouped = curriculumData.map((section) => {
+        const sectionLessons = lessonsWithSlugs.filter(
+          (lesson) => lesson.curriculumId === section._id || lesson.curriculumId === section.id
         );
         return { ...section, lessons: sectionLessons };
       });
 
       setCourse(courseInfo);
       setCurriculum(grouped);
-      setLessons(allLessons);
+      setLessons(lessonsWithSlugs);
 
-      // ✅ Progress
-      // ✅ Fetch user progress from JSON server
-      const resProgress = await fetch(
-        `http://localhost:4011/userProgress?userId=${userId}&courseId=${courseInfo.id}`
-      );
-      const progressData = await resProgress.json();
+      // ✅ Fetch user progress from backend
+      const userProgress = await getUserProgress(courseInfo._id);
 
-      if (progressData.length > 0) {
-        const userProgress = progressData[0];
-        setCompletedLessons(userProgress.completedLessons || []);
+      let savedCurrentLessonId = null;
+      if (userProgress && userProgress.completedLessons) {
+        setCompletedLessons(userProgress.completedLessons);
         if (userProgress.currentLesson) {
+          savedCurrentLessonId = userProgress.currentLesson;
           const current = allLessons.find(
             (l) => String(l.id) === String(userProgress.currentLesson)
           );
@@ -152,7 +150,7 @@ const CourseDashboard = () => {
       // ✅ Initial lesson
       let initial =
         allLessons.find((l) => slugify(l.title) === lessonSlug) ||
-        allLessons.find((l) => l.id === savedCurrentId) ||
+        (savedCurrentLessonId ? allLessons.find((l) => String(l.id) === String(savedCurrentLessonId)) : null) ||
         grouped?.[0]?.lessons?.[0] ||
         null;
 
@@ -213,32 +211,16 @@ const CourseDashboard = () => {
 
     const syncProgress = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:4011/userProgress?userId=${userId}&courseId=${course?.id}`
-        );
-        const existing = await res.json();
+        if (!course?._id) return;
 
-        if (existing.length > 0) {
-          // ✅ Update existing progress (include id)
-          await fetch(`http://localhost:4011/userProgress/${existing[0].id}`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              ...existing[0],
-              ...savedData, // ✅ ensures completedLessons are updated
-            }),
-          });
-        } else {
-          // ✅ Create new record with unique id
-          await fetch(`http://localhost:4011/userProgress`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              id: crypto.randomUUID(), // 🆕 generate id
-              ...savedData,
-            }),
-          });
-        }
+        const progressData = {
+          completedLessons: savedData.completedLessons || [],
+          currentLesson: savedData.currentLesson,
+          progress: Math.round((savedData.completedLessons.length / totalLessonsCount) * 100),
+          timeSpent: 0, // Could be tracked separately
+        };
+
+        await updateUserProgress(course._id, progressData);
       } catch (error) {
         console.error("❌ Error syncing user progress:", error);
       }
@@ -359,18 +341,7 @@ const CourseDashboard = () => {
       if (nextLesson) goToLesson(nextLesson);
     }
 
-    // optional backend sync
-    try {
-      if (course?.id) {
-        await fetch(`http://localhost:3000/courses/${course.id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ completedLessons: updated }),
-        });
-      }
-    } catch {
-      // ignore (local progress still ok)
-    }
+    // Progress is now synced via UserProgress API in the useEffect above
   };
 
   useEffect(() => {

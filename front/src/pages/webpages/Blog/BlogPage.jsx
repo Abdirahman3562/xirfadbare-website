@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { FaCalendarAlt, FaCheckCircle } from "react-icons/fa";
 import { FiBook, FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { getAllBlogs } from "../../../api/blogService";
 
 function BlogPage() {
   const [search, setSearch] = useState("");
@@ -24,28 +25,27 @@ function BlogPage() {
     });
   };
 
-  // 🧠 Fetch blogs & authors oo isku dar
+  // 🧠 Fetch blogs with author details from backend
   useEffect(() => {
-    Promise.all([
-      fetch("http://localhost:4000/blogs").then((r) => r.json()),
-      fetch("http://localhost:4001/authors").then((r) => r.json()),
-    ])
-      .then(([blogsData, authorsData]) => {
-        const merged = blogsData.map((blog) => {
-          const author = authorsData.find(
-            (a) => Number(a.id) === Number(blog.authorId)
-          );
-        return {
-            ...blog,
-            authorName: author ? author.name : "Unknown Author",
-            authorImage: author ? author.avatar : "/default-avatar.png",
-            verified: !!author?.verified,
-          };
-        });
-        setArticles(merged);
-      })
-      .catch((e) => console.error("Error loading data:", e))
-      .finally(() => setLoading(false));
+    const fetchBlogs = async () => {
+      try {
+        const blogsData = await getAllBlogs();
+        const formattedBlogs = blogsData.map((blog) => ({
+          ...blog,
+          id: blog._id,
+          authorName: blog.author ? blog.author.name : "Unknown Author",
+          authorImage: blog.author ? blog.author.avatar : "/default-avatar.png",
+          verified: !!blog.author?.verified,
+        }));
+        setArticles(formattedBlogs);
+      } catch (error) {
+        console.error("Error loading blogs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
   }, []);
 
   // filter by search

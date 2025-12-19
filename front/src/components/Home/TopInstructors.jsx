@@ -1,36 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { useData } from "../../contexts/DataContext";
 
 export default function TopInstructors() {
-  const [instructors, setInstructors] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { instructors } = useData();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchInstructors = async () => {
-      try {
-        const res = await fetch("http://localhost:4002/instructors");
-        if (!res.ok) throw new Error("Failed to fetch instructors");
-        const data = await res.json();
-        setInstructors(data);
-      } catch (error) {
-        console.error("❌ Error fetching instructors:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchInstructors();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-40 text-emerald-600">
-        Loading instructors...
-      </div>
-    );
-  }
 
   const createSlug = (name) => name.toLowerCase().replace(/\s+/g, "-");
 

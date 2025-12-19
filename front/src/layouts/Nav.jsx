@@ -200,7 +200,7 @@ function Nav() {
                     <div className="h-px  bg-gray-200 my-2 m" />
                     <Link
                       to="/dashboard/student"
-                      onClick={() => setOpenProfile(false)} // ✅ sax
+                      onClick={() => setOpenProfile(false)}
                       className=" cursor-pointer w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-600 font-medium"
                     >
                       <LayoutDashboard size={18} />

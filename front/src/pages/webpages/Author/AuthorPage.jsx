@@ -8,6 +8,8 @@ import {
   FaTwitter,
   FaCheckCircle,
 } from "react-icons/fa";
+import { getAuthorByUsername } from "../../../api/authorService";
+import { getBlogsByAuthorId } from "../../../api/blogService";
 
 function AuthorPage() {
   const { username } = useParams();
@@ -41,15 +43,8 @@ function AuthorPage() {
       try {
         setLoading(true);
 
-        // 1️⃣ Fetch all authors
-        const aRes = await fetch("http://localhost:4001/authors");
-        if (!aRes.ok) throw new Error("Failed to load authors");
-        const aData = await aRes.json();
-
-        // find by username (case-insensitive)
-        const found = aData.find(
-          (a) => a.username?.toLowerCase() === username?.toLowerCase()
-        );
+        // 1️⃣ Fetch author by username
+        const found = await getAuthorByUsername(username);
 
         if (!found) {
           setAuthor(null);
@@ -59,7 +54,7 @@ function AuthorPage() {
         }
 
         setAuthor({
-          id: found.id,
+          id: found._id,
           username: found.username,
           name: found.name,
           image: found.avatar,
@@ -69,18 +64,8 @@ function AuthorPage() {
           social: found.social || {},
         });
 
-        // 2️⃣ Fetch blogs and filter by authorId or username
-        const pRes = await fetch("http://localhost:4000/blogs");
-        if (!pRes.ok) throw new Error("Failed to load blogs");
-        const blogs = await pRes.json();
-
-        const posts = blogs.filter(
-          (p) =>
-            Number(p.authorId) === Number(found.id) ||
-            p.authorName?.toLowerCase().replace(/\s+/g, "") ===
-              found.username?.toLowerCase()
-        );
-
+        // 2️⃣ Fetch blogs by author ID
+        const posts = await getBlogsByAuthorId(found._id);
         setArticles(posts || []);
       } catch (err) {
         console.error("Error loading author page:", err);
