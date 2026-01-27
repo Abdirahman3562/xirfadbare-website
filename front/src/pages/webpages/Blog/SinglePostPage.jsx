@@ -11,6 +11,7 @@ import {
 import RelatedArticles from "../../../components/Blog/RelatedArticles";
 import { CommentSection } from "../../../components/Comment";
 import { getAllBlogs, getBlogById } from "../../../api/blogService";
+import UserAvatar from "../../../components/UserAvatar";
 import { useAuth } from "../../../hooks/useAuth";
 
 function SinglePostPage() {
@@ -100,8 +101,8 @@ function SinglePostPage() {
   // 4️⃣ Related posts (same category)
   const relatedPosts = article
     ? articles.filter(
-        (p) => p.category === article.category && p.id !== article.id
-      )
+      (p) => p.category === article.category && p.id !== article.id
+    )
     : [];
 
   // Loading & not found states
@@ -149,23 +150,17 @@ function SinglePostPage() {
         </h1>
 
         <div className="flex items-center space-x-3">
-          <img
-            src={
-              author?.avatar ||
-              article.authorImage ||
-              "/images/authors/default.jpg"
-            }
-            alt={author?.name || article.authorName || "Author"}
-            className="w-10 h-10 rounded-full object-cover border border-gray-300"
-            onError={(e) => (e.target.src = "/images/authors/default.jpg")}
+          <UserAvatar
+            image={author?.avatar || article.authorImage}
+            name={author?.name || article.authorName || "Author"}
+            size="w-10 h-10"
           />
           <div className="flex flex-col mt-2 text-sm text-gray-600">
             <span className="font-medium text-gray-900 flex items-center gap-1">
               <Link
-                to={`/u/${
-                  author?.username ||
+                to={`/u/${author?.username ||
                   article.authorName?.toLowerCase().replace(/\s+/g, "")
-                }`}
+                  }`}
                 className="hover:text-emerald-600"
               >
                 {author?.name || article.authorName || "Unknown Author"}
@@ -197,11 +192,11 @@ function SinglePostPage() {
         ) : author ? (
           <div className="flex flex-col md:flex-row  items-center md:items-start   rounded-xl shadow-md">
             {/* Author Avatar */}
-            <img
-              src={author.avatar || "/images/authors/default.jpg"}
-              alt={author.name}
-              className="w-56 h-56 rounded-xl object-cover border-emerald-500"
-              onError={(e) => (e.target.src = "/images/authors/default.jpg")}
+            <UserAvatar
+              image={author.avatar}
+              name={author.name}
+              size="w-56 h-56"
+              className="rounded-xl"
             />
 
             {/* Author Info */}

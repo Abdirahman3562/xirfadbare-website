@@ -16,3 +16,4 @@ const FAQ = mongoose.model('FAQ', faqSchema);
 export default FAQ;
 
 
+

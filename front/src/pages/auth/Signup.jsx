@@ -63,7 +63,7 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center py-10 bg-white">
-      <ToastContainer position="top-right" autoClose={2000} />
+
 
       {/* ✅ Left side */}
       <div className="hidden md:flex flex-col items-start justify-center w-1/2 px-16 space-y-6">
@@ -198,10 +198,10 @@ const Signup = () => {
 
 
 
-            
 
 
-            
+
+
 
             {/* Confirm Password */}
             <div className="relative">
@@ -232,8 +232,8 @@ const Signup = () => {
             </div>
 
 
-            
-                      
+
+
 
             {/* Terms */}
             <div className="flex items-start gap-2">

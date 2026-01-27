@@ -8,8 +8,11 @@ import {
   FaCalendarAlt,
   FaPenFancy,
   FaBook,
+  FaTrash,
 } from "react-icons/fa";
-import toast, { Toaster } from "react-hot-toast";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import UserAvatar from "../UserAvatar";
 import { getInstructorBySlug, updateInstructor } from "../../api/instructorService";
 import { getAllCourses } from "../../api/courseService";
 
@@ -22,6 +25,44 @@ const generateSlug = (name = "") =>
     .trim()
     .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-");
+
+/* ✅ Delete Confirmation Modal */
+function DeleteConfirmationModal({ isOpen, onClose, onConfirm, review }) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[1000000] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl transform transition-all animate-scaleUp">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FaTrash size={28} />
+          </div>
+          <h3 className="text-xl font-bold text-gray-800 mb-2">Ma hubtaa?</h3>
+          <p className="text-gray-500 text-sm mb-6">
+            Review-gan dib looma soo celin karo marka la tirtiro.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition cursor-pointer font-medium"
+          >
+            Iska dhaaf
+          </button>
+          <button
+            onClick={() => {
+              onConfirm(review);
+              onClose();
+            }}
+            className="flex-1 px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition cursor-pointer font-medium shadow-md shadow-red-200"
+          >
+            Haa, tirtir
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 /* ----------------------------------------------------------------
    ✅ Review Comment Component (Read More / Show Less)
@@ -41,9 +82,8 @@ function ReviewComment({ text }) {
   return (
     <div className="relative mt-2">
       <p
-        className={`text-gray-600 ml-13 leading-relaxed transition-all duration-300 ease-in-out ${
-          expanded ? "max-h-full" : "max-h-[4.5rem] overflow-hidden"
-        }`}
+        className={`text-gray-600 ml-13 leading-relaxed transition-all duration-300 ease-in-out ${expanded ? "max-h-full" : "max-h-[4.5rem] overflow-hidden"
+          }`}
         style={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}
       >
         {displayText}
@@ -64,6 +104,7 @@ function ReviewComment({ text }) {
   );
 }
 
+
 /* ----------------------------------------------------------------
    ✅ REVIEWS PAGE COMPONENT
 ------------------------------------------------------------------ */
@@ -74,13 +115,21 @@ export default function Reviews() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState("");
-  const [existingReview, setExistingReview] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [reviewToDelete, setReviewToDelete] = useState(null);
   const formRef = useRef(null);
 
   /* ✅ Load logged user from localStorage */
   useEffect(() => {
     const stored = localStorage.getItem("loggedInUser");
-    if (stored) setUser(JSON.parse(stored));
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setUser(parsed);
+      } catch (err) {
+        console.error("❌ Error parsing user from localStorage:", err);
+      }
+    }
   }, []);
 
   /* ✅ Fetch Instructor + Courses + Reviews */
@@ -96,9 +145,10 @@ export default function Reviews() {
         }
 
         const allCourses = await getAllCourses();
-        const instructorCourses = allCourses.filter(
-          (c) => c.instructor && String(c.instructor) === String(found._id)
-        );
+        const instructorCourses = allCourses.filter((c) => {
+          const courseInstructorId = c.instructor?._id || c.instructor;
+          return courseInstructorId && String(courseInstructorId) === String(found._id);
+        });
 
         setInstructor({ ...found, id: found._id, courses: instructorCourses });
         setReviews(found.reviews || []);
@@ -113,24 +163,18 @@ export default function Reviews() {
     fetchInstructorAndReviews();
   }, [slug]);
 
-  /* ✅ Check existing review */
-  useEffect(() => {
-    if (!selectedCourse || !user || !reviews.length) {
-      setExistingReview(null);
-      return;
-    }
+  /* ✅ Sync existing review derivation based on selectedCourse */
+  const currentUserFullname = user
+    ? `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+    user.name ||
+    user.username
+    : null;
 
-    const found = reviews.find(
-      (r) =>
-        r.courseId === selectedCourse &&
-        r.student ===
-          (`${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-            user.name ||
-            user.username)
-    );
-
-    setExistingReview(found || null);
-  }, [selectedCourse, user, reviews]);
+  const currentExistingReview = reviews.find(
+    (r) =>
+      r.courseId === selectedCourse &&
+      r.student === currentUserFullname
+  );
 
   /* ✅ Submit or Update review handler */
   const handleReviewSubmit = async (e) => {
@@ -140,18 +184,21 @@ export default function Reviews() {
       return toast.error("Please select a course before submitting.");
 
     const form = e.target;
+    // Get the absolute latest user data from localStorage for the photo
+    const latestUser = JSON.parse(localStorage.getItem("loggedInUser")) || user;
+
     const studentName =
-      `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
-      user.name ||
-      user.username ||
+      `${latestUser.firstName || ""} ${latestUser.lastName || ""}`.trim() ||
+      latestUser.name ||
+      latestUser.username ||
       "Anonymous";
 
     const newReview = {
       courseId: selectedCourse,
       student: studentName,
       image:
-        user.image ||
-        user.photo ||
+        latestUser.image ||
+        latestUser.photo ||
         "https://cdn-icons-png.flaticon.com/512/149/149071.png",
       rating: parseInt(form.rating.value),
       comment: form.comment.value,
@@ -160,7 +207,7 @@ export default function Reviews() {
 
     try {
       let updatedReviews;
-      if (existingReview) {
+      if (currentExistingReview) {
         updatedReviews = reviews.map((r) =>
           r.courseId === selectedCourse && r.student === studentName
             ? newReview
@@ -170,30 +217,59 @@ export default function Reviews() {
         updatedReviews = [...reviews, newReview];
       }
 
-      const updatedInstructor = { ...instructor, reviews: updatedReviews };
-
-      await updateInstructor(instructor.id, updatedInstructor);
-
       setReviews(updatedReviews);
-      setExistingReview(newReview);
+      // ✅ Minimal update: only send reviews array
+      await updateInstructor(instructor._id, { reviews: updatedReviews });
 
       // ✅ Clear form
       formRef.current.reset();
       setSelectedCourse("");
 
-      existingReview
-        ? toast.success("✅ Review updated successfully!")
-        : toast.success("✅ Review added successfully!");
+      toast.success(`Waxaad review ka bixisay macallin ${instructor.name}!`);
+
+      // ✅ Auto-refresh page after submission to update stats
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+
     } catch (err) {
       console.error("❌ Error posting review:", err);
       toast.error("Something went wrong while saving your review!");
     }
   };
 
+  /* ✅ Delete review handler */
+  const handleDeleteReview = async (review) => {
+    try {
+      const updatedReviews = reviews.filter(
+        (r) =>
+          !(
+            r.courseId === review.courseId &&
+            r.student === review.student &&
+            r.createdAt === review.createdAt
+          )
+      );
+
+      setReviews(updatedReviews);
+
+      // ✅ Minimal update: only send reviews array
+      await updateInstructor(instructor._id, { reviews: updatedReviews });
+
+      toast.success("Review-ga waa la tirtiray!");
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (err) {
+      console.error("❌ Error deleting review:", err);
+      toast.error("Wuu ku fashilmay tirtirista review-ga!");
+    }
+  };
+
   /* ✅ Helper to get course title */
   const getCourseTitle = (id) => {
     if (!Array.isArray(instructor?.courses)) return "";
-    const found = instructor.courses.find((c) => String(c.id) === String(id));
+    const found = instructor.courses.find((c) => String(c._id || c.id) === String(id));
     return found ? found.title : "";
   };
 
@@ -201,8 +277,8 @@ export default function Reviews() {
   const averageRating =
     reviews.length > 0
       ? (
-          reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length
-        ).toFixed(1)
+        reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length
+      ).toFixed(1)
       : 0;
 
   if (loading)
@@ -222,69 +298,80 @@ export default function Reviews() {
   /* ✅ MAIN UI */
   return (
     <div className="max-w-3xl mx-auto bg-[#edf4f5] p-6 rounded-2xl shadow-lg border border-gray-100 transition hover:shadow-xl mt-10">
-      {/* ✅ Toast Container */}
-      <Toaster position="top-right" reverseOrder={false} />
+      {/* ✅ Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleDeleteReview}
+        review={reviewToDelete}
+      />
 
       {/* Header */}
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-1">
           Reviews for {instructor.name}
         </h2>
-      
       </div>
 
       {/* Reviews List */}
       {reviews.length > 0 ? (
         <div className="space-y-4">
-          {reviews.map((rev, i) => (
-            <div
-              key={i}
-              className="border border-gray-100 hover:border-emerald-400 rounded-xl p-4 bg-[#edf4f5] shadow-sm hover:shadow-md transition"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                {rev.image ? (
-                  <img
-                    src={rev.image}
-                    alt={rev.student}
-                    className="w-10 h-10 rounded-full object-cover border border-gray-200"
-                  />
-                ) : (
-                  <FaUserCircle className="text-gray-500 text-3xl" />
+          {reviews.map((rev, i) => {
+            const isOwner = currentUserFullname === rev.student;
+            return (
+              <div
+                key={i}
+                className="border border-gray-100 hover:border-emerald-400 rounded-xl p-4 bg-[#edf4f5] shadow-sm hover:shadow-md transition relative group"
+              >
+                {isOwner && (
+                  <button
+                    onClick={() => {
+                      setReviewToDelete(rev);
+                      setIsModalOpen(true);
+                    }}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-red-500 cursor-pointer transition p-2 opacity-0 group-hover:opacity-100"
+                    title="Delete Review"
+                  >
+                    <FaTrash size={14} />
+                  </button>
                 )}
-                <div>
-                  <p className="font-semibold text-gray-700 mt-2">
-                    {rev.student}
-                  </p>
-                  <p className="text-emerald-500 text-sm flex items-center gap-1">
-                    {Array.from({ length: rev.rating }).map((_, j) => (
-                      <FaStar key={j} />
-                    ))}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                    <FaCalendarAlt className="text-emerald-500 text-[11px]" />
-                    {rev.createdAt && !isNaN(new Date(rev.createdAt))
-                      ? new Date(rev.createdAt).toLocaleDateString("en-US", {
+                <div className="flex items-center gap-3 mb-2">
+                  <UserAvatar image={rev.image} name={rev.student} />
+                  <div>
+                    <p className="font-semibold text-gray-700 mt-2">
+                      {rev.student}
+                    </p>
+                    <p className="text-emerald-500 text-sm flex items-center gap-1">
+                      {Array.from({ length: rev.rating }).map((_, j) => (
+                        <FaStar key={j} />
+                      ))}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                      <FaCalendarAlt className="text-emerald-500 text-[11px]" />
+                      {rev.createdAt && !isNaN(new Date(rev.createdAt))
+                        ? new Date(rev.createdAt).toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
                         })
-                      : "Recently"}
-                  </p>
+                        : "Recently"}
+                    </p>
+                  </div>
                 </div>
+
+                {/* ✅ Comment with Read More / Less */}
+                <ReviewComment text={rev.comment} />
+
+                <p className="text-xs text-gray-500 italic mt-1 ml-12 flex items-center gap-1">
+                  <FaBook className="text-emerald-500 text-[11px]" />
+                  Course:{" "}
+                  <span className="text-emerald-600 font-medium">
+                    {getCourseTitle(rev.courseId) || "Unknown Course"}
+                  </span>
+                </p>
               </div>
-
-              {/* ✅ Comment with Read More / Less */}
-              <ReviewComment text={rev.comment} />
-
-              <p className="text-xs text-gray-500 italic mt-1 ml-12 flex items-center gap-1">
-                <FaBook className="text-emerald-500 text-[11px]" />
-                Course:{" "}
-                <span className="text-emerald-600 font-medium">
-                  {getCourseTitle(rev.courseId) || "Unknown Course"}
-                </span>
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <p className="text-gray-500 italic mb-6 text-center">
@@ -307,6 +394,7 @@ export default function Reviews() {
         ) : (
           <form
             ref={formRef}
+            key={selectedCourse}
             onSubmit={handleReviewSubmit}
             className="max-w-xl mx-auto bg-[#edf4f5] rounded-2xl shadow-md p-6 space-y-5 transition hover:shadow-lg"
           >
@@ -341,7 +429,7 @@ export default function Reviews() {
               </label>
               <select
                 name="rating"
-                defaultValue={existingReview?.rating || ""}
+                defaultValue={currentExistingReview?.rating || ""}
                 className="w-full border border-gray-300 rounded-lg pl-5 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                 required
               >
@@ -361,7 +449,7 @@ export default function Reviews() {
               </label>
               <textarea
                 name="comment"
-                defaultValue={existingReview?.comment || ""}
+                defaultValue={currentExistingReview?.comment || ""}
                 placeholder={`Write your review about ${instructor.name}...`}
                 className="w-full border border-gray-300 rounded-lg pl-5 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                 rows="4"
@@ -375,7 +463,7 @@ export default function Reviews() {
               className="w-full bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white py-2.5 rounded-full font-medium transition transform hover:-translate-y-0.5 shadow-md"
             >
               <FaCommentDots className="inline mr-2" />
-              {existingReview ? "Update Review" : "Submit Review"}
+              {currentExistingReview ? "Update Review" : "Submit Review"}
             </button>
           </form>
         )}

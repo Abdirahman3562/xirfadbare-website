@@ -9,6 +9,7 @@ import {
   FaUser
 } from "react-icons/fa";
 import { toast } from "react-toastify";
+import UserAvatar from "../UserAvatar";
 import { updateComment, deleteComment, createComment } from "../../api/commentService";
 
 const Comment = ({
@@ -156,11 +157,10 @@ const Comment = ({
     <div className={`${getIndentClass()} ${level > 0 ? 'mt-4' : ''}`}>
       <div className="flex items-start space-x-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
         {/* Avatar */}
-        <img
-          src={comment.author?.image || "/images/authors/default.jpg"}
-          alt={comment.author?.firstName || "User"}
-          className="w-8 h-8 rounded-full object-cover border border-gray-300 flex-shrink-0"
-          onError={(e) => (e.target.src = "/images/authors/default.jpg")}
+        <UserAvatar
+          image={comment.author?.image}
+          name={`${comment.author?.firstName || ""} ${comment.author?.lastName || ""}`.trim() || "User"}
+          size="w-8 h-8"
         />
 
         {/* Comment Content */}
@@ -261,10 +261,10 @@ const Comment = ({
           {isReplying && user && (
             <div className="mt-3 space-y-2">
               <div className="flex items-start space-x-2">
-                <img
-                  src={user.image || "/images/authors/default.jpg"}
-                  alt={user.firstName}
-                  className="w-6 h-6 rounded-full object-cover border border-gray-300 flex-shrink-0"
+                <UserAvatar
+                  image={user.image}
+                  name={`${user.firstName || ""} ${user.lastName || ""}`.trim() || "User"}
+                  size="w-6 h-6"
                 />
                 <div className="flex-1">
                   <textarea

@@ -10,7 +10,8 @@ import {
   FaCalendarAlt,
 } from "react-icons/fa";
 import InstructorTabs from "../../../components/instructor/InstructorTabs";
-import { Toaster, toast } from "react-hot-toast";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { getInstructorBySlug, updateInstructor } from "../../../api/instructorService";
 import { getAllCourses } from "../../../api/courseService";
 
@@ -18,12 +19,9 @@ export default function InstructorDetails() {
   const { slug } = useParams();
   const [instructor, setInstructor] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [averageRating, setAverageRating] = useState(0);
-  const [totalReviews, setTotalReviews] = useState(0);
   const [totalCourses, setTotalCourses] = useState(0);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [totalStudents, setTotalStudents] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
-
   const dropdownRef = useRef(null);
 
   const currentUser = JSON.parse(localStorage.getItem("loggedInUser"));
@@ -42,44 +40,9 @@ export default function InstructorDetails() {
     const fetchInstructorDetails = async () => {
       try {
         const found = await getInstructorBySlug(slug);
-
-        if (!found) {
-          setInstructor(null);
-          return;
+        if (found) {
+          setInstructor({ ...found, id: found._id });
         }
-
-        // ✅ Calculate average rating
-        if (found.reviews && found.reviews.length > 0) {
-          const total = found.reviews.reduce((sum, r) => sum + r.rating, 0);
-          const avg = total / found.reviews.length;
-          setAverageRating(avg.toFixed(1));
-          setTotalReviews(found.reviews.length);
-        }
-
-        // ✅ Fetch courses count
-        let courseCount = 0;
-        try {
-          const coursesData = await getAllCourses();
-          const instructorCourses = coursesData.filter(
-            (c) => c.instructor && String(c.instructor) === String(found._id)
-          );
-          courseCount = instructorCourses.length;
-        } catch {
-          console.warn("⚠️ Could not fetch courses. Using fallback value.");
-          courseCount = found.courses || 0;
-        }
-        setTotalCourses(courseCount);
-
-        // ✅ Check follow status
-        if (currentUser && found.followersList?.includes(currentUser.id)) {
-          setIsFollowing(true);
-        }
-
-        // Format instructor data to match frontend expectations
-        setInstructor({
-          ...found,
-          id: found._id
-        });
       } catch (err) {
         console.error("❌ Error loading instructor:", err);
         toast.error("Failed to load instructor data!");
@@ -87,9 +50,41 @@ export default function InstructorDetails() {
         setLoading(false);
       }
     };
-
     fetchInstructorDetails();
-  }, [slug, currentUser]);
+  }, [slug]);
+
+  // ✅ Derived stats
+  const currentReviews = instructor?.reviews || [];
+  const averageRating = currentReviews.length > 0
+    ? (currentReviews.reduce((sum, r) => sum + (r.rating || 0), 0) / currentReviews.length).toFixed(1)
+    : 0;
+  const totalReviewsCount = currentReviews.length;
+  const isFollowing = currentUser && instructor?.followersList?.includes(currentUser._id);
+
+  // ✅ Fetch courses count and total students for the stats bar
+  useEffect(() => {
+    const fetchCourseAndStudentCount = async () => {
+      if (!instructor?._id) return;
+      try {
+        const coursesData = await getAllCourses();
+        const instructorCourses = coursesData.filter((c) => {
+          const courseInstructorId = c.instructor?._id || c.instructor;
+          return courseInstructorId && String(courseInstructorId) === String(instructor._id);
+        });
+
+        setTotalCourses(instructorCourses.length);
+
+        // Sum enrolledCount from all instructor's courses
+        const studentSum = instructorCourses.reduce((sum, c) => sum + (c.enrolledCount || 0), 0);
+        setTotalStudents(studentSum);
+
+      } catch (err) {
+        console.warn("⚠️ Could not fetch counts:", err);
+      }
+    };
+    fetchCourseAndStudentCount();
+  }, [instructor?._id]);
+
 
   // ✅ Follow / Unfollow Logic (preserves old followers)
   const handleFollow = async () => {
@@ -107,31 +102,28 @@ export default function InstructorDetails() {
 
       let newFollowersList = [...currentFollowers];
 
-      if (currentFollowers.includes(currentUser.id)) {
+      if (currentFollowers.includes(currentUser._id)) {
         // ❌ Unfollow
         newFollowersList = currentFollowers.filter(
-          (id) => id !== currentUser.id
+          (id) => id !== currentUser._id
         );
-        setIsFollowing(false);
         toast("You unfollowed this instructor 👋", { position: "top-right" });
       } else {
         // ✅ Follow
-        newFollowersList = [...new Set([...currentFollowers, currentUser.id])];
-        setIsFollowing(true);
-        toast.success("You are now following this instructor ✅", {
+        newFollowersList = [...new Set([...currentFollowers, currentUser._id])];
+        toast.success("You are now following this instructor", {
           position: "top-right",
         });
       }
 
-      const updatedInstructor = {
-        ...instructor,
+      const dataToUpdate = {
         followersList: newFollowersList,
         followers:
           (instructor.followers || 0) +
           (newFollowersList.length - currentFollowers.length),
       };
 
-      const result = await updateInstructor(instructor._id, updatedInstructor);
+      const result = await updateInstructor(instructor._id, dataToUpdate);
 
       if (!result) throw new Error("Failed to update instructor");
 
@@ -166,7 +158,7 @@ export default function InstructorDetails() {
       key: "students",
       icon: <FaUserGraduate className="text-emerald-500 text-2xl" />,
       label: "Students",
-      value: instructor.students || 0,
+      value: totalStudents,
     },
     {
       key: "courses",
@@ -178,22 +170,20 @@ export default function InstructorDetails() {
       key: "reviews",
       icon: <FaStar className="text-emerald-500 text-2xl" />,
       label: "Reviews",
-      value: totalReviews,
+      value: totalReviewsCount,
     },
   ];
 
   return (
     <div className="min-h-screen relative -mt-20">
-      <Toaster position="top-right" reverseOrder={false} />
 
       {/* ✅ Hero Section */}
       <div
         className="relative h-[400px] bg-cover bg-center z-10"
         style={{
-          backgroundImage: `url(${
-            instructor.coverImage ||
+          backgroundImage: `url(${instructor.coverImage ||
             "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80"
-          })`,
+            })`,
         }}
       >
         <div className="absolute inset-0 bg-black/40 pointer-events-none"></div>
@@ -215,8 +205,6 @@ export default function InstructorDetails() {
               <p className="text-gray-500 text-sm mt-1">
                 {instructor.instructorTitle}
               </p>
-
-                <p className="text-black bg-emerald-200 rounded-md w-[80px] pl-2">{instructor.title || "Instructor"}</p>
 
 
               {/* ✅ Rating & Followers */}
@@ -268,7 +256,6 @@ export default function InstructorDetails() {
                     <button
                       onClick={async () => {
                         await handleFollow(); // samee unfollow API logic
-                        setIsFollowing(false); // 💥 isla markiiba beddel UI-ga
                         setShowDropdown(false); // 💥 xiro dropdown
                       }}
                       className="block w-full cursor-pointer text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-t-xl"
@@ -287,11 +274,11 @@ export default function InstructorDetails() {
             )}
 
             <a href={`https://wa.me/${instructor.contactPhone}`} target="_blank"
-             className="border border-emerald-500 cursor-pointer text-emerald-700 flex items-center px-5 py-2 rounded-full text-sm font-medium hover:bg-emerald-50 transition">
+              className="border border-emerald-500 cursor-pointer text-emerald-700 flex items-center px-5 py-2 rounded-full text-sm font-medium hover:bg-emerald-50 transition">
               <FaEnvelope className="inline mr-2 text-emerald-500" />
-        
-                Send Message
-          
+
+              Send Message
+
             </a>
           </div>
         </div>

@@ -64,3 +64,4 @@ testimonials.forEach(async (testimonial, index) => {
 console.log('Adding testimonials to database...');
 
 
+

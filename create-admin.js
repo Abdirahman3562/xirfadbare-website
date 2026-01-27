@@ -35,3 +35,4 @@ const createAdminUser = async () => {
 };
 
 createAdminUser();
+

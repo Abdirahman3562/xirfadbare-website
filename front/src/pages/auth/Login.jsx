@@ -41,7 +41,7 @@ const Login = () => {
       localStorage.setItem("loggedInUser", JSON.stringify(data));
       window.dispatchEvent(new Event("userLogin"));
       toast.success(`Welcome back, ${data.firstName}!`);
-      
+
       // Redirect to student dashboard
       navigate("/dashboard/student");
     } catch (err) {
@@ -52,7 +52,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen  py-20 flex flex-col md:flex-row items-center justify-center bg-white">
-      <ToastContainer position="top-right" autoClose={2000} />
+
 
       {/* ✅ Left section */}
       <div className="hidden md:flex flex-col items-start justify-center w-1/2 px-16 space-y-6">

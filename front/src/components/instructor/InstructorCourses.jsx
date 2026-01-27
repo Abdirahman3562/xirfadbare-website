@@ -12,7 +12,7 @@ import { getAllCourses } from "../../api/courseService";
 
 const InstructorCourses = ({ instructorSlug }) => {
 
-  
+
   const [courses, setCourses] = useState([]);
   const [instructor, setInstructor] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -32,9 +32,10 @@ const InstructorCourses = ({ instructorSlug }) => {
 
         const courseData = await getAllCourses();
 
-        const instructorCourses = courseData.filter(
-          (c) => c.instructor && String(c.instructor) === String(foundInstructor._id)
-        );
+        const instructorCourses = courseData.filter((c) => {
+          const courseInstructorId = c.instructor?._id || c.instructor;
+          return courseInstructorId && String(courseInstructorId) === String(foundInstructor._id);
+        });
 
         // ✅ Process courses with curriculum data (already embedded from backend)
         const detailedCourses = instructorCourses.map((course) => {
@@ -204,11 +205,10 @@ const InstructorCourses = ({ instructorSlug }) => {
                 )}
 
                 <span
-                  className={`text-[18px] font-semibold ${
-                    isFree
+                  className={`text-[18px] font-semibold ${isFree
                       ? "bg-white text-emerald-600 px-6 py-0 rounded-full shadow-sm"
                       : "text-emerald-600"
-                  }`}
+                    }`}
                 >
                   {isFree ? "Free" : `$${course.price}`}
                 </span>

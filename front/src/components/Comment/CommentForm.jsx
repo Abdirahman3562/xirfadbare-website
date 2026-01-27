@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaUser } from "react-icons/fa";
+import UserAvatar from "../UserAvatar";
 import { createComment } from "../../api/commentService";
 
 const CommentForm = ({ user, article, onCommentPosted }) => {
@@ -41,10 +42,10 @@ const CommentForm = ({ user, article, onCommentPosted }) => {
   return (
     <div className="mb-8">
       <div className="flex items-start space-x-4">
-        <img
-          src={user.image || "/images/authors/default.jpg"}
-          alt={user.firstName}
-          className="w-10 h-10 rounded-full object-cover border border-gray-300"
+        <UserAvatar
+          image={user.image}
+          name={`${user.firstName || ""} ${user.lastName || ""}`.trim() || "User"}
+          size="w-10 h-10"
         />
         <div className="flex-1">
           <textarea

@@ -3,6 +3,7 @@ import { FaUserGraduate, FaBook } from "react-icons/fa";
 import InstructorCourses from "./InstructorCourses";
 import { useParams } from "react-router-dom";
 import Reviews from "./Reviews";
+import InstructorArticles from "./InstructorArticles";
 
 export default function InstructorTabs({ instructor }) {
   const [activeTab, setActiveTab] = useState("about");
@@ -13,7 +14,7 @@ export default function InstructorTabs({ instructor }) {
     { id: "courses", label: "Courses" },
     { id: "articles", label: "Articles" },
     { id: "reviews", label: "Reviews" },
-  
+
   ];
 
   return (
@@ -24,11 +25,10 @@ export default function InstructorTabs({ instructor }) {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`pb-1 transition-all cursor-pointer ${
-              activeTab === tab.id
-                ? "text-emerald-600 border-b-2 border-emerald-500"
-                : "hover:text-emerald-600"
-            }`}
+            className={`pb-1 transition-all cursor-pointer ${activeTab === tab.id
+              ? "text-emerald-600 border-b-2 border-emerald-500"
+              : "hover:text-emerald-600"
+              }`}
           >
             {tab.label}
           </button>
@@ -39,91 +39,32 @@ export default function InstructorTabs({ instructor }) {
       <div className="p-8 space-y-10 text-gray-700">
         {/* ✅ About Tab */}
         {activeTab === "about" && (
-          <>
-            {instructor.education && (
-              <div>
-                <h2 className="text-base font-semibold text-gray-800 mb-2">
-                  Education
-                </h2>
-                <ul className="list-disc list-inside text-gray-600 leading-relaxed space-y-1 ml-2">
-                  {instructor.education.map((edu, i) => (
-                    <li key={i} className="hover:text-emerald-600 transition">
-                      {edu}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {instructor.experience && (
-              <div>
-                <h2 className="text-base font-semibold text-gray-800 mb-2">
-                  Experiences
-                </h2>
-                <ul className="list-disc list-inside text-gray-600 leading-relaxed space-y-1 ml-2">
-                  {instructor.experience.map((exp, i) => (
-                    <li key={i} className="hover:text-emerald-600 transition">
-                      {exp}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {instructor.about && (
-              <div>
-                <h2 className="text-base font-semibold text-gray-800 mb-2">
-                  About
-                </h2>
-                <p className="text-gray-600 leading-relaxed max-w-3xl">
-                  {instructor.about}
-                </p>
-              </div>
-            )}
-
-            {instructor.skills && (
-              <div>
-                <h2 className="text-base font-semibold text-gray-800 mb-3">
-                  Skills
-                </h2>
-                <div className="flex flex-wrap gap-2">
-                  {instructor.skills.map((skill, idx) => (
-                    <span
-                      key={idx}
-                      className="px-3 py-1 bg-gray-100 hover:bg-emerald-100 text-gray-700 hover:text-emerald-700 text-sm rounded-full border border-gray-200 transition"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* ✅ Courses Tab */}
-        {activeTab === "courses" && (
-      <InstructorCourses instructorSlug={slug} />
-        )}
-
-        {/* ✅ Articles Tab */}
-        {activeTab === "articles" && (
           <div>
-            <h2 className="text-base font-semibold text-gray-800 mb-3">
-              Articles
+            <h2 className="text-base font-semibold text-gray-800 mb-2">
+              Description
             </h2>
-            <p className="text-gray-600">
-              No articles available for this instructor yet.
+            <p className="text-gray-600 leading-relaxed max-w-3xl">
+              {instructor.description || instructor.about || "No description available."}
             </p>
           </div>
         )}
 
-        {/* ✅ Forum Tab */}
-        {activeTab === "reviews" && (
-          <Reviews/>
+        {/* ✅ Courses Tab */}
+        {activeTab === "courses" && (
+          <InstructorCourses instructorSlug={slug} />
         )}
 
-     
+        {/* ✅ Articles Tab */}
+        {activeTab === "articles" && (
+          <InstructorArticles instructorName={instructor.name} />
+        )}
+
+        {/* ✅ Forum Tab */}
+        {activeTab === "reviews" && (
+          <Reviews />
+        )}
+
+
 
       </div>
     </div>

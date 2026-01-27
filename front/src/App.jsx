@@ -35,7 +35,7 @@ function App() {
 
   const hideFooter =
     location.pathname.startsWith("/dashboard") ||
-    location.pathname === "/auth/signup"|| location.pathname === "/auth/login"|| location.pathname.startsWith("/watch");
+    location.pathname === "/auth/signup" || location.pathname === "/auth/login" || location.pathname.startsWith("/watch");
 
   const hideNav = location.pathname.startsWith("/auth");
 
@@ -75,7 +75,7 @@ function App() {
           element={<CourseDashboard />}
         />
       </Routes>
-      <ToastContainer position="top-center" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} />
       {/* WhatsApp bubble: visible on all pages */}
       <WhatsAppBubble
         phone="+252619537487"

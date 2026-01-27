@@ -42,3 +42,4 @@ const GlobalLoader = () => {
 
 export default GlobalLoader;
 
+

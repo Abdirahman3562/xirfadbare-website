@@ -21,3 +21,4 @@ const UserProgress = mongoose.model('UserProgress', userProgressSchema);
 export default UserProgress;
 
 
+

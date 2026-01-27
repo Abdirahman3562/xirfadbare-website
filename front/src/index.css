@@ -2,12 +2,50 @@
 
 
 .scrollbar-hide {
-  -ms-overflow-style: none;     /* IE/Edge */
-  scrollbar-width: none;        /* Firefox */
-  scrollbar-gutter: stable;     /* optional */
+  -ms-overflow-style: none;
+  /* IE/Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  scrollbar-gutter: stable;
+  /* optional */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
   width: 0;
   height: 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-scaleUp {
+  animation: scaleUp 0.2s ease-out;
+}
+
+/* ✅ Force Toastify to stay on top of everything */
+.Toastify__toast-container {
+  z-index: 999999999 !important;
 }

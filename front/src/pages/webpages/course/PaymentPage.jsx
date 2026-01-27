@@ -165,7 +165,7 @@ function PaymentPage() {
       });
 
       if (res.ok) {
-        toast.success("✅ Order placed successfully!");
+        toast.success("Order placed successfully!");
         setTimeout(() => navigate("/dashboard/orders"), 1500);
       } else {
         const errorData = await res.json();
@@ -318,22 +318,20 @@ function PaymentPage() {
         <div className="flex border-b border-gray-200 mb-6">
           <button
             onClick={() => setSelectedTab("local")}
-            className={`flex-1 text-center py-3 cursor-pointer font-medium text-sm border-b-2 transition ${
-              selectedTab === "local"
+            className={`flex-1 text-center py-3 cursor-pointer font-medium text-sm border-b-2 transition ${selectedTab === "local"
                 ? "border-emerald-500 text-emerald-600"
                 : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
+              }`}
           >
             <p>Local Payment</p>
             <p className="text-xs text-gray-400">Mobile Money & Cash</p>
           </button>
           <button
             onClick={() => setSelectedTab("online")}
-            className={`flex-1 text-center py-3 cursor-pointer font-medium text-sm border-b-2 transition ${
-              selectedTab === "online"
+            className={`flex-1 text-center py-3 cursor-pointer font-medium text-sm border-b-2 transition ${selectedTab === "online"
                 ? "border-emerald-500 text-emerald-600"
                 : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
+              }`}
           >
             <p>Online Payment</p>
             <p className="text-xs text-gray-400">Credit/Debit Card</p>
@@ -357,18 +355,16 @@ function PaymentPage() {
                 <button
                   key={i}
                   onClick={() => setSelectedMethod(method)}
-                  className={`w-full relative border rounded-lg cursor-pointer p-3 pl-4 text-left text-sm transition flex flex-col ${
-                    selectedMethod === method
+                  className={`w-full relative border rounded-lg cursor-pointer p-3 pl-4 text-left text-sm transition flex flex-col ${selectedMethod === method
                       ? "border-emerald-500 bg-emerald-50"
                       : "border-gray-200 hover:border-emerald-300"
-                  }`}
+                    }`}
                 >
                   <span
-                    className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 ${
-                      selectedMethod === method
+                    className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 ${selectedMethod === method
                         ? "border-emerald-500"
                         : "border-gray-300"
-                    } flex items-center justify-center`}
+                      } flex items-center justify-center`}
                   >
                     {selectedMethod === method && (
                       <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
@@ -401,13 +397,12 @@ function PaymentPage() {
                     }}
                     placeholder="E.g. 612345678"
                     required={selectedTab === "local"} // ✅ required oo kaliya marka local
-                    className={`w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 ${
-                      selectedTab === "local" &&
-                      phone.length > 0 &&
-                      (phone.length < 8 || phone.length > 15)
+                    className={`w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 ${selectedTab === "local" &&
+                        phone.length > 0 &&
+                        (phone.length < 8 || phone.length > 15)
                         ? "border-red-500 focus:border-red-500"
                         : "border-gray-300 focus:border-emerald-400"
-                    }`}
+                      }`}
                   />
                   {selectedTab === "local" &&
                     phone.length > 0 &&
@@ -484,12 +479,11 @@ function PaymentPage() {
             selectedTab === "local" &&
             (!selectedMethod || phone.length < 8 || phone.length > 15)
           }
-          className={`mt-2 w-full font-medium py-3 rounded-lg transition ${
-            selectedTab === "local" &&
-            (!selectedMethod || phone.length < 8 || phone.length > 15)
+          className={`mt-2 w-full font-medium py-3 rounded-lg transition ${selectedTab === "local" &&
+              (!selectedMethod || phone.length < 8 || phone.length > 15)
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-emerald-500 text-white hover:bg-emerald-600"
-          }`}
+            }`}
         >
           Pay ${finalPrice} Now
         </button>
