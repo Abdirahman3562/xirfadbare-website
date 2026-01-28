@@ -1,6 +1,8 @@
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 import Course from '../models/Course.js';
+import sendEmail from '../utils/sendEmail.js';
+import { orderApprovedTemplate, orderRejectedTemplate } from '../utils/emailTemplates.js';
 
 // @desc    Create new order
 // @route   POST /api/orders
@@ -15,6 +17,7 @@ const addOrderItems = async (req, res) => {
     totalToPay,
     discountApplied = 0,
     finalPrice,
+    paymentProof,
   } = req.body;
 
   if (!courseId) {
@@ -69,6 +72,8 @@ const addOrderItems = async (req, res) => {
           contactPhone: course.instructor.contactPhone,
         } : null,
         learningOutcomes: course.learningOutcomes,
+        discountCode: course.discountCode,
+        discountPercentage: course.discountPercentage,
         isBestSeller: course.isBestSeller,
         curriculum: course.curriculum.map(curr => ({
           title: curr.title,
@@ -92,6 +97,7 @@ const addOrderItems = async (req, res) => {
       totalToPay,
       discountApplied,
       finalPrice: finalPrice || totalToPay,
+      paymentProof,
     });
 
     const createdOrder = await order.save();
@@ -124,6 +130,21 @@ const updateOrderToActive = async (req, res) => {
   if (order) {
     order.status = 'active';
     const updatedOrder = await order.save();
+
+    // Send Approval Email
+    try {
+      if (order.userDetails && order.userDetails.email) {
+        await sendEmail({
+          email: order.userDetails.email,
+          subject: 'Enrollment Approved - Xirfadbare Academy',
+          html: orderApprovedTemplate(order),
+        });
+      }
+    } catch (error) {
+      console.error('Failed to send approval email', error);
+      // Continue without failing the request
+    }
+
     res.json(updatedOrder);
   } else {
     res.status(404).json({ message: 'Order not found' });
@@ -139,6 +160,21 @@ const updateOrderToRejected = async (req, res) => {
   if (order) {
     order.status = 'rejected';
     const updatedOrder = await order.save();
+
+    // Send Rejection Email
+    try {
+      if (order.userDetails && order.userDetails.email) {
+        await sendEmail({
+          email: order.userDetails.email,
+          subject: 'Order Update - Xirfadbare Academy',
+          html: orderRejectedTemplate(order),
+        });
+      }
+    } catch (error) {
+      console.error('Failed to send rejection email', error);
+      // Continue without failing the request
+    }
+
     res.json(updatedOrder);
   } else {
     res.status(404).json({ message: 'Order not found' });
@@ -157,8 +193,22 @@ const getMyOrders = async (req, res) => {
 // @route   GET /api/orders
 // @access  Private/Admin
 const getOrders = async (req, res) => {
-  const orders = await Order.find({}).populate('user', 'id firstName lastName');
+  const orders = await Order.find({}).populate('user', 'id firstName lastName image');
   res.json(orders);
+};
+
+// @desc    Delete order
+// @route   DELETE /api/orders/:id
+// @access  Private/Admin
+const deleteOrder = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (order) {
+    await order.deleteOne();
+    res.json({ message: 'Order removed' });
+  } else {
+    res.status(404).json({ message: 'Order not found' });
+  }
 };
 
 export {
@@ -166,6 +216,7 @@ export {
   getOrderById,
   updateOrderToActive,
   updateOrderToRejected,
+  deleteOrder,
   getMyOrders,
   getOrders,
 };

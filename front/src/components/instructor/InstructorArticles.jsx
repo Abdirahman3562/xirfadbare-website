@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getImageUrl } from "../../utils/format";
 import { FaCalendarAlt, FaUserEdit } from "react-icons/fa";
 import { getAllBlogs } from "../../api/blogService";
 
@@ -50,7 +51,7 @@ const InstructorArticles = ({ instructorName }) => {
                 >
                     <div className="w-full md:w-48 h-32 flex-shrink-0">
                         <img
-                            src={article.thumbnail || "/default-blog.jpg"}
+                            src={getImageUrl(article.thumbnail) || "/default-blog.jpg"}
                             alt={article.title}
                             className="w-full h-full object-cover rounded-lg group-hover:scale-105 transition duration-300"
                         />

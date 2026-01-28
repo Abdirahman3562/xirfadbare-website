@@ -35,6 +35,8 @@ const orderSchema = mongoose.Schema(
         contactPhone: { type: String },
       },
       learningOutcomes: [String],
+      discountCode: { type: String },
+      discountPercentage: { type: Number },
       isBestSeller: { type: Boolean, default: false },
       curriculum: [{
         title: { type: String },
@@ -58,6 +60,7 @@ const orderSchema = mongoose.Schema(
     totalToPay: { type: Number },
     discountApplied: { type: Number, default: 0 },
     finalPrice: { type: Number },
+    paymentProof: { type: String },
 
     status: {
       type: String,

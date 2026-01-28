@@ -19,10 +19,8 @@ const AppWithData = () => {
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
-      <DataProvider>
-        <AppWithData />
-      </DataProvider>
-    </BrowserRouter>
+    <DataProvider>
+      <AppWithData />
+    </DataProvider>
   </StrictMode>,
 )

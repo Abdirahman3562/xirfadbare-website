@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { FaCalendarAlt, FaCheckCircle } from "react-icons/fa";
+import { getImageUrl } from "../../../utils/format";
 import { FiBook, FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { getAllBlogs } from "../../../api/blogService";
@@ -125,7 +126,7 @@ function BlogPage() {
                   className="relative block"
                 >
                   <img
-                    src={article.thumbnail}
+                    src={getImageUrl(article.thumbnail)}
                     alt={article.title}
                     className="w-full h-48 object-cover transition-transform duration-500 ease-in-out transform hover:scale-110"
                   />
@@ -150,7 +151,7 @@ function BlogPage() {
                   <div className="flex justify-between items-center mt-4">
                     <div className="flex items-center gap-2">
                       <img
-                        src={article.authorImage}
+                        src={getImageUrl(article.authorImage)}
                         alt={article.authorName}
                         className="w-8 h-8 rounded-full object-cover border border-gray-300"
                       />
@@ -181,11 +182,10 @@ function BlogPage() {
               <button
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
-                className={`px-3 py-1 rounded-md border ${
-                  currentPage === 1
+                className={`px-3 py-1 rounded-md border ${currentPage === 1
                     ? "text-gray-400 border-gray-200 cursor-not-allowed"
                     : "text-emerald-700 border-emerald-200 hover:bg-emerald-50"
-                }`}
+                  }`}
               >
                 Prev
               </button>
@@ -197,11 +197,10 @@ function BlogPage() {
                   <button
                     key={p}
                     onClick={() => goToPage(p)}
-                    className={`w-9 h-9 rounded-md border text-sm ${
-                      p === currentPage
+                    className={`w-9 h-9 rounded-md border text-sm ${p === currentPage
                         ? "bg-emerald-500 text-white border-emerald-500"
                         : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
-                    }`}
+                      }`}
                   >
                     {p}
                   </button>
@@ -211,11 +210,10 @@ function BlogPage() {
               <button
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded-md border ${
-                  currentPage === totalPages
+                className={`px-3 py-1 rounded-md border ${currentPage === totalPages
                     ? "text-gray-400 border-gray-200 cursor-not-allowed"
                     : "text-emerald-700 border-emerald-200 hover:bg-emerald-50"
-                }`}
+                  }`}
               >
                 Next
               </button>

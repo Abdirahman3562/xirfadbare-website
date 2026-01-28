@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { FaCalendarAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { getImageUrl } from "../../utils/format";
 
 export default function RelatedArticles({
   relatedPosts = [],
@@ -35,7 +36,7 @@ export default function RelatedArticles({
               >
                 <img
                   src={
-                    post.thumbnail || "/images/placeholders/article-thumb.jpg"
+                    getImageUrl(post.thumbnail) || "/images/placeholders/article-thumb.jpg"
                   }
                   alt={post.title}
                   className="w-20 h-14 object-cover rounded-md border border-gray-200"

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 
 export default function Outcomes() {
+
   const stats = [
     { value: "87%", label: "Course completion rate" },
     { value: "72%", label: "Landed a tech job" },
@@ -9,7 +10,7 @@ export default function Outcomes() {
 
   return (
     <section className="py-16 bg-[#edf4f5]  border-gray-200 hover:border-emerald-400 overflow-hidden  lg:m-0 md:m-0 m-4">
-    
+
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <h2 className="text-3xl md:text-4xl text-emerald-600 font-extrabold text-center mb-12">
           Student Outcomes

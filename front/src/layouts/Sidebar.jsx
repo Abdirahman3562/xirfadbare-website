@@ -10,14 +10,8 @@ import {
 
 const Sidebar = () => {
   return (
-    <aside className="hidden md:flex lg:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 flex-col">
+    <aside className="hidden md:flex lg:flex fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-white border-r border-gray-200 flex-col">
       <div className="flex-1 overflow-y-auto">
-        {/* Brand */}
-        <div className="p-6 font-bold text-emerald-600 text-2xl flex items-center gap-2">
-          <GraduationCap className="w-6 h-6 text-emerald-600" />
-          Xirfadbare
-        </div>
-
         {/* Navigation */}
         <nav className="px-4 text-sm">
           {/* Overview */}
@@ -26,12 +20,11 @@ const Sidebar = () => {
               Overview
             </p>
             <NavLink
-                  to="/dashboard/student"
+              to="/dashboard/student"
               className={({ isActive }) =>
-                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                    : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
+                  ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
                 }`
               }
             >
@@ -48,10 +41,9 @@ const Sidebar = () => {
             <NavLink
               to="/dashboard/courses"
               className={({ isActive }) =>
-                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                    : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
+                  ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
                 }`
               }
             >
@@ -68,10 +60,9 @@ const Sidebar = () => {
             <NavLink
               to="/dashboard/orders"
               className={({ isActive }) =>
-                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                    : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
+                  ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
                 }`
               }
             >
@@ -88,10 +79,9 @@ const Sidebar = () => {
             <NavLink
               to="/dashboard/profile"
               className={({ isActive }) =>
-                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                    : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
+                  ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
                 }`
               }
             >

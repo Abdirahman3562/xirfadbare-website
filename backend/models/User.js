@@ -9,7 +9,11 @@ const userSchema = mongoose.Schema(
     phone: { type: String },
     password: { type: String, required: true },
     image: { type: String },
-    role: { type: String, enum: ['student', 'admin'], default: 'student' },
+    role: { type: String, enum: ['student', 'admin', 'author', 'teacher'], default: 'student' },
+    isActive: { type: Boolean, default: true },
+    is2FAEnabled: { type: Boolean, default: false },
+    twoFactorCode: { type: String },
+    twoFactorExpires: { type: Date },
   },
   { timestamps: true }
 );
@@ -18,7 +22,7 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.pre('save', async function() {
+userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
     return;
   }

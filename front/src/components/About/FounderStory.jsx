@@ -1,15 +1,21 @@
 import React from "react";
 import { Quote } from "lucide-react";
-import founderceo from "../../assets/founderceo.png"
+import { useData } from "../../contexts/DataContext";
+import { getImageUrl } from "../../utils/format";
+import founderceo from "../../assets/founderceo.png";
+
 export default function FounderStory() {
+  const { settings } = useData();
+  const founder = settings?.about?.founder || {};
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
         {/* Left: Founder Image + Quote */}
         <div className="relative">
           <img
-            src={founderceo}
-            alt="Founder of Dugsiye"
+            src={founder.image ? getImageUrl(founder.image) : founderceo}
+            alt={founder.name || "Founder"}
             className="rounded-2xl w-full max-w-sm mx-auto shadow-md"
           />
 
@@ -18,8 +24,7 @@ export default function FounderStory() {
             <div className="flex items-start gap-2">
               <Quote className="text-emerald-500 w-5 h-5 mt-1" />
               <p className="text-[13px] text-slate-600 leading-snug italic">
-                “Language should never be a barrier to building, every talented
-                person deserves a chance to build, create, and succeed.”
+                {founder.bio || "“Language should never be a barrier to building, every talented person deserves a chance to build, create, and succeed.”"}
               </p>
             </div>
           </div>
@@ -55,10 +60,12 @@ export default function FounderStory() {
           </p>
 
           <div>
-            <h4 className="font-semibold text-emerald-600">Abdirahman Mohamed</h4>
-            <p className="inline-block mb-5 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-sm border border-emerald-100">
-              Founder &amp; CEO
-            </p>
+            <h4 className="font-semibold text-emerald-600">{founder.name || "Abdirahman Mohamed"}</h4>
+            <div className="mt-1">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-sm border border-emerald-100">
+                {founder.role || "Founder & CEO"}
+              </span>
+            </div>
           </div>
         </div>
       </div>

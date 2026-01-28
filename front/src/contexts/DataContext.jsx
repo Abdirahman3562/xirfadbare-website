@@ -5,6 +5,7 @@ import { getAllInstructors } from '../api/instructorService';
 import { getAllBlogs } from '../api/blogService';
 import { getAllAuthors } from '../api/authorService';
 import { getFAQs } from '../api/faqService';
+import { getSystemSettings } from '../api/systemService';
 
 // Create the context
 const DataContext = createContext();
@@ -28,6 +29,7 @@ export const DataProvider = ({ children }) => {
     authors: [],
     faqs: [],
     categories: [],
+    settings: null,
   });
 
   const [loading, setLoading] = useState(true);
@@ -42,31 +44,36 @@ export const DataProvider = ({ children }) => {
         setError(null);
 
         // Fetch all data in parallel for better performance
-        const [
-          coursesData,
-          testimonialsData,
-          instructorsData,
-          blogsData,
-          authorsData,
-          faqsData,
-        ] = await Promise.allSettled([
+        const results = await Promise.allSettled([
           loadCourses(),
           getTestimonials(),
           getAllInstructors(),
           getAllBlogs(),
           getAllAuthors(),
           getFAQs(),
+          getSystemSettings(),
         ]);
+
+        const [
+          coursesRes,
+          testimonialsRes,
+          instructorsRes,
+          blogsRes,
+          authorsRes,
+          faqsRes,
+          settingsRes,
+        ] = results;
 
         // Process results and handle any failures gracefully
         const newData = {
-          courses: coursesData.status === 'fulfilled' ? coursesData.value : [],
-          testimonials: testimonialsData.status === 'fulfilled' ? testimonialsData.value : [],
-          instructors: instructorsData.status === 'fulfilled' ? instructorsData.value : [],
-          blogs: blogsData.status === 'fulfilled' ? blogsData.value : [],
-          authors: authorsData.status === 'fulfilled' ? authorsData.value : [],
-          faqs: faqsData.status === 'fulfilled' ? faqsData.value : [],
-          categories: extractCategories(coursesData.status === 'fulfilled' ? coursesData.value : []),
+          courses: coursesRes.status === 'fulfilled' ? coursesRes.value : [],
+          testimonials: testimonialsRes.status === 'fulfilled' ? testimonialsRes.value : [],
+          instructors: instructorsRes.status === 'fulfilled' ? instructorsRes.value : [],
+          blogs: blogsRes.status === 'fulfilled' ? blogsRes.value : [],
+          authors: authorsRes.status === 'fulfilled' ? authorsRes.value : [],
+          faqs: faqsRes.status === 'fulfilled' ? faqsRes.value : [],
+          categories: extractCategories(coursesRes.status === 'fulfilled' ? coursesRes.value : []),
+          settings: settingsRes.status === 'fulfilled' ? settingsRes.value : null,
         };
 
         setData(newData);
@@ -78,6 +85,7 @@ export const DataProvider = ({ children }) => {
           authors: newData.authors.length,
           faqs: newData.faqs.length,
           categories: newData.categories.length,
+          settings: !!newData.settings,
         });
 
       } catch (err) {
@@ -161,6 +169,10 @@ export const DataProvider = ({ children }) => {
           newData = await getFAQs();
           setData(prev => ({ ...prev, faqs: newData }));
           break;
+        case 'settings':
+          newData = await getSystemSettings();
+          setData(prev => ({ ...prev, settings: newData }));
+          break;
         default:
           console.warn(`⚠️ Unknown data type: ${dataType}`);
       }
@@ -181,6 +193,7 @@ export const DataProvider = ({ children }) => {
     authors: data.authors,
     faqs: data.faqs,
     categories: data.categories,
+    settings: data.settings,
 
     // State
     loading,

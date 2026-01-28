@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Mail, MessageSquare, Monitor, ArrowRight, Send } from "lucide-react";
+import { useData } from "../../../contexts/DataContext";
 
 export default function ContactPage() {
+  const { settings } = useData();
+  const contact = settings?.contact || {};
+
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -16,22 +20,22 @@ export default function ContactPage() {
       icon: Mail,
       title: "Email Support",
       text: "Get a response within 24 hours",
-      value: "info@xirfadbare.com",
-      href: "mailto:xirfadbare.com",
+      value: contact.email || "info@xirfadbare.com",
+      href: `mailto:${contact.email || "info@xirfadbare.com"}`,
     },
     {
       icon: MessageSquare,
       title: "WhatsApp Chat",
       text: "Quick response on WhatsApp",
-      value: "+252 619537487",
-      href: "https://wa.me/252618846254",
-      active: false, 
+      value: contact.phone || "+252 619537487",
+      href: `https://wa.me/${(contact.phone || "252619537487").replace(/\s+/g, '')}`,
+      active: false,
     },
     {
       icon: Monitor,
-      title: "Virtual Office",
-      text: "Connect with us online",
-      value: "Always Available",
+      title: "Office Address",
+      text: contact.workingHours || "Sat - Thu: 8:00 AM - 5:00 PM",
+      value: contact.address || "Mogadishu, Somalia",
       href: "#",
     },
   ];
@@ -189,67 +193,67 @@ export default function ContactPage() {
         </div>
 
         {/* Right: Other Ways to Connect */}
-    <div>
-  <h3 className="text-lg font-semibold text-slate-900 mb-3">
-    Other Ways to Connect
-  </h3>
-  <p className="text-sm text-slate-500 mb-6">
-    Choose the method that works best for you. We’re here to help!
-  </p>
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900 mb-3">
+            Other Ways to Connect
+          </h3>
+          <p className="text-sm text-slate-500 mb-6">
+            Choose the method that works best for you. We’re here to help!
+          </p>
 
-  <div className="space-y-5">
-    {contacts.map((c, i) => {
-      const Icon = c.icon;
-      const active = c.active;
+          <div className="space-y-5">
+            {contacts.map((c, i) => {
+              const Icon = c.icon;
+              const active = c.active;
 
-      return (
-        <a
-          key={i}
-          href={c.href}
-          target={c.href?.startsWith("http") ? "_blank" : undefined}
-          rel="noreferrer"
-          className={[
-            "block rounded-2xl border p-5 transition-all duration-300 shadow-sm",
-            "hover:shadow-md hover:-translate-y-[2px]",
-            active
-              ? "bg-emerald-100/70 border-emerald-200 ring-2 ring-emerald-100"
-              : "bg-emerald-50/40 border-emerald-100 hover:bg-emerald-100/70",
-            "group",
-          ].join(" ")}
-        >
-          <div className="flex items-start gap-4">
-            {/* ICON */}
-            <div
-              className={[
-                "w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300",
-                active
-                  ? "bg-emerald-500 text-white"
-                  : "bg-emerald-100 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white",
-              ].join(" ")}
-            >
-              <Icon className="w-6 h-6" />
-            </div>
+              return (
+                <a
+                  key={i}
+                  href={c.href}
+                  target={c.href?.startsWith("http") ? "_blank" : undefined}
+                  rel="noreferrer"
+                  className={[
+                    "block rounded-2xl border p-5 transition-all duration-300 shadow-sm",
+                    "hover:shadow-md hover:-translate-y-[2px]",
+                    active
+                      ? "bg-emerald-100/70 border-emerald-200 ring-2 ring-emerald-100"
+                      : "bg-emerald-50/40 border-emerald-100 hover:bg-emerald-100/70",
+                    "group",
+                  ].join(" ")}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* ICON */}
+                    <div
+                      className={[
+                        "w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300",
+                        active
+                          ? "bg-emerald-500 text-white"
+                          : "bg-emerald-100 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white",
+                      ].join(" ")}
+                    >
+                      <Icon className="w-6 h-6" />
+                    </div>
 
-            {/* TEXT CONTENT */}
-            <div className="flex-1">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h4 className="font-semibold text-slate-900">{c.title}</h4>
-                  <p className="text-xs text-slate-500">{c.text}</p>
-                </div>
-                <ArrowRight className="w-5 h-5 text-emerald-500 opacity-60 group-hover:opacity-100 transition" />
-              </div>
+                    {/* TEXT CONTENT */}
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <h4 className="font-semibold text-slate-900">{c.title}</h4>
+                          <p className="text-xs text-slate-500">{c.text}</p>
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-emerald-500 opacity-60 group-hover:opacity-100 transition" />
+                      </div>
 
-              <div className="mt-3 text-emerald-700 font-medium">
-                {c.value}
-              </div>
-            </div>
+                      <div className="mt-3 text-emerald-700 font-medium">
+                        {c.value}
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
           </div>
-        </a>
-      );
-    })}
-  </div>
-</div>
+        </div>
 
       </section>
     </div>

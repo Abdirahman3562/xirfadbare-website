@@ -1,516 +1,369 @@
-import { ChevronRight, Home } from "lucide-react";
-import { useState, useEffect } from "react";
-import toast, { Toaster } from "react-hot-toast";
-import { FaCamera } from "react-icons/fa6";
+import { ChevronRight, Home, User, Mail, Phone, Camera, Shield, Save, Loader2, Lock, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { API_BASE_URL } from "../../../config";
+import { uploadImage, updateUserProfile } from "../../../api/userService";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
-  const [image, setImage] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isCompressingImage, setIsCompressingImage] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const fileInputRef = useRef(null);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
+    image: "",
     password: "",
+    confirmPassword: "",
+    is2FAEnabled: false
   });
 
-  // Fetch user data on page load
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+  const token = loggedInUser.token;
+
   useEffect(() => {
-    console.log("🔍 Profile: Starting to fetch user data...");
-
-    const loggedUser =
-      JSON.parse(localStorage.getItem("loggedInUser")) ||
-      JSON.parse(localStorage.getItem("user"));
-
-    console.log(
-      "👤 Profile: Retrieved user from localStorage:",
-      loggedUser ? "Found" : "Not found"
-    );
-
-    if (!loggedUser) {
-      console.warn("⚠️ Profile: No logged-in user found in localStorage!");
-      toast.error("Please login to access your profile.");
-      return;
-    }
-
-    if (!loggedUser.token) {
-      console.warn("⚠️ Profile: No token found in user data!");
-      toast.error("Authentication token missing. Please login again.");
-      return;
-    }
-
-    console.log("🔑 Profile: Token found, making API request...");
-
-    // Fetch current user profile from backend
-    fetch(`${API_BASE_URL}/users/profile`, {
-      headers: {
-        Authorization: `Bearer ${loggedUser.token}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        console.log("📡 Profile: API response status:", res.status);
-        return res.json();
-      })
-      .then((currentUser) => {
-        console.log("📋 Profile: API response data:", currentUser);
-
-        if (currentUser && !currentUser.message) {
-          console.log("✅ Profile: User data loaded successfully");
-          setUser(currentUser);
-          setFormData({
-            firstName: currentUser.firstName || "",
-            lastName: currentUser.lastName || "",
-            email: currentUser.email || "",
-            phone: currentUser.phone || "",
-            password: "",
-          });
-
-          const storedImage = localStorage.getItem("profileImage");
-          if (storedImage) {
-            setImage(storedImage);
-          } else if (currentUser?.image) {
-            setImage(currentUser.image);
-          }
-        } else {
-          console.error("❌ Profile: Invalid user data received:", currentUser);
-          toast.error(currentUser?.message || "User profile not found!");
-        }
-      })
-      .catch((err) => {
-        console.error("❌ Profile: Error fetching user profile:", err);
-        toast.error(
-          "Failed to load user profile! Please check your connection."
-        );
-      });
+    fetchProfile();
   }, []);
 
-  // Handle image change (for user profile picture)
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith("image/")) {
-        toast.error("Please select a valid image file.");
-        return;
-      }
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`${API_BASE_URL}/users/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
 
-      // Validate file size (before compression)
-      if (file.size > 10 * 1024 * 1024) {
-        // 10MB limit
-        toast.error(
-          "Image file is too large. Please select an image under 10MB."
-        );
-        return;
+      if (res.ok) {
+        setUser(data);
+        setFormData({
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          image: data.image || "",
+          password: "",
+          confirmPassword: "",
+          is2FAEnabled: data.is2FAEnabled || false
+        });
+      } else {
+        toast.error(data.message || "Failed to load profile");
       }
-
-      setIsCompressingImage(true);
-      try {
-        console.log("🔄 Compressing image...");
-        // Compress image before converting to base64
-        const compressedBase64 = await compressImage(file);
-        console.log("✅ Image compressed successfully");
-
-        setPreviewImage(compressedBase64); // Show preview immediately
-        setFormData({ ...formData, image: compressedBase64 }); // Store for save
-        // Don't update main image or localStorage until save is successful
-      } catch (error) {
-        console.error("❌ Error compressing image:", error);
-        toast.error("Failed to process image. Please try again.");
-      } finally {
-        setIsCompressingImage(false);
-      }
+    } catch (err) {
+      toast.error("Error connecting to server");
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const getInitials = (first, last) => {
-    if (!first && !last) return "SU";
-    return (first?.charAt(0) + last?.charAt(0)).toUpperCase();
-  };
-
-  // Compress image to reduce payload size
-  const compressImage = (
-    file,
-    maxWidth = 300,
-    maxHeight = 300,
-    quality = 0.7
-  ) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-
-          // Calculate new dimensions
-          let { width, height } = img;
-          if (width > height) {
-            if (width > maxWidth) {
-              height = (height * maxWidth) / width;
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width = (width * maxHeight) / height;
-              height = maxHeight;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          // Draw and compress
-          ctx.drawImage(img, 0, 0, width, height);
-          const compressedBase64 = canvas.toDataURL("image/jpeg", quality);
-
-          resolve(compressedBase64);
-        };
-        img.onerror = reject;
-        img.src = e.target.result;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const uploadFormData = new FormData();
+    uploadFormData.append("image", file);
+
+    try {
+      setUploading(true);
+      const imageUrl = await uploadImage(uploadFormData, token);
+      setFormData({ ...formData, image: imageUrl });
+
+      // Immediate sync for student header too if it exists
+      const updatedLocalStorageUser = { ...loggedInUser, image: imageUrl };
+      localStorage.setItem("loggedInUser", JSON.stringify(updatedLocalStorageUser));
+      window.dispatchEvent(new Event("userLogin"));
+
+      toast.success("Profile image uploaded!");
+    } catch (error) {
+      toast.error(error.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const toggle2FA = () => {
+    setFormData({ ...formData, is2FAEnabled: !formData.is2FAEnabled });
   };
 
   const handleSave = async (e) => {
     e.preventDefault();
 
-    const loggedUser =
-      JSON.parse(localStorage.getItem("loggedInUser")) ||
-      JSON.parse(localStorage.getItem("user"));
-
-    if (!loggedUser?.token) {
-      toast.error("Authentication token missing. Please login again.");
+    if (formData.password && formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match");
       return;
     }
 
     try {
-      console.log("🚀 Starting profile update request...");
-      console.log("📋 Form data being sent:", formData);
-      console.log("📋 User data:", user);
+      setUpdating(true);
+      const updateData = { ...formData };
+      if (!updateData.password) delete updateData.password;
+      delete updateData.confirmPassword;
 
-      // Check if there are any actual changes to save
-      const hasDataChange =
-        formData.firstName !== user.firstName ||
-        formData.lastName !== user.lastName ||
-        formData.email !== user.email ||
-        formData.phone !== user.phone ||
-        (formData.password && formData.password.trim() !== "");
-      const hasImageChange =
-        formData.image && formData.image !== (user.image || "");
+      const updatedUser = await updateUserProfile(updateData, token);
 
-      console.log("🔍 Change detection:", { hasDataChange, hasImageChange });
+      const newUserContext = { ...updatedUser, token: token };
+      localStorage.setItem("loggedInUser", JSON.stringify(newUserContext));
 
-      if (!hasDataChange && !hasImageChange) {
-        toast.success("No changes were made.");
-        setIsEditing(false);
-        return;
-      }
-
-      // Prepare data to send, excluding empty password
-      const dataToSend = { ...formData };
-      if (!dataToSend.password || dataToSend.password.trim() === "") {
-        delete dataToSend.password;
-      }
-
-      // Validate image size if present
-      if (dataToSend.image && dataToSend.image.length > 1024 * 1024) {
-        // 1MB limit for base64
-        toast.error(
-          "Image is too large after compression. Please try a smaller image."
-        );
-        return;
-      }
-
-      console.log("📋 Data actually sent to server:", dataToSend);
-      console.log("📋 Data keys:", Object.keys(dataToSend));
-      console.log("📋 Has image in dataToSend:", !!dataToSend.image);
-      console.log(
-        "📋 Image data length:",
-        dataToSend.image ? dataToSend.image.length : "no image"
-      );
-
-      const res = await fetch(`${API_BASE_URL}/users/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${loggedUser.token}`,
-        },
-        body: JSON.stringify(dataToSend),
-      });
-
-      console.log("📡 Profile update response status:", res.status);
-
-      if (res.ok) {
-        const updatedUser = await res.json();
-
-        // ✅ 1. Cusbooneysii xogta user-ka ee gudaha state
-        setUser(updatedUser);
-
-        // ✅ 2. Kaydi xogta saxda ah ee Nav uu akhriyo (including new token)
-        localStorage.setItem("loggedInUser", JSON.stringify(updatedUser));
-
-        // ✅ 3. Haddii image cusub la upload gareeyay, update main image and localStorage
-        if (formData.image) {
-          setImage(formData.image); // Update main image state
-          setPreviewImage(null); // Clear preview
-          localStorage.setItem("profileImage", formData.image);
-        }
-
-        // ✅ 4. Ogeysii Nav in user la update gareeyay
-        window.dispatchEvent(new Event("userLogin"));
-
-        // ✅ 5. Show proper success message
-        if (hasImageChange && hasDataChange) {
-          toast.success("Profile and photo updated successfully!");
-        } else if (hasImageChange) {
-          toast.success("Profile photo updated successfully!");
-        } else if (hasDataChange) {
-          toast.success("Profile updated successfully!");
-        }
-
-        setIsEditing(false);
-      } else {
-        // Try to parse error response
-        let errorMessage = "Error updating profile!";
-        console.log("❌ Update failed with status:", res.status);
-        console.log(
-          "❌ Response headers:",
-          Object.fromEntries(res.headers.entries())
-        );
-
-        try {
-          const responseText = await res.text();
-          console.log("❌ Raw error response:", responseText);
-          console.log("❌ Response length:", responseText.length);
-
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.message || errorMessage;
-          console.log("❌ Parsed error message:", errorMessage);
-        } catch (parseError) {
-          console.log("❌ Failed to parse error response:", parseError.message);
-          console.log("❌ Parse error details:", parseError);
-          // If we can't parse JSON, check the response status
-          if (res.status === 413) {
-            errorMessage =
-              "Image file is too large. Please try a smaller image.";
-          } else if (res.status === 400) {
-            errorMessage = "Invalid data provided. Please check your inputs.";
-          } else if (res.status === 401) {
-            errorMessage = "Session expired. Please login again.";
-          } else if (res.status === 415) {
-            errorMessage = "Unsupported content type. Please try again.";
-          } else if (res.status >= 500) {
-            errorMessage = "Server error. Please try again later.";
-          } else {
-            errorMessage = `Update failed with status ${res.status}. Please try again.`;
-          }
-        }
-        toast.error(errorMessage);
-      }
+      toast.success("Profile updated successfully!");
+      setUser(updatedUser);
+      window.dispatchEvent(new Event("userLogin"));
     } catch (error) {
-      console.error("Profile update error:", error);
-      toast.error("Failed to update profile. Please try again.");
+      toast.error(error.message || "Update failed");
+    } finally {
+      setUpdating(false);
     }
   };
 
-  const handleCancel = () => {
-    setFormData({ ...user });
-    setImage(user.image || null);
-    setPreviewImage(null); // Reset preview image
-    setIsEditing(false);
+  const getImageUrl = (img) => {
+    if (!img) return null;
+    return img.startsWith("/") ? `http://localhost:5000${img}` : img;
   };
 
-  if (!user) {
+  if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-gray-500 mb-4">Loading user data...</p>
-          <p className="text-sm text-gray-400">
-            If this takes too long, please try refreshing the page or logging in
-            again.
-          </p>
-        </div>
+      <div className="flex justify-center items-center h-screen bg-white">
+        <Loader2 className="animate-spin text-emerald-600" size={40} />
       </div>
     );
   }
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 space-y-8 mt-20">
-      <Toaster position="top-right" reverseOrder={false} />
+    <div className="max-w-5xl mx-auto p-8 pt-24 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 font-[Inter]">
 
-      <div className="flex gap-1 items-center">
-        <Home className="w-5 h-5 text-emerald-600" />
-        <ChevronRight className="w-5 h-5 text-emerald-600" />
-        <span className="text-lg font-semibold text-gray-700">Profile</span>
+      <div className="flex gap-1 items-center text-sm text-gray-500">
+        <Home className="w-4 h-4" />
+        <ChevronRight className="w-4 h-4" />
+        <span className="font-semibold text-emerald-600">Student Profile</span>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2">Profile Settings</h1>
-      <p className="text-gray-500 text-[14px] mb-6">
-        Manage your account settings and preferences.
-      </p>
+      <div>
+        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Account Settings</h1>
+        <p className="text-gray-500 text-sm mt-1">Manage your identity, security preferences, and student status.</p>
+      </div>
 
-      <div className="flex mt-20 flex-col lg:flex-row md:flex-row gap-10  lg:gap-0 md:gap-0  ">
-        <div className="w-1/4 flex flex-col  ml-32 lg:ml-0 md:ml-0  items-center space-y-3">
-          <div className="lg:w-36 lg:h-36 md:w-36 md:h-36 w-44 h-44 cursor-pointer rounded-xl bg-green-100 flex items-center justify-center shadow-lg relative group overflow-hidden">
-            {previewImage || image ? (
-              <img
-                src={previewImage || image}
-                alt="Profile"
-                className="w-full h-full object-cover rounded-xl"
-              />
-            ) : (
-              <span className="text-green-600 font-bold text-4xl">
-                {getInitials(user.firstName, user.lastName)}
-              </span>
-            )}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Card */}
+        <div className="lg:col-span-4 space-y-6">
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-24 bg-emerald-600/5 group-hover:bg-emerald-600/10 transition-colors"></div>
 
-            <div className="absolute inset-0 bg-[#0f0f0fb0] flex flex-col items-center justify-center rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              {isCompressingImage ? (
-                <div className="text-white text-sm font-semibold flex flex-col items-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mb-2"></div>
-                  Processing...
+            <div className="relative z-10">
+              <div className="relative inline-block mb-4">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+                <div className="relative">
+                  {formData.image ? (
+                    <img
+                      src={getImageUrl(formData.image)}
+                      alt="Profile"
+                      className={`w-32 h-32 rounded-[2rem] object-cover border-4 border-white shadow-xl ring-1 ring-gray-100 group-hover:scale-[1.02] transition-transform duration-500 ${uploading ? 'opacity-50' : ''}`}
+                    />
+                  ) : (
+                    <div className="w-32 h-32 bg-emerald-50 rounded-[2rem] flex items-center justify-center text-emerald-600 border-4 border-white shadow-xl ring-1 ring-gray-100">
+                      <User size={48} />
+                    </div>
+                  )}
+                  {uploading && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Loader2 className="animate-spin text-emerald-600" size={32} />
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <label
-                  htmlFor="profile-photo"
-                  className="text-white text-sm font-semibold cursor-pointer flex flex-col items-center"
+                <button
+                  onClick={handleUploadClick}
+                  type="button"
+                  disabled={uploading}
+                  className="absolute -bottom-2 -right-2 p-3 bg-white text-emerald-600 rounded-2xl shadow-xl border border-gray-100 hover:bg-emerald-600 hover:text-white transition-all duration-300 transform hover:rotate-12 disabled:opacity-50"
                 >
-                  <FaCamera className="text-white mb-1" />
-                  Change Photo
-                </label>
-              )}
-              <input
-                type="file"
-                id="profile-photo"
-                accept="image/*"
-                onChange={handleImageChange}
-                disabled={isCompressingImage}
-                className="hidden"
-              />
+                  <Camera size={20} />
+                </button>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900">{formData.firstName} {formData.lastName}</h2>
+              <p className="text-emerald-600 font-bold text-[10px] uppercase tracking-[0.2em] mt-2 bg-emerald-50 inline-block px-3 py-1 rounded-full">Student Member</p>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-50 grid grid-cols-2 gap-4 text-left">
+              <div>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                  <p className="text-xs font-bold text-gray-700">Online</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Verified</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <ShieldCheck size={14} className="text-blue-500" />
+                  <p className="text-xs font-bold text-gray-700">Student</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="text-center">
-            <p className="font-semibold text-gray-900">
-              {user.firstName} {user.lastName}
-            </p>
-            <p className="text-xs text-gray-500">{user.email}</p>
+          {/* 2FA Status Card */}
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-[2.5rem] shadow-xl text-white">
+            <div className="flex items-center justify-between mb-6">
+              <div className="p-3 bg-white/10 rounded-2xl">
+                <Shield size={24} className="text-emerald-400" />
+              </div>
+              <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${formData.is2FAEnabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                {formData.is2FAEnabled ? 'Protected' : 'At Risk'}
+              </div>
+            </div>
+            <h3 className="text-lg font-bold mb-2">Two-Step Verification</h3>
+            <p className="text-gray-400 text-xs leading-relaxed mb-6">Secure your student account by requiring an email verification code upon every login attempt.</p>
+
+            <button
+              type="button"
+              onClick={toggle2FA}
+              className={`w-full py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-3 ${formData.is2FAEnabled
+                ? 'bg-white text-gray-900 hover:bg-gray-100'
+                : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                }`}
+            >
+              {formData.is2FAEnabled ? (
+                <><Shield size={18} /> Disable 2FA</>
+              ) : (
+                <><ShieldCheck size={18} /> Enable 2FA</>
+              )}
+            </button>
           </div>
         </div>
 
-        <div className="flex-1 space-y-6 m-10 lg:m-0 md:m-0">
-          <form className="space-y-6" onSubmit={handleSave}>
-            <div className="flex gap-6">
-              <div className="flex-1">
-                <label className="block text-xs font-medium text-gray-600 mb-1">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName || ""}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full border border-gray-200 rounded-md px-3 py-2 text-xs text-gray-700 focus:border-emerald-500"
-                />
+        {/* Right Form */}
+        <div className="lg:col-span-8">
+          <form onSubmit={handleSave} className="space-y-6">
+            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="w-1.5 h-8 bg-emerald-600 rounded-full"></div>
+                <h3 className="text-lg font-bold text-gray-900">Personal Data</h3>
               </div>
 
-              <div className="flex-1">
-                <label className="block text-xs font-medium text-gray-600 mb-1">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName || ""}
-                  onChange={handleChange}
-                  disabled={!isEditing}
-                  className="w-full border border-gray-200 rounded-md px-3 py-2 text-xs text-gray-700 focus:border-emerald-500"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">First Name</label>
+                  <div className="relative group">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={18} />
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-emerald-500 transition-all text-sm font-medium"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Last Name</label>
+                  <div className="relative group">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={18} />
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-emerald-500 transition-all text-sm font-medium"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email</label>
+                  <div className="relative group">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={18} />
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-emerald-500 transition-all text-sm font-medium"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Phone</label>
+                  <div className="relative group">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={18} />
+                    <input
+                      type="text"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-emerald-500 transition-all text-sm font-medium"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="text"
-                name="phone"
-                value={formData.phone || ""}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className="w-full border border-gray-200 rounded-md px-3 py-2 text-xs text-gray-700 focus:border-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs font-medium text-gray-600 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email || ""}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className="w-full border border-gray-200 rounded-md px-3 py-2 text-xs text-gray-700 focus:border-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password || ""}
-                onChange={handleChange}
-                disabled={!isEditing}
-                className="w-full border border-gray-200 rounded-md px-3 py-2 text-xs text-gray-700 focus:border-emerald-500"
-              />
-            </div>
-
-            {!isEditing ? (
-              <button
-                type="button"
-                onClick={() => setIsEditing(true)}
-                className="w-full bg-emerald-500 text-white py-3 rounded-md hover:bg-emerald-600 transition"
-              >
-                Edit Profile
-              </button>
-            ) : (
-              <div className="flex gap-4">
-                <button
-                  type="submit"
-                  className="flex-1 bg-emerald-500 text-white py-3 rounded-md hover:bg-emerald-600 transition"
-                >
-                  Save Changes
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCancel}
-                  className="flex-1 bg-gray-500 text-white py-3 rounded-md hover:bg-gray-600 transition"
-                >
-                  Cancel
-                </button>
+            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-8">
+              <div className="flex items-center gap-4">
+                <div className="w-1.5 h-8 bg-blue-600 rounded-full"></div>
+                <h3 className="text-lg font-bold text-gray-900">Security</h3>
               </div>
-            )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">New Password</label>
+                  <div className="relative group">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600" size={18} />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-medium"
+                      placeholder="••••••••"
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Confirm Password</label>
+                  <div className="relative group">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600" size={18} />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-medium"
+                      placeholder="••••••••"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={updating}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-5 rounded-[1.5rem] transition-all shadow-xl hover:shadow-emerald-200 flex items-center justify-center gap-3 group disabled:opacity-70"
+            >
+              {updating ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} className="group-hover:scale-110 transition-transform" />}
+              <span className="uppercase tracking-widest text-xs">Save Account Changes</span>
+            </button>
           </form>
         </div>
       </div>

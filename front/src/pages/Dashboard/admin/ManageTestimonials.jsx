@@ -1,0 +1,454 @@
+import React, { useState, useEffect } from 'react';
+import {
+    MessageSquareQuote,
+    ShieldCheck,
+    Search,
+    Plus,
+    Trash2,
+    PenTool,
+    X,
+    Loader2,
+    Star,
+    Quote
+} from 'lucide-react';
+import { getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial } from '../../../api/adminService';
+import { toast } from 'react-toastify';
+
+const ManageTestimonials = () => {
+    const [testimonials, setTestimonials] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [formData, setFormData] = useState({
+        name: '',
+        role: '',
+        tag: '',
+        quote: '',
+        rating: 5,
+        image: ''
+    });
+    const [submitting, setSubmitting] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+
+    // Delete Modal State
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    useEffect(() => {
+        fetchTestimonials();
+    }, []);
+
+    const fetchTestimonials = async () => {
+        try {
+            setLoading(true);
+            const data = await getTestimonials();
+            setTestimonials(data);
+        } catch (error) {
+            toast.error('Failed to fetch testimonials');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = (item) => {
+        setItemToDelete(item);
+        setDeleteModalOpen(true);
+    };
+
+    const confirmDelete = async () => {
+        if (!itemToDelete) return;
+        try {
+            setIsDeleting(true);
+            await deleteTestimonial(itemToDelete._id);
+            toast.success('Testimonial removed successfully');
+            setTestimonials(testimonials.filter(t => t._id !== itemToDelete._id));
+            setDeleteModalOpen(false);
+            setItemToDelete(null);
+        } catch (error) {
+            toast.error(error.message || 'Failed to delete');
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const handleToggleStatus = async (item) => {
+        try {
+            const updated = await updateTestimonial(item._id, { ...item, isActive: !item.isActive });
+            setTestimonials(testimonials.map(t => t._id === item._id ? updated : t));
+            toast.success(`Testimonial ${updated.isActive ? 'activated' : 'deactivated'}`);
+        } catch (error) {
+            toast.error('Failed to update status');
+        }
+    };
+
+    const handleEdit = (item) => {
+        setEditingId(item._id);
+        setFormData({
+            name: item.name,
+            role: item.role,
+            tag: item.tag || '',
+            quote: item.quote,
+            rating: item.rating,
+            image: item.image || ''
+        });
+        setIsModalOpen(true);
+    };
+
+    const uploadFileHandler = async (e) => {
+        const file = e.target.files[0];
+        const formDataPayload = new FormData();
+        formDataPayload.append('image', file);
+        setUploading(true);
+
+        try {
+            const user = JSON.parse(localStorage.getItem('loggedInUser'));
+            const res = await fetch('http://localhost:5000/api/upload', {
+                method: 'POST',
+                body: formDataPayload,
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                }
+            });
+
+            if (res.ok) {
+                const data = await res.text();
+                setFormData(prev => ({ ...prev, image: data }));
+                toast.success('Image uploaded successfully');
+            } else {
+                toast.error('Image upload failed');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Error uploading image');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            setSubmitting(true);
+            if (editingId) {
+                const updated = await updateTestimonial(editingId, formData);
+                setTestimonials(testimonials.map(t => t._id === editingId ? updated : t));
+                toast.success('Testimonial updated');
+            } else {
+                const created = await createTestimonial(formData);
+                setTestimonials([created, ...testimonials]);
+                toast.success('Testimonial created');
+            }
+            setIsModalOpen(false);
+            resetForm();
+        } catch (error) {
+            toast.error(error.message || 'Operation failed');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const resetForm = () => {
+        setFormData({ name: '', role: '', tag: '', quote: '', rating: 5, image: '' });
+        setEditingId(null);
+    };
+
+    const getImageUrl = (image) => {
+        if (!image) return null;
+        return image.startsWith('/') ? `http://localhost:5000${image}` : image;
+    };
+
+    const filteredTestimonials = testimonials.filter(t =>
+        t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        t.role.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    return (
+        <div className="space-y-6 animate-in fade-in duration-500">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900 font-[Inter]">Testimonials</h1>
+                    <p className="text-gray-500 text-sm mt-1">Manage what your students say about you.</p>
+                </div>
+                <button
+                    onClick={() => { resetForm(); setIsModalOpen(true); }}
+                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl transition-all font-medium text-sm shadow-sm hover:shadow-emerald-200"
+                >
+                    <Plus size={18} />
+                    <span>Add Testimonial</span>
+                </button>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <input
+                        type="text"
+                        placeholder="Search by name or role..."
+                        className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-1 focus:ring-emerald-500 text-sm transition-all"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+            </div>
+
+            {loading ? (
+                <div className="h-64 flex items-center justify-center">
+                    <Loader2 className="animate-spin text-emerald-600" size={32} />
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                    {filteredTestimonials.map((item) => (
+                        <div key={item._id} className={`bg-white p-6 rounded-2xl border ${item.isActive ? 'border-gray-100' : 'border-amber-100 bg-amber-50/30'} shadow-sm hover:shadow-md transition-all relative group flex flex-col h-full`}>
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="flex items-center gap-3">
+                                    {item.image ? (
+                                        <img
+                                            src={getImageUrl(item.image)}
+                                            alt={item.name}
+                                            className={`w-10 h-10 rounded-full object-cover border ${item.isActive ? 'border-gray-100' : 'border-amber-200 grayscale'}`}
+                                        />
+                                    ) : (
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${item.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                                            {item.name.charAt(0)}
+                                        </div>
+                                    )}
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 text-sm">{item.name}</h3>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-xs text-gray-500">{item.role}</p>
+                                            {item.tag && (
+                                                <span className="text-[10px] bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-md font-medium">
+                                                    {item.tag}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col items-end gap-1">
+                                    <div className="flex gap-1">
+                                        {[...Array(5)].map((_, i) => (
+                                            <Star key={i} size={12} className={i < item.rating ? "text-amber-400 fill-amber-400" : "text-gray-200"} />
+                                        ))}
+                                    </div>
+                                    <span className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${item.isActive ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>
+                                        {item.isActive ? 'Active' : 'Pending'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="mb-4 relative flex-1">
+                                <Quote size={16} className="text-gray-300 absolute -top-1 -left-1 opacity-50" />
+                                <p className="text-gray-600 text-sm leading-relaxed pl-4 italic">
+                                    "{item.quote}"
+                                </p>
+                            </div>
+
+                            <div className="flex items-center justify-end gap-2 pt-4 border-t border-gray-50 mt-auto">
+                                <button
+                                    onClick={() => handleToggleStatus(item)}
+                                    title={item.isActive ? "Deactivate" : "Approve"}
+                                    className={`p-2 rounded-lg transition-colors ${item.isActive ? 'text-gray-400 hover:text-amber-600 bg-gray-50' : 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'}`}
+                                >
+                                    <ShieldCheck size={16} />
+                                </button>
+                                <button
+                                    onClick={() => handleEdit(item)}
+                                    className="p-2 text-gray-400 hover:text-emerald-600 bg-gray-50 rounded-lg transition-colors"
+                                >
+                                    <PenTool size={16} />
+                                </button>
+                                <button
+                                    onClick={() => handleDelete(item)}
+                                    className="p-2 text-gray-400 hover:text-red-600 bg-gray-50 rounded-lg transition-colors"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                    {filteredTestimonials.length === 0 && (
+                        <div className="col-span-full text-center py-12 text-gray-400">
+                            <MessageSquareQuote size={48} className="mx-auto mb-3 opacity-20" />
+                            <p>No testimonials found</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Create/Edit Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                            <h2 className="text-xl font-bold text-gray-900">{editingId ? 'Edit Testimonial' : 'Add Testimonial'}</h2>
+                            <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                            {/* Image Upload */}
+                            <div className="flex items-center justify-center mb-4">
+                                <div className="relative group/upload cursor-pointer">
+                                    <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-emerald-50 bg-gray-50 flex items-center justify-center relative shadow-sm group-hover/upload:border-emerald-100 transition-colors">
+                                        {formData.image ? (
+                                            <img
+                                                src={getImageUrl(formData.image)}
+                                                alt="Preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="text-gray-300 font-bold text-2xl">
+                                                {formData.name ? formData.name.charAt(0) : '?'}
+                                            </div>
+                                        )}
+                                        {uploading && (
+                                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[1px]">
+                                                <Loader2 size={24} className="text-white animate-spin" />
+                                            </div>
+                                        )}
+                                        <div className="absolute inset-0 bg-black/0 group-hover/upload:bg-black/20 transition-colors flex items-center justify-center">
+                                            <div className="opacity-0 group-hover/upload:opacity-100 transition-opacity bg-black/50 p-1.5 rounded-full text-white">
+                                                <Plus size={16} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                                        onChange={uploadFileHandler}
+                                        disabled={uploading}
+                                    />
+                                    {formData.image && !uploading && (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setFormData({ ...formData, image: '' });
+                                            }}
+                                            className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-sm hover:scale-110 transition-transform z-20"
+                                        >
+                                            <X size={10} />
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="text-xs text-gray-400 ml-4 max-w-[150px]">Click to upload a photo for this testimonial.</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Name</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        placeholder="e.g. John Doe"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Role</label>
+                                    <input
+                                        required
+                                        type="text"
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
+                                        value={formData.role}
+                                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                        placeholder="e.g. Student"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Tag (Optional)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-1 focus:ring-emerald-500 text-sm"
+                                        value={formData.tag}
+                                        onChange={(e) => setFormData({ ...formData, tag: e.target.value })}
+                                        placeholder="e.g. Verified Graduate"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-xs font-bold text-gray-500 uppercase ml-1">Rating</label>
+                                    <div className="flex gap-2 h-[42px] items-center">
+                                        {[1, 2, 3, 4, 5].map((star) => (
+                                            <button
+                                                key={star}
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, rating: star })}
+                                                className={`p-1 transition-transform hover:scale-110 ${star <= formData.rating ? 'text-amber-400' : 'text-gray-200'}`}
+                                            >
+                                                <Star size={24} fill={star <= formData.rating ? "currentColor" : "none"} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-gray-500 uppercase ml-1">Quote</label>
+                                <textarea
+                                    required
+                                    rows="4"
+                                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-1 focus:ring-emerald-500 text-sm resize-none"
+                                    value={formData.quote}
+                                    onChange={(e) => setFormData({ ...formData, quote: e.target.value })}
+                                    placeholder="What did they say?"
+                                />
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={submitting}
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-emerald-200 mt-4 flex items-center justify-center gap-2"
+                            >
+                                {submitting && <Loader2 className="animate-spin" size={20} />}
+                                <span>{submitting ? 'Saving...' : 'Save Testimonial'}</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
+            {/* Delete Confirmation Modal */}
+            {deleteModalOpen && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="p-6 text-center">
+                            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Trash2 size={32} />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Delete Testimonial?</h3>
+                            <p className="text-gray-500 text-sm mb-6">
+                                Are you sure you want to delete this testimonial? This action cannot be undone.
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setDeleteModalOpen(false)}
+                                    className="flex-1 py-2.5 bg-gray-100 text-gray-700 font-bold rounded-xl hover:bg-gray-200"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={confirmDelete}
+                                    disabled={isDeleting}
+                                    className="flex-1 py-2.5 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 flex items-center justify-center gap-2"
+                                >
+                                    {isDeleting && <Loader2 className="animate-spin" size={16} />}
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default ManageTestimonials;

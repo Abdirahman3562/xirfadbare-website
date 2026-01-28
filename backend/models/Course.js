@@ -28,6 +28,8 @@ const courseSchema = mongoose.Schema(
     communityLink: { type: String },
     learningOutcomes: [String],
     isBestSeller: { type: Boolean, default: false },
+    discountCode: { type: String },
+    discountPercentage: { type: Number, default: 0 },
     curriculum: [curriculumSchema],
   },
   { timestamps: true }

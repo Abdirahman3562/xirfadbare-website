@@ -39,5 +39,48 @@ export async function getAuthorByUsername(username) {
   }
 }
 
+// ✅ Create a new author
+export async function createAuthor(authorData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/authors`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(authorData),
+    });
+    if (!response.ok) throw new Error('Failed to create author');
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating author:', error);
+    return null;
+  }
+}
 
+// ✅ Update an author
+export async function updateAuthor(id, authorData) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/authors/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(authorData),
+    });
+    if (!response.ok) throw new Error('Failed to update author');
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating author:', error);
+    return null;
+  }
+}
 
+// ✅ Delete an author
+export async function deleteAuthor(id) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/authors/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error('Failed to delete author');
+    return true;
+  } catch (error) {
+    console.error('Error deleting author:', error);
+    return false;
+  }
+}

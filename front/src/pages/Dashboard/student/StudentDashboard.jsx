@@ -11,11 +11,12 @@ import {
   CalendarClock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { getImageUrl } from "../../../utils/format";
 import { getMyOrders } from "../../../api/orderService";
 import { getAllCourses } from "../../../api/courseService";
 import { getUserProgress } from "../../../api/userProgressService";
 
-export default function Courses() {
+export default function StudentDashboard() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,12 +36,21 @@ export default function Courses() {
           return;
         }
 
+        // ✅ Kaliya u dhaaf dalabka 'active', ka saar 'rejected' iyo 'pending'
+        const validOrders = userOrders.filter(order => order.status === 'active');
+
+        if (validOrders.length === 0) {
+          setCourses([]);
+          setLoading(false);
+          return;
+        }
+
         // ✅ Hel dhammaan courses-ka
         const allCourses = await getAllCourses();
 
         // ✅ Ku dar xogta course + progress
         const enrichedCourses = await Promise.all(
-          userOrders.map(async (order) => {
+          validOrders.map(async (order) => {
             try {
               // Hel course info from allCourses
               const course = allCourses.find(
@@ -132,34 +142,34 @@ export default function Courses() {
 
   const avgProgress = courses.length
     ? Math.min(
-        Math.round(
-          courses.reduce((sum, c) => sum + (c.progress || 0), 0) /
-            courses.length
-        ),
-        100
-      )
+      Math.round(
+        courses.reduce((sum, c) => sum + (c.progress || 0), 0) /
+        courses.length
+      ),
+      100
+    )
     : 0;
 
   const userLevel =
     avgProgress >= 80
       ? "Advanced"
       : avgProgress >= 50
-      ? "Intermediate"
-      : avgProgress > 0
-      ? "Beginner"
-      : "Not Started";
+        ? "Intermediate"
+        : avgProgress > 0
+          ? "Beginner"
+          : "Not Started";
 
   const levelColor =
     userLevel === "Advanced"
       ? "text-emerald-600"
       : userLevel === "Intermediate"
-      ? "text-yellow-600"
-      : userLevel === "Beginner"
-      ? "text-blue-600"
-      : "text-gray-600";
+        ? "text-yellow-600"
+        : userLevel === "Beginner"
+          ? "text-blue-600"
+          : "text-gray-600";
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 space-y-8 mt-20">
+    <div className="space-y-8">
       {/* Breadcrumb */}
       <div className="flex gap-1 items-center">
         <Home className="w-5 h-5 text-emerald-600" />
@@ -169,7 +179,7 @@ export default function Courses() {
         </span>
         <ChevronRight className="w-5 h-5 text-emerald-600" />
         <span className="text-lg font-semibold mb-1 text-gray-700">
-          Courses
+          Dashboard
         </span>
       </div>
 
@@ -267,7 +277,7 @@ export default function Courses() {
                   {/* Thumbnail */}
                   <div className="md:w-64 w-full h-44 md:h-auto relative">
                     <img
-                      src={course.image}
+                      src={getImageUrl(course.image)}
                       alt={course.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
@@ -312,11 +322,10 @@ export default function Courses() {
                       </span>
                       <div className="bg-gray-200 rounded-full h-2 w-full mt-1">
                         <div
-                          className={`h-2 rounded-full ${
-                            course.status === "pending"
-                              ? "bg-yellow-400"
-                              : "bg-emerald-500"
-                          }`}
+                          className={`h-2 rounded-full ${course.status === "pending"
+                            ? "bg-yellow-400"
+                            : "bg-emerald-500"
+                            }`}
                           style={{ width: `${progressValue}%` }}
                         ></div>
                       </div>
@@ -354,14 +363,14 @@ export default function Courses() {
                               Last access
                             </p>
                             <p className="text-[14px] font-semibold text-gray-800">
-                              {course.lastAccess?.date
+                              {course.lastAccess
                                 ? new Date(
-                                    course.lastAccess.date
-                                  ).toLocaleDateString("en-US", {
-                                    month: "short",
-                                    day: "numeric",
-                                    year: "numeric",
-                                  })
+                                  course.lastAccess.date || course.lastAccess
+                                ).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })
                                 : "Not started yet"}
                             </p>
                           </div>
@@ -375,11 +384,10 @@ export default function Courses() {
                       )}/lessons/${slugify(
                         course.currentLesson || course.lastAccess?.lessonTitle || "introduction"
                       )}`}
-                      className={`mt-6 font-medium px-5 py-2 rounded-lg text-sm transition self-start shadow-sm flex items-center gap-2 ${
-                        course.status === "pending"
-                          ? "bg-gray-300 text-gray-600 cursor-not-allowed pointer-events-none"
-                          : "bg-emerald-500 text-white hover:bg-emerald-600"
-                      }`}
+                      className={`mt-6 font-medium px-5 py-2 rounded-lg text-sm transition self-start shadow-sm flex items-center gap-2 ${course.status === "pending"
+                        ? "bg-gray-300 text-gray-600 cursor-not-allowed pointer-events-none"
+                        : "bg-emerald-500 text-white hover:bg-emerald-600"
+                        }`}
                     >
                       {course.status === "pending" ? (
                         <>

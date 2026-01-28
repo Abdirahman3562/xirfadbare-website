@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getImageUrl } from "../../utils/format";
 import {
   FaPlayCircle,
   FaClock,
@@ -110,7 +111,7 @@ const InstructorCourses = ({ instructorSlug }) => {
             <div className="relative h-52 w-full overflow-hidden z-0">
               <Link to={`/courses/${slug}`}>
                 <img
-                  src={course.thumbnail || "/default-course.jpg"}
+                  src={getImageUrl(course.thumbnail) || "/default-course.jpg"}
                   alt={course.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
@@ -119,6 +120,12 @@ const InstructorCourses = ({ instructorSlug }) => {
               <span className="absolute top-3 right-3 bg-white/90 text-emerald-600 text-xs font-semibold px-3 py-1 rounded-full shadow">
                 {course.level || "Beginner"}
               </span>
+
+              {course.discountPercentage > 0 && (
+                <span className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg animate-pulse z-10">
+                  {course.discountPercentage}% OFF
+                </span>
+              )}
             </div>
 
             {/* ✅ Info */}
@@ -138,7 +145,7 @@ const InstructorCourses = ({ instructorSlug }) => {
               <div className="flex items-center gap-3 mb-4">
                 {instructor.image ? (
                   <img
-                    src={instructor.image}
+                    src={getImageUrl(instructor.image)}
                     alt={instructor.name}
                     className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm"
                   />
@@ -204,14 +211,27 @@ const InstructorCourses = ({ instructorSlug }) => {
                   </span>
                 )}
 
-                <span
-                  className={`text-[18px] font-semibold ${isFree
-                      ? "bg-white text-emerald-600 px-6 py-0 rounded-full shadow-sm"
-                      : "text-emerald-600"
-                    }`}
-                >
-                  {isFree ? "Free" : `$${course.price}`}
-                </span>
+                <div className="flex flex-col items-end">
+                  {course.discountPercentage > 0 ? (
+                    <>
+                      <span className="text-gray-400 text-xs line-through font-bold">
+                        ${course.price}
+                      </span>
+                      <span className="text-[18px] font-black text-emerald-600">
+                        ${(course.price * (1 - course.discountPercentage / 100)).toFixed(2)}
+                      </span>
+                    </>
+                  ) : (
+                    <span
+                      className={`text-[18px] font-semibold ${isFree
+                        ? "bg-white text-emerald-600 px-6 py-0 rounded-full shadow-sm"
+                        : "text-emerald-600"
+                        }`}
+                    >
+                      {isFree ? "Free" : `$${course.price}`}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="border-t border-gray-100 mb-4"></div>

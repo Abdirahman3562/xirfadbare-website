@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
+import { getImageUrl } from "../../../utils/format";
 import {
   FaEnvelope,
   FaUserPlus,
@@ -10,8 +11,7 @@ import {
   FaCalendarAlt,
 } from "react-icons/fa";
 import InstructorTabs from "../../../components/instructor/InstructorTabs";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { getInstructorBySlug, updateInstructor } from "../../../api/instructorService";
 import { getAllCourses } from "../../../api/courseService";
 
@@ -181,7 +181,7 @@ export default function InstructorDetails() {
       <div
         className="relative h-[400px] bg-cover bg-center z-10"
         style={{
-          backgroundImage: `url(${instructor.coverImage ||
+          backgroundImage: `url(${getImageUrl(instructor.coverImage) ||
             "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1920&q=80"
             })`,
         }}
@@ -194,7 +194,7 @@ export default function InstructorDetails() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-6">
             <img
-              src={instructor.image}
+              src={getImageUrl(instructor.image)}
               alt={instructor.name}
               className="w-28 h-28 object-cover rounded-full border-4 border-white shadow-md"
             />

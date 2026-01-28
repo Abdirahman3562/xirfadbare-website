@@ -1,5 +1,6 @@
 import { FaCode, FaArrowLeft } from "react-icons/fa6";
 import { Link, useParams } from "react-router-dom";
+import { getImageUrl } from "../../../utils/format";
 import { useState, useEffect } from "react";
 import Curriculum from "../../../components/course/Curriculum";
 import Testimonials from "../../../components/Home/Testimonials";
@@ -7,7 +8,7 @@ import FAQ from "../../../components/Home/FAQ";
 import { useData } from "../../../contexts/DataContext";
 
 function CourseDetails() {
-  const { getCourseBySlug } = useData();
+  const { getCourseBySlug, loading } = useData();
   const { slug } = useParams();
 
   // ✅ Hel course-ka si toos ah oo data preloaded ah
@@ -20,11 +21,24 @@ function CourseDetails() {
     }
   }, [course]);
 
+  // 🔄 Loading state
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+        <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-emerald-600 font-bold italic animate-pulse tracking-widest text-sm uppercase">Soo aqrinaya koorsada...</p>
+      </div>
+    );
+  }
+
   // ❌ Error or not found
   if (!course) {
     return (
-      <div className="flex justify-center items-center h-screen text-red-500 font-semibold text-xl">
-        Course not found 😕
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+        <div className="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6 text-4xl">😕</div>
+        <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tighter">KOORSADAN LAMA HELIN!</h2>
+        <p className="text-gray-500 mb-8 max-w-sm font-medium italic">Waan ka xunnahay, koorsada aad raadinayso ma muuqato ama dib ayaa loo saaray. Fadlan iska hubi link-ga.</p>
+        <Link to="/courses" className="bg-emerald-600 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-emerald-700 transition shadow-xl shadow-emerald-100 active:scale-95">Raadi koorso kale</Link>
       </div>
     );
   }
@@ -35,7 +49,7 @@ function CourseDetails() {
       <section className="relative w-full h-72 md:h-96 overflow-hidden rounded-b-2xl shadow-lg">
         <div className="absolute inset-0">
           <img
-            src={course.thumbnail || "/default-course.jpg"}
+            src={getImageUrl(course.thumbnail) || "/default-course.jpg"}
             alt={course.title}
             className="w-full h-full object-cover scale-105 blur-[2px]"
           />
@@ -110,6 +124,7 @@ function CourseDetails() {
             curriculum={course.curriculum}
             learningOutcomes={course.learningOutcomes}
             price={course.price}
+            discountPercentage={course.discountPercentage}
             courseId={course._id || course.id}
             enrolledCount={course.enrolledCount}
             courseTitle={course.title}
@@ -126,7 +141,7 @@ function CourseDetails() {
 
             {course.instructor?.image && (
               <img
-                src={course.instructor.image}
+                src={getImageUrl(course.instructor.image)}
                 alt={course.instructor.name}
                 className="w-28 h-28 rounded-full object-cover mx-auto mb-4 border-4 border-emerald-100 shadow-md"
               />

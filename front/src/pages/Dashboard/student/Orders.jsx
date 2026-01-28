@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../../../utils/format";
 import { FaShoppingCart } from "react-icons/fa";
 import { API_BASE_URL } from "../../../config";
 
@@ -89,13 +90,13 @@ export default function Orders() {
   // ✅ Hel image course-ka
   const getCourseImage = (courseId) => {
     const course = courses.find((c) => String(c._id) === String(courseId));
-    return (
-      course?.thumbnail || "https://via.placeholder.com/400x200?text=No+Image"
-    );
+    return getImageUrl(
+      course?.thumbnail
+    ) || "https://via.placeholder.com/400x200?text=No+Image";
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-8 space-y-8 mt-20">
+    <div className="space-y-8">
       <Toaster position="top-right" reverseOrder={false} />
 
       <div className="flex gap-1 items-center">
@@ -150,11 +151,10 @@ export default function Orders() {
                     {order.courseTitle || order.courseDetails?.title}
                   </h2>
                   <span
-                    className={`text-xs font-semibold px-2 py-1 rounded-full ${
-                      order.status === "completed"
-                        ? "bg-emerald-100 text-emerald-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
+                    className={`text-xs font-semibold px-2 py-1 rounded-full ${order.status === "completed"
+                      ? "bg-emerald-100 text-emerald-700"
+                      : "bg-yellow-100 text-yellow-700"
+                      }`}
                   >
                     {order.status || "pending"}
                   </span>

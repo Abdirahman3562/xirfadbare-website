@@ -12,6 +12,7 @@ const instructorSchema = mongoose.Schema(
       {
         courseId: { type: String },
         student: { type: String },
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         image: { type: String },
         rating: { type: Number, default: 0 },
         comment: { type: String },
@@ -23,6 +24,7 @@ const instructorSchema = mongoose.Schema(
     contactPhone: { type: String },
     students: { type: Number, default: 0 },
     image: { type: String },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

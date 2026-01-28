@@ -10,8 +10,7 @@ import {
   FaBook,
   FaTrash,
 } from "react-icons/fa";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import UserAvatar from "../UserAvatar";
 import { getInstructorBySlug, updateInstructor } from "../../api/instructorService";
 import { getAllCourses } from "../../api/courseService";
@@ -196,6 +195,7 @@ export default function Reviews() {
     const newReview = {
       courseId: selectedCourse,
       student: studentName,
+      user: latestUser._id || latestUser.id,
       image:
         latestUser.image ||
         latestUser.photo ||
@@ -336,7 +336,10 @@ export default function Reviews() {
                   </button>
                 )}
                 <div className="flex items-center gap-3 mb-2">
-                  <UserAvatar image={rev.image} name={rev.student} />
+                  <UserAvatar
+                    image={rev.user?.image || rev.image}
+                    name={rev.student}
+                  />
                   <div>
                     <p className="font-semibold text-gray-700 mt-2">
                       {rev.student}

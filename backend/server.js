@@ -1,3 +1,4 @@
+import path from 'path';
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -10,10 +11,19 @@ connectDB();
 const app = express();
 
 app.use(cors());
-app.use(express.json({ limit: '10mb' })); // Increased limit for image uploads
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+const __dirname = path.resolve();
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+
 import userRoutes from './routes/userRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 import courseRoutes from './routes/courseRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import blogRoutes from './routes/blogRoutes.js';
@@ -24,6 +34,10 @@ import testimonialRoutes from './routes/testimonialRoutes.js';
 import faqRoutes from './routes/faqRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import contactRoutes from './routes/contactRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import roleRoutes from './routes/roleRoutes.js';
+import systemRoutes from './routes/systemRoutes.js';
 
 // Import models to ensure they're registered with Mongoose
 import './models/Blog.js';
@@ -40,6 +54,11 @@ app.use('/api/testimonials', testimonialRoutes);
 app.use('/api/faqs', faqRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/contacts', contactRoutes);
+app.use('/api/payment-methods', paymentRoutes);
+app.use('/api/roles', roleRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/settings', systemRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');
@@ -48,4 +67,5 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, console.log(`Server running on port ${PORT}`));
+
 

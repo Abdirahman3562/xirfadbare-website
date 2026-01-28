@@ -1,99 +1,120 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaPlus, FaMinus } from "react-icons/fa";
-import { useData } from "../../contexts/DataContext";
+import { getFAQs } from "../../api/faqService";
+import { Loader2, MessageCircleQuestion } from "lucide-react";
 
 export default function FAQ() {
-  const { faqs: preloadedFaqs } = useData();
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [openIndex, setOpenIndex] = useState(null);
 
-  // Use preloaded FAQs or fallback to sample data
-  const faqs = preloadedFaqs.length > 0 ? preloadedFaqs : [
-    {
-      _id: "sample1",
-      question: "Sideen uga diiwaan gali karaa koorsooyinka Xirfadbare?",
-      answer: "Tag bogga 'Courses', dooro koorsada aad rabto, kadib guji 'Enroll Now'. Waxaad heli doontaa fariin xaqiijin ah iyo tillaabooyinka xiga ee bixinta ama bilaabista koorsada.",
-      category: "enrollment",
-      order: 1,
-    },
-    {
-      _id: "sample2",
-      question: "Koorsooyinka Xirfadbare ma bilaash baa mise waa lacag leh?",
-      answer: "Xirfadbare waxay bixisaa koorsooyin bilaash ah iyo kuwo premium ah. Koorsooyinka premium waxay bixiyaan waxyaabo dheeraad ah sida hagitaan toos ah, support gaar ah iyo fursado shaqo.",
-      category: "pricing",
-      order: 2,
-    },
-    {
-      _id: "sample3",
-      question: "Ma heli karaa taageero haddii aan dhibaato kala kulmo koorsada?",
-      answer: "Haa, kooxda support-ka ee Xirfadbare ayaa diyaar u ah inay ku caawiso 24/7. Waxaad nala soo xiriiri kartaa email, chat, ama qaybta support-ka ee website-ka.",
-      category: "support",
-      order: 3,
-    },
-  ];
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      try {
+        setLoading(true);
+        const data = await getFAQs();
+        // Kaliya soo aqri xogta database-ka ku jirta (No fallback)
+        setFaqs(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error("Failed to fetch FAQs:", error);
+        setFaqs([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFAQs();
+  }, []);
 
   return (
-    <section className="py-20  bg-[#edf4f5]">
+    <section className="py-24 bg-[#edf4f5]">
       <div className="max-w-4xl mx-auto px-6">
         {/* ✅ Header */}
-        <div className="text-center mb-12">
-          <span className="inline-block text-sm font-semibold text-[#00cc8f] bg-emerald-50 px-4 py-1 rounded-full">
-            💬 FAQ
+        <div className="text-center mb-16">
+          <span className="inline-block text-sm font-black text-emerald-600 bg-emerald-50 px-5 py-2 rounded-full uppercase tracking-widest shadow-sm">
+            💬 Faalo & Su'aalo
           </span>
-          <h2 className="mt-4 text-3xl md:text-4xl font-extrabold text-[#00cc8f]">
-            Frequently Asked Questions
+          <h2 className="mt-6 text-4xl md:text-5xl font-black text-gray-900 tracking-tight">
+            Frequently Asked <span className="text-emerald-600">Questions</span>
           </h2>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-4 text-gray-500 font-medium max-w-2xl mx-auto">
             Halkan ka hel jawaabaha su’aalaha ugu badan ee ku saabsan Xirfadbare iyo khibradda waxbarasho ee online-ka.
           </p>
         </div>
 
-        {/* ✅ Highlight Box */}
-        <div className="border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] rounded-2xl p-6 mb-10 shadow-sm">
-          <h3 className="font-bold text-lg text-emerald-700 mb-2">
-            Waa maxay Xirfadbare?
-          </h3>
-          <p className="text-gray-700 leading-relaxed">
-            <strong>Xirfadbare</strong> waa madal waxbarasho casri ah oo diiradda saarta tababarka
-            iyo horumarinta xirfadaha Technology-ga sida{" "}
-            <strong>Full Stack Development</strong>,{" "}
-            <strong>UI/UX Design</strong>, iyo{" "}
-            <strong>Data Analysis</strong>. Waxay bixisaa casharro la jaanqaadaya suuqa shaqada
-            si ardaydu u noqdaan xirfadlayaal dhab ah.
-          </p>
-          <ul className="list-disc list-inside mt-3 text-gray-700 space-y-1">
-            <li>Macallimiin khubaro ah oo leh waayo-aragnimo dhab ah.</li>
-            <li>Casharro tayo sare leh oo la jaanqaadaya suuqa shaqada.</li>
-            <li>Shahaadooyin la aqoonsan yahay iyo tababaro shaqo dhameystiran.</li>
-          </ul>
-        </div>
+        {/* ✅ Highlight Box (Optional: Only if SPECIFIC question exists) */}
+        {(() => {
+          const xirfadbareFaq = faqs.find(f => f.question?.includes("Waa maxay Xirfadbare"));
+          if (!xirfadbareFaq) return null;
+
+          return (
+            <div className="border border-emerald-100 bg-white rounded-[2.5rem] p-10 mb-12 shadow-xl shadow-emerald-50/50 transition-all duration-500 group hover:border-emerald-500">
+              <h3 className="font-black text-2xl text-emerald-600 mb-4 uppercase tracking-tighter">
+                {xirfadbareFaq.question}
+              </h3>
+              <p className="text-gray-700 text-lg leading-relaxed font-medium">
+                {xirfadbareFaq.answer}
+              </p>
+              <div className="mt-6 flex items-center gap-2 text-emerald-600 font-bold text-sm">
+                <div className="w-8 h-[2px] bg-emerald-600"></div>
+                <span>Official Information</span>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ✅ FAQ List */}
-        <div className="space-y-4">
-          {faqs.map((item, i) => (
-            <div
-              key={item._id || i}
-              className="border border-gray-200 hover:border-emerald-400 cusrpo bg-[#edf4f5] rounded-md hover:shadow-sm transition"
-            >
-              <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex justify-between items-center px-6 py-4 cursor-pointer text-left text-gray-800 font-medium"
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[3rem] border border-gray-50 shadow-sm">
+            <Loader2 className="animate-spin text-emerald-500 mb-4" size={48} />
+            <p className="text-gray-500 font-bold italic">Soo aqrinaya xogta dhabta ah...</p>
+          </div>
+        ) : faqs.length > 0 ? (
+          <div className="space-y-5 animate-in fade-in slide-in-from-bottom-5 duration-700">
+            {faqs.map((item, i) => (
+              <div
+                key={item._id || i}
+                className={`border-2 transition-all duration-500 rounded-[2rem] overflow-hidden ${openIndex === i
+                    ? 'border-emerald-500 bg-white shadow-xl shadow-emerald-100'
+                    : 'border-white bg-white/60 hover:bg-white hover:border-emerald-100 shadow-sm'
+                  }`}
               >
-                <span>{item.question}</span>
-                {openIndex === i ? (
-                  <FaMinus className="text-[#00cc8f]" />
-                ) : (
-                  <FaPlus className="text-[#00cc8f]" />
-                )}
-              </button>
+                <button
+                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                  className="w-full flex justify-between items-center px-8 py-7 cursor-pointer text-left group"
+                >
+                  <span className={`text-lg font-black transition-colors duration-300 ${openIndex === i ? 'text-emerald-600' : 'text-gray-900 group-hover:text-emerald-600'
+                    }`}>
+                    {item.question}
+                  </span>
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 ${openIndex === i ? 'bg-emerald-600 text-white rotate-180' : 'bg-emerald-50 text-emerald-500'
+                    }`}>
+                    {openIndex === i ? <FaMinus size={14} /> : <FaPlus size={14} />}
+                  </div>
+                </button>
 
-              {openIndex === i && (
-                <div className="px-6 pb-4 text-gray-600 border-t border-gray-100">
-                  {item.answer}
+                <div
+                  className={`px-8 transition-all duration-500 ease-in-out overflow-hidden ${openIndex === i ? "max-h-[800px] pb-10 opacity-100" : "max-h-0 opacity-0"
+                    }`}
+                >
+                  <div className="pt-6 border-t border-gray-50 text-gray-600 text-lg leading-relaxed font-normal">
+                    {item.answer}
+                  </div>
                 </div>
-              )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-[3rem] border-2 border-dashed border-gray-200 py-24 text-center">
+            <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-8 text-gray-300">
+              <MessageCircleQuestion size={56} />
             </div>
-          ))}
-        </div>
+            <h3 className="text-2xl font-black text-gray-900 mb-2 uppercase tracking-tighter">Database-ka waa madhan yahay!</h3>
+            <p className="text-gray-500 font-medium max-w-sm mx-auto leading-relaxed">
+              Majirto xog laga helay server-ka. Fadlan ka soo dar qaybta Admin-ka si ay halkan uga muuqato.
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

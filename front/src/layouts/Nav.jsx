@@ -52,7 +52,12 @@ function Nav() {
   useEffect(() => {
     const u = localStorage.getItem("loggedInUser");
     if (u && location.pathname.startsWith("/auth/")) {
-      navigate("/dashboard/student", { replace: true });
+      const parsedUser = JSON.parse(u);
+      if (parsedUser.role === "admin") {
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        navigate("/dashboard/student", { replace: true });
+      }
     }
   }, [location, navigate]);
 
@@ -94,14 +99,21 @@ function Nav() {
   };
 
   const initials = (user?.firstName?.[0] || "") + (user?.lastName?.[0] || "");
-  const avatar = user?.image || localStorage.getItem("profileImage");
+
+  const getImageUrl = (img) => {
+    if (!img) return null;
+    return img.startsWith("/") ? `http://localhost:5000${img}` : img;
+  };
+
+  const avatar = getImageUrl(user?.image || localStorage.getItem("profileImage"));
 
   const linkClass = ({ isActive }) =>
-    `relative px-3 py-2 font-medium transition-all duration-200 ease-in-out ${
-      isActive
-        ? "text-emerald-600 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-emerald-500"
-        : "text-gray-600 hover:text-emerald-600 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-emerald-400 hover:after:w-full after:transition-all after:duration-300"
+    `relative px-3 py-2 font-medium transition-all duration-200 ease-in-out ${isActive
+      ? "text-emerald-600 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-emerald-500"
+      : "text-gray-600 hover:text-emerald-600 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-emerald-400 hover:after:w-full after:transition-all after:duration-300"
     }`;
+
+  const dashboardLink = user?.role === "admin" ? "/admin" : "/dashboard/student";
 
   return (
     <nav className="bg-[#f0f7f8] shadow-sm fixed w-full top-0 z-50 border-b border-gray-100">
@@ -199,7 +211,7 @@ function Nav() {
                     </div>
                     <div className="h-px  bg-gray-200 my-2 m" />
                     <Link
-                      to="/dashboard/student"
+                      to={dashboardLink}
                       onClick={() => setOpenProfile(false)}
                       className=" cursor-pointer w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-600 font-medium"
                     >
@@ -239,9 +251,9 @@ function Nav() {
                   className="flex items-center gap-2 cursor-pointer"
                 >
                   {avatar &&
-                  avatar !== "null" &&
-                  avatar !== "undefined" &&
-                  avatar.trim() !== "" ? (
+                    avatar !== "null" &&
+                    avatar !== "undefined" &&
+                    avatar.trim() !== "" ? (
                     <img
                       src={avatar}
                       alt="User avatar"
@@ -281,10 +293,9 @@ function Nav() {
             to="/"
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
-              `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                isActive
-                  ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+              `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
+                ? "bg-[#e5f9f3] text-emerald-500" // Active state
+                : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
               }`
             }
           >
@@ -295,10 +306,9 @@ function Nav() {
             to="/courses"
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
-              `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                isActive
-                  ? "bg-[#e5f9f3] text-emerald-500"
-                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+              `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
+                ? "bg-[#e5f9f3] text-emerald-500"
+                : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
               }`
             }
           >
@@ -309,10 +319,9 @@ function Nav() {
             to="/about"
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
-              `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                isActive
-                  ? "bg-[#e5f9f3] text-emerald-500"
-                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+              `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
+                ? "bg-[#e5f9f3] text-emerald-500"
+                : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
               }`
             }
           >
@@ -323,10 +332,9 @@ function Nav() {
             to="/contact"
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
-              `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                isActive
-                  ? "bg-[#e5f9f3] text-emerald-500"
-                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+              `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
+                ? "bg-[#e5f9f3] text-emerald-500"
+                : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
               }`
             }
           >
@@ -345,99 +353,110 @@ function Nav() {
         </div>
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar Overlay (Mobile) */}
       {sidebarOpen && (
-        <aside className="fixed  lg:hidden md:hidden left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 z-[1000] flex flex-col">
-          <div className="flex-1 overflow-y-auto py-20">
-            <nav className="px-4 text-sm">
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[999] lg:hidden md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar (Mobile) */}
+      {sidebarOpen && (
+        <aside className="fixed lg:hidden md:hidden left-0 top-0 h-screen w-[280px] bg-white z-[1000] flex flex-col shadow-2xl animate-in slide-in-from-left duration-300">
+          <div className="flex-1 overflow-y-auto py-10">
+            <nav className="px-4 space-y-1">
               {/* Overview */}
-              <div className="mt-2">
-                <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
+              <div className="mb-4">
+                <p className="text-[10px] font-black text-gray-400 px-3 mb-2 uppercase tracking-[0.2em]">
                   Overview
                 </p>
                 <NavLink
-                  to="/dashboard/student"
+                  to={dashboardLink}
+                  onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
-                    `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                      isActive
-                        ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                        : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                    `w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${isActive
+                      ? "bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-emerald-600"
                     }`
                   }
                 >
-                  <LayoutDashboard size={18} />
+                  <LayoutDashboard size={20} />
                   Dashboard
                 </NavLink>
               </div>
 
               {/* Learning */}
-              <div className="mt-3">
-                <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
+              <div className="mb-4">
+                <p className="text-[10px] font-black text-gray-400 px-3 mb-2 uppercase tracking-[0.2em]">
                   Learning
                 </p>
                 <NavLink
                   to="/dashboard/courses"
+                  onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
-                    `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                      isActive
-                        ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                        : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                    `w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${isActive
+                      ? "bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-emerald-600"
                     }`
                   }
                 >
-                  <BookOpen size={18} />
+                  <BookOpen size={20} />
                   My Courses
                 </NavLink>
               </div>
 
               {/* Payments */}
-              <div className="mt-3">
-                <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
+              <div className="mb-4">
+                <p className="text-[10px] font-black text-gray-400 px-3 mb-2 uppercase tracking-[0.2em]">
                   Payments
                 </p>
                 <NavLink
                   to="/dashboard/orders"
+                  onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
-                    `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                      isActive
-                        ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                        : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                    `w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${isActive
+                      ? "bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-emerald-600"
                     }`
                   }
                 >
-                  <FileText size={18} />
+                  <FileText size={20} />
                   Orders
                 </NavLink>
               </div>
 
               {/* Account */}
-              <div className="mt-3">
-                <p className="text-[11px] font-semibold text-gray-400 px-3 mb-1 uppercase tracking-wider">
+              <div className="mb-4">
+                <p className="text-[10px] font-black text-gray-400 px-3 mb-2 uppercase tracking-[0.2em]">
                   Account
                 </p>
                 <NavLink
                   to="/dashboard/profile"
+                  onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
-                    `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
-                      isActive
-                        ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                        : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                    `w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${isActive
+                      ? "bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-emerald-600"
                     }`
                   }
                 >
-                  <User size={18} />
+                  <UserIcon size={20} />
                   Profile
                 </NavLink>
               </div>
             </nav>
           </div>
 
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-gray-100">
             <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 bg-[#edf4f5] text-emerald-600 px-4 py-1.5 rounded-md hover:bg-red-600 transition w-full"
+              onClick={() => {
+                handleLogout();
+                setSidebarOpen(false);
+              }}
+              className="flex items-center justify-center gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl hover:bg-red-100 transition-colors w-full font-bold text-sm"
             >
-              <LogOut className="w-4 h-4" /> Logout
+              <LogOut size={18} /> Logout Account
             </button>
           </div>
         </aside>

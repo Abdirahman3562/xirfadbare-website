@@ -72,3 +72,41 @@ export async function getFullCourseDetailsBySlug(slug) {
     return null;
   }
 }
+// ✅ Update a course
+export async function updateCourse(courseId, courseData) {
+  try {
+    const userInfo = JSON.parse(localStorage.getItem('loggedInUser'));
+    const isNew = courseId === 'new';
+    const res = await fetch(`${API_BASE_URL}/courses${isNew ? '' : `/${courseId}`}`, {
+      method: isNew ? "POST" : "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo?.token}`,
+      },
+      body: JSON.stringify(courseData),
+    });
+    if (!res.ok) throw new Error(`Failed to ${isNew ? 'create' : 'update'} course`);
+    return await res.json();
+  } catch (error) {
+    console.error(`❌ Error in ${courseId === 'new' ? 'createCourse' : 'updateCourse'}:`, error);
+    throw error;
+  }
+}
+
+// ✅ Delete a course
+export async function deleteCourse(courseId) {
+  try {
+    const userInfo = JSON.parse(localStorage.getItem('loggedInUser'));
+    const res = await fetch(`${API_BASE_URL}/courses/${courseId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${userInfo?.token}`,
+      },
+    });
+    if (!res.ok) throw new Error("Failed to delete course");
+    return await res.json();
+  } catch (error) {
+    console.error("❌ Error in deleteCourse:", error);
+    throw error;
+  }
+}

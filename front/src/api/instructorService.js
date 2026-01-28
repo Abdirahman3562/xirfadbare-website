@@ -59,5 +59,40 @@ export async function updateInstructor(id, data) {
   }
 }
 
+// ✅ Create instructor
+export async function createInstructor(data) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/instructors`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) throw new Error('Failed to create instructor');
+    const instructor = await response.json();
+    return instructor;
+  } catch (error) {
+    console.error('Error creating instructor:', error);
+    return null;
+  }
+}
+
+// ✅ Delete instructor
+export async function deleteInstructor(id) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/instructors/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) throw new Error('Failed to delete instructor');
+    return true;
+  } catch (error) {
+    console.error('Error deleting instructor:', error);
+    return false;
+  }
+}
+
 
 

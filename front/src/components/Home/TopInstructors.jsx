@@ -23,7 +23,7 @@ export default function TopInstructors() {
         </div>
 
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          {instructors.map((instructor, i) => (
+          {instructors.filter(ins => ins.isActive !== false).map((instructor, i) => (
             <motion.div
               key={i}
               whileHover={{ y: -8, scale: 1.04 }}

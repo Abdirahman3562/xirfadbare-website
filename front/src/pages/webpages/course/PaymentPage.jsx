@@ -1,5 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
+import { CreditCard, Camera, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getImageUrl } from "../../../utils/format";
 import toast, { Toaster } from "react-hot-toast";
 import {
   FaCheckCircle,
@@ -23,14 +25,21 @@ function PaymentPage() {
   const [selectedTab, setSelectedTab] = useState("local");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
   const [errorMsg, setErrorMsg] = useState("");
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [loadingMethods, setLoadingMethods] = useState(true);
+  const [paymentProof, setPaymentProof] = useState("");
+  const [uploadingProof, setUploadingProof] = useState(false);
   const navigate = useNavigate();
 
-  const websiteDiscount = 0.25;
-  const totalDiscount = websiteDiscount + appliedDiscount;
+  // Calculate prices dynamically
+  const baseDiscount = (course?.discountCode ? 0 : (course?.discountPercentage || 0)) / 100;
+  const totalDiscount = baseDiscount + appliedDiscount;
+
   const totalPrice = Number(
     selectedPlan?.price || course?.price?.amount || course?.price || 0
   );
-  const finalPrice = (totalPrice * (1 - totalDiscount)).toFixed(2);
+  const discountAmount = (totalPrice * totalDiscount).toFixed(2);
+  const finalPrice = (totalPrice - discountAmount).toFixed(2);
 
   // ✅ Fetch course (auto detect slug or id)
   useEffect(() => {
@@ -58,6 +67,47 @@ function PaymentPage() {
     if (id) fetchCourseData();
   }, [id]);
 
+  // ✅ Fetch payment methods
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/payment-methods`);
+        const data = await res.json();
+        if (res.ok) {
+          setPaymentMethods(data);
+        }
+      } catch (error) {
+        console.error("❌ Error fetching payment methods:", error);
+      } finally {
+        setLoadingMethods(false);
+      }
+    };
+    fetchPaymentMethods();
+  }, []);
+
+  const handleProofUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      setUploadingProof(true);
+      const res = await fetch(`${API_BASE_URL}/upload`, {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.text();
+      setPaymentProof(data);
+      toast.success("Cadeentii waa la soo galiyay!");
+    } catch (error) {
+      toast.error("Wuu fashilmay upload-ka.");
+    } finally {
+      setUploadingProof(false);
+    }
+  };
+
   // Helper: initials fallback
   const getInitials = (name) => {
     if (!name) return "?";
@@ -71,10 +121,12 @@ function PaymentPage() {
   // Coupon
   const handleApplyDiscount = () => {
     const coupon = discount.trim().toLowerCase();
+    const courseCode = course?.discountCode?.trim().toLowerCase();
 
-    if (coupon === "samafale") {
-      setAppliedDiscount(0.15);
+    if (courseCode && coupon === courseCode) {
+      setAppliedDiscount((course.discountPercentage || 0) / 100);
       setErrorMsg("");
+      toast.success(`Code applied! You got ${course.discountPercentage}% off.`);
     } else if (coupon === "") {
       setErrorMsg("Please enter a coupon code.");
       setAppliedDiscount(0);
@@ -151,8 +203,9 @@ function PaymentPage() {
         paymentMethod: selectedMethod,
         phoneNumber: phone,
         totalToPay: totalPrice,
-        discountApplied: (totalPrice * (websiteDiscount + appliedDiscount)).toFixed(2),
+        discountApplied: Number(discountAmount),
         finalPrice: Number(finalPrice),
+        paymentProof: paymentProof,
       };
 
       const res = await fetch(`${API_BASE_URL}/orders`, {
@@ -194,6 +247,21 @@ function PaymentPage() {
     return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
   };
 
+  const calculateTotalDuration = (curriculum) => {
+    if (!curriculum) return "0m";
+    let totalSec = 0;
+    curriculum.forEach(sec => {
+      sec.lessons?.forEach(lesson => {
+        if (!lesson.duration) return;
+        const [m, s] = lesson.duration.split(':').map(Number);
+        totalSec += (m || 0) * 60 + (s || 0);
+      });
+    });
+    const hours = Math.floor(totalSec / 3600);
+    const mins = Math.floor((totalSec % 3600) / 60);
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  };
+
   if (!course)
     return (
       <div className="min-h-screen flex justify-center items-center text-gray-500">
@@ -208,7 +276,7 @@ function PaymentPage() {
       {/* ===== LEFT SIDE ===== */}
       <div className="lg:col-span-1  shadow-md rounded-2xl border border-gray-100 overflow-hidden">
         <img
-          src={course.thumbnail}
+          src={getImageUrl(course.thumbnail)}
           alt={course.title}
           className="w-full h-64 object-cover rounded-t-xl"
         />
@@ -218,7 +286,7 @@ function PaymentPage() {
             {course.title}
           </h2>
 
-          <div className="flex flex-wrap text-sm text-emerald-500 mt-3 gap-x-2 gap-y-2">
+          <div className="flex flex-wrap text-[15px] text-emerald-500 mt-3 mb-4  gap-x-6 gap-y-2">
             {/* Duration */}
             <p className="flex items-center">
               <FaClock className="mr-1 text-emerald-500" />
@@ -245,10 +313,10 @@ function PaymentPage() {
           </div>
 
           {/* Instructor */}
-          <div className="mt-4 px-2 flex items-center gap-3">
+          <div className="mt-6 px-2 flex items-center gap-3 ">
             {course?.instructor?.image ? (
               <img
-                src={course.instructor.image}
+                src={getImageUrl(course.instructor.image)}
                 alt={course.instructor.name}
                 className="h-9 w-9 rounded-full object-cover border border-gray-200"
               />
@@ -319,8 +387,8 @@ function PaymentPage() {
           <button
             onClick={() => setSelectedTab("local")}
             className={`flex-1 text-center py-3 cursor-pointer font-medium text-sm border-b-2 transition ${selectedTab === "local"
-                ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+              ? "border-emerald-500 text-emerald-600"
+              : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
           >
             <p>Local Payment</p>
@@ -329,8 +397,8 @@ function PaymentPage() {
           <button
             onClick={() => setSelectedTab("online")}
             className={`flex-1 text-center py-3 cursor-pointer font-medium text-sm border-b-2 transition ${selectedTab === "online"
-                ? "border-emerald-500 text-emerald-600"
-                : "border-transparent text-gray-500 hover:text-gray-700"
+              ? "border-emerald-500 text-emerald-600"
+              : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
           >
             <p>Online Payment</p>
@@ -338,135 +406,209 @@ function PaymentPage() {
           </button>
         </div>
 
-        {/* Local Payment */}
-        {selectedTab === "local" && (
-          <>
-            <h3 className="text-sm font-semibold mb-2 text-gray-700">
-              Payment Method
-            </h3>
-            <div className="space-y-2 mb-6 relative">
-              {[
-                "EVC Plus",
-                "ZAAD Service",
-                "Sahal",
-                "EBIR",
-                "Cash on Delivery",
-              ].map((method, i) => (
+        {/* Dynamic Payment Methods (Shared for Local & Online) */}
+        <h3 className="text-sm font-semibold mb-2 text-gray-700">
+          Payment Method
+        </h3>
+        <div className="space-y-3 mb-6 relative">
+          {loadingMethods ? (
+            <div className="py-4 text-center text-gray-500 text-sm animate-pulse">
+              Soo aqrinaya qababka lacag bixinta...
+            </div>
+          ) : (
+            paymentMethods
+              .filter(m => (m.type || 'local') === selectedTab)
+              .map((method, i) => (
                 <button
                   key={i}
-                  onClick={() => setSelectedMethod(method)}
-                  className={`w-full relative border rounded-lg cursor-pointer p-3 pl-4 text-left text-sm transition flex flex-col ${selectedMethod === method
-                      ? "border-emerald-500 bg-emerald-50"
-                      : "border-gray-200 hover:border-emerald-300"
+                  onClick={() => setSelectedMethod(method.name)}
+                  className={`w-full relative border rounded-xl cursor-pointer p-4 text-left text-sm transition-all duration-300 flex flex-col ${selectedMethod === method.name
+                    ? "border-emerald-500 bg-emerald-50 shadow-sm"
+                    : "border-gray-100 hover:border-emerald-200 hover:bg-gray-50"
                     }`}
                 >
                   <span
-                    className={`absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 ${selectedMethod === method
-                        ? "border-emerald-500"
-                        : "border-gray-300"
-                      } flex items-center justify-center`}
+                    className={`absolute right-4 top-6 w-5 h-5 rounded-full border-2 ${selectedMethod === method.name
+                      ? "border-emerald-500 bg-emerald-500"
+                      : "border-gray-200"
+                      } flex items-center justify-center transition-all`}
                   >
-                    {selectedMethod === method && (
-                      <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                    {selectedMethod === method.name && (
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
                     )}
                   </span>
-                  <div className="font-medium text-gray-800 flex items-center gap-2">
-                    {method}
+                  <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedMethod === method.name ? 'bg-white shadow-sm text-emerald-600' : 'bg-gray-50 text-gray-400'
+                      }`}>
+                      <CreditCard size={20} />
+                    </div>
+                    <div>
+                      <div className="font-bold text-gray-900">{method.name}</div>
+                      <div className="text-gray-500 text-[11px] font-medium mt-0.5">
+                        {selectedTab === 'local' ? `Pay with ${method.name} wallet` : `Pay securely with ${method.name}`}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-gray-500 text-xs">
-                    {method === "Cash on Delivery"
-                      ? "Pay when you receive"
-                      : `Pay with ${method} mobile money`}
-                  </div>
-                </button>
-              ))}
-            </div>
 
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              {selectedTab === "local" && (
-                <div className="mb-4">
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, ""); // tirada kaliya
-                      if (value.length <= 15) setPhone(value);
-                    }}
-                    placeholder="E.g. 612345678"
-                    required={selectedTab === "local"} // ✅ required oo kaliya marka local
-                    className={`w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 ${selectedTab === "local" &&
-                        phone.length > 0 &&
-                        (phone.length < 8 || phone.length > 15)
-                        ? "border-red-500 focus:border-red-500"
-                        : "border-gray-300 focus:border-emerald-400"
-                      }`}
-                  />
-                  {selectedTab === "local" &&
-                    phone.length > 0 &&
-                    (phone.length < 8 || phone.length > 15) && (
-                      <p className="text-red-500 text-xs mt-1">
-                        Phone number must be 8–15 digits.
+                  {/* Dynamic Instruction */}
+                  {selectedMethod === method.name && (
+                    <div className="mt-4 pt-4 border-t border-emerald-100/50 animate-in slide-in-from-top-2 duration-300">
+                      <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest block mb-1.5 underline decoration-emerald-200 underline-offset-4">How to pay:</span>
+                      <p className="text-xs font-bold text-emerald-800 leading-relaxed bg-white/50 p-3 rounded-lg border border-emerald-100/50">
+                        {method.instruction}
                       </p>
-                    )}
-                </div>
-              )}
+                    </div>
+                  )}
+                </button>
+              ))
+          )}
+
+          {paymentMethods.filter(m => (m.type || 'local') === selectedTab).length === 0 && !loadingMethods && (
+            <div className="p-4 bg-amber-50 rounded-xl border border-amber-100 text-amber-600 text-sm font-medium text-center">
+              Hadda ma jiraan qab lacag bixin oo {selectedTab === 'local' ? 'Local' : 'Online'} ah oo diyaar ah.
             </div>
-          </>
-        )}
-
-        {/* Online Payment */}
-        {selectedTab === "online" && (
-          <div className="border rounded-lg p-3 mb-6 border-emerald-500 bg-emerald-50">
-            <div className="font-medium text-gray-800">Credit/Debit Card</div>
-            <p className="text-gray-500 text-xs">
-              Pay securely using your credit or debit card
-            </p>
-          </div>
-        )}
-
-        {/* Discount */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Discount Code (Optional)
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={discount}
-              onChange={(e) => setDiscount(e.target.value)}
-              placeholder="Enter discount code"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400"
-            />
-            <button
-              onClick={handleApplyDiscount}
-              className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition"
-            >
-              Apply
-            </button>
-          </div>
-          {errorMsg && <p className="text-red-500 text-xs mt-1">{errorMsg}</p>}
-          {appliedDiscount > 0 && (
-            <p className="text-emerald-600 text-xs mt-1">
-              🎉 Coupon “samafale” applied! (Extra 15% off)
-            </p>
           )}
         </div>
+
+        {/* Local Payment Specific Inputs (Phone Number) */}
+        {selectedTab === "local" && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone Number
+            </label>
+            <div className="mb-4">
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, ""); // tirada kaliya
+                  if (value.length <= 15) setPhone(value);
+                }}
+                placeholder="E.g. 612345678"
+                className={`w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400 ${phone.length > 0 &&
+                  (phone.length < 8 || phone.length > 15)
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-emerald-400"
+                  }`}
+              />
+              {phone.length > 0 &&
+                (phone.length < 8 || phone.length > 15) && (
+                  <p className="text-red-500 text-xs mt-1">
+                    Phone number must be 8–15 digits.
+                  </p>
+                )}
+            </div>
+          </div>
+        )}
+
+        {/* Proof of Payment Upload */}
+        <div className="mb-6 bg-gray-50/50 p-6 rounded-2xl border border-gray-100/50">
+          <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-3">
+            Proof of Payment (Screenshot)
+          </label>
+
+          {!paymentProof ? (
+            <div className="relative">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleProofUpload}
+                className="hidden"
+                id="proof-upload"
+              />
+              <label
+                htmlFor="proof-upload"
+                className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${uploadingProof
+                  ? "bg-gray-100 border-gray-200"
+                  : "bg-white border-emerald-100 hover:border-emerald-500 hover:bg-emerald-50"
+                  }`}
+              >
+                {uploadingProof ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-[10px] font-bold text-gray-500">Soo galinaya...</span>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-emerald-600">
+                    <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
+                      <Camera size={20} />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest">Upload Screenshot</span>
+                    <span className="text-[9px] text-gray-400 font-medium">PNG, JPG qura</span>
+                  </div>
+                )}
+              </label>
+            </div>
+          ) : (
+            <div className="relative group rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+              <img
+                src={`${API_BASE_URL.replace('/api', '')}${paymentProof}`}
+                alt="Payment Proof"
+                className="w-full h-48 object-cover"
+              />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={() => setPaymentProof("")}
+                  className="p-3 bg-red-600 text-white rounded-full hover:scale-110 transition-transform shadow-lg"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="absolute top-3 left-3 bg-emerald-600 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg">
+                Cadeyn la helay
+              </div>
+            </div>
+          )}
+        </div>
+
+
+        {/* Discount Section (Only if course has a code) */}
+        {course.discountCode && (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Discount Code (Optional)
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+                placeholder="Enter discount code"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-400"
+              />
+              <button
+                onClick={handleApplyDiscount}
+                className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition"
+              >
+                Apply
+              </button>
+            </div>
+            {errorMsg && <p className="text-red-500 text-xs mt-1">{errorMsg}</p>}
+            {appliedDiscount > 0 && (
+              <p className="text-emerald-600 text-xs mt-1">
+                🎉 Code "{course.discountCode}" applied! ({course.discountPercentage}% off)
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Summary */}
         <div className="border-t border-gray-200 pt-4 mb-6">
           <div className="flex justify-between font-semibold text-gray-700 mb-2">
             <span>Original Price</span>
-            <span className="text-gray-500 line-through">${totalPrice}.00</span>
+            <span className={`${totalDiscount > 0 ? "text-gray-500 line-through" : ""}`}>${totalPrice}.00</span>
           </div>
-          <div className="flex justify-between font-semibold text-gray-700 mb-2">
-            <span>Discount (25%)</span>
-            <span className="text-emerald-500">
-              -${(totalPrice * 0.25).toFixed(2)}
-            </span>
-          </div>
+
+          {totalDiscount > 0 && (
+            <div className="flex justify-between font-semibold text-gray-700 mb-2">
+              <span>Discount ({Math.round(totalDiscount * 100)}%)</span>
+              <span className="text-emerald-500">
+                -${discountAmount}
+              </span>
+            </div>
+          )}
+
           <div className="flex justify-between font-semibold text-gray-800 text-lg">
             <span>Total to Pay</span>
             <span className="text-emerald-600">${finalPrice}</span>
@@ -476,13 +618,15 @@ function PaymentPage() {
         <button
           onClick={handlePayment}
           disabled={
-            selectedTab === "local" &&
-            (!selectedMethod || phone.length < 8 || phone.length > 15)
+            !selectedMethod ||
+            (selectedTab === "local" && (phone.length < 8 || phone.length > 15)) ||
+            !paymentProof || uploadingProof
           }
-          className={`mt-2 w-full font-medium py-3 rounded-lg transition ${selectedTab === "local" &&
-              (!selectedMethod || phone.length < 8 || phone.length > 15)
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-emerald-500 text-white hover:bg-emerald-600"
+          className={`mt-2 w-full font-medium py-3 rounded-lg transition ${!selectedMethod ||
+            (selectedTab === "local" && (phone.length < 8 || phone.length > 15)) ||
+            !paymentProof || uploadingProof
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : "bg-emerald-500 text-white hover:bg-emerald-600"
             }`}
         >
           Pay ${finalPrice} Now

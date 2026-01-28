@@ -17,6 +17,7 @@ export default function Curriculum({
   curriculum = [],
   learningOutcomes = [],
   price,
+  discountPercentage = 0,
   courseId,
   enrolledCount = 0,
   courseTitle
@@ -85,7 +86,7 @@ export default function Curriculum({
       {/* ✅ Summary Boxes */}
       <div className="grid sm:grid-cols-4 gap-4 mb-8 text-center">
 
-      {/* ✅ Students Enrolled (Box Afraad) */}
+        {/* ✅ Students Enrolled (Box Afraad) */}
         <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] transition">
           <FaUserGraduate className="text-emerald-500 text-2xl mx-auto mb-2" />
           <p className="text-xl font-semibold text-gray-800">
@@ -117,7 +118,7 @@ export default function Curriculum({
           <p className="text-gray-500 text-sm">Skill Level</p>
         </div>
 
-       
+
       </div>
 
       {/* ✅ Curriculum Header */}
@@ -226,6 +227,25 @@ export default function Curriculum({
         )}
 
         <div className="border-t border-gray-100 pt-4">
+          <div className="mb-4 flex items-center justify-between">
+            <span className="text-gray-500 font-medium">Course Price:</span>
+            <div className="flex flex-col items-end">
+              {discountPercentage > 0 ? (
+                <>
+                  <span className="text-sm text-gray-400 line-through font-bold">
+                    ${price}
+                  </span>
+                  <span className="text-3xl font-black text-emerald-600">
+                    ${(price * (1 - discountPercentage / 100)).toFixed(2)}
+                  </span>
+                </>
+              ) : (
+                <span className="text-3xl font-black text-emerald-600">
+                  {Number(price) === 0 ? "Free" : `$${price}`}
+                </span>
+              )}
+            </div>
+          </div>
           {isPaid ? (
             <button
               onClick={() => {
@@ -237,12 +257,12 @@ export default function Curriculum({
                   );
                 }
               }}
-              className="w-full bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition"
+              className="w-full bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100"
             >
               Buy Course To Get Full Access <FaArrowRight />
             </button>
           ) : (
-            <button className="w-full bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition">
+            <button className="w-full bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100">
               Continue Learning <FaArrowRight />
             </button>
           )}

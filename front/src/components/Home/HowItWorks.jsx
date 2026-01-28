@@ -2,19 +2,36 @@ import React from "react";
 import { motion } from "framer-motion";
 
 export default function HowItWorks() {
+
   const steps = [
-    { t: "Create account", d: "Join for free and set your goals." },
-    { t: "Pick a path", d: "Choose a track or individual courses." },
-    { t: "Build projects", d: "Learn by doing with real tasks." },
-    { t: "Get certified", d: "Finish, earn certificate, apply!" },
+    {
+      step: 1,
+      title: "Create Account",
+      description: "Join for free and set your goals."
+    },
+    {
+      step: 2,
+      title: "Pick a path",
+      description: "Choose a track or individual courses."
+    },
+    {
+      step: 3,
+      title: "Build projects",
+      description: "Learn by doing with real tasks."
+    },
+    {
+      step: 4,
+      title: "Get certified",
+      description: "Finish, earn certificate, apply!"
+    },
   ];
 
   return (
     <section id="how-it-works" className="py-16">
-     
+
       <div className="max-w-7xl mx-auto px-6">
-        <Header title="How It Works"  />
-        <div className="mt-8 grid gap-6 md:grid-cols-4">
+        <Header title="How It Works" />
+        <div className="mt-8 grid gap-6 grid-cols-1 md:grid-cols-2">
           {steps.map((s, i) => (
             <motion.div
               key={i}
@@ -23,10 +40,10 @@ export default function HowItWorks() {
               className="rounded-2xl bg-[#edf4f5] border border-gray-200 hover:border-emerald-400 p-6 shadow hover:shadow-lg transition"
             >
               <div className="w-10 h-10 grid place-content-center rounded-full bg-emerald-600 text-white font-bold">
-                {i + 1}
+                {s.step || i + 1}
               </div>
-              <h3 className="mt-4 font-bold text-lg text-gray-800">{s.t}</h3>
-              <p className="text-gray-600 mt-2">{s.d}</p>
+              <h3 className="mt-4 font-bold text-lg text-gray-800">{s.title}</h3>
+              <p className="text-gray-600 mt-2">{s.description}</p>
             </motion.div>
           ))}
         </div>

@@ -1,15 +1,20 @@
 import { Link, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { getAuthorByUsername } from "../../../api/authorService";
+import { getBlogsByAuthorId } from "../../../api/blogService";
+import { getImageUrl } from "../../../utils/format";
 import {
   FaCalendarAlt,
   FaGlobe,
   FaGithub,
   FaLinkedin,
   FaTwitter,
+  FaFacebook,
+  FaInstagram,
+  FaYoutube,
   FaCheckCircle,
+  FaMapMarkerAlt
 } from "react-icons/fa";
-import { getAuthorByUsername } from "../../../api/authorService";
-import { getBlogsByAuthorId } from "../../../api/blogService";
 
 function AuthorPage() {
   const { username } = useParams();
@@ -58,9 +63,11 @@ function AuthorPage() {
           username: found.username,
           name: found.name,
           image: found.avatar,
+          email: found.email,
           bio: found.bio || "No bio available yet.",
           verified: !!found.verified,
-          badge: found.badge || null,
+          location: found.location,
+          website: found.website,
           social: found.social || {},
         });
 
@@ -104,10 +111,10 @@ function AuthorPage() {
       {/* ✅ Author Profile Section */}
       <div className="flex flex-col md:flex-row items-center md:items-start bg-white p-6 rounded-xl shadow-md">
         <img
-          src={author.image || "/images/authors/default.jpg"}
+          src={getImageUrl(author.image) || "/images/authors/default.jpg"}
           alt={author.name}
           onError={(e) => (e.target.src = "/images/authors/default.jpg")}
-          className="w-56 h-56 rounded-xl object-cover border border-emerald-500"
+          className="w-56 h-56 rounded-xl object-cover border border-emerald-500 shadow-lg"
         />
 
         <div className="flex-1 ml-12 md:ml-6 mt-4 md:mt-0">
@@ -129,13 +136,21 @@ function AuthorPage() {
           </div>
 
           <p className="text-gray-600 mt-1">@{author.username}</p>
-          <p className="text-gray-700 mt-2 max-w-xl mr-5">"{author.bio}"</p>
+
+          {author.location && (
+            <div className="flex items-center gap-2 text-gray-500 text-sm mt-2">
+              <FaMapMarkerAlt className="text-emerald-500" />
+              <span>{author.location}</span>
+            </div>
+          )}
+
+          <p className="text-gray-700 mt-3 max-w-xl mr-5 leading-relaxed italic">"{author.bio}"</p>
 
           {/* ✅ Social Links */}
           <div className="flex flex-wrap gap-2 mt-6">
-            {social.website && (
+            {author.website && (
               <a
-                href={social.website}
+                href={author.website}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 px-4 py-2 border border-gray-200 hover:border-emerald-400 rounded-md text-gray-700 hover:bg-gray-100 transition"
@@ -177,6 +192,39 @@ function AuthorPage() {
                 <span>Twitter</span>
               </a>
             )}
+            {social.facebook && (
+              <a
+                href={social.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 px-4 py-2 border border-gray-200 hover:border-emerald-400 rounded-md text-gray-700 hover:bg-gray-100 transition"
+              >
+                <FaFacebook className="text-blue-600 text-lg" />
+                <span>Facebook</span>
+              </a>
+            )}
+            {social.instagram && (
+              <a
+                href={social.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 px-4 py-2 border border-gray-200 hover:border-emerald-400 rounded-md text-gray-700 hover:bg-gray-100 transition"
+              >
+                <FaInstagram className="text-pink-600 text-lg" />
+                <span>Instagram</span>
+              </a>
+            )}
+            {social.youtube && (
+              <a
+                href={social.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-2 px-4 py-2 border border-gray-200 hover:border-emerald-400 rounded-md text-gray-700 hover:bg-gray-100 transition"
+              >
+                <FaYoutube className="text-red-600 text-lg" />
+                <span>YouTube</span>
+              </a>
+            )}
           </div>
         </div>
 
@@ -197,9 +245,7 @@ function AuthorPage() {
               className="relative bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden group"
             >
               <img
-                src={
-                  post.thumbnail || "/images/placeholders/article-thumb.jpg"
-                }
+                src={getImageUrl(post.thumbnail) || "/images/placeholders/article-thumb.jpg"}
                 alt={post.title}
                 className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out"
                 onError={(e) =>

@@ -5,7 +5,7 @@ import FAQ from '../models/FAQ.js';
 // @access  Public
 const getFAQs = async (req, res) => {
   try {
-    const faqs = await FAQ.find({ isActive: true })
+    const faqs = await FAQ.find({})
       .sort({ order: 1, createdAt: -1 });
 
     res.json(faqs);

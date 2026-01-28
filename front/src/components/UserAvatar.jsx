@@ -17,17 +17,27 @@ const UserAvatar = ({ image, name, size = "w-10 h-10", className = "" }) => {
             .toUpperCase()
         : "??";
 
+    // Helper to format image URL correctly
+    const getImageUrl = (img) => {
+        if (!img) return null;
+        if (typeof img !== "string") return img;
+        if (img.startsWith("http") || img.startsWith("data:image")) return img;
+        if (img.startsWith("/")) return `http://localhost:5000${img}`;
+        return img;
+    };
+
+    const imageUrl = getImageUrl(image);
+
     // Check if image is a valid URL or base64
     const isValidImage =
-        image &&
-        typeof image === "string" &&
-        !image.includes("flaticon.com") &&
-        (image.startsWith("http") || image.startsWith("data:image") || image.startsWith("/"));
+        imageUrl &&
+        typeof imageUrl === "string" &&
+        !imageUrl.includes("flaticon.com");
 
     if (isValidImage && !hasError) {
         return (
             <img
-                src={image}
+                src={imageUrl}
                 alt={name}
                 className={`${size} rounded-full object-cover border border-gray-200 shadow-sm ${className}`}
                 onError={() => setHasError(true)}

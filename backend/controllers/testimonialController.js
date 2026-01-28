@@ -5,7 +5,7 @@ import Testimonial from '../models/Testimonial.js';
 // @access  Public
 const getTestimonials = async (req, res) => {
   try {
-    const testimonials = await Testimonial.find({ isActive: true })
+    const testimonials = await Testimonial.find({})
       .sort({ order: 1, createdAt: -1 });
 
     res.json(testimonials);

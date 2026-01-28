@@ -8,22 +8,17 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useMemo } from "react";
 import { FaUserGraduate } from "react-icons/fa6";
+import { getImageUrl } from "../../utils/format";
 
 function CourseCard({ course }) {
   const navigate = useNavigate();
 
   const totalLessons = Array.isArray(course.curriculum)
     ? course.curriculum.reduce(
-        (sum, section) => sum + (section.lessons?.length || 0),
-        0
-      )
+      (sum, section) => sum + (section.lessons?.length || 0),
+      0
+    )
     : 0;
-    
-
-
-
-
-    
 
   const calcTotalDuration = () => {
     if (!Array.isArray(course.curriculum)) return null;
@@ -62,7 +57,7 @@ function CourseCard({ course }) {
       <div className="relative h-52 w-full overflow-hidden z-0">
         <Link to={`/courses/${course.slug}`}>
           <img
-            src={course.thumbnail || "/default-course.jpg"}
+            src={getImageUrl(course.thumbnail) || "/default-course.jpg"}
             alt={course.title}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
@@ -72,10 +67,20 @@ function CourseCard({ course }) {
         <span className="absolute top-3 right-3 bg-white/90 text-emerald-600 text-xs font-semibold px-3 py-1 rounded-full shadow">
           {course.level || "Beginner"}
         </span>
+
+        {course.discountPercentage > 0 && (
+          <span className="absolute top-3 left-3 bg-red-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-lg animate-pulse z-10">
+            {course.discountPercentage}% OFF
+          </span>
+        )}
       </div>
 
-      {/* Info */}
       <div className="relative z-20 p-6">
+        {course.type && (
+          <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-1">
+            {course.type}
+          </span>
+        )}
         <Link
           to={`/courses/${course.slug}`}
           className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition"
@@ -91,7 +96,7 @@ function CourseCard({ course }) {
         <div className="flex items-center gap-3 mb-4">
           {instructor.image ? (
             <img
-              src={instructor.image}
+              src={getImageUrl(instructor.image)}
               alt={instructorTitle}
               className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm"
             />
@@ -166,15 +171,27 @@ function CourseCard({ course }) {
           )}
 
           {/* Price */}
-          <span
-            className={`text-[18px] font-semibold ${
-              isFree
-                ? "bg-[#edf4f5] text-emerald-600 px-6 py-0 rounded-full shadow-sm"
-                : "text-emerald-600"
-            }`}
-          >
-            {isFree ? "free" : `$${course.price}`}
-          </span>
+          <div className="flex flex-col items-end">
+            {course.discountPercentage > 0 ? (
+              <>
+                <span className="text-gray-400 text-xs line-through font-bold">
+                  ${course.price}
+                </span>
+                <span className="text-[18px] font-black text-emerald-600">
+                  ${(course.price * (1 - course.discountPercentage / 100)).toFixed(2)}
+                </span>
+              </>
+            ) : (
+              <span
+                className={`text-[18px] font-semibold ${isFree
+                  ? "bg-[#edf4f5] text-emerald-600 px-6 py-0 rounded-full shadow-sm"
+                  : "text-emerald-600"
+                  }`}
+              >
+                {isFree ? "free" : `$${course.price}`}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="border-t border-gray-100 mb-4"></div>

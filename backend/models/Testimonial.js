@@ -8,7 +8,7 @@ const testimonialSchema = mongoose.Schema(
     image: { type: String },
     quote: { type: String, required: true },
     rating: { type: Number, default: 5, min: 1, max: 5 },
-    isActive: { type: Boolean, default: true },
+    isActive: { type: Boolean, default: false },
     order: { type: Number, default: 0 }, // For ordering testimonials
   },
   { timestamps: true }

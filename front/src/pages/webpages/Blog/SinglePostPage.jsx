@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
+import { getImageUrl } from "../../../utils/format";
 import {
   FaCalendarAlt,
   FaCheckCircle,
@@ -129,7 +130,7 @@ function SinglePostPage() {
       {/* Thumbnail + Meta */}
       <div className="relative mb-8">
         <img
-          src={article.thumbnail}
+          src={getImageUrl(article.thumbnail)}
           alt={article.title}
           className="w-full h-80 object-cover rounded-xl"
           onError={(e) => (e.target.src = "/images/placeholder.jpg")}
@@ -151,7 +152,7 @@ function SinglePostPage() {
 
         <div className="flex items-center space-x-3">
           <UserAvatar
-            image={author?.avatar || article.authorImage}
+            image={getImageUrl(author?.avatar || article.authorImage)}
             name={author?.name || article.authorName || "Author"}
             size="w-10 h-10"
           />
@@ -193,7 +194,7 @@ function SinglePostPage() {
           <div className="flex flex-col md:flex-row  items-center md:items-start   rounded-xl shadow-md">
             {/* Author Avatar */}
             <UserAvatar
-              image={author.avatar}
+              image={getImageUrl(author.avatar)}
               name={author.name}
               size="w-56 h-56"
               className="rounded-xl"

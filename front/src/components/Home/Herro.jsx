@@ -1,22 +1,30 @@
-// src/components/Hero.jsx
 import React from "react";
 import { Link } from "react-router-dom";
+import { useData } from "../../contexts/DataContext";
 
 export default function Hero({
-  title = (
-    <>
-      Become a <span className="text-[#00cc8f]">Full-Stack</span> Engineer
-      <br className="hidden md:block" /> the <span className="text-[#00cc8f]">smart way</span>
-    </>
-  ),
-  subtitle = "Hands-on projects, mentor feedback, and job-ready skills.",
+  title: propTitle,
+  subtitle: propSubtitle,
   primaryCta = { label: "Explore Courses", to: "/courses" },
   secondaryCta = { label: "How it works", to: "#how-it-works" },
-   
 }) {
+  const { settings } = useData();
+
+  const title = propTitle || (
+    settings?.hero?.title ? (
+      <>{settings.hero.title}</>
+    ) : (
+      <>
+        Become a <span className="text-[#00cc8f]">Full-Stack</span> Engineer
+        <br className="hidden md:block" /> the <span className="text-[#00cc8f]">smart way</span>
+      </>
+    )
+  );
+
+  const subtitle = propSubtitle || settings?.hero?.subtitle || "Hands-on projects, mentor feedback, and job-ready skills.";
   return (
     <section className="relative  overflow-hidden pt-36  sm:pt-36">
-      
+
 
       <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight text-gray-900">

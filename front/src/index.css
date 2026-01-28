@@ -49,3 +49,12 @@
 .Toastify__toast-container {
   z-index: 999999999 !important;
 }
+
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(-5%); }
+  50% { transform: translateY(0); }
+}
+
+.animate-bounce-subtle {
+  animation: bounce-subtle 1s infinite ease-in-out;
+}

@@ -53,9 +53,9 @@ const CourseDashboard = () => {
   const progress =
     totalLessonsCount > 0
       ? Math.min(
-          100,
-          Math.round((completedLessonsCount / totalLessonsCount) * 100)
-        )
+        100,
+        Math.round((completedLessonsCount / totalLessonsCount) * 100)
+      )
       : 0;
 
   // Helper function (ku dar meel sare, ka hor useEffect)
@@ -100,9 +100,9 @@ const CourseDashboard = () => {
 
       // ✅ Process curriculum data (already embedded in course)
       const curriculumData = courseInfo.curriculum || [];
-      
+
       // ✅ Flatten lessons and preserve section reference
-      const allLessons = curriculumData.flatMap((section) => 
+      const allLessons = curriculumData.flatMap((section) =>
         (section.lessons || []).map((lesson) => ({
           ...lesson,
           sectionId: section._id || section.id,
@@ -401,10 +401,9 @@ const CourseDashboard = () => {
             onClick={handleMarkAsCompleted}
             disabled={completedLessons.includes(currentLesson?.id)}
             className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-medium transition
-              ${
-                completedLessons.includes(currentLesson?.id)
-                  ? "bg-emerald-200 text-emerald-900 cursor-not-allowed"
-                  : "bg-emerald-500 hover:bg-emerald-600 text-white"
+              ${completedLessons.includes(currentLesson?.id)
+                ? "bg-emerald-200 text-emerald-900 cursor-not-allowed"
+                : "bg-emerald-500 hover:bg-emerald-600 text-white"
               }`}
           >
             {completedLessons.includes(currentLesson?.id) ? (
@@ -505,10 +504,9 @@ const CourseDashboard = () => {
                             key={lesson.id}
                             onClick={() => goToLesson(lesson)}
                             className={`flex justify-between items-center border rounded-lg p-2 transition duration-300 cursor-pointer
-                              ${
-                                isActive
-                                  ? "bg-emerald-100 border-emerald-500"
-                                  : isCompleted
+                              ${isActive
+                                ? "bg-emerald-100 border-emerald-500"
+                                : isCompleted
                                   ? "bg-emerald-50 border-emerald-300"
                                   : "border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/50"
                               }`}
@@ -530,8 +528,8 @@ const CourseDashboard = () => {
                                   isCompleted
                                     ? "line-through text-gray-400"
                                     : isActive
-                                    ? "font-semibold text-emerald-700"
-                                    : ""
+                                      ? "font-semibold text-emerald-700"
+                                      : ""
                                 }
                               >
                                 {lesson.title}
@@ -587,7 +585,7 @@ const CourseDashboard = () => {
 
           {/* Course Community Section */}
           {course?.communityLink && (
-            <div className="bg-[#edf4f5] border border-gray-200 rounded-xl p-5 shadow-sm">
+            <div className="bg-[#edf4f5] border border-gray-200 rounded-xl p-5 shadow-sm mt-10">
               <div className="flex items-center gap-2 mb-2">
                 <Users className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-semibold text-gray-800 text-base">
@@ -706,10 +704,9 @@ const CourseDashboard = () => {
                                 setShowLessons(false);
                               }}
                               className={`flex justify-between items-center border rounded-lg p-2 transition duration-300 cursor-pointer
-                                ${
-                                  isActive
-                                    ? "bg-emerald-100 border-emerald-500"
-                                    : isCompleted
+                                ${isActive
+                                  ? "bg-emerald-100 border-emerald-500"
+                                  : isCompleted
                                     ? "bg-emerald-50 border-emerald-300"
                                     : "border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/50"
                                 }`}
@@ -731,8 +728,8 @@ const CourseDashboard = () => {
                                     isCompleted
                                       ? "line-through text-gray-400"
                                       : isActive
-                                      ? "font-semibold text-emerald-700"
-                                      : ""
+                                        ? "font-semibold text-emerald-700"
+                                        : ""
                                   }
                                 >
                                   {lesson.title}
