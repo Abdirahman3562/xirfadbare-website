@@ -13,8 +13,8 @@ export default function Testimonials() {
       <div className="max-w-7xl mx-auto px-6">
         {/* ✅ Header */}
         <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-[#00cc8f]">
-            What Our Learners Say
+          <h2 className="text-3xl md:text-4xl font-extrabold text-emerald-600">
+            What Our Students  Say
           </h2>
           <div className="mt-2 h-1 w-24 bg-[#00cc8f] rounded-full mx-auto"></div>
         </div>

@@ -1,10 +1,34 @@
-import React, { useState } from "react";
-import { Mail, MessageSquare, Monitor, ArrowRight, Send } from "lucide-react";
-import { useData } from "../../../contexts/DataContext";
+import React, { useState, useEffect } from "react";
+import { Mail, MessageSquare, Monitor, ArrowRight, Send, Phone, MapPin } from "lucide-react";
+
 
 export default function ContactPage() {
-  const { settings } = useData();
-  const contact = settings?.contact || {};
+  const [settings, setSettings] = useState({
+    contactEmail: "info@xirfadbare.com",
+    phoneNumber: "+252 61 234 5678",
+    location: "Mogadishu, Somalia",
+    whatsappLink: ""
+  });
+
+  // Fetch settings from API
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/settings");
+        const data = await response.json();
+        setSettings({
+          contactEmail: data.contactEmail || "info@xirfadbare.com",
+          phoneNumber: data.phoneNumber || "+252 61 234 5678",
+          location: data.location || "Mogadishu, Somalia",
+          whatsappLink: data.whatsappLink || ""
+        });
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
 
   const [form, setForm] = useState({
     name: "",
@@ -20,22 +44,22 @@ export default function ContactPage() {
       icon: Mail,
       title: "Email Support",
       text: "Get a response within 24 hours",
-      value: contact.email || "info@xirfadbare.com",
-      href: `mailto:${contact.email || "info@xirfadbare.com"}`,
+      value: settings.contactEmail,
+      href: `mailto:${settings.contactEmail}`,
     },
     {
       icon: MessageSquare,
       title: "WhatsApp Chat",
       text: "Quick response on WhatsApp",
-      value: contact.phone || "+252 619537487",
-      href: `https://wa.me/${(contact.phone || "252619537487").replace(/\s+/g, '')}`,
+      value: settings.phoneNumber,
+      href: settings.whatsappLink || `https://wa.me/${settings.phoneNumber.replace(/\s+/g, '')}`,
       active: false,
     },
     {
-      icon: Monitor,
+      icon: MapPin,
       title: "Office Address",
-      text: contact.workingHours || "Sat - Thu: 8:00 AM - 5:00 PM",
-      value: contact.address || "Mogadishu, Somalia",
+      text: "Visit us during working hours",
+      value: settings.location,
       href: "#",
     },
   ];

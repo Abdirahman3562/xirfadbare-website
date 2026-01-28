@@ -1,10 +1,13 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import CourseCard from "./CourseCard";
 import { useData } from "../../contexts/DataContext";
 import { Search, Filter, BookOpen, Layers, DollarSign, X, SlidersHorizontal } from "lucide-react";
 
 function Courses({ IsHome }) {
-  const { courses, categories, loading } = useData();
+  const { courses, loading } = useData();
+  const [searchParams] = useSearchParams();
+  const [dbCategories, setDbCategories] = useState([]);
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,6 +16,30 @@ function Courses({ IsHome }) {
   const [selectedPrice, setSelectedPrice] = useState("All");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Fetch categories from database
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/categories");
+        const data = await response.json();
+        setDbCategories(data.map(cat => cat.name));
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setDbCategories([]);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Auto-select category from URL parameter
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get('category');
+    if (categoryFromUrl) {
+      setSelectedCategory(decodeURIComponent(categoryFromUrl));
+    }
+  }, [searchParams]);
+
   // Filter Logic
   const filteredCourses = useMemo(() => {
     return courses.filter((course) => {
@@ -20,7 +47,7 @@ function Courses({ IsHome }) {
         ?.toLowerCase()
         .includes(searchQuery.toLowerCase());
       const matchesCategory =
-        selectedCategory === "All" || course.category === selectedCategory;
+        selectedCategory === "All" || course.type === selectedCategory;
       const matchesLevel =
         selectedLevel === "All" || course.level === selectedLevel;
 
@@ -132,20 +159,18 @@ function Courses({ IsHome }) {
               {/* Categories */}
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Categories</label>
-                <div className="space-y-1">
-                  {["All", ...categories].map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`w-full text-left px-4 py-2 rounded-xl text-sm font-semibold transition-all ${selectedCategory === cat
-                        ? "bg-emerald-50 text-emerald-600"
-                        : "text-gray-500 hover:bg-gray-50"
-                        }`}
-                    >
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:bg-white focus:border-emerald-500/20 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="All">All Categories</option>
+                  {dbCategories.map((cat) => (
+                    <option key={cat} value={cat}>
                       {cat}
-                    </button>
+                    </option>
                   ))}
-                </div>
+                </select>
               </div>
 
               {/* Levels */}

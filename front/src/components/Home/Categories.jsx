@@ -1,29 +1,62 @@
 // src/components/Categories.jsx
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useData } from "../../contexts/DataContext";
 
 export default function Categories({
   title = "Browse by Category",
   to = (cat) => `/courses?category=${encodeURIComponent(cat)}`, // route generator
   onSelect, // optional callback instead of Link
 }) {
-  const { categories: dataCategories } = useData();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Use preloaded categories or fallback to defaults
-  const categories = dataCategories.length > 0 ? dataCategories : [
-    "Frontend",
-    "Backend",
-    "Full-Stack",
-    "Database",
-    "DevOps",
-    "Mobile",
-    "AI/ML",
-    "Data",
-  ];
+  // Fetch categories from database
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/categories");
+        const data = await response.json();
+        // Extract category names from the response
+        setCategories(data.map(cat => cat.name));
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        // Fallback to default categories if fetch fails
+        setCategories([
+          "Frontend",
+          "Backend",
+          "Full-Stack",
+          "Database",
+          "DevOps",
+          "Mobile",
+          "AI/ML",
+          "Data",
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-6">
+          <Header title={title} />
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="rounded-2xl bg-gray-100 animate-pulse px-5 py-4 h-20" />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16">
-      
+
       <div className="max-w-7xl mx-auto px-6">
         <Header title={title} />
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -9,7 +9,7 @@ function CTABanner() {
           Start your learning journey today
         </h3>
         <p className="mt-3 text-sm md:text-base opacity-90">
-          Join thousands of learners upgrading their tech careers with Yiksitech.
+          Join thousands of learners upgrading their tech careers with Xirfadbare Academy.
         </p>
         <Link
           to="/courses"

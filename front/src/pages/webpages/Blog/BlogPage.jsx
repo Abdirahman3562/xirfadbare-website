@@ -30,13 +30,18 @@ function BlogPage() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const blogsData = await getAllBlogs();
-        const formattedBlogs = blogsData.map((blog) => ({
+        const response = await fetch("http://localhost:5000/api/blogs");
+        const data = await response.json();
+
+        // Filter only active blogs
+        const activeBlogs = (data.blogs || []).filter(blog => blog.status === 'active');
+
+        const formattedBlogs = activeBlogs.map((blog) => ({
           ...blog,
           id: blog._id,
-          authorName: blog.author ? blog.author.name : "Unknown Author",
-          authorImage: blog.author ? blog.author.avatar : "/default-avatar.png",
-          verified: !!blog.author?.verified,
+          authorName: blog.author ? `${blog.author.firstName} ${blog.author.lastName}` : "Samafale Team",
+          authorImage: blog.author?.image || "",
+          verified: true, // System admins/authors are verified by default
         }));
         setArticles(formattedBlogs);
       } catch (error) {
@@ -183,8 +188,8 @@ function BlogPage() {
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
                 className={`px-3 py-1 rounded-md border ${currentPage === 1
-                    ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                    : "text-emerald-700 border-emerald-200 hover:bg-emerald-50"
+                  ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                  : "text-emerald-700 border-emerald-200 hover:bg-emerald-50"
                   }`}
               >
                 Prev
@@ -198,8 +203,8 @@ function BlogPage() {
                     key={p}
                     onClick={() => goToPage(p)}
                     className={`w-9 h-9 rounded-md border text-sm ${p === currentPage
-                        ? "bg-emerald-500 text-white border-emerald-500"
-                        : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
+                      ? "bg-emerald-500 text-white border-emerald-500"
+                      : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
                       }`}
                   >
                     {p}
@@ -211,8 +216,8 @@ function BlogPage() {
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
                 className={`px-3 py-1 rounded-md border ${currentPage === totalPages
-                    ? "text-gray-400 border-gray-200 cursor-not-allowed"
-                    : "text-emerald-700 border-emerald-200 hover:bg-emerald-50"
+                  ? "text-gray-400 border-gray-200 cursor-not-allowed"
+                  : "text-emerald-700 border-emerald-200 hover:bg-emerald-50"
                   }`}
               >
                 Next

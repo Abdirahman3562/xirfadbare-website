@@ -5,7 +5,6 @@ import { getAllInstructors } from '../api/instructorService';
 import { getAllBlogs } from '../api/blogService';
 import { getAllAuthors } from '../api/authorService';
 import { getFAQs } from '../api/faqService';
-import { getSystemSettings } from '../api/systemService';
 
 // Create the context
 const DataContext = createContext();
@@ -29,7 +28,6 @@ export const DataProvider = ({ children }) => {
     authors: [],
     faqs: [],
     categories: [],
-    settings: null,
   });
 
   const [loading, setLoading] = useState(true);
@@ -51,7 +49,6 @@ export const DataProvider = ({ children }) => {
           getAllBlogs(),
           getAllAuthors(),
           getFAQs(),
-          getSystemSettings(),
         ]);
 
         const [
@@ -61,7 +58,6 @@ export const DataProvider = ({ children }) => {
           blogsRes,
           authorsRes,
           faqsRes,
-          settingsRes,
         ] = results;
 
         // Process results and handle any failures gracefully
@@ -73,7 +69,6 @@ export const DataProvider = ({ children }) => {
           authors: authorsRes.status === 'fulfilled' ? authorsRes.value : [],
           faqs: faqsRes.status === 'fulfilled' ? faqsRes.value : [],
           categories: extractCategories(coursesRes.status === 'fulfilled' ? coursesRes.value : []),
-          settings: settingsRes.status === 'fulfilled' ? settingsRes.value : null,
         };
 
         setData(newData);
@@ -85,7 +80,6 @@ export const DataProvider = ({ children }) => {
           authors: newData.authors.length,
           faqs: newData.faqs.length,
           categories: newData.categories.length,
-          settings: !!newData.settings,
         });
 
       } catch (err) {
@@ -169,10 +163,6 @@ export const DataProvider = ({ children }) => {
           newData = await getFAQs();
           setData(prev => ({ ...prev, faqs: newData }));
           break;
-        case 'settings':
-          newData = await getSystemSettings();
-          setData(prev => ({ ...prev, settings: newData }));
-          break;
         default:
           console.warn(`⚠️ Unknown data type: ${dataType}`);
       }
@@ -193,7 +183,6 @@ export const DataProvider = ({ children }) => {
     authors: data.authors,
     faqs: data.faqs,
     categories: data.categories,
-    settings: data.settings,
 
     // State
     loading,

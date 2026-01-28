@@ -1,10 +1,21 @@
 import mongoose from 'mongoose';
 
 const systemSettingSchema = mongoose.Schema({
+    general: {
+        logo: { type: String, default: '' },
+        tagline: { type: String, default: 'Learn to code in Somali' }
+    },
     hero: {
         title: { type: String, default: 'Become a Full-Stack Engineer the smart way' },
         subtitle: { type: String, default: 'Hands-on projects, mentor feedback, and job-ready skills.' },
         description: { type: String, default: '' }
+    },
+    // aboutStats stores the SNAPSHOT of real data (updated by Admin)
+    aboutStats: {
+        students: { type: Number, default: 0 },
+        courses: { type: Number, default: 0 },
+        lessons: { type: Number, default: 0 },
+        hours: { type: Number, default: 0 }
     },
     stats: {
         learners: { type: String, default: '10,000+' },
@@ -26,13 +37,14 @@ const systemSettingSchema = mongoose.Schema({
         }
     ],
     about: {
-        badge: { type: String, default: '#1 Somali Coding Platform' },
+        badge: { type: String, default: '⭐ #1 Somali Coding Platform' },
         title: { type: String, default: 'Building Real Opportunities for Somalis Through Tech' },
         description: { type: String, default: 'Xirfadbare gives Somali youth and diaspora a clear, structured path to learn coding and AI — in their own language.' },
         founder: {
             name: { type: String, default: 'Abdirahman Mohamed' },
             role: { type: String, default: 'Founder & CEO' },
             bio: { type: String, default: '' },
+            story: { type: String, default: '' }, // New field for long story
             image: { type: String, default: '' }
         }
     },

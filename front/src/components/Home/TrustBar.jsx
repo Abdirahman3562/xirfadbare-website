@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import { useData } from "../../contexts/DataContext";
 
 function Stat({ label, value }) {
@@ -16,9 +17,24 @@ function Stat({ label, value }) {
 
 function TrustBar() {
   const { courses } = useData();
+  const [stats, setStats] = useState({ students: 0, instructors: 0 });
 
-  // 🔥 CALCULATE REAL DATA FROM DATABASE
-  const totalEnrolled = courses.reduce((sum, course) => sum + (course.enrolledCount || 0), 0);
+  // Fetch platform statistics
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/stats");
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  // Calculate total courses
   const totalCourses = courses.length;
 
   // Calculate average rating (assuming courses have a rating field)
@@ -32,7 +48,7 @@ function TrustBar() {
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
         <Stat
           label="Learners"
-          value={`${totalEnrolled.toLocaleString()}+`}
+          value={`${stats.students.toLocaleString()}+`}
         />
         <Stat
           label="Courses"

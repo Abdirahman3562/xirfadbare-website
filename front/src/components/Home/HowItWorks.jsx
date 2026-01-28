@@ -6,23 +6,23 @@ export default function HowItWorks() {
   const steps = [
     {
       step: 1,
-      title: "Create Account",
-      description: "Join for free and set your goals."
+      title: "Create an Account",
+      description: "Sign up easily for free and get your own personal account."
     },
     {
       step: 2,
-      title: "Pick a path",
-      description: "Choose a track or individual courses."
+      title: "Choose Your Goal",
+      description: "Select what you want to learn or improve based on your goals."
     },
     {
       step: 3,
-      title: "Build projects",
-      description: "Learn by doing with real tasks."
+      title: "Learn & Practice",
+      description: "Access lessons, guidance, and activities that help you learn effectively."
     },
     {
       step: 4,
-      title: "Get certified",
-      description: "Finish, earn certificate, apply!"
+      title: "Achieve & Grow",
+      description: "Complete your journey, gain confidence and skills, and apply them in real life."
     },
   ];
 
@@ -31,7 +31,7 @@ export default function HowItWorks() {
 
       <div className="max-w-7xl mx-auto px-6">
         <Header title="How It Works" />
-        <div className="mt-8 grid gap-6 grid-cols-1 md:grid-cols-2">
+        <div className="mt-8 grid gap-6 grid-cols-1 md:grid-cols-4">
           {steps.map((s, i) => (
             <motion.div
               key={i}

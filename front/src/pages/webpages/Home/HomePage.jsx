@@ -15,30 +15,34 @@ function HomePage() {
   return (
     <div className="bg-[#edf4f5] relative">
       <div className="absolute -top-24 -left-24 w-72 h-72 bg-indigo-200/40 blur-3xl rounded-full" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-200/40 blur-3xl rounded-full" />
-      
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-200/40 blur-3xl rounded-full" />
+
 
       {/* 1️⃣ Hero Section */}
-            <Herro /> {/* or <Hero slides={mySlides} intervalMs={7000} /> */}
+      <Herro /> {/* or <Hero slides={mySlides} intervalMs={7000} /> */}
 
 
       {/* 2️⃣ Trust Bar (Statistics) */}
       <TrustBar />
 
-      {/* 3️⃣ Browse by Category Section */}
-      <Categories />
-
       {/* 4️⃣ How It Works Section */}
       <HowItWorks />
 
+      {/* 3️⃣ Browse by Category Section */}
+      <Categories />
+
+
+
       {/* 5️⃣ Outcomes / Student Success Stats */}
-      <Outcomes />
+      {/* <Outcomes /> */}
+
+      {/* 7️⃣ Featured / Recent Courses Section */}
+      <Courses IsHome={true} />
 
       {/* 6️⃣ Testimonials Section */}
       <Testimonials />
 
-      {/* 7️⃣ Featured / Recent Courses Section */}
-      <Courses IsHome={true} />
+
 
       {/* 8️⃣ View All Courses Button Section */}
       <ViewAllCourses />
@@ -48,7 +52,7 @@ function HomePage() {
 
       {/* 🔟 Top Instructors Section */}
       <TopInstructors />
-      <FAQ/>
+      <FAQ />
     </div>
   );
 }

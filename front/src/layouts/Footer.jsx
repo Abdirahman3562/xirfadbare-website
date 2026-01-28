@@ -1,8 +1,51 @@
-import React from "react";
-import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
+  const [settings, setSettings] = useState({
+    websiteTitle: "Xirfadbare Academy",
+    websiteDescription: "Xirfadbare waa madal waxbarasho casri ah oo kaa caawisa inaad barato xirfadaha Technology-ga sida Web Development, Design, iyo AI — si aad u noqoto xirfadle diyaar u ah suuqa shaqada maanta.",
+    contactEmail: "info@xirfadbare.com",
+    phoneNumber: "+252 61 234 5678",
+    location: "Mogadishu, Somalia",
+    logo: "",
+    facebookLink: "",
+    twitterLink: "",
+    linkedinLink: "",
+    instagramLink: "",
+    tiktokLink: "",
+    youtubeLink: ""
+  });
+
+  // Fetch settings from API
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/settings");
+        const data = await response.json();
+        setSettings({
+          websiteTitle: data.websiteTitle || "Xirfadbare Academy",
+          websiteDescription: data.websiteDescription || "Xirfadbare waa madal waxbarasho casri ah oo kaa caawisa inaad barato xirfadaha Technology-ga sida Web Development, Design, iyo AI — si aad u noqoto xirfadle diyaar u ah suuqa shaqada maanta.",
+          contactEmail: data.contactEmail || "info@xirfadbare.com",
+          phoneNumber: data.phoneNumber || "+252 61 234 5678",
+          location: data.location || "Mogadishu, Somalia",
+          logo: data.logo || "",
+          facebookLink: data.facebookLink || "",
+          twitterLink: data.twitterLink || "",
+          linkedinLink: data.linkedinLink || "",
+          instagramLink: data.instagramLink || "",
+          tiktokLink: data.tiktokLink || "",
+          youtubeLink: data.youtubeLink || ""
+        });
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
   return (
     <footer className="relative overflow-hidden pt-16 pb-8 bg-[#edf4f5] text-gray-800">
       {/* 🎨 Background blobs — sida FAQ & Hero */}
@@ -13,26 +56,84 @@ export default function Footer() {
       <div className="relative max-w-7xl mx-auto px-6 grid gap-10 md:grid-cols-4 z-10">
         {/* 1️⃣ Brand & About */}
         <div>
-          <Link to="/" className="text-2xl font-extrabold text-emerald-600">
-            Xirfadbare<span className="text-emerald-600">.</span>
-          </Link>
+          {/* Logo or Brand Name */}
+          {settings.logo ? (
+            <Link to="/" className="block">
+              <img src={settings.logo} alt="Logo" className="h-20 mt-[-20px] mb-[-10px] object-contain" />
+            </Link>
+          ) : (
+            <Link to="/" className="text-2xl font-extrabold text-emerald-600">
+              Xirfadbare<span className="text-emerald-600">.</span>
+            </Link>
+          )}
+
+          {/* Description */}
           <p className="mt-4 text-sm leading-relaxed text-gray-700">
-            Xirfadbare waa madal waxbarasho casri ah oo kaa caawisa inaad barato
-            xirfadaha Technology-ga sida Web Development, Design, iyo AI — si aad
-            u noqoto xirfadle diyaar u ah suuqa shaqada maanta.
+            {settings.websiteDescription}
           </p>
 
           {/* Social Icons */}
           <div className="flex gap-3 mt-5">
-            {[FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram].map((Icon, i) => (
+            {settings.facebookLink && (
               <a
-                key={i}
-                href="#"
+                href={settings.facebookLink}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-9 h-9 grid place-content-center rounded-full bg-white shadow hover:bg-[#00cc8f] hover:text-white transition"
               >
-                <Icon className="text-gray-700 text-sm" />
+                <FaFacebookF className="text-gray-700 text-sm hover:text-white" />
               </a>
-            ))}
+            )}
+            {settings.twitterLink && (
+              <a
+                href={settings.twitterLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 grid place-content-center rounded-full bg-white shadow hover:bg-[#00cc8f] hover:text-white transition"
+              >
+                <FaTwitter className="text-gray-700 text-sm hover:text-white" />
+              </a>
+            )}
+            {settings.linkedinLink && (
+              <a
+                href={settings.linkedinLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 grid place-content-center rounded-full bg-white shadow hover:bg-[#00cc8f] hover:text-white transition"
+              >
+                <FaLinkedinIn className="text-gray-700 text-sm hover:text-white" />
+              </a>
+            )}
+            {settings.instagramLink && (
+              <a
+                href={settings.instagramLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 grid place-content-center rounded-full bg-white shadow hover:bg-[#00cc8f] hover:text-white transition"
+              >
+                <FaInstagram className="text-gray-700 text-sm hover:text-white" />
+              </a>
+            )}
+            {settings.tiktokLink && (
+              <a
+                href={settings.tiktokLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 grid place-content-center rounded-full bg-white shadow hover:bg-[#00cc8f] hover:text-white transition"
+              >
+                <FaTiktok className="text-gray-700 text-sm hover:text-white" />
+              </a>
+            )}
+            {settings.youtubeLink && (
+              <a
+                href={settings.youtubeLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 grid place-content-center rounded-full bg-white shadow hover:bg-[#00cc8f] hover:text-white transition"
+              >
+                <FaYoutube className="text-gray-700 text-sm hover:text-white  " />
+              </a>
+            )}
           </div>
         </div>
 
@@ -41,9 +142,10 @@ export default function Footer() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Links</h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li><Link to="/" className="hover:text-[#00cc8f] transition">Home</Link></li>
+            <li><Link to="/about" className="hover:text-[#00cc8f] transition">About Us</Link></li>
             <li><Link to="/courses" className="hover:text-[#00cc8f] transition">Courses</Link></li>
-            <li><Link to="/add-course" className="hover:text-[#00cc8f] transition">Add Course</Link></li>
-            <li><a href="#how-it-works" className="hover:text-[#00cc8f] transition">How It Works</a></li>
+            <li><Link to="/instructors" className="hover:text-[#00cc8f] transition">Instructors</Link></li>
+            <li><Link to="/blog" className="hover:text-[#00cc8f] transition">Blog</Link></li>
           </ul>
         </div>
 
@@ -51,10 +153,11 @@ export default function Footer() {
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Support</h3>
           <ul className="space-y-2 text-sm text-gray-700">
-            <li><a href="#" className="hover:text-[#00cc8f] transition">Help Center</a></li>
-            <li><a href="#" className="hover:text-[#00cc8f] transition">FAQ</a></li>
-            <li><a href="#" className="hover:text-[#00cc8f] transition">Contact Us</a></li>
+            <li><Link to="/contact" className="hover:text-[#00cc8f] transition">Contact Us</Link></li>
+            <li><Link to="/about" className="hover:text-[#00cc8f] transition">About</Link></li>
+            <li><a href="#faq" className="hover:text-[#00cc8f] transition">FAQ</a></li>
             <li><a href="#" className="hover:text-[#00cc8f] transition">Privacy Policy</a></li>
+            <li><a href="#" className="hover:text-[#00cc8f] transition">Terms of Service</a></li>
           </ul>
         </div>
 
@@ -62,9 +165,9 @@ export default function Footer() {
         <div>
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Info</h3>
           <ul className="space-y-2 text-sm text-gray-700">
-            <li><span className="text-gray-600">Email:</span> info@xirfadbare.com</li>
-            <li><span className="text-gray-600">Phone:</span> +252 61 234 5678</li>
-            <li><span className="text-gray-600">Location:</span> Mogadishu, Somalia</li>
+            <li><span className="text-gray-600">Email:</span> {settings.contactEmail}</li>
+            <li><span className="text-gray-600">Phone:</span> {settings.phoneNumber}</li>
+            <li><span className="text-gray-600">Location:</span> {settings.location}</li>
           </ul>
         </div>
       </div>

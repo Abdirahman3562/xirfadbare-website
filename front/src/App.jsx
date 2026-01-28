@@ -43,7 +43,11 @@ import ManageFAQs from "./pages/Dashboard/admin/ManageFAQs";
 import ManageInstructors from "./pages/Dashboard/admin/ManageInstructors";
 import ManageOrders from "./pages/Dashboard/admin/ManageOrders";
 import ManageAuthors from "./pages/Dashboard/admin/ManageAuthors";
-import ManageSettings from "./pages/Dashboard/admin/ManageSettings";
+import ManageCategories from "./pages/Dashboard/admin/ManageCategories";
+import SystemSettings from "./pages/Dashboard/admin/SystemSettings";
+import ManageBlogs from "./pages/Dashboard/admin/ManageBlogs";
+import CreateBlog from "./pages/Dashboard/admin/CreateBlog";
+// ManageSettings removed
 import PublicLayout from "./layouts/PublicLayout";
 import Orders from "./pages/Dashboard/student/Orders";
 import CourseDashboard from "./pages/Dashboard/student/CourseDashboard";
@@ -126,7 +130,12 @@ function App() {
           <Route path="instructors" element={<ManageInstructors />} />
           <Route path="orders" element={<ManageOrders />} />
           <Route path="authors" element={<ManageAuthors />} />
-          <Route path="settings" element={<ManageSettings />} />
+          <Route path="categories" element={<ManageCategories />} />
+          <Route path="blogs" element={<ManageBlogs />} />
+          <Route path="blogs/create" element={<CreateBlog />} />
+          <Route path="blogs/edit/:id" element={<CreateBlog />} />
+          <Route path="system-settings" element={<SystemSettings />} />
+          {/* Settings route removed */}
           <Route path="profile" element={<Profile />} />
         </Route>
 

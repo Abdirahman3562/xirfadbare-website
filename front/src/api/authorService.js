@@ -29,7 +29,7 @@ export async function getAuthorById(id) {
 // ✅ Get author by username
 export async function getAuthorByUsername(username) {
   try {
-    const response = await fetch(`${API_BASE_URL}/authors/username/${username}`);
+    const response = await fetch(`${API_BASE_URL}/users/public/${username}`);
     if (!response.ok) throw new Error('Failed to fetch author');
     const author = await response.json();
     return author;

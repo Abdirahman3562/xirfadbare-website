@@ -11,10 +11,15 @@ const blogSchema = mongoose.Schema(
   {
     title: { type: String, required: true },
     category: { type: String },
-    author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     date: { type: String },
     thumbnail: { type: String },
     content: { type: String, required: true },
+    status: {
+      type: String,
+      enum: ['active', 'inactive', 'pending'],
+      default: 'pending'
+    },
     comments: [commentSchema],
   },
   { timestamps: true }

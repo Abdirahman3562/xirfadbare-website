@@ -1,73 +1,178 @@
-import React from "react";
-import { Quote } from "lucide-react";
-import { useData } from "../../contexts/DataContext";
+import React, { useState } from "react";
+import { Quote, Sparkles, ArrowRight, Award, Users, Heart } from "lucide-react";
 import { getImageUrl } from "../../utils/format";
-import founderceo from "../../assets/founderceo.png";
+import founderceo from "../../assets/founderceo.jpg";
+import { motion } from "framer-motion";
 
 export default function FounderStory() {
-  const { settings } = useData();
-  const founder = settings?.about?.founder || {};
+  const founder = {
+    name: "Abdirahman Mohamed",
+    role: "Founder & CEO",
+    image: "",
+    bio: "Language should never be a barrier to growth. Every talented person deserves a clear chance to succeed.",
+    story: ""
+  };
+
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const defaultStory = `When I started Xirfadbare, I didn’t want to build just another platform. I wanted to create a learning space that Somali learners could truly understand — in their own language and at their own pace.
+
+I grew up seeing talented people held back, not because they lacked ability, but because learning opportunities were not designed for them. Xirfadbare exists to change that.
+
+Our mission is simple: to open clear pathways to knowledge, confidence, and real opportunities for Somalis through accessible, high-quality learning.`;
+
+  const storyText = founder.story || defaultStory;
+  const paragraphs = storyText.split('\n').filter(p => p.trim() !== '');
+  const visibleParagraphs = isExpanded ? paragraphs : paragraphs.slice(0, 2);
+  const hasMore = paragraphs.length > 2;
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
-        {/* Left: Founder Image + Quote */}
-        <div className="relative">
-          <img
-            src={founder.image ? getImageUrl(founder.image) : founderceo}
-            alt={founder.name || "Founder"}
-            className="rounded-2xl w-full max-w-sm mx-auto shadow-md"
-          />
+    <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 relative overflow-hidden">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 right-20 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 left-20 w-80 h-80 bg-teal-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+      </div>
 
-          {/* Quote Box */}
-          <div className="absolute -bottom-8 lg:left-80 md:left-80 left-40   shaddow-lg bg-[#edf4f5] border border-gray-200 hover:border-emerald-400  rounded-xl p-4 max-w-[220px]">
-            <div className="flex items-start gap-2">
-              <Quote className="text-emerald-500 w-5 h-5 mt-1" />
-              <p className="text-[13px] text-slate-600 leading-snug italic">
-                {founder.bio || "“Language should never be a barrier to building, every talented person deserves a chance to build, create, and succeed.”"}
-              </p>
-            </div>
-          </div>
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4"
+          >
+            <Sparkles className="w-4 h-4 text-emerald-600" />
+            <span className="text-emerald-700 font-bold text-sm uppercase tracking-wider">Our Story</span>
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl font-black text-gray-900 mb-4"
+          >
+            Meet the <span className="text-emerald-600">Founder</span>
+          </motion.h2>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="w-24 h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto"
+          ></motion.div>
         </div>
 
-        {/* Right: Text Content */}
-        <div>
-          <div className="inline-block mb-5 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-sm border border-emerald-100">
-            From the Founder
-          </div>
-          <h2 className="text-[28px] sm:text-4xl font-extrabold text-emerald-600 mb-4">
-            Why I Started Xirfadbare
-          </h2>
+        {/* Main Content Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+          className="bg-white rounded-3xl shadow-2xl shadow-emerald-900/5 overflow-hidden border border-gray-100"
+        >
+          <div className="grid lg:grid-cols-5 gap-0">
+            {/* Left: Image Section */}
+            <div className="lg:col-span-2 relative p-8 lg:p-12">
+              {/* Decorative Pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <svg className="w-full h-full" viewBox="0 0 100 100">
+                  <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                    <circle cx="1" cy="1" r="1" fill="white" />
+                  </pattern>
+                  <rect width="100" height="100" fill="url(#grid)" />
+                </svg>
+              </div>
 
-          <div className="inline-block mb-5 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-sm border border-emerald-100">
-            Fariin katimid Aasaasaha
-          </div>
+              <div className="relative z-10">
+                {/* Image Container */}
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 mb-6 group">
+                  <img
+                    src={founder.image ? getImageUrl(founder.image) : founderceo}
+                    alt={founder.name}
+                    className="w-full aspect-[3/4] object-cover transform group-hover:scale-110 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                </div>
 
-          <p className="text-slate-600 mb-4 leading-relaxed">
-            When I started xirfadbare, I didn’t want to build just another
-            platform. I wanted to make learning tech something that a Somali
-            student could truly understand — in their own language, at their
-            own pace.
-          </p>
-          <p className="text-slate-600 mb-4 leading-relaxed">
-            I grew up seeing talented people stuck, not because they lacked
-            ability, but because the learning wasn’t made for them. xirfadbare
-            aims to change that.
-          </p>
-          <p className="text-slate-600 mb-6 leading-relaxed">
-            Our mission is simple: open the doors to global opportunities for
-            Somalis through direct, high-quality tech education.
-          </p>
+                {/* Name & Role Card */}
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
+                  <h3 className="text-2xl font-black text-gray-900 mb-1">{founder.name}</h3>
+                  <p className="text-emerald-600 font-bold text-sm uppercase tracking-wider mb-3">{founder.role}</p>
+                  <div className="w-16 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
+                </div>
+              </div>
+            </div>
 
-          <div>
-            <h4 className="font-semibold text-emerald-600">{founder.name || "Abdirahman Mohamed"}</h4>
-            <div className="mt-1">
-              <span className="inline-block px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-sm border border-emerald-100">
-                {founder.role || "Founder & CEO"}
-              </span>
+            {/* Right: Content Section */}
+            <div className="lg:col-span-3 p-8 lg:p-12">
+              {/* Quote */}
+              <div className="relative mb-8 p-6 bg-emerald-50/50 rounded-2xl border-l-4 border-emerald-500">
+                <Quote className="absolute top-4 right-4 w-8 h-8 text-emerald-200" fill="currentColor" />
+                <p className="text-lg text-gray-700 italic font-medium leading-relaxed relative z-10">
+                  "{founder.bio}"
+                </p>
+              </div>
+
+              {/* Story Content */}
+              <div className="space-y-5 text-gray-600 leading-relaxed">
+                {visibleParagraphs.map((paragraph, index) => (
+                  <motion.p
+                    key={index}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    className="text-base lg:text-lg"
+                  >
+                    {paragraph}
+                  </motion.p>
+                ))}
+              </div>
+
+              {/* Read More Button */}
+              {hasMore && (
+                <div className="mt-8">
+                  <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-1 transition-all duration-300"
+                  >
+                    {isExpanded ? "Show Less" : "Read Full Story"}
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              )}
+
+              {/* Stats Row with Icons */}
+              <div className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-3 gap-6">
+                <div className="text-center group">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                    <Award className="w-6 h-6 text-emerald-600 group-hover:text-white transition-colors" />
+                  </div>
+                  <div className="text-3xl font-black text-emerald-600 mb-1">5+</div>
+                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Years Experience</div>
+                </div>
+                <div className="text-center group">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                    <Users className="w-6 h-6 text-emerald-600 group-hover:text-white transition-colors" />
+                  </div>
+                  <div className="text-3xl font-black text-emerald-600 mb-1">1000+</div>
+                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Students Helped</div>
+                </div>
+                <div className="text-center group">
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                    <Heart className="w-6 h-6 text-emerald-600 group-hover:text-white transition-colors" />
+                  </div>
+                  <div className="text-3xl font-black text-emerald-600 mb-1">100%</div>
+                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Dedicated</div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

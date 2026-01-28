@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
     LayoutDashboard,
@@ -12,10 +12,33 @@ import {
     GraduationCap,
     ShoppingCart,
     MessageSquareQuote,
-    MessageCircleQuestion
+    MessageCircleQuestion,
+    Folder,
+    Newspaper
 } from 'lucide-react';
 
 const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
+    const [settings, setSettings] = useState({
+        logo: "",
+        websiteTitle: "Samafale Academy"
+    });
+
+    // Fetch settings
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/api/settings");
+                const data = await response.json();
+                setSettings({
+                    logo: data.logo || "",
+                    websiteTitle: data.websiteTitle || "Samafale Academy"
+                });
+            } catch (error) {
+                console.error("Error fetching settings:", error);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     const menuItems = [
         { title: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
@@ -25,9 +48,12 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
         { title: 'Orders', icon: <ShoppingCart size={20} />, path: '/admin/orders' },
         { title: 'Roles', icon: <ShieldCheck size={20} />, path: '/admin/roles' },
         { title: 'Manage Courses', icon: <BookOpen size={20} />, path: '/admin/courses' },
+        { title: 'Manage Blogs', icon: <Newspaper size={20} />, path: '/admin/blogs' },
+        { title: 'Categories', icon: <Folder size={20} />, path: '/admin/categories' },
         { title: 'Testimonials', icon: <MessageSquareQuote size={20} />, path: '/admin/testimonials' },
         { title: 'FAQs', icon: <MessageCircleQuestion size={20} />, path: '/admin/faqs' },
-        { title: 'System Settings', icon: <Settings size={20} />, path: '/admin/settings' },
+        { title: 'System Settings', icon: <Settings size={20} />, path: '/admin/system-settings' },
+
     ];
 
 
@@ -35,9 +61,17 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
         <div className="h-full flex flex-col bg-white border-r border-gray-100 shadow-sm">
             {/* Logo Area */}
             <div className="p-6 flex items-center justify-center border-b border-gray-50 h-[80px]">
-                <h1 className="text-2xl font-black text-emerald-600 tracking-tighter cursor-pointer hover:scale-105 transition-transform duration-300 font-[Outfit]">
-                    Samafale<span className="text-gray-900">Academy</span>
-                </h1>
+                {settings.logo ? (
+                    <img
+                        src={settings.logo}
+                        alt={settings.websiteTitle}
+                        className="h-[80px] mt-5 ml-[-80px] object-contain hover:scale-105 transition-transform duration-300"
+                    />
+                ) : (
+                    <h1 className="text-2xl font-black text-emerald-600 tracking-tighter cursor-pointer hover:scale-105 transition-transform duration-300 font-[Outfit]">
+                        Samafale<span className="text-gray-900">Academy</span>
+                    </h1>
+                )}
             </div>
 
             {/* Navigation */}

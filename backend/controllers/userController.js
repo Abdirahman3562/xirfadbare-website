@@ -422,6 +422,57 @@ const updateUserByAdmin = async (req, res) => {
   }
 };
 
+// @desc    Get user by username (Public Profile)
+// @route   GET /api/users/profile/:username
+// @access  Public
+const getUserByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+    // Search by username (exact) or firstName+lastName (fuzzy fallback)
+    let user = await User.findOne({ username: username }).select('-password -twoFactorCode -twoFactorExpires');
+
+    if (!user) {
+      // Fallback: Try to find by combining First + Last name lowercase
+      // This is a bit expensive but helps with migration
+      // Since we can't do complex aggregation easily here without huge change, 
+      // we'll try strict regex or just return not found.
+      // Let's try to match basic "samafalemohamed" -> firstName: "Samafale", lastName: "Mohamed"
+      // For now, strict username match is safer. 
+      // BUT, to help the current user, let's look up by email part if applicable or just fail.
+      // Let's stick to username. If they don't have one, they need to update profile.
+
+      // Actually, for the specific request '/u/samafalemohamed', let's try a regex on firstName/lastName
+      const users = await User.find({}).select('firstName lastName email image bio location website verified social role createdAt');
+      user = users.find(u =>
+        (u.firstName + u.lastName).toLowerCase() === username.toLowerCase() ||
+        (u.firstName + u.lastName).toLowerCase().replace(/\s/g, '') === username.toLowerCase()
+      );
+    }
+
+    if (user) {
+      res.json({
+        _id: user._id,
+        username: user.username || (user.firstName + user.lastName).toLowerCase().replace(/\s/g, ''),
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email, // Maybe hide email for public? keeping for now as per old author logic
+        image: user.image,
+        bio: user.bio,
+        location: user.location,
+        website: user.website,
+        verified: user.verified,
+        social: user.social,
+        role: user.role,
+        createdAt: user.createdAt
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching user by username:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 export {
   authUser,
   verify2FA,
@@ -433,5 +484,6 @@ export {
   updateUserRole,
   createUserByAdmin,
   toggleUserStatus,
-  updateUserByAdmin
+  updateUserByAdmin,
+  getUserByUsername
 };

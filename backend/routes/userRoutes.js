@@ -11,6 +11,7 @@ import {
   updateUserRole,
   toggleUserStatus,
   updateUserByAdmin,
+  getUserByUsername
 } from '../controllers/userController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
@@ -36,6 +37,8 @@ router.route('/:id/role')
 
 router.route('/:id/status')
   .put(protect, admin, toggleUserStatus);
+
+router.get('/public/:username', getUserByUsername);
 
 export default router;
 

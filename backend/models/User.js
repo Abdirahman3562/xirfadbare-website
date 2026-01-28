@@ -14,6 +14,20 @@ const userSchema = mongoose.Schema(
     is2FAEnabled: { type: Boolean, default: false },
     twoFactorCode: { type: String },
     twoFactorExpires: { type: Date },
+    // Author Profile Fields
+    username: { type: String, unique: true, sparse: true }, // sparse allows null/undefined to be non-unique
+    bio: { type: String },
+    location: { type: String },
+    website: { type: String },
+    verified: { type: Boolean, default: false },
+    social: {
+      github: { type: String },
+      linkedin: { type: String },
+      twitter: { type: String },
+      youtube: { type: String },
+      facebook: { type: String },
+      instagram: { type: String }
+    }
   },
   { timestamps: true }
 );

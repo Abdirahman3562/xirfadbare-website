@@ -1,37 +1,53 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
-  Menu,
-  X,
-  Sun,
-  Moon,
-  LogIn,
-  Rocket,
-  Bell,
-  User as UserIcon,
-  LayoutDashboard,
-  LogOut,
-  Loader2,
-  BookOpen,
-  FileText,
-  User,
-  Settings,
-  Phone,
-  Info,
-  Home,
+  Menu, X, Sun, Moon, LogIn, Rocket, Bell, User as UserIcon, LayoutDashboard, LogOut, Loader2, BookOpen, FileText, User, Settings, Phone, Info, Home
 } from "lucide-react";
-import logo from "../assets/logo.png";
+import defaultLogo from "../assets/logo.png";
+import { useData } from "../contexts/DataContext";
 
 function Nav() {
+  const [settings, setSettings] = useState({
+    logo: "",
+    websiteTitle: "Samafale Academy"
+  });
   const [open, setOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [user, setUser] = useState(null);
   const [openProfile, setOpenProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+
+  // 🎨 Fetch settings from API
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/settings");
+        const data = await response.json();
+        setSettings({
+          logo: data.logo || "",
+          websiteTitle: data.websiteTitle || "Samafale Academy"
+        });
+      } catch (error) {
+        console.error("Error fetching settings:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  // 🎨 Scroll animation
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // 🌓 Dark mode
   useEffect(() => {
@@ -105,6 +121,8 @@ function Nav() {
     return img.startsWith("/") ? `http://localhost:5000${img}` : img;
   };
 
+  const logoSrc = settings.logo || defaultLogo;
+
   const avatar = getImageUrl(user?.image || localStorage.getItem("profileImage"));
 
   const linkClass = ({ isActive }) =>
@@ -116,16 +134,20 @@ function Nav() {
   const dashboardLink = user?.role === "admin" ? "/admin" : "/dashboard/student";
 
   return (
-    <nav className="bg-[#f0f7f8] shadow-sm fixed w-full top-0 z-50 border-b border-gray-100">
+    <nav className={`bg-[#f0f7f8] shadow-sm fixed w-full top-0 z-50 border-b border-gray-100 transition-all duration-300 ${scrolled ? "py-2 shadow-lg" : "py-0"
+      }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className={`flex justify-between items-center transition-all duration-300 ${scrolled ? "h-14" : "h-16"
+          }`}>
           {/* ✅ Logo */}
-          <NavLink to="/" className="flex items-center">
+          <NavLink to="/" className="flex items-center gap-2 ml-[40px] mt-4">
             <img
-              src={logo}
-              alt="Logo"
-              className="w-32 md:w-48 lg:w-64 h-auto object-contain"
+              src={logoSrc}
+              alt={settings.websiteTitle}
+              className={`object-contain transition-all duration-300 ${scrolled ? "h-10 w-auto" : "h-12 w-auto"
+                }`}
             />
+            {/* Tagline removed */}
           </NavLink>
 
           {/* ✅ Links - Desktop */}

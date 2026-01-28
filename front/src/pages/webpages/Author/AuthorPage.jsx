@@ -62,7 +62,7 @@ function AuthorPage() {
           id: found._id,
           username: found.username,
           name: found.name,
-          image: found.avatar,
+          image: found.image,
           email: found.email,
           bio: found.bio || "No bio available yet.",
           verified: !!found.verified,
@@ -266,7 +266,7 @@ function AuthorPage() {
 
                 <div className="inline-flex items-center gap-1 text-xs font-medium bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md shadow-sm">
                   <FaCalendarAlt className="text-[12px]" />
-                  <span>{getRelativeTime(post.date)}</span>
+                  <span>{getRelativeTime(post.createdAt)}</span>
                 </div>
 
                 <p className="text-gray-700 text-sm line-clamp-3 leading-relaxed">

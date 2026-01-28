@@ -37,11 +37,14 @@ import contactRoutes from './routes/contactRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import roleRoutes from './routes/roleRoutes.js';
-import systemRoutes from './routes/systemRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
+import statsRoutes from './routes/statsRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
 
 // Import models to ensure they're registered with Mongoose
 import './models/Blog.js';
 import './models/Comment.js';
+import './models/Category.js';
 
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
@@ -56,9 +59,11 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/contacts', contactRoutes);
 app.use('/api/payment-methods', paymentRoutes);
 app.use('/api/roles', roleRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/stats', statsRoutes);
+app.use('/api/settings', settingsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/settings', systemRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');

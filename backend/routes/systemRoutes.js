@@ -1,9 +1,11 @@
 import express from 'express';
 import SystemSetting from '../models/SystemSetting.js';
 
+import { protect, admin } from '../middleware/authMiddleware.js';
+
 const router = express.Router();
 
-// ✅ Get system settings
+// ✅ Get system settings (Public)
 router.get('/', async (req, res) => {
     try {
         let settings = await SystemSetting.findOne();
@@ -18,8 +20,8 @@ router.get('/', async (req, res) => {
     }
 });
 
-// ✅ Update system settings
-router.patch('/', async (req, res) => {
+// ✅ Update system settings (Admin Only)
+router.patch('/', protect, admin, async (req, res) => {
     try {
         let settings = await SystemSetting.findOne();
         if (!settings) {

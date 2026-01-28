@@ -210,6 +210,7 @@ const EditCourse = () => {
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [instructors, setInstructors] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [courseData, setCourseData] = useState({
         title: '',
         type: '',
@@ -231,9 +232,10 @@ const EditCourse = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const [course, allInstructors] = await Promise.all([
+                const [course, allInstructors, allCategories] = await Promise.all([
                     id === 'new' ? Promise.resolve(null) : getFullCourseDetails(id),
-                    getAllInstructors()
+                    getAllInstructors(),
+                    fetch('http://localhost:5000/api/categories').then(res => res.json())
                 ]);
 
                 if (course) {
@@ -266,6 +268,7 @@ const EditCourse = () => {
                     });
                 }
                 setInstructors(allInstructors);
+                setCategories(allCategories || []);
             } catch (error) {
                 toast.error("Failed to load data");
             } finally {
@@ -579,15 +582,18 @@ const EditCourse = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Type (Frontend, etc.)</label>
-                                <input
-                                    type="text"
+                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Category</label>
+                                <select
                                     name="type"
                                     value={courseData.type}
                                     onChange={handleInputChange}
-                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all"
-                                    placeholder="e.g. Front End"
-                                />
+                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all appearance-none cursor-pointer"
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.map(cat => (
+                                        <option key={cat._id} value={cat.name}>{cat.name}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Technology</label>

@@ -1,24 +1,29 @@
 import React from "react";
-import { useData } from "../../contexts/DataContext";
+
 
 export default function AboutHero() {
-  const { settings } = useData();
-  const about = settings?.about || {};
+  // const { settings } = useData(); // Removed
+  const about = {
+    badge: "⭐ Transform Your Future",
+    title: null, // use default
+    description: "We help Somali learners develop skills, confidence, and opportunities through accessible, structured learning in Af-Soomaali."
+  };
 
   return (
     <section className="relative pt-28  sm:pt-28 bg-white overflow-hidden">
       <div className="max-w-5xl mx-auto px-6 text-center ">
         {/* Badge */}
         <div className="inline-block mb-5 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-sm border border-emerald-100">
-          {about.badge || "⭐ #1 Somali Coding Platform"}
+          {about.badge || "⭐ #Transform Your Future"}
         </div>
 
         {/* Title */}
-        <h1 className="text-[25px] p-2  sm:text-[26px] md:text-[46px] lg:leading-14 md:leading-14 leading-10 font-extrabold  text-gray-900">
+        <h1 className="text-[20px] p-2  sm:text-[26px] md:text-[45px] lg:leading-14 md:leading-14 leading-10 font-extrabold  text-gray-900">
           {about.title || (
             <>
-              Building Real Opportunities <br className="hidden sm:block" />
-              <span className="text-emerald-500">for Somalis Through Tech</span>
+              Empowering Somali Learners
+              <br className="hidden sm:block" />
+              <span className="text-emerald-500">for the Future</span>
             </>
           )}
         </h1>

@@ -1,18 +1,41 @@
-import React from "react";
-import { Users, BookOpen, Target, Heart } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Users, BookOpen, Target, Clock } from "lucide-react";
+
 
 export default function AboutStats() {
-  const stats = [
-    { icon: Users, value: "300+", label: "Active Students" },
-    { icon: BookOpen, value: "15", label: "Complete Courses" },
-    { icon: Target, value: "800+", label: "Total Lessons" },
-    { icon: Heart, value: "1", label: "Active Community" },
+  const [stats, setStats] = useState({
+    students: 0,
+    courses: 0,
+    lessons: 0,
+    hours: 0
+  });
+
+  // Fetch platform statistics
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/stats");
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const statsDisplay = [
+    { icon: Users, value: `${stats.students.toLocaleString()}+`, label: "Active Students" },
+    { icon: BookOpen, value: `${stats.courses.toLocaleString()}+`, label: "Complete Courses" },
+    { icon: Target, value: `${stats.lessons.toLocaleString()}+`, label: "Total Lessons" },
+    { icon: Clock, value: `${stats.hours.toLocaleString()}+`, label: "Total Hours" },
   ];
 
   return (
     <section className="py-10 bg-white">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {stats.map((item, i) => {
+        {statsDisplay.map((item, i) => {
           const Icon = item.icon;
 
           return (

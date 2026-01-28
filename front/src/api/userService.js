@@ -193,8 +193,15 @@ export const uploadImage = async (formData, token) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to upload image');
+      let errorMessage = 'Failed to upload image';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch (e) {
+        const text = await response.text();
+        if (text) errorMessage = text;
+      }
+      throw new Error(errorMessage);
     }
 
     return await response.text();

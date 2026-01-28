@@ -44,18 +44,38 @@ function SinglePostPage() {
     const loadBlogs = async () => {
       try {
         setLoading(true);
-        const data = await getAllBlogs();
+        const response = await getAllBlogs();
+        // Handle response structure { blogs: [], count: ... } or just array (legacy)
+        const rawBlogs = response.blogs || response || [];
+
+        // Filter only active blogs
+        const activeBlogs = Array.isArray(rawBlogs)
+          ? rawBlogs.filter(b => b.status === "active")
+          : [];
 
         // Format data to match frontend expectations
-        const formattedData = data.map(blog => ({
+        const formattedData = activeBlogs.map(blog => ({
           ...blog,
           id: blog._id,
-          authorId: blog.author?._id
+          authorId: blog.author?._id,
+          // Ensure author details are populated for the page content
+          authorName: blog.author ? `${blog.author.firstName} ${blog.author.lastName}` : "Samafale Team",
+          authorImage: blog.author?.image || "",
+          verified: true
         }));
 
         setArticles(formattedData);
+
+        // Find article by slug
         const selected = formattedData.find((b) => toSlug(b.title) === title);
-        setArticle(selected || null);
+
+        if (selected) {
+          setArticle(selected);
+        } else {
+          console.log("Article not found for slug:", title);
+          setArticle(null);
+        }
+
       } catch (err) {
         console.error("Error loading article:", err);
       } finally {
@@ -75,9 +95,9 @@ function SinglePostPage() {
     if (article.author) {
       setAuthor({
         id: article.author._id,
-        username: article.author.username,
-        name: article.author.name,
-        avatar: article.author.avatar,
+        username: article.author.username || (article.author.firstName + article.author.lastName).toLowerCase().replace(/\s/g, ''),
+        name: `${article.author.firstName} ${article.author.lastName}`,
+        avatar: article.author.image,
         bio: article.author.bio || "No bio available yet.",
         verified: !!article.author.verified,
         social: article.author.social || {}
@@ -182,9 +202,10 @@ function SinglePostPage() {
       </div>
 
       {/* Article Content */}
-      <div className="prose lg:prose-2xl  p-10 lg:p-0 md:p-0     text-gray-700 mt-8 max-w-4xl mx-auto">
-        {article.content}
-      </div>
+      <div
+        className="prose lg:prose-xl prose-emerald text-gray-700 mt-8 max-w-4xl mx-auto [&_img]:max-w-full [&_img]:h-auto [&_iframe]:max-w-full break-words overflow-hidden"
+        dangerouslySetInnerHTML={{ __html: article.content }}
+      />
 
       {/* Author Profile Section */}
       <div className="mt-10  max-w-4xl mx-auto ">

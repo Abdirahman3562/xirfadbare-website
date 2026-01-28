@@ -1,29 +1,54 @@
-import React from "react";
-import { Target, Lightbulb } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Target, Lightbulb, Users, BookOpen, GraduationCap, Clock } from "lucide-react";
+
 
 export default function MissionVision() {
+  const [stats, setStats] = useState({
+    students: 0,
+    courses: 0,
+    lessons: 0,
+    hours: 0
+  });
+
+  // Fetch platform statistics
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/stats");
+        const data = await response.json();
+        setStats(data);
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   const data = [
     {
       icon: Target,
       title: "Our Mission",
-      subtitle: "Building Somalia’s Tech Future",
-      desc: `To make world-class tech education accessible and understandable to every Somali — wherever they are.`,
-      descSo: `Inaan wacyigelinno fursadoyoinkii iyo barashada sare u fidinno qof kasta oo Af-Soomaali ah u garanaya Somalil kadib — meel kasta oo uu joogo.`,
-      stat1: "300+",
+      subtitle: "Empowering Every Somali to Thrive",
+      desc: `To create opportunities and provide knowledge that enables every Somali to grow, succeed, and contribute — wherever they are.`,
+      stat1: `${stats.students.toLocaleString()}+`,
       label1: "Students",
-      stat2: "15",
+      icon1: Users,
+      stat2: `${stats.courses.toLocaleString()}+`,
       label2: "Courses",
+      icon2: BookOpen,
     },
     {
       icon: Lightbulb,
       title: "Our Vision",
-      subtitle: "A Tech-Enabled Somalia",
-      desc: `A future where Somali talent builds, leads, and shapes global technology — without language being a barrier.`,
-      descSo: `Mustaqbal ay Soomaalidu kaalin xoogan kaga leedahay horumarinta tiknoolajiyadda caalamka — iyadoon luqaddu ayan caqabad ahayn.`,
-      stat1: "800+",
+      subtitle: "A Thriving Somalia for All",
+      desc: `A future where Somali talent leads, innovates, and prospers across all fields — without barriers of language, location, or resources.`,
+      stat1: `${stats.lessons.toLocaleString()}+`,
       label1: "Lessons",
-      stat2: "200+",
+      icon1: GraduationCap,
+      stat2: `${stats.hours.toLocaleString()}+`,
       label2: "Hours",
+      icon2: Clock,
     },
   ];
 
@@ -65,22 +90,32 @@ export default function MissionVision() {
                 {item.descSo}
               </p>
 
-              {/* Stats */}
+              {/* Stats with Icons */}
               <div className="flex items-center gap-8 pt-2">
-                <div>
-                  <div className="text-2xl font-bold text-emerald-600">
-                    {item.stat1}
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 transition-colors">
+                    {React.createElement(item.icon1, { className: "w-5 h-5 text-emerald-600 group-hover:text-white transition-colors" })}
                   </div>
-                  <div className="text-xs text-slate-500">
-                    {item.label1}
+                  <div>
+                    <div className="text-2xl font-bold text-emerald-600">
+                      {item.stat1}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {item.label1}
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <div className="text-2xl font-bold text-emerald-600">
-                    {item.stat2}
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 transition-colors">
+                    {React.createElement(item.icon2, { className: "w-5 h-5 text-emerald-600 group-hover:text-white transition-colors" })}
                   </div>
-                  <div className="text-xs text-slate-500">
-                    {item.label2}
+                  <div>
+                    <div className="text-2xl font-bold text-emerald-600">
+                      {item.stat2}
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {item.label2}
+                    </div>
                   </div>
                 </div>
               </div>

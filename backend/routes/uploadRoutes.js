@@ -35,8 +35,20 @@ const upload = multer({
     },
 });
 
-router.post('/', upload.single('image'), (req, res) => {
-    res.send(`/${req.file.path}`);
+router.post('/', (req, res) => {
+    upload.single('image')(req, res, function (err) {
+        if (err) {
+            return res.status(400).json({ message: err.message || err });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        // Fix Windows paths
+        const normalizedPath = req.file.path.replace(/\\/g, "/");
+        res.json({ url: `/${normalizedPath}` });
+    });
 });
 
 export default router;
