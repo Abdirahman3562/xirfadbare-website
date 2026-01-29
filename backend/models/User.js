@@ -12,6 +12,7 @@ const userSchema = mongoose.Schema(
     role: { type: String, enum: ['student', 'admin', 'author', 'teacher'], default: 'student' },
     isActive: { type: Boolean, default: true },
     is2FAEnabled: { type: Boolean, default: false },
+    isChatPausedByAdmin: { type: Boolean, default: false },
     twoFactorCode: { type: String },
     twoFactorExpires: { type: Date },
     // Author Profile Fields

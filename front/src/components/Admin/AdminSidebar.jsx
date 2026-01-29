@@ -11,11 +11,13 @@ import {
     FileText,
     GraduationCap,
     ShoppingCart,
+    MessageSquare,
     MessageSquareQuote,
     MessageCircleQuestion,
     Folder,
     Newspaper,
-    Mail
+    Mail,
+    Bot
 } from 'lucide-react';
 
 const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
@@ -23,8 +25,13 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
         logo: "",
         websiteTitle: "Samafale Academy"
     });
+    const [unreadCount, setUnreadCount] = useState(0);
 
-    // Fetch settings
+    // Auth
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+    const token = loggedInUser.token;
+
+    // Fetch settings & unread count
     useEffect(() => {
         const fetchSettings = async () => {
             try {
@@ -38,8 +45,26 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
                 console.error("Error fetching settings:", error);
             }
         };
+
+        const fetchUnreadCount = async () => {
+            if (!token) return;
+            try {
+                const response = await fetch("http://localhost:5000/api/chat/unread-count", {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                setUnreadCount(data.count || 0);
+            } catch (error) {
+                console.error("Error fetching unread count:", error);
+            }
+        };
+
         fetchSettings();
-    }, []);
+        fetchUnreadCount();
+
+        const interval = setInterval(fetchUnreadCount, 10000); // Poll every 10s
+        return () => clearInterval(interval);
+    }, [token]);
 
     const menuItems = [
         { title: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
@@ -51,6 +76,13 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
         { title: 'Manage Courses', icon: <BookOpen size={20} />, path: '/admin/courses' },
         { title: 'Manage Blogs', icon: <Newspaper size={20} />, path: '/admin/blogs' },
         { title: 'Manage Contacts', icon: <Mail size={20} />, path: '/admin/contacts' },
+        {
+            title: "Live Chat",
+            icon: <MessageSquare size={20} />,
+            path: "/admin/live-chat",
+            badge: unreadCount > 0 ? unreadCount : null
+        },
+        { title: "Bot Answers", icon: <Bot size={20} />, path: "/admin/bot-responses" },
         { title: 'Categories', icon: <Folder size={20} />, path: '/admin/categories' },
         { title: 'Testimonials', icon: <MessageSquareQuote size={20} />, path: '/admin/testimonials' },
         { title: 'FAQs', icon: <MessageCircleQuestion size={20} />, path: '/admin/faqs' },
@@ -94,6 +126,11 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
                             {item.icon}
                         </span>
                         <span>{item.title}</span>
+                        {item.badge && (
+                            <span className="ml-auto bg-red-500 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full min-w-[20px] h-[20px] flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
+                                {item.badge}
+                            </span>
+                        )}
                     </NavLink>
                 ))}
             </nav>

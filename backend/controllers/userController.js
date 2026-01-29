@@ -50,6 +50,7 @@ const authUser = async (req, res) => {
       image: user.image,
       phone: user.phone,
       is2FAEnabled: user.is2FAEnabled,
+      isChatPausedByAdmin: user.isChatPausedByAdmin,
       createdAt: user.createdAt,
       token: generateToken(user._id),
     });
@@ -79,6 +80,7 @@ const verify2FA = async (req, res) => {
       image: user.image,
       phone: user.phone,
       is2FAEnabled: user.is2FAEnabled,
+      isChatPausedByAdmin: user.isChatPausedByAdmin,
       createdAt: user.createdAt,
       token: generateToken(user._id),
     });
@@ -138,6 +140,7 @@ const getUserProfile = async (req, res) => {
       role: user.role,
       image: user.image,
       is2FAEnabled: user.is2FAEnabled,
+      isChatPausedByAdmin: user.isChatPausedByAdmin,
       createdAt: user.createdAt,
     });
   } else {

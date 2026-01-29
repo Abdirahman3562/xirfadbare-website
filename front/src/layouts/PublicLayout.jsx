@@ -2,7 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Nav from './Nav';
 import Footer from './Footer';
-import WhatsAppBubbleFixedRight from '../components/WhatsAppBubble';
+import SupportWidget from '../components/SupportWidget';
 
 const PublicLayout = () => {
     return (
@@ -12,7 +12,7 @@ const PublicLayout = () => {
                 <Outlet />
             </main>
             <Footer />
-            <WhatsAppBubbleFixedRight />
+            <SupportWidget />
         </div>
     );
 };

@@ -48,6 +48,8 @@ import SystemSettings from "./pages/Dashboard/admin/SystemSettings";
 import ManageBlogs from "./pages/Dashboard/admin/ManageBlogs";
 import CreateBlog from "./pages/Dashboard/admin/CreateBlog";
 import ManageContacts from "./pages/Dashboard/admin/ManageContacts";
+import ManageBotResponses from "./pages/Dashboard/admin/ManageBotResponses";
+import LiveChat from "./pages/Dashboard/admin/LiveChat";
 // ManageSettings removed
 import PublicLayout from "./layouts/PublicLayout";
 import Orders from "./pages/Dashboard/student/Orders";
@@ -139,6 +141,8 @@ function App() {
           <Route path="system-settings" element={<SystemSettings />} />
           {/* Settings route removed */}
           <Route path="profile" element={<Profile />} />
+          <Route path="bot-responses" element={<ManageBotResponses />} />
+          <Route path="live-chat" element={<LiveChat />} />
         </Route>
 
         {/* 404 Route Wrapped in PublicLayout */}

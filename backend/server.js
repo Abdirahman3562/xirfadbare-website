@@ -40,6 +40,8 @@ import roleRoutes from './routes/roleRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import statsRoutes from './routes/statsRoutes.js';
 import settingsRoutes from './routes/settingsRoutes.js';
+import chatRoutes from './routes/chatRoutes.js';
+import botResponseRoutes from './routes/botResponseRoutes.js';
 
 // Import models to ensure they're registered with Mongoose
 import './models/Blog.js';
@@ -64,6 +66,8 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/bot-responses', botResponseRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');
