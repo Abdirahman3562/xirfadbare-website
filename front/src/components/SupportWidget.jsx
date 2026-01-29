@@ -108,10 +108,10 @@ export default function SupportWidget() {
     const findBotResponse = (input) => {
         const lowerInput = input.toLowerCase();
 
-        // Find best match (prioritize exact match if strictly needed, but here we scan list)
-        // We filter for active responses
+        // 1. Filter active responses
         const activeResponses = botResponses.filter(r => r.isActive !== false);
 
+        // 2. Find best match
         const match = activeResponses.find(r => {
             if (r.matchType === 'exact') {
                 return r.trigger?.toLowerCase() === lowerInput;
@@ -122,12 +122,27 @@ export default function SupportWidget() {
 
         if (match) return match.response;
 
-        // Fallbacks (Only if DB match fails)
-        if ((lowerInput.includes("hello") || lowerInput.includes("hi")) && !activeResponses.some(r => r.trigger === 'hello')) {
-            return `Hello ${user?.firstName || "there"}! Welcome to Xirfadbare Assistant. How can I assist you?`;
+        // 3. Fallback for Greetings (if not in DB)
+        if (lowerInput.includes("hello") || lowerInput.includes("hi") || lowerInput.includes("hey") || lowerInput.includes("asalam")) {
+            return `Hello ${user?.firstName || "there"}! 👋 I'm your Xirfadbare Assistant. How can I help you today? You can ask about our courses, pricing, or how to join.`;
         }
 
-        return "I'm not sure about that. Our support team will get back to you shortly, or you can check our FAQs.";
+        // 4. Look for a 'default' or '*' trigger in DB
+        const defaultMatch = activeResponses.find(r => r.trigger?.toLowerCase() === 'default' || r.trigger === '*');
+        if (defaultMatch) return defaultMatch.response;
+
+        // 5. Smart Recommendation Fallback
+        // Get up to 3 interesting triggers to suggest
+        const suggestions = activeResponses
+            .filter(r => r.trigger !== 'default' && r.trigger !== '*')
+            .slice(0, 3)
+            .map(r => r.trigger);
+
+        if (suggestions.length > 0) {
+            return `I'm not quite sure I understand "${input}". I can help with things like: ${suggestions.join(", ")}. Or stay tuned, an agent will be with you shortly!`;
+        }
+
+        return "I'm not sure about that yet. Our support team has been notified and will get back to you shortly!";
     };
 
     const handleSendMessage = async (e) => {
@@ -360,14 +375,14 @@ export default function SupportWidget() {
                                                 </div>
                                             )}
 
-                                            <div className={`flex flex-col max-w-[75%] ${msg.isBot || msg.isAdmin ? "items-start" : "items-end"}`}>
+                                            <div className={`flex flex-col max-w-[75%] min-w-0 ${msg.isBot || msg.isAdmin ? "items-start" : "items-end"}`}>
                                                 {/* Sender Name */}
                                                 <span className={`text-[10px] text-gray-400 mb-1 px-1 ${msg.isBot || msg.isAdmin ? "text-left" : "text-right"}`}>
                                                     {msg.isBot ? "Assistant" : msg.isAdmin ? (msg.admin?.firstName || "Administrator") : (user?.firstName || "You")}
                                                 </span>
 
                                                 <div
-                                                    className={`px-4 py-3 shadow-sm text-sm leading-relaxed relative group ${msg.isBot
+                                                    className={`px-4 py-3 shadow-sm text-sm leading-relaxed relative group break-all whitespace-pre-wrap ${msg.isBot
                                                         ? "bg-white text-gray-800 rounded-2xl rounded-tl-sm border border-gray-100"
                                                         : msg.isAdmin
                                                             ? "bg-emerald-50 text-emerald-900 rounded-2xl rounded-tl-sm border border-emerald-100"

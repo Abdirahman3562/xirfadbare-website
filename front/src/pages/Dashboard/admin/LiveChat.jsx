@@ -140,11 +140,11 @@ export default function LiveChat() {
     );
 
     return (
-        <div className="flex flex-col lg:flex-row h-[calc(100dvh-120px)] lg:h-[calc(100vh-120px)] bg-white lg:rounded-3xl overflow-hidden shadow-2xl border border-gray-100 font-[Inter] animate-in fade-in zoom-in duration-500">
+        <div className="flex flex-col lg:flex-row h-[calc(100vh-144px)] lg:h-[calc(100vh-160px)] w-full max-w-full bg-white lg:rounded-3xl overflow-hidden shadow-2xl border border-gray-100 font-[Inter] animate-in fade-in zoom-in duration-500">
 
             {/* Sidebar */}
-            <div className={`${showMobileMessages ? "hidden" : "flex"} lg:flex w-full lg:w-1/3 border-r border-gray-100 flex-col bg-slate-50`}>
-                <div className="p-6 border-b border-gray-100 bg-white">
+            <div className={`${showMobileMessages ? "hidden" : "flex"} lg:flex w-full lg:w-1/3 border-r border-gray-100 flex-col bg-slate-50 min-w-0 h-full`}>
+                <div className="p-6 border-b border-gray-100 bg-white shrink-0">
                     <h2 className="font-black text-2xl text-gray-900 mb-6 flex items-center gap-3">
                         <div className="p-2 bg-emerald-100 rounded-xl">
                             <MessageSquare className="text-emerald-600" size={24} />
@@ -163,7 +163,8 @@ export default function LiveChat() {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
+                {/* Users List */}
+                <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar p-3 space-y-2">
                     {loading ? (
                         <div className="p-12 text-center">
                             <Loader className="animate-spin text-emerald-500 mx-auto mb-2" size={32} />
@@ -217,11 +218,11 @@ export default function LiveChat() {
             </div>
 
             {/* Chat Window */}
-            <div className={`${!showMobileMessages ? "hidden" : "flex"} lg:flex lg:w-2/3 flex-col bg-white relative h-full overflow-hidden`}>
+            <div className={`${!showMobileMessages ? "hidden" : "flex"} lg:flex lg:w-2/3 flex-col bg-white relative h-full overflow-hidden min-w-0`}>
                 {selectedUser ? (
-                    <>
+                    <div className="flex flex-col h-full w-full">
                         {/* Header */}
-                        <div className="p-4 lg:p-5 border-b border-gray-100 flex items-center justify-between shadow-sm z-20 bg-white/80 backdrop-blur-md">
+                        <div className="p-4 lg:p-5 border-b border-gray-100 flex items-center justify-between shadow-sm z-20 bg-white/80 backdrop-blur-md shrink-0">
                             <div className="flex items-center gap-3 lg:gap-4">
                                 {/* Back Button for Mobile */}
                                 <button
@@ -259,7 +260,7 @@ export default function LiveChat() {
                         </div>
 
                         {/* Messages Area */}
-                        <div className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6 lg:space-y-8 bg-slate-50/50 overscroll-contain" style={{ backgroundImage: 'radial-gradient(#e2e8f0 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
+                        <div className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6 lg:space-y-8 bg-slate-50/50 overscroll-contain min-h-0" style={{ backgroundImage: 'radial-gradient(#e2e8f0 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
                             {msgLoading ? (
                                 <div className="flex h-full flex-col items-center justify-center text-gray-400">
                                     <Loader className="animate-spin text-emerald-500 mb-4" size={32} lg:size={40} />
@@ -306,8 +307,8 @@ export default function LiveChat() {
                                                     </div>
                                                 </div>
 
-                                                <div className={`flex flex-col ${alignRight ? "items-end" : "items-start"}`}>
-                                                    <div className={`relative px-5 py-3.5 rounded-3xl shadow-sm text-sm leading-relaxed ${isAdmin
+                                                <div className={`flex flex-col min-w-0 ${alignRight ? "items-end" : "items-start"}`}>
+                                                    <div className={`relative px-5 py-3.5 rounded-3xl shadow-sm text-sm leading-relaxed break-all whitespace-pre-wrap ${isAdmin
                                                         ? "bg-emerald-600 text-white rounded-br-none"
                                                         : isBot
                                                             ? "bg-slate-800 text-slate-100 rounded-br-none"
@@ -331,8 +332,8 @@ export default function LiveChat() {
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* Input Area */}
-                        <div className="p-4 lg:p-6 border-t border-gray-100 bg-white">
+                        {/* Message Input area */}
+                        <div className="p-4 lg:p-6 border-t border-gray-100 bg-white shrink-0">
                             <form onSubmit={handleSend} className="relative flex items-center gap-2 lg:gap-3">
                                 <div className="flex-1 relative group">
                                     <input
@@ -362,7 +363,7 @@ export default function LiveChat() {
                                 End-to-end Encrypted Support Channel
                             </p>
                         </div>
-                    </>
+                    </div>
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center p-20 text-center space-y-6">
                         <div className="relative">

@@ -11,7 +11,9 @@ import {
     Clock,
     ExternalLink,
     PlusCircle,
-    Calendar
+    Calendar,
+    GraduationCap,
+    Newspaper
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getDashboardStats } from '../../../api/adminService';
@@ -72,18 +74,42 @@ const AdminDashboard = () => {
             up: true
         },
         {
+            label: 'Monthly Revenue',
+            value: `$${(stats?.monthlyRevenue || 0).toLocaleString()}`,
+            icon: <ArrowUpRight className="text-emerald-600" size={24} />,
+            bg: 'bg-emerald-50',
+            change: 'This Month',
+            up: true
+        },
+        {
+            label: 'Yearly Revenue',
+            value: `$${(stats?.yearlyRevenue || 0).toLocaleString()}`,
+            icon: <TrendingUp className="text-blue-600" size={24} />,
+            bg: 'bg-blue-50',
+            change: 'This Year',
+            up: true
+        },
+        {
             label: 'Total Revenue',
             value: `$${(stats?.totalRevenue || 0).toLocaleString()}`,
-            icon: <TrendingUp className="text-emerald-600" size={24} />,
+            icon: <Package className="text-emerald-600" size={24} />,
             bg: 'bg-emerald-50',
-            change: '+18.7%',
+            change: 'Lifetime',
+            up: true
+        },
+        {
+            label: 'Total Instructors',
+            value: stats?.totalInstructors || 0,
+            icon: <GraduationCap className="text-purple-600" size={24} />,
+            bg: 'bg-purple-50',
+            change: 'Verified',
             up: true
         },
         {
             label: 'Active Courses',
             value: stats?.totalCourses || 0,
-            icon: <BookOpen className="text-purple-600" size={24} />,
-            bg: 'bg-purple-50',
+            icon: <BookOpen className="text-pink-600" size={24} />,
+            bg: 'bg-pink-50',
             change: '+4%',
             up: true
         },
@@ -93,6 +119,14 @@ const AdminDashboard = () => {
             icon: <ShoppingCart className="text-orange-600" size={24} />,
             bg: 'bg-orange-50',
             change: '+22%',
+            up: true
+        },
+        {
+            label: 'Total Blogs',
+            value: stats?.totalBlogs || 0,
+            icon: <Newspaper className="text-indigo-600" size={24} />,
+            bg: 'bg-indigo-50',
+            change: 'Published',
             up: true
         },
     ];

@@ -81,9 +81,9 @@ const AdminLayout = () => {
             />
 
             {/* Main Content Area */}
-            <div className={`flex-1 transition-all duration-300 w-full ${isCollapsed ? 'md:ml-20' : 'md:ml-64'} ml-0`}>
+            <div className={`flex-1 transition-all duration-300 ${isCollapsed ? 'md:ml-20' : 'md:ml-64'} ml-0 flex flex-col min-h-screen overflow-x-hidden`}>
                 {/* Header */}
-                <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 gap-4">
+                <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 gap-4 shrink-0">
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMobileOpen(true)}
@@ -256,7 +256,7 @@ const AdminLayout = () => {
                 </header>
 
                 {/* Content Section */}
-                <main className="p-8 w-full">
+                <main className="flex-1 p-4 md:p-8 min-w-0">
                     <Outlet />
                 </main>
             </div>

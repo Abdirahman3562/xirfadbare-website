@@ -1,6 +1,8 @@
 import User from '../models/User.js';
 import Course from '../models/Course.js';
 import Order from '../models/Order.js';
+import Blog from '../models/Blog.js';
+import Instructor from '../models/Instructor.js';
 
 // @desc    Get dashboard stats
 // @route   GET /api/admin/stats
@@ -8,9 +10,30 @@ import Order from '../models/Order.js';
 const getDashboardStats = async (req, res) => {
     try {
         // 1. Total Revenue (from active/approved orders)
-        // Using 'active' status as proxy for paid since isPaid isn't in schema shown
         const activeOrders = await Order.find({ status: 'active' });
         const totalRevenue = activeOrders.reduce((acc, order) => acc + (order.finalPrice || order.totalToPay || 0), 0);
+
+        // 1b. Monthly Revenue
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const monthlyOrders = await Order.find({
+            status: 'active',
+            createdAt: { $gte: startOfMonth }
+        });
+        const monthlyRevenue = monthlyOrders.reduce((acc, order) => acc + (order.finalPrice || order.totalToPay || 0), 0);
+
+        // 1c. Yearly Revenue
+        const startOfYear = new Date();
+        startOfYear.setMonth(0, 1);
+        startOfYear.setHours(0, 0, 0, 0);
+
+        const yearlyOrders = await Order.find({
+            status: 'active',
+            createdAt: { $gte: startOfYear }
+        });
+        const yearlyRevenue = yearlyOrders.reduce((acc, order) => acc + (order.finalPrice || order.totalToPay || 0), 0);
 
         // 2. Total Students
         const totalStudents = await User.countDocuments({ role: 'student' });
@@ -41,10 +64,15 @@ const getDashboardStats = async (req, res) => {
             .select('firstName lastName email image createdAt');
 
         // 8. Total Instructors
-        const totalInstructors = await User.countDocuments({ role: 'instructor' });
+        const totalInstructors = await Instructor.countDocuments({});
+
+        // 9. Total Blogs
+        const totalBlogs = await Blog.countDocuments({});
 
         res.json({
             totalRevenue,
+            monthlyRevenue,
+            yearlyRevenue,
             totalStudents,
             activeStudents,
             totalCourses,
@@ -52,7 +80,8 @@ const getDashboardStats = async (req, res) => {
             pendingOrders,
             recentOrders,
             recentStudents,
-            totalInstructors
+            totalInstructors,
+            totalBlogs
         });
     } catch (error) {
         console.error(error);
