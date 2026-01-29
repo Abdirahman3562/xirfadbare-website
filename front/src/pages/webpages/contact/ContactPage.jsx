@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Mail, MessageSquare, Monitor, ArrowRight, Send, Phone, MapPin } from "lucide-react";
+import { Mail, MessageSquare, Monitor, ArrowRight, Send, Phone, MapPin, Loader2 } from "lucide-react";
+import { toast } from "react-toastify";
 
 
 export default function ContactPage() {
@@ -37,7 +38,8 @@ export default function ContactPage() {
     about: "",
     message: "",
   });
-  const [status, setStatus] = useState(null); // "ok" | "err" | null
+
+  const [loading, setLoading] = useState(false);
 
   const contacts = [
     {
@@ -69,6 +71,7 @@ export default function ContactPage() {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await fetch('http://localhost:5000/api/contacts', {
         method: 'POST',
@@ -79,16 +82,16 @@ export default function ContactPage() {
       });
 
       if (response.ok) {
-        setStatus("ok");
+        toast.success("Message sent successfully! We'll get back to you soon.");
         setForm({ name: "", phone: "", email: "", about: "", message: "" });
-        setTimeout(() => setStatus(null), 3500);
       } else {
         throw new Error('Failed to send message');
       }
     } catch (e) {
       console.error('Error submitting contact form:', e);
-      setStatus("err");
-      setTimeout(() => setStatus(null), 3500);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -197,22 +200,15 @@ export default function ContactPage() {
 
             <button
               type="submit"
-              className="w-full cursor-pointer md:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold px-5 py-3 shadow-sm hover:shadow-md transition"
+              disabled={loading}
+              className="w-full cursor-pointer md:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold px-5 py-3 shadow-sm hover:shadow-md transition disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Send Message <Send className="w-4 h-4" />
+              {loading ? (
+                <>Sending... <Loader2 className="w-4 h-4 animate-spin" /></>
+              ) : (
+                <>Send Message <Send className="w-4 h-4" /></>
+              )}
             </button>
-
-            {/* status toast */}
-            {status === "ok" && (
-              <p className="text-emerald-600 text-sm mt-2">
-                ✅ Message sent! We’ll get back to you soon.
-              </p>
-            )}
-            {status === "err" && (
-              <p className="text-red-600 text-sm mt-2">
-                ❌ Something went wrong. Please try again.
-              </p>
-            )}
           </form>
         </div>
 

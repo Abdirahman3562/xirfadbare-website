@@ -5,6 +5,7 @@ import {
   getContactById,
   updateContact,
   deleteContact,
+  replyToContact
 } from '../controllers/contactController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -18,6 +19,8 @@ router.route('/:id')
   .get(protect, getContactById)
   .put(protect, updateContact)
   .delete(protect, deleteContact);
+
+router.route('/:id/reply').post(protect, replyToContact);
 
 export default router;
 

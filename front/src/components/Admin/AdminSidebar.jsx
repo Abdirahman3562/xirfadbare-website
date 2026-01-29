@@ -14,7 +14,8 @@ import {
     MessageSquareQuote,
     MessageCircleQuestion,
     Folder,
-    Newspaper
+    Newspaper,
+    Mail
 } from 'lucide-react';
 
 const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
@@ -49,6 +50,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
         { title: 'Roles', icon: <ShieldCheck size={20} />, path: '/admin/roles' },
         { title: 'Manage Courses', icon: <BookOpen size={20} />, path: '/admin/courses' },
         { title: 'Manage Blogs', icon: <Newspaper size={20} />, path: '/admin/blogs' },
+        { title: 'Manage Contacts', icon: <Mail size={20} />, path: '/admin/contacts' },
         { title: 'Categories', icon: <Folder size={20} />, path: '/admin/categories' },
         { title: 'Testimonials', icon: <MessageSquareQuote size={20} />, path: '/admin/testimonials' },
         { title: 'FAQs', icon: <MessageCircleQuestion size={20} />, path: '/admin/faqs' },

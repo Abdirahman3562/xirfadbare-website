@@ -21,31 +21,75 @@ const getCommentsByBlog = async (req, res) => {
       return res.status(404).json({ message: 'Blog not found' });
     }
 
-    // Filter and sort top-level comments (comments without parentComment)
-    const topLevelComments = blog.comments
-      .filter(comment => !comment.parentComment)
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by newest first
+    // Convert all comments to plain objects
+    const allComments = blog.comments.map(c => c.toObject());
 
-    // Format the comments to match the expected structure
-    const formattedComments = topLevelComments.map(comment => ({
-      _id: comment._id,
-      content: comment.content,
-      author: comment.author,
-      parentComment: comment.parentComment,
-      replies: blog.comments
-        .filter(reply => reply.parentComment && reply.parentComment.toString() === comment._id.toString())
-        .map(reply => ({
-          _id: reply._id,
-          content: reply.content,
-          author: reply.author,
-          createdAt: reply.createdAt
-        }))
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)), // Sort replies chronologically
-      createdAt: comment.createdAt,
-      updatedAt: comment.updatedAt
-    }));
+    // Create a map for O(1) access
+    const commentMap = {};
+    allComments.forEach(comment => {
+      comment.replies = []; // Initialize empty replies array
+      commentMap[comment._id] = comment;
+    });
 
-    res.json(formattedComments);
+    const rootComments = [];
+
+    // Build the tree
+    allComments.forEach(comment => {
+      if (comment.parentComment) {
+        const parent = commentMap[comment.parentComment];
+        if (parent) {
+          parent.replies.push(comment);
+        } else {
+          // If parent not found (orphaned), maybe treat as root?
+          // For now, only push if parent exists.
+          // Or we can ignore orphans.
+        }
+      } else {
+        rootComments.push(comment);
+      }
+    });
+
+    // Helper to sort recursively
+    const sortComments = (comments) => {
+      // Sort in-place
+      comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Newest top-level first for roots
+
+      // For replies, users usually want oldest first (chronological) to read as a thread
+      // But user specifically asked for "Newest first" before, then corrected to "Oldest first".
+      // Wait, Facebook top-levels are usually specific sort, but replies are usually chronological.
+      // Let's stick to: Roots = Newest first (standard blog style). Replies = Oldest first.
+
+      comments.forEach(comment => {
+        if (comment.parentComment) {
+          // sort replies of this comment (which are children) strictly older -> newer
+          // Wait, the 'comments' array passed here is a list at one level. 
+          // Recursive call will handle children.
+        }
+        if (comment.replies.length > 0) {
+          comment.replies.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          sortComments(comment.replies);
+        }
+      });
+    };
+
+    // Sort roots Newest -> Oldest
+    rootComments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    // Recursive sort for children (Oldest -> Newest)
+    const recursiveSort = (list) => {
+      list.forEach(c => {
+        if (c.replies && c.replies.length > 0) {
+          c.replies.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          recursiveSort(c.replies);
+        }
+      });
+    };
+
+    recursiveSort(rootComments);
+
+    res.json(rootComments);
+
+
   } catch (error) {
     console.error('Error fetching comments:', error);
     res.status(500).json({ message: 'Server error while fetching comments' });
@@ -78,7 +122,7 @@ const createComment = async (req, res) => {
         return res.status(404).json({ message: 'Parent comment not found' });
       }
 
-      // Create the reply object
+      // Create the reply object attached to the immediate parent
       const reply = {
         content,
         author: req.user._id,
@@ -212,8 +256,12 @@ const deleteComment = async (req, res) => {
       return res.status(404).json({ message: 'Comment not found' });
     }
 
-    // Check if user is the author of the comment
-    if (comment.author.toString() !== req.user._id.toString()) {
+    // Check if user is the author of the comment or an admin
+    if (
+      comment.author.toString() !== req.user._id.toString() &&
+      req.user.role !== 'admin' &&
+      req.user.role !== 'superadmin'
+    ) {
       return res.status(401).json({ message: 'Not authorized to delete this comment' });
     }
 
