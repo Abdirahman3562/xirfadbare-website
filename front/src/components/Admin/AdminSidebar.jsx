@@ -147,19 +147,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
                 ))}
             </nav>
 
-            {/* Logout Area */}
-            <div className="p-4 border-t border-gray-50">
-                <button
-                    onClick={() => {
-                        localStorage.removeItem('loggedInUser');
-                        window.location.href = '/login';
-                    }}
-                    className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-red-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 font-medium group"
-                >
-                    <LogOut size={20} className="group-hover:-translate-x-1 transition-transform" />
-                    <span>Logout</span>
-                </button>
-            </div>
+
         </div>
     );
 
