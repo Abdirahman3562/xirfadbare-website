@@ -11,12 +11,13 @@ router.route('/')
 router.post('/bot', protect, saveBotMessage);
 
 import { admin } from '../middleware/authMiddleware.js';
+import { checkPermission } from '../middleware/permissionMiddleware.js';
 import { getConversations, getMessagesByUser, sendAdminMessage, takeOverChat, getTotalUnreadMessages } from '../controllers/chatController.js';
 
-router.get('/unread-count', protect, admin, getTotalUnreadMessages);
-router.get('/conversations', protect, admin, getConversations);
-router.get('/admin/:userId', protect, admin, getMessagesByUser);
-router.post('/admin', protect, admin, sendAdminMessage);
-router.put('/take-over/:userId', protect, admin, takeOverChat);
+router.get('/unread-count', protect, checkPermission('chat.view'), getTotalUnreadMessages);
+router.get('/conversations', protect, checkPermission('chat.view'), getConversations);
+router.get('/admin/:userId', protect, checkPermission('chat.view'), getMessagesByUser);
+router.post('/admin', protect, checkPermission('chat.manage'), sendAdminMessage);
+router.put('/take-over/:userId', protect, checkPermission('chat.manage'), takeOverChat);
 
 export default router;

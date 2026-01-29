@@ -1,5 +1,25 @@
 import { API_BASE_URL } from '../config';
 
+export const getRoleById = async (roleId, token) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/roles/${roleId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch role');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching role:', error);
+        throw error;
+    }
+};
+
 export const getRoles = async (token) => {
     try {
         const response = await fetch(`${API_BASE_URL}/roles`, {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import {
     Plus,
     Search,
@@ -12,8 +13,6 @@ import {
 } from 'lucide-react';
 import {
     getRoles,
-    createRole,
-    updateRole,
     deleteRole
 } from '../../../api/roleService.js';
 import { toast } from 'react-toastify';
@@ -24,20 +23,12 @@ const ManageRoles = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const user = JSON.parse(localStorage.getItem('loggedInUser'));
     const token = user?.token;
+    const navigate = useNavigate();
 
     // Modal states
-    const [showModal, setShowModal] = useState(false);
-    const [modalMode, setModalMode] = useState('create'); // 'create' or 'edit'
     const [selectedRole, setSelectedRole] = useState(null);
     const [submitting, setSubmitting] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-    // Form state
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        permissions: []
-    });
 
     const fetchData = async () => {
         try {
@@ -59,56 +50,6 @@ const ManageRoles = () => {
             setLoading(false);
         }
     }, [token]);
-
-    const resetForm = () => {
-        setFormData({
-            name: '',
-            description: '',
-            permissions: []
-        });
-        setSelectedRole(null);
-    };
-
-    const handleOpenModal = (mode, roleData = null) => {
-        setModalMode(mode);
-        if (mode === 'edit' && roleData) {
-            setSelectedRole(roleData);
-            setFormData({
-                name: roleData.name || '',
-                description: roleData.description || '',
-                permissions: roleData.permissions || []
-            });
-        } else {
-            resetForm();
-        }
-        setShowModal(true);
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setSubmitting(true);
-        try {
-            if (modalMode === 'create') {
-                const res = await createRole(formData, token);
-                if (res) {
-                    toast.success("Door cusub ayaa lagu daray!");
-                    fetchData();
-                    setShowModal(false);
-                }
-            } else {
-                const res = await updateRole(selectedRole._id, formData, token);
-                if (res) {
-                    toast.success("Xogta doorka waa la cusbooneysiiyay!");
-                    fetchData();
-                    setShowModal(false);
-                }
-            }
-        } catch (error) {
-            toast.error(error.message || "Khalad ayaa dhacay. Fadlan isku day markale.");
-        } finally {
-            setSubmitting(false);
-        }
-    };
 
     const handleDelete = async () => {
         setSubmitting(true);
@@ -140,7 +81,7 @@ const ManageRoles = () => {
                     <p className="text-gray-500 text-sm mt-1 font-medium">Create and manage system roles used for user permissions.</p>
                 </div>
                 <button
-                    onClick={() => handleOpenModal('create')}
+                    onClick={() => navigate('/admin/roles/create')}
                     className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl shadow-emerald-200 active:scale-95"
                 >
                     <Plus size={20} />
@@ -178,7 +119,7 @@ const ManageRoles = () => {
                                     </div>
                                     <div className="flex gap-2">
                                         <button
-                                            onClick={() => handleOpenModal('edit', roleItem)}
+                                            onClick={() => navigate(`/admin/roles/edit/${roleItem._id}`)}
                                             className="p-3 text-gray-400 hover:text-emerald-600 bg-gray-50 hover:bg-emerald-50 rounded-2xl transition-all"
                                         >
                                             <Edit3 size={18} />
@@ -202,10 +143,19 @@ const ManageRoles = () => {
                                 </div>
 
                                 <div className="mt-8 pt-6 border-t border-gray-50 flex items-center justify-between mt-auto">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Created</span>
-                                    <p className="text-[10px] text-gray-400 font-bold italic opacity-60">
-                                        {new Date(roleItem.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                                    </p>
+                                    <div className="flex flex-col gap-2">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Security Access</span>
+                                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 shadow-sm shadow-emerald-50">
+                                            <ShieldCheck size={12} strokeWidth={3} />
+                                            <span className="text-[10px] font-black uppercase tracking-tight">{roleItem.permissions?.length || 0} Permissions</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex flex-col items-end gap-1">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Created</span>
+                                        <p className="text-[10px] text-gray-400 font-bold italic opacity-60">
+                                            {new Date(roleItem.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         ))
@@ -220,73 +170,6 @@ const ManageRoles = () => {
                             </div>
                         </div>
                     )}
-                </div>
-            )}
-
-            {/* Create/Edit Modal */}
-            {showModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setShowModal(false)}></div>
-                    <div className="relative bg-white w-full max-w-lg rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="flex items-center justify-between p-8 border-b border-gray-50 bg-gray-50/50">
-                            <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">
-                                {modalMode === 'create' ? 'Add New Role' : 'Edit Role'}
-                            </h2>
-                            <button onClick={() => setShowModal(false)} className="p-3 text-gray-400 hover:text-gray-900 hover:bg-white rounded-2xl transition-all shadow-sm">
-                                <X size={24} />
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="p-8">
-                            <div className="space-y-6">
-                                {/* Name */}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Role Name</label>
-                                    <div className="relative">
-                                        <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500" size={18} />
-                                        <input
-                                            required
-                                            type="text"
-                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-emerald-500 transition-all font-bold text-gray-700"
-                                            placeholder="e.g. Moderator"
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Description */}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Description</label>
-                                    <textarea
-                                        rows="4"
-                                        className="w-full px-6 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-emerald-500 transition-all font-bold text-gray-700 resize-none"
-                                        placeholder="Describe what this role can do..."
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    ></textarea>
-                                </div>
-                            </div>
-
-                            <div className="mt-10 flex gap-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowModal(false)}
-                                    className="flex-1 py-4 rounded-2xl bg-gray-100 text-gray-600 font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    disabled={submitting}
-                                    type="submit"
-                                    className="flex-[2] py-4 rounded-2xl bg-emerald-600 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-3 disabled:opacity-50"
-                                >
-                                    {submitting ? <Loader2 className="animate-spin" size={20} /> : <Check size={20} />}
-                                    <span>{modalMode === 'create' ? 'Create Role' : 'Save Changes'}</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
                 </div>
             )}
 

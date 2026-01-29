@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema(
     phone: { type: String },
     password: { type: String, required: true },
     image: { type: String },
-    role: { type: String, enum: ['student', 'admin', 'author', 'teacher'], default: 'student' },
+    role: { type: String, default: 'student' },
     isActive: { type: Boolean, default: true },
     is2FAEnabled: { type: Boolean, default: false },
     isChatPausedByAdmin: { type: Boolean, default: false },

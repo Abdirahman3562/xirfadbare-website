@@ -1,6 +1,7 @@
 import express from 'express';
 import PaymentMethod from '../models/PaymentMethod.js';
-import { protect, admin } from '../middleware/authMiddleware.js';
+import { protect } from '../middleware/authMiddleware.js';
+import { checkPermission } from '../middleware/permissionMiddleware.js';
 
 const router = express.Router();
 
@@ -18,8 +19,8 @@ router.get('/', async (req, res) => {
 
 // @desc    Fetch all payment methods (Admin)
 // @route   GET /api/payment-methods/admin
-// @access  Private/Admin
-router.get('/admin', protect, admin, async (req, res) => {
+// @access  Private/Permission
+router.get('/admin', protect, checkPermission('payments.view'), async (req, res) => {
     try {
         const methods = await PaymentMethod.find({}).sort({ createdAt: -1 });
         res.json(methods);
@@ -30,8 +31,8 @@ router.get('/admin', protect, admin, async (req, res) => {
 
 // @desc    Create a payment method
 // @route   POST /api/payment-methods
-// @access  Private/Admin
-router.post('/', protect, admin, async (req, res) => {
+// @access  Private/Permission
+router.post('/', protect, checkPermission('payments.create'), async (req, res) => {
     const { name, instruction, icon, isActive, type } = req.body;
 
     try {
@@ -61,8 +62,8 @@ router.post('/', protect, admin, async (req, res) => {
 
 // @desc    Update a payment method
 // @route   PUT /api/payment-methods/:id
-// @access  Private/Admin
-router.put('/:id', protect, admin, async (req, res) => {
+// @access  Private/Permission
+router.put('/:id', protect, checkPermission('payments.edit'), async (req, res) => {
     try {
         const method = await PaymentMethod.findById(req.params.id);
 
@@ -85,8 +86,8 @@ router.put('/:id', protect, admin, async (req, res) => {
 
 // @desc    Delete a payment method
 // @route   DELETE /api/payment-methods/:id
-// @access  Private/Admin
-router.delete('/:id', protect, admin, async (req, res) => {
+// @access  Private/Permission
+router.delete('/:id', protect, checkPermission('payments.delete'), async (req, res) => {
     try {
         const method = await PaymentMethod.findById(req.params.id);
 

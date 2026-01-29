@@ -17,10 +17,11 @@ import {
     Folder,
     Newspaper,
     Mail,
-    Bot
+    Bot,
+    CreditCard
 } from 'lucide-react';
 
-const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
+const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], isSuperAdmin = false }) => {
     const [settings, setSettings] = useState({
         logo: "",
         websiteTitle: "Samafale Academy"
@@ -67,28 +68,39 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
     }, [token]);
 
     const menuItems = [
-        { title: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard' },
-        { title: 'Manage Users', icon: <Users size={20} />, path: '/admin/users' },
-        { title: 'Instructors', icon: <GraduationCap size={20} />, path: '/admin/instructors' },
-        { title: 'Authors', icon: <FileText size={20} />, path: '/admin/authors' },
-        { title: 'Orders', icon: <ShoppingCart size={20} />, path: '/admin/orders' },
-        { title: 'Roles', icon: <ShieldCheck size={20} />, path: '/admin/roles' },
-        { title: 'Manage Courses', icon: <BookOpen size={20} />, path: '/admin/courses' },
-        { title: 'Manage Blogs', icon: <Newspaper size={20} />, path: '/admin/blogs' },
-        { title: 'Manage Contacts', icon: <Mail size={20} />, path: '/admin/contacts' },
+        { title: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard', permission: 'dashboard.view' },
+        { title: 'Manage Users', icon: <Users size={20} />, path: '/admin/users', permission: 'users.view' },
+        { title: 'Instructors', icon: <GraduationCap size={20} />, path: '/admin/instructors', permission: 'instructors.view' },
+        { title: 'Authors', icon: <FileText size={20} />, path: '/admin/authors', permission: 'authors.view' },
+        { title: 'Orders', icon: <ShoppingCart size={20} />, path: '/admin/orders', permission: 'orders.view' },
+        { title: 'Roles', icon: <ShieldCheck size={20} />, path: '/admin/roles', permission: 'roles.view' },
+        { title: 'Manage Courses', icon: <BookOpen size={20} />, path: '/admin/courses', permission: 'courses.view' },
+        { title: 'Manage Blogs', icon: <Newspaper size={20} />, path: '/admin/blogs', permission: 'blogs.view' },
+        { title: 'Manage Contacts', icon: <Mail size={20} />, path: '/admin/contacts', permission: 'contacts.view' },
         {
             title: "Live Chat",
             icon: <MessageSquare size={20} />,
             path: "/admin/live-chat",
-            badge: unreadCount > 0 ? unreadCount : null
+            badge: unreadCount > 0 ? unreadCount : null,
+            permission: 'chat.view'
         },
-        { title: "Bot Answers", icon: <Bot size={20} />, path: "/admin/bot-responses" },
-        { title: 'Categories', icon: <Folder size={20} />, path: '/admin/categories' },
-        { title: 'Testimonials', icon: <MessageSquareQuote size={20} />, path: '/admin/testimonials' },
-        { title: 'FAQs', icon: <MessageCircleQuestion size={20} />, path: '/admin/faqs' },
-        { title: 'System Settings', icon: <Settings size={20} />, path: '/admin/system-settings' },
-
+        { title: "Bot Answers", icon: <Bot size={20} />, path: "/admin/bot-responses", permission: 'bot.view' },
+        { title: 'Categories', icon: <Folder size={20} />, path: '/admin/categories', permission: 'categories.view' },
+        { title: 'Testimonials', icon: <MessageSquareQuote size={20} />, path: '/admin/testimonials', permission: 'testimonials.view' },
+        { title: 'FAQs', icon: <MessageCircleQuestion size={20} />, path: '/admin/faqs', permission: 'faqs.view' },
+        { title: 'Payment Methods', icon: <CreditCard size={20} />, path: '/admin/payments', permission: 'payments.view' },
+        { title: 'System Settings', icon: <Settings size={20} />, path: '/admin/system-settings', permission: 'settings.view' },
     ];
+
+    // Filter menu items based on permissions
+    const filteredMenuItems = menuItems.filter(item => {
+        // Super admin sees everything
+        if (isSuperAdmin) return true;
+        // Dashboard is always visible to any admin-panel user
+        if (item.permission === 'dashboard.view') return true;
+        // Check if user has explicit permission
+        return userPermissions.includes(item.permission);
+    });
 
 
     const sidebarContent = (
@@ -110,7 +122,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar }) => {
 
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
-                {menuItems.map((item) => (
+                {filteredMenuItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}

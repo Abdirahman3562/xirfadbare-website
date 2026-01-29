@@ -7,14 +7,15 @@ import {
     deleteCategory,
 } from '../controllers/categoryController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { checkPermission } from '../middleware/permissionMiddleware.js';
 
 const router = express.Router();
 
-router.route('/').get(getCategories).post(protect, createCategory);
+router.route('/').get(getCategories).post(protect, checkPermission('categories.create'), createCategory);
 router
     .route('/:id')
     .get(getCategoryById)
-    .put(protect, updateCategory)
-    .delete(protect, deleteCategory);
+    .put(protect, checkPermission('categories.edit'), updateCategory)
+    .delete(protect, checkPermission('categories.delete'), deleteCategory);
 
 export default router;

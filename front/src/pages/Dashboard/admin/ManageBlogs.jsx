@@ -27,7 +27,8 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
         replyingTo, setReplyingTo, replyContent, setReplyContent, handleReply,
         editingComment, setEditingComment, editContent, setEditContent, handleEditComment, handleDeleteComment,
         getImageUrl,
-        currentUser
+        currentUser,
+        hasPermission
     } = props;
 
     const hasReplies = comment.replies && comment.replies.length > 0;
@@ -104,7 +105,7 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
                         {/* Hover Actions */}
                         {!editingComment && (
                             <div className="absolute -right-16 top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white shadow-sm p-1 rounded-full border border-gray-100">
-                                {(currentUser?._id === comment.author?._id || currentUser?.role === 'admin' || currentUser?.role === 'superadmin') && (
+                                {(currentUser?._id === comment.author?._id || hasPermission('blogs.delete')) && (
                                     <button
                                         onClick={() => handleDeleteComment(comment._id)}
                                         className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
@@ -113,7 +114,7 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
                                         <Trash2 size={14} />
                                     </button>
                                 )}
-                                {currentUser?._id === comment.author?._id && (
+                                {(currentUser?._id === comment.author?._id || hasPermission('blogs.edit')) && (
                                     <button
                                         onClick={() => {
                                             setEditingComment(comment._id);
@@ -132,7 +133,7 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
 
                     {/* Meta Actions Row */}
                     <div className="flex items-center gap-4 mt-1 ml-1 select-none">
-                        {(!currentUser || currentUser?._id !== comment.author?._id) && (
+                        {(hasPermission('blogs.edit')) && (
                             <button
                                 onClick={() => {
                                     setReplyingTo(replyingTo === comment._id ? null : comment._id);
@@ -234,15 +235,37 @@ const ManageBlogs = () => {
     const [editContent, setEditContent] = useState("");
     const [expandedComments, setExpandedComments] = useState(new Set());
 
-    const [currentUser, setCurrentUser] = useState(null);
+    const [userPermissions, setUserPermissions] = useState([]);
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+    const user = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
+    const token = user?.token;
+    const [currentUser, setCurrentUser] = useState(user);
     const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
     const [commentToDelete, setCommentToDelete] = useState(null);
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem('loggedInUser'));
-        setCurrentUser(user);
-        fetchBlogs();
-    }, []);
+        if (token) {
+            fetchBlogs();
+            fetchUserProfile();
+        }
+    }, [token]);
+
+    const fetchUserProfile = async () => {
+        if (!token) return;
+        try {
+            const response = await fetch("http://localhost:5000/api/users/profile", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            setUserPermissions(data.permissions || []);
+            setIsSuperAdmin(data.isSuperAdmin || data.role === 'admin');
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+            setIsSuperAdmin(user.role === 'admin');
+        }
+    };
+
+    const hasPermission = (perm) => isSuperAdmin || userPermissions.includes(perm);
 
     const fetchBlogs = async () => {
         try {
@@ -463,13 +486,15 @@ const ManageBlogs = () => {
                         Create, edit, and manage your blog posts
                     </p>
                 </div>
-                <Link
-                    to="/admin/blogs/create"
-                    className="flex items-center justify-center gap-2 px-6 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all shadow-sm font-medium"
-                >
-                    <Plus size={20} />
-                    Create Blog
-                </Link>
+                {hasPermission('blogs.create') && (
+                    <Link
+                        to="/admin/blogs/create"
+                        className="flex items-center justify-center gap-2 px-6 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-all shadow-sm font-medium"
+                    >
+                        <Plus size={20} />
+                        Create Blog
+                    </Link>
+                )}
             </div>
 
             {/* Filters */}
@@ -586,23 +611,27 @@ const ManageBlogs = () => {
                                             <MessageCircle size={16} />
                                             <span className="text-xs font-semibold">{blog.comments?.length || 0}</span>
                                         </button>
-                                        <Link
-                                            to={`/admin/blogs/edit/${blog._id}`}
-                                            className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                            title="Edit Blog"
-                                        >
-                                            <Edit size={16} />
-                                        </Link>
-                                        <button
-                                            onClick={() => {
-                                                setBlogToDelete(blog);
-                                                setShowDeleteModal(true);
-                                            }}
-                                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                            title="Delete Blog"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
+                                        {hasPermission('blogs.edit') && (
+                                            <Link
+                                                to={`/admin/blogs/edit/${blog._id}`}
+                                                className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                                title="Edit Blog"
+                                            >
+                                                <Edit size={16} />
+                                            </Link>
+                                        )}
+                                        {hasPermission('blogs.delete') && (
+                                            <button
+                                                onClick={() => {
+                                                    setBlogToDelete(blog);
+                                                    setShowDeleteModal(true);
+                                                }}
+                                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Delete Blog"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -685,6 +714,7 @@ const ManageBlogs = () => {
                                         handleDeleteComment={handleDeleteComment}
                                         getImageUrl={getImageUrl}
                                         currentUser={currentUser}
+                                        hasPermission={hasPermission}
                                     />
                                 ))
 

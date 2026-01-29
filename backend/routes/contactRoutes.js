@@ -8,19 +8,20 @@ import {
   replyToContact
 } from '../controllers/contactController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { checkPermission } from '../middleware/permissionMiddleware.js';
 
 const router = express.Router();
 
 router.route('/')
-  .get(protect, getContacts)
+  .get(protect, checkPermission('contacts.view'), getContacts)
   .post(createContact);
 
 router.route('/:id')
-  .get(protect, getContactById)
-  .put(protect, updateContact)
-  .delete(protect, deleteContact);
+  .get(protect, checkPermission('contacts.view'), getContactById)
+  .put(protect, checkPermission('contacts.reply'), updateContact)
+  .delete(protect, checkPermission('contacts.delete'), deleteContact);
 
-router.route('/:id/reply').post(protect, replyToContact);
+router.route('/:id/reply').post(protect, checkPermission('contacts.reply'), replyToContact);
 
 export default router;
 

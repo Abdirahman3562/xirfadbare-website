@@ -14,10 +14,20 @@ const ProtectedRoute = ({ children, role }) => {
     }
 
     if (role && user.role !== role) {
-        // If user has wrong role, redirect to their allowed dashboard or home
-        if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
-        if (user.role === 'instructor') return <Navigate to="/instructor/dashboard" replace />;
-        if (user.role === 'student') return <Navigate to="/student/dashboard" replace />;
+        // Special logic for admin dashboard: allow any staff role with permissions
+        const isStaff = user.role === 'admin' || (user.permissions && user.permissions.length > 0);
+
+        if (role === 'admin' && isStaff) {
+            return children;
+        }
+
+        // If user has wrong role, redirect to their allowed dashboard
+        if (isStaff) {
+            if (user.role === 'instructor') return <Navigate to="/instructor/dashboard" replace />;
+            return <Navigate to="/admin/dashboard" replace />;
+        }
+
+        if (user.role === 'student') return <Navigate to="/dashboard/student" replace />;
         return <Navigate to="/" replace />;
     }
 

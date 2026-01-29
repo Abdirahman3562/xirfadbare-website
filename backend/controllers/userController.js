@@ -1,4 +1,5 @@
 import User from '../models/User.js';
+import Role from '../models/Role.js';
 import generateToken from '../config/generateToken.js';
 import sendEmail from '../utils/sendEmail.js';
 import { verificationEmailTemplate } from '../utils/emailTemplates.js';
@@ -41,12 +42,18 @@ const authUser = async (req, res) => {
       }
     }
 
+    // Fetch role permissions (case-insensitive lookup)
+    const roleData = await Role.findOne({ name: { $regex: new RegExp(`^${user.role}$`, 'i') } });
+    const permissions = roleData ? roleData.permissions : [];
+
     res.json({
       _id: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       role: user.role,
+      permissions,
+      isSuperAdmin: user.role === 'admin',
       image: user.image,
       phone: user.phone,
       is2FAEnabled: user.is2FAEnabled,
@@ -71,12 +78,18 @@ const verify2FA = async (req, res) => {
     user.twoFactorExpires = undefined;
     await user.save();
 
+    // Fetch role permissions
+    const roleData = await Role.findOne({ name: { $regex: new RegExp(`^${user.role}$`, 'i') } });
+    const permissions = roleData ? roleData.permissions : [];
+
     res.json({
       _id: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       role: user.role,
+      permissions,
+      isSuperAdmin: user.role === 'admin',
       image: user.image,
       phone: user.phone,
       is2FAEnabled: user.is2FAEnabled,
@@ -131,6 +144,10 @@ const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
 
   if (user) {
+    // Fetch role permissions
+    const roleData = await Role.findOne({ name: { $regex: new RegExp(`^${user.role}$`, 'i') } });
+    const permissions = roleData ? roleData.permissions : [];
+
     res.json({
       _id: user._id,
       firstName: user.firstName,
@@ -138,6 +155,8 @@ const getUserProfile = async (req, res) => {
       email: user.email,
       phone: user.phone,
       role: user.role,
+      permissions,
+      isSuperAdmin: user.role === 'admin',
       image: user.image,
       is2FAEnabled: user.is2FAEnabled,
       isChatPausedByAdmin: user.isChatPausedByAdmin,

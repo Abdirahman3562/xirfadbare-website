@@ -11,8 +11,10 @@ import {
     AlertTriangle,
     Eye
 } from 'lucide-react';
+import { usePermissions } from '../../../hooks/usePermissions';
 
 const ManagePayments = () => {
+    const { hasPermission } = usePermissions();
     const [methods, setMethods] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -138,17 +140,19 @@ const ManagePayments = () => {
                     <h1 className="text-3xl font-black text-gray-900 tracking-tight">Payment Methods</h1>
                     <p className="text-gray-500 font-medium mt-1">Maaree qababka lacag bixinta iyo tilmaamahooda.</p>
                 </div>
-                <button
-                    onClick={() => {
-                        setEditingMethod(null);
-                        setFormData({ name: '', instruction: '', isActive: true, type: 'local', icon: 'CreditCard' });
-                        setIsModalOpen(true);
-                    }}
-                    className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-200 transition-all active:scale-95"
-                >
-                    <Plus size={16} />
-                    Method Cusub
-                </button>
+                {hasPermission('payments.create') && (
+                    <button
+                        onClick={() => {
+                            setEditingMethod(null);
+                            setFormData({ name: '', instruction: '', isActive: true, type: 'local', icon: 'CreditCard' });
+                            setIsModalOpen(true);
+                        }}
+                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-200 transition-all active:scale-95"
+                    >
+                        <Plus size={16} />
+                        Method Cusub
+                    </button>
+                )}
             </div>
 
             {loading ? (
@@ -180,18 +184,22 @@ const ManagePayments = () => {
                                     </div>
                                 </div>
                                 <div className="flex gap-1">
-                                    <button
-                                        onClick={() => handleEdit(method)}
-                                        className="p-2.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
-                                    >
-                                        <Edit2 size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => handleDeleteClick(method)}
-                                        className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
+                                    {hasPermission('payments.edit') && (
+                                        <button
+                                            onClick={() => handleEdit(method)}
+                                            className="p-2.5 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                                        >
+                                            <Edit2 size={16} />
+                                        </button>
+                                    )}
+                                    {hasPermission('payments.delete') && (
+                                        <button
+                                            onClick={() => handleDeleteClick(method)}
+                                            className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 

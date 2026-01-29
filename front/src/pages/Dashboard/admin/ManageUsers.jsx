@@ -36,8 +36,11 @@ const ManageUsers = () => {
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const user = JSON.parse(localStorage.getItem('loggedInUser'));
+    const [userPermissions, setUserPermissions] = useState([]);
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+    const user = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
     const token = user?.token;
+    const [unreadCount, setUnreadCount] = useState(0);
 
     // Modal states
     const [showModal, setShowModal] = useState(false);
@@ -98,9 +101,27 @@ const ManageUsers = () => {
         }
     };
 
+    const fetchUserProfile = async () => {
+        if (!token) return;
+        try {
+            const response = await fetch("http://localhost:5000/api/users/profile", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            setUserPermissions(data.permissions || []);
+            setIsSuperAdmin(data.isSuperAdmin || data.role === 'admin');
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+            setIsSuperAdmin(user.role === 'admin');
+        }
+    };
+
+    const hasPermission = (perm) => isSuperAdmin || userPermissions.includes(perm);
+
     useEffect(() => {
         if (token) {
             fetchData();
+            fetchUserProfile();
         } else {
             toast.error("Fadlan soo gal marka hore");
             setLoading(false);
@@ -249,13 +270,15 @@ const ManageUsers = () => {
                     <h1 className="text-3xl font-black text-gray-900 tracking-tight">User Management</h1>
                     <p className="text-gray-500 text-sm mt-1 font-medium">Create, edit, and manage system users and their roles.</p>
                 </div>
-                <button
-                    onClick={() => handleOpenModal('create')}
-                    className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl shadow-emerald-200 active:scale-95"
-                >
-                    <UserPlus size={20} />
-                    <span className="uppercase tracking-widest">Add New User</span>
-                </button>
+                {hasPermission('users.create') && (
+                    <button
+                        onClick={() => handleOpenModal('create')}
+                        className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl shadow-emerald-200 active:scale-95"
+                    >
+                        <UserPlus size={20} />
+                        <span className="uppercase tracking-widest">Add New User</span>
+                    </button>
+                )}
             </div>
 
             {/* toolbar Section */}
@@ -305,18 +328,22 @@ const ManageUsers = () => {
                                         />
                                     </div>
                                     <div className="flex gap-2">
-                                        <button
-                                            onClick={() => handleOpenModal('edit', userItem)}
-                                            className="p-3 text-gray-400 hover:text-emerald-600 bg-gray-50 hover:bg-emerald-50 rounded-2xl transition-all"
-                                        >
-                                            <Edit3 size={18} />
-                                        </button>
-                                        <button
-                                            onClick={() => { setSelectedUser(userItem); setShowDeleteModal(true); }}
-                                            className="p-3 text-gray-400 hover:text-rose-600 bg-gray-50 hover:bg-rose-50 rounded-2xl transition-all"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
+                                        {hasPermission('users.edit') && (
+                                            <button
+                                                onClick={() => handleOpenModal('edit', userItem)}
+                                                className="p-3 text-gray-400 hover:text-emerald-600 bg-gray-50 hover:bg-emerald-50 rounded-2xl transition-all"
+                                            >
+                                                <Edit3 size={18} />
+                                            </button>
+                                        )}
+                                        {hasPermission('users.delete') && (
+                                            <button
+                                                onClick={() => { setSelectedUser(userItem); setShowDeleteModal(true); }}
+                                                className="p-3 text-gray-400 hover:text-rose-600 bg-gray-50 hover:bg-rose-50 rounded-2xl transition-all"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
@@ -340,20 +367,22 @@ const ManageUsers = () => {
 
                                     <div className="flex flex-col gap-2">
                                         {/* Status Toggle */}
-                                        <button
-                                            onClick={() => toggleStatus(userItem)}
-                                            className={`w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border transition-all ${userItem.isActive !== false
-                                                ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                                                : 'bg-amber-50 border-amber-100 text-amber-600'
-                                                }`}
-                                        >
-                                            <span className="text-[10px] font-black uppercase tracking-widest">
-                                                {userItem.isActive !== false ? 'Active' : 'Inactive'}
-                                            </span>
-                                            <div className={`w-8 h-4 rounded-full relative transition-colors ${userItem.isActive !== false ? 'bg-emerald-500' : 'bg-amber-400'}`}>
-                                                <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${userItem.isActive !== false ? 'right-0.5' : 'left-0.5'}`}></div>
-                                            </div>
-                                        </button>
+                                        {hasPermission('users.status') && (
+                                            <button
+                                                onClick={() => toggleStatus(userItem)}
+                                                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border transition-all ${userItem.isActive !== false
+                                                    ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
+                                                    : 'bg-amber-50 border-amber-100 text-amber-600'
+                                                    }`}
+                                            >
+                                                <span className="text-[10px] font-black uppercase tracking-widest">
+                                                    {userItem.isActive !== false ? 'Active' : 'Inactive'}
+                                                </span>
+                                                <div className={`w-8 h-4 rounded-full relative transition-colors ${userItem.isActive !== false ? 'bg-emerald-500' : 'bg-amber-400'}`}>
+                                                    <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all ${userItem.isActive !== false ? 'right-0.5' : 'left-0.5'}`}></div>
+                                                </div>
+                                            </button>
+                                        )}
 
 
                                     </div>

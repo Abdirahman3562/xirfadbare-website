@@ -69,8 +69,14 @@ function Nav() {
     const u = localStorage.getItem("loggedInUser");
     if (u && location.pathname.startsWith("/auth/")) {
       const parsedUser = JSON.parse(u);
-      if (parsedUser.role === "admin") {
-        navigate("/admin/dashboard", { replace: true });
+      const isStaff = parsedUser.role === "admin" || (parsedUser.permissions && parsedUser.permissions.length > 0);
+
+      if (isStaff) {
+        if (parsedUser.role === 'instructor') {
+          navigate("/instructor/dashboard", { replace: true });
+        } else {
+          navigate("/admin/dashboard", { replace: true });
+        }
       } else {
         navigate("/dashboard/student", { replace: true });
       }
@@ -131,7 +137,10 @@ function Nav() {
       : "text-gray-600 hover:text-emerald-600 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-emerald-400 hover:after:w-full after:transition-all after:duration-300"
     }`;
 
-  const dashboardLink = user?.role === "admin" ? "/admin" : "/dashboard/student";
+  const isStaff = user?.role === "admin" || (user?.permissions && user?.permissions.length > 0);
+  const dashboardLink = isStaff
+    ? (user?.role === 'instructor' ? "/instructor/dashboard" : "/admin/dashboard")
+    : "/dashboard/student";
 
   return (
     <nav className={`bg-[#f0f7f8] shadow-sm fixed w-full top-0 z-50 border-b border-gray-100 transition-all duration-300 ${scrolled ? "py-2 shadow-lg" : "py-0"

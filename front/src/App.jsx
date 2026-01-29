@@ -18,6 +18,7 @@ import CreateCourse from "./pages/Dashboard/instructor/CreateCourse";
 import ManageCourses from "./pages/Dashboard/instructor/ManageCourses";
 import ManageUsers from "./pages/Dashboard/admin/ManageUsers";
 import ManageRoles from "./pages/Dashboard/admin/ManageRoles";
+import RolePermissionEditor from "./pages/Dashboard/admin/RolePermissionEditor";
 import ManageCoursesAdmin from "./pages/Dashboard/admin/ManageCourses";
 import CourseContent from "./pages/webpages/course/CourseContent";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -50,6 +51,7 @@ import CreateBlog from "./pages/Dashboard/admin/CreateBlog";
 import ManageContacts from "./pages/Dashboard/admin/ManageContacts";
 import ManageBotResponses from "./pages/Dashboard/admin/ManageBotResponses";
 import LiveChat from "./pages/Dashboard/admin/LiveChat";
+import ManagePayments from "./pages/Dashboard/admin/ManagePayments";
 // ManageSettings removed
 import PublicLayout from "./layouts/PublicLayout";
 import Orders from "./pages/Dashboard/student/Orders";
@@ -125,6 +127,8 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<ManageUsers />} />
           <Route path="roles" element={<ManageRoles />} />
+          <Route path="roles/create" element={<RolePermissionEditor />} />
+          <Route path="roles/edit/:id" element={<RolePermissionEditor />} />
           <Route path="courses" element={<ManageCoursesAdmin />} />
           <Route path="courses/create/:id" element={<EditCourseAdmin />} />
           <Route path="courses/edit/:id" element={<EditCourseAdmin />} />
@@ -138,6 +142,7 @@ function App() {
           <Route path="blogs/create" element={<CreateBlog />} />
           <Route path="blogs/edit/:id" element={<CreateBlog />} />
           <Route path="contacts" element={<ManageContacts />} />
+          <Route path="payments" element={<ManagePayments />} />
           <Route path="system-settings" element={<SystemSettings />} />
           {/* Settings route removed */}
           <Route path="profile" element={<Profile />} />

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Save, Globe, Mail, Phone, MapPin, MessageCircle, Image as ImageIcon } from "lucide-react";
+import { Save, Globe, Mail, Phone, MapPin, MessageCircle, Image as ImageIcon, Lock } from "lucide-react";
 import { toast } from "react-toastify";
+import { usePermissions } from "../../../hooks/usePermissions";
 
 export default function SystemSettings() {
+    const { hasPermission } = usePermissions();
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [settings, setSettings] = useState({
@@ -423,16 +424,22 @@ export default function SystemSettings() {
                     )}
                 </div>
 
-                {/* Save Button */}
                 <div className="flex justify-end">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <Save className="w-5 h-5" />
-                        {loading ? "Saving..." : "Save Settings"}
-                    </button>
+                    {!hasPermission('settings.edit') ? (
+                        <div className="flex items-center gap-2 px-6 py-3 bg-amber-50 text-amber-600 rounded-xl border border-amber-100 font-bold text-xs">
+                            <Lock size={14} />
+                            READ-ONLY MODE (RESTRICTED ACCESS)
+                        </div>
+                    ) : (
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold rounded-xl shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Save className="w-5 h-5" />
+                            {loading ? "Saving..." : "Save Settings"}
+                        </button>
+                    )}
                 </div>
             </form>
         </div>

@@ -20,7 +20,7 @@ import UserAvatar from '../../../components/UserAvatar';
 import { getImageUrl } from '../../../utils/format';
 
 const ManageCourses = () => {
-    const navigate = useNavigate(); // Hook for navigation
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -28,18 +28,40 @@ const ManageCourses = () => {
     const [filters, setFilters] = useState({
         level: '',
         technology: '',
-        priceType: 'all', // all, free, paid
+        priceType: 'all',
         sortBy: 'newest'
     });
 
-    // Delete Modal State
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [courseToDelete, setCourseToDelete] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    const [userPermissions, setUserPermissions] = useState([]);
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+    const user = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
+    const token = user?.token;
+
     useEffect(() => {
         fetchCourses();
+        fetchUserProfile();
     }, []);
+
+    const fetchUserProfile = async () => {
+        if (!token) return;
+        try {
+            const response = await fetch("http://localhost:5000/api/users/profile", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            setUserPermissions(data.permissions || []);
+            setIsSuperAdmin(data.isSuperAdmin || data.role === 'admin');
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+            setIsSuperAdmin(user.role === 'admin');
+        }
+    };
+
+    const hasPermission = (perm) => isSuperAdmin || userPermissions.includes(perm);
 
     const fetchCourses = async () => {
         try {
@@ -136,13 +158,15 @@ const ManageCourses = () => {
                     <h1 className="text-3xl font-black text-gray-900 tracking-tight">Course Catalog</h1>
                     <p className="text-gray-500 text-sm mt-1 font-medium">Manage and monitor all educational content on the platform.</p>
                 </div>
-                <button
-                    onClick={() => navigate('/admin/courses/create/new')} // Placeholder for create
-                    className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl shadow-emerald-200 active:scale-95"
-                >
-                    <Plus size={20} strokeWidth={3} />
-                    <span className="uppercase tracking-widest">Create Course</span>
-                </button>
+                {hasPermission('courses.create') && (
+                    <button
+                        onClick={() => navigate('/admin/courses/create/new')} // Placeholder for create
+                        className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl shadow-emerald-200 active:scale-95"
+                    >
+                        <Plus size={20} strokeWidth={3} />
+                        <span className="uppercase tracking-widest">Create Course</span>
+                    </button>
+                )}
             </div>
 
             {/* Filters & Search */}
@@ -294,26 +318,30 @@ const ManageCourses = () => {
                                 </div>
 
                                 <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-2">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            navigate(`/admin/courses/edit/${course._id}`);
-                                        }}
-                                        className="p-3 bg-white/90 backdrop-blur-md text-gray-700 hover:bg-emerald-600 hover:text-white rounded-2xl shadow-xl transition-all hover:scale-110"
-                                        title="Edit"
-                                    >
-                                        <Edit size={18} />
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleDelete(course._id);
-                                        }}
-                                        className="p-3 bg-white/90 backdrop-blur-md text-red-500 hover:bg-red-600 hover:text-white rounded-2xl shadow-xl transition-all hover:scale-110"
-                                        title="Delete"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
+                                    {hasPermission('courses.edit') && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate(`/admin/courses/edit/${course._id}`);
+                                            }}
+                                            className="p-3 bg-white/90 backdrop-blur-md text-gray-700 hover:bg-emerald-600 hover:text-white rounded-2xl shadow-xl transition-all hover:scale-110"
+                                            title="Edit"
+                                        >
+                                            <Edit size={18} />
+                                        </button>
+                                    )}
+                                    {hasPermission('courses.delete') && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(course._id);
+                                            }}
+                                            className="p-3 bg-white/90 backdrop-blur-md text-red-500 hover:bg-red-600 hover:text-white rounded-2xl shadow-xl transition-all hover:scale-110"
+                                            title="Delete"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 

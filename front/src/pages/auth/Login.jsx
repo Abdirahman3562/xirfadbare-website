@@ -50,9 +50,15 @@ const Login = () => {
     window.dispatchEvent(new Event("userLogin"));
     toast.success(`Welcome back, ${data.firstName}!`);
 
-    // Redirect based on role
-    if (data.role === 'admin') {
-      navigate("/admin/dashboard");
+    // Redirect based on role and permissions
+    const isStaff = data.role === 'admin' || (data.permissions && data.permissions.length > 0);
+
+    if (isStaff) {
+      if (data.role === 'instructor') {
+        navigate("/instructor/dashboard");
+      } else {
+        navigate("/admin/dashboard");
+      }
     } else {
       navigate("/dashboard/student");
     }
@@ -195,7 +201,11 @@ const Login = () => {
             to="/"
             className="text-xs font-bold text-gray-400 hover:text-emerald-600 mb-8 inline-block flex items-center gap-2 uppercase tracking-widest transition-colors"
           >
-            <ArrowLeft size={14} /> Back to home
+            <div className="flex items-center gap-2">
+              <ArrowLeft size={14} />
+              <span> Back to home</span>
+            </div>
+
           </Link>
 
           <h2 className="text-4xl font-black text-gray-900 mb-3 tracking-tight">

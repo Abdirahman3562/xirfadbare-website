@@ -14,29 +14,30 @@ import {
   getUserByUsername
 } from '../controllers/userController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
+import { checkPermission } from '../middleware/permissionMiddleware.js';
 
 const router = express.Router();
 
 router.route('/')
-  .get(protect, admin, getUsers)
+  .get(protect, checkPermission('users.view'), getUsers)
   .post(registerUser);
 
 router.post('/login', authUser);
 router.post('/verify-2fa', verify2FA);
-router.post('/admin-create', protect, admin, createUserByAdmin);
+router.post('/admin-create', protect, checkPermission('users.create'), createUserByAdmin);
 
 router.get('/profile', protect, getUserProfile);
 router.put('/profile', protect, updateUserProfile);
 
 router.route('/:id')
-  .delete(protect, admin, deleteUser)
-  .put(protect, admin, updateUserByAdmin);
+  .delete(protect, checkPermission('users.delete'), deleteUser)
+  .put(protect, checkPermission('users.edit'), updateUserByAdmin);
 
 router.route('/:id/role')
-  .put(protect, admin, updateUserRole);
+  .put(protect, checkPermission('users.edit'), updateUserRole);
 
 router.route('/:id/status')
-  .put(protect, admin, toggleUserStatus);
+  .put(protect, checkPermission('users.status'), toggleUserStatus);
 
 router.get('/public/:username', getUserByUsername);
 

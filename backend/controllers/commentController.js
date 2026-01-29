@@ -194,8 +194,9 @@ const updateComment = async (req, res) => {
       return res.status(404).json({ message: 'Comment not found' });
     }
 
-    // Check if user is the author of the comment
-    if (comment.author.toString() !== req.user._id.toString()) {
+    // Check if user is the author of the comment or has edit permission
+    const hasEditPermission = req.user.isSuperAdmin || (req.user.permissions && req.user.permissions.includes('blogs.edit'));
+    if (comment.author.toString() !== req.user._id.toString() && !hasEditPermission) {
       return res.status(401).json({ message: 'Not authorized to update this comment' });
     }
 
@@ -256,12 +257,9 @@ const deleteComment = async (req, res) => {
       return res.status(404).json({ message: 'Comment not found' });
     }
 
-    // Check if user is the author of the comment or an admin
-    if (
-      comment.author.toString() !== req.user._id.toString() &&
-      req.user.role !== 'admin' &&
-      req.user.role !== 'superadmin'
-    ) {
+    // Check if user is the author of the comment or has delete permission
+    const hasDeletePermission = req.user.isSuperAdmin || (req.user.permissions && req.user.permissions.includes('blogs.delete'));
+    if (comment.author.toString() !== req.user._id.toString() && !hasDeletePermission) {
       return res.status(401).json({ message: 'Not authorized to delete this comment' });
     }
 

@@ -13,6 +13,8 @@ export default function LiveChat() {
     const [msgLoading, setMsgLoading] = useState(false);
     const [settings, setSettings] = useState(null);
     const [showMobileMessages, setShowMobileMessages] = useState(false);
+    const [userPermissions, setUserPermissions] = useState([]);
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
     // Auth
     const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
@@ -29,10 +31,28 @@ export default function LiveChat() {
             } catch (error) { console.error("Settings fetch failed"); }
         };
         fetchSettings();
+        fetchUserProfile();
         fetchConversations();
         const interval = setInterval(fetchConversations, 10000);
         return () => clearInterval(interval);
     }, []);
+
+    const fetchUserProfile = async () => {
+        if (!token) return;
+        try {
+            const response = await fetch("http://localhost:5000/api/users/profile", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            setUserPermissions(data.permissions || []);
+            setIsSuperAdmin(data.isSuperAdmin || data.role === 'admin');
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+            setIsSuperAdmin(loggedInUser.role === 'admin');
+        }
+    };
+
+    const hasPermission = (perm) => isSuperAdmin || userPermissions.includes(perm);
 
     // Fetch Messages Loop (if user selected)
     useEffect(() => {
@@ -97,6 +117,11 @@ export default function LiveChat() {
         e.preventDefault();
         if (!input.trim() || !selectedUser) return;
 
+        if (!hasPermission('chat.manage')) {
+            toast.error("You don't have permission to send messages.");
+            return;
+        }
+
         const text = input;
         setInput("");
 
@@ -116,6 +141,12 @@ export default function LiveChat() {
 
     const handleTakeOver = async () => {
         if (!selectedUser) return;
+
+        if (!hasPermission('chat.manage')) {
+            toast.error("You don't have permission to manage chat status.");
+            return;
+        }
+
         const newStatus = !selectedUser.isChatPausedByAdmin;
 
         try {
@@ -246,17 +277,19 @@ export default function LiveChat() {
                                 </div>
                             </div>
 
-                            <button
-                                onClick={handleTakeOver}
-                                className={`flex items-center gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl font-bold text-[10px] lg:text-xs transition-all active:scale-95 shadow-lg shrink-0 ${selectedUser.isChatPausedByAdmin
-                                    ? "bg-gray-100 text-gray-600 hover:bg-gray-200 shadow-gray-200/50"
-                                    : "bg-amber-500 text-white hover:bg-amber-600 shadow-amber-200"
-                                    }`}
-                            >
-                                {selectedUser.isChatPausedByAdmin ? <ShieldCheck size={14} /> : <ShieldAlert size={14} />}
-                                <span className="hidden sm:inline">{selectedUser.isChatPausedByAdmin ? "Resume Bot" : "Take Over Chat"}</span>
-                                <span className="sm:hidden">{selectedUser.isChatPausedByAdmin ? "Resume" : "Take Over"}</span>
-                            </button>
+                            {hasPermission('chat.manage') && (
+                                <button
+                                    onClick={handleTakeOver}
+                                    className={`flex items-center gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl font-bold text-[10px] lg:text-xs transition-all active:scale-95 shadow-lg shrink-0 ${selectedUser.isChatPausedByAdmin
+                                        ? "bg-gray-100 text-gray-600 hover:bg-gray-200 shadow-gray-200/50"
+                                        : "bg-amber-500 text-white hover:bg-amber-600 shadow-amber-200"
+                                        }`}
+                                >
+                                    {selectedUser.isChatPausedByAdmin ? <ShieldCheck size={14} /> : <ShieldAlert size={14} />}
+                                    <span className="hidden sm:inline">{selectedUser.isChatPausedByAdmin ? "Resume Bot" : "Take Over Chat"}</span>
+                                    <span className="sm:hidden">{selectedUser.isChatPausedByAdmin ? "Resume" : "Take Over"}</span>
+                                </button>
+                            )}
                         </div>
 
                         {/* Messages Area */}
@@ -340,8 +373,9 @@ export default function LiveChat() {
                                         type="text"
                                         value={input}
                                         onChange={e => setInput(e.target.value)}
-                                        placeholder={selectedUser.isChatPausedByAdmin ? "Type your reply..." : "Bot is active..."}
-                                        className="w-full bg-gray-50 border-2 border-transparent focus:border-emerald-500/30 focus:bg-white rounded-2xl lg:rounded-[1.5rem] px-4 lg:px-6 py-3 lg:py-4 outline-none transition-all text-xs lg:text-sm placeholder:text-gray-400 pr-12 lg:pr-14"
+                                        disabled={!hasPermission('chat.manage')}
+                                        placeholder={!hasPermission('chat.manage') ? "View only mode" : selectedUser.isChatPausedByAdmin ? "Type your reply..." : "Bot is active..."}
+                                        className="w-full bg-gray-50 border-2 border-transparent focus:border-emerald-500/30 focus:bg-white rounded-2xl lg:rounded-[1.5rem] px-4 lg:px-6 py-3 lg:py-4 outline-none transition-all text-xs lg:text-sm placeholder:text-gray-400 pr-12 lg:pr-14 disabled:opacity-50 disabled:cursor-not-allowed"
                                     />
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
                                         {!selectedUser.isChatPausedByAdmin && (

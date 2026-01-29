@@ -8,15 +8,33 @@ const AdminLayout = () => {
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [userPermissions, setUserPermissions] = useState([]);
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
     const [stats, setStats] = useState(null);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('loggedInUser') || '{}'));
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Close mobile sidebar on route change
-    useEffect(() => {
-        setIsMobileOpen(false);
-    }, [location.pathname]);
+    // Permission Map
+    const PERMISSION_MAP = {
+        '/admin/users': 'users.view',
+        '/admin/instructors': 'instructors.view',
+        '/admin/authors': 'authors.view',
+        '/admin/orders': 'orders.view',
+        '/admin/roles': 'roles.view',
+        '/admin/roles/create': 'roles.create',
+        '/admin/roles/edit/:id': 'roles.edit',
+        '/admin/courses': 'courses.view',
+        '/admin/blogs': 'blogs.view',
+        '/admin/contacts': 'contacts.view',
+        '/admin/live-chat': 'chat.view',
+        '/admin/bot-responses': 'bot.view',
+        '/admin/categories': 'categories.view',
+        '/admin/testimonials': 'testimonials.view',
+        '/admin/faqs': 'faqs.view',
+        '/admin/payments': 'payments.view',
+        '/admin/system-settings': 'settings.view',
+    };
 
     const fetchStats = async () => {
         try {
@@ -28,9 +46,25 @@ const AdminLayout = () => {
         }
     };
 
-    React.useEffect(() => {
+    const fetchUserProfile = async () => {
+        const token = user?.token;
+        if (!token) return;
+        try {
+            const response = await fetch("http://localhost:5000/api/users/profile", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            setUserPermissions(data.permissions || []);
+            setIsSuperAdmin(data.isSuperAdmin || data.role === 'admin');
+        } catch (error) {
+            console.error("Error fetching profile:", error);
+        }
+    };
+
+    useEffect(() => {
         fetchStats();
-        // Poll for new orders every 30 seconds
+        fetchUserProfile();
+
         const interval = setInterval(fetchStats, 30000);
 
         const syncUser = () => {
@@ -47,6 +81,43 @@ const AdminLayout = () => {
             clearInterval(interval);
         };
     }, []);
+
+    // Route Protection
+    useEffect(() => {
+        if (isSuperAdmin) return;
+
+        const currentPath = location.pathname;
+
+        // Find if current path matches any pattern in PERMISSION_MAP
+        let requiredPermission = null;
+
+        // 1. Exact match
+        if (PERMISSION_MAP[currentPath]) {
+            requiredPermission = PERMISSION_MAP[currentPath];
+        } else {
+            // 2. Pattern match (e.g., /admin/roles/edit/:id)
+            Object.keys(PERMISSION_MAP).forEach(pattern => {
+                const regexPattern = pattern.replace(/:\w+/g, '[^/]+');
+                const regex = new RegExp(`^${regexPattern}$`);
+                if (regex.test(currentPath)) {
+                    requiredPermission = PERMISSION_MAP[pattern];
+                }
+            });
+        }
+
+        if (requiredPermission && !userPermissions.includes(requiredPermission)) {
+            // Redirect to dashboard if they don't have access
+            // Skip redirect if already on dashboard or profile
+            if (currentPath !== '/admin/dashboard' && currentPath !== '/admin/profile') {
+                navigate('/admin/dashboard');
+            }
+        }
+    }, [location.pathname, userPermissions, isSuperAdmin]);
+
+    // Close mobile sidebar on route change
+    useEffect(() => {
+        setIsMobileOpen(false);
+    }, [location.pathname]);
 
     const handleLogout = () => {
         localStorage.removeItem('loggedInUser');
@@ -76,6 +147,8 @@ const AdminLayout = () => {
             <AdminSidebar
                 isCollapsed={isCollapsed}
                 isMobileOpen={isMobileOpen}
+                userPermissions={userPermissions}
+                isSuperAdmin={isSuperAdmin}
                 toggleSidebar={() => setIsCollapsed(!isCollapsed)}
                 closeMobileSidebar={() => setIsMobileOpen(false)}
             />
