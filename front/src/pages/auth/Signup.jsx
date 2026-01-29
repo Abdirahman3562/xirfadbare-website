@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
+import { Link } from "react-router-dom";
+import { User, Mail, Phone, Lock, Eye, EyeOff, CheckCircle, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { FaCamera } from "react-icons/fa6";
 import { API_BASE_URL } from "../../config";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -18,8 +19,6 @@ const Signup = () => {
     confirmPassword: "",
     image: ""
   });
-
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,6 +31,8 @@ const Signup = () => {
       toast.error("❌ Passwords do not match!");
       return;
     }
+
+    setLoading(true);
 
     try {
       const res = await fetch(`${API_BASE_URL}/users`, {
@@ -49,16 +50,41 @@ const Signup = () => {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success("Signup successful!");
-        setTimeout(() => navigate("/auth/login"), 2000);
+        toast.success("Signup successful! Please check your email.");
+        setIsSubmitted(true);
       } else {
         toast.error(data.message || "Error saving user!");
       }
     } catch (err) {
       console.error(err);
       toast.error("Server error — make sure the backend is running!");
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
+          <div className="flex flex-col items-center">
+            <CheckCircle className="w-16 h-16 text-emerald-500 mb-4" />
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Check Your Email</h2>
+            <p className="text-gray-600 mb-6">
+              We've sent a verification link to <strong>{formData.email}</strong>.
+              Please click the link to activate your account.
+            </p>
+            <Link
+              to="/auth/login"
+              className="px-6 py-2.5 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 transition w-full block"
+            >
+              Back to Login
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row items-center justify-center py-10 bg-white">
@@ -195,13 +221,6 @@ const Signup = () => {
               </button>
             </div>
 
-
-
-
-
-
-
-
             {/* Confirm Password */}
             <div className="relative">
               <label className="block text-gray-700 mb-1 font-medium">
@@ -230,10 +249,6 @@ const Signup = () => {
               </button>
             </div>
 
-
-
-
-
             {/* Terms */}
             <div className="flex items-start gap-2">
               <input
@@ -256,9 +271,17 @@ const Signup = () => {
 
             <button
               type="submit"
-              className="w-full bg-emerald-500 text-white py-2 rounded-full font-medium hover:bg-emerald-600 transition cursor-pointer"
+              disabled={loading}
+              className="w-full bg-emerald-500 text-white py-2 rounded-full font-medium hover:bg-emerald-600 transition cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              Create account →
+              {loading ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  Creating account...
+                </>
+              ) : (
+                "Create account →"
+              )}
             </button>
           </form>
 

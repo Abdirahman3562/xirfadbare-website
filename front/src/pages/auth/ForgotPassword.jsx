@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FiMail } from "react-icons/fi";
+import { Loader2 } from "lucide-react";
+import { API_BASE_URL } from "../../config";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email.trim()) {
@@ -16,14 +19,31 @@ function ForgotPassword() {
       return;
     }
 
-    // Simulate sending reset email
-    setTimeout(() => {
-      setMessage(
-        "✅ Password reset instructions have been sent to your email address."
-      );
-      setError("");
-      setEmail("");
-    }, 1000);
+    setLoading(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage(data.message || "✅ Password reset instructions have been sent to your email address.");
+        setEmail("");
+      } else {
+        setError(data.message || "Something went wrong. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Server error — ensure the backend is running.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,9 +105,10 @@ function ForgotPassword() {
 
           <button
             type="submit"
-            className="w-full bg-emerald-500 text-white font-medium py-2.5 rounded-lg hover:bg-emerald-600 transition"
+            disabled={loading}
+            className="w-full bg-emerald-500 text-white font-medium py-2.5 rounded-lg hover:bg-emerald-600 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Send Instructions →
+            {loading ? <Loader2 size={20} className="animate-spin" /> : "Send Instructions →"}
           </button>
         </form>
       </div>

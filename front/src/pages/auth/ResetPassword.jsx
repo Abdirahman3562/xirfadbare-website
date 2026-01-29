@@ -1,16 +1,20 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { Loader2 } from "lucide-react";
+import { API_BASE_URL } from "../../config";
 
 function ResetPassword() {
+    const { token } = useParams();
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!password || !confirmPassword) {
@@ -28,13 +32,33 @@ function ResetPassword() {
             return;
         }
 
-        // Simulate password reset
+        setLoading(true);
         setError("");
-        setMessage("✅ Password has been reset successfully. Redirecting to login...");
+        setMessage("");
 
-        setTimeout(() => {
-            navigate("/auth/login");
-        }, 2000);
+        try {
+            const res = await fetch(`${API_BASE_URL}/users/reset-password/${token}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                setMessage("✅ Password has been reset successfully. Redirecting to login...");
+                setTimeout(() => {
+                    navigate("/auth/login");
+                }, 2000);
+            } else {
+                setError(data.message || "Failed to reset password. Link may be expired.");
+            }
+        } catch (err) {
+            console.error(err);
+            setError("Server error. Please try again later.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -114,9 +138,10 @@ function ResetPassword() {
 
                     <button
                         type="submit"
-                        className="w-full bg-emerald-500 text-white font-medium py-2.5 rounded-lg hover:bg-emerald-600 transition"
+                        disabled={loading}
+                        className="w-full bg-emerald-500 text-white font-medium py-2.5 rounded-lg hover:bg-emerald-600 transition disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
-                        Reset Password
+                        {loading ? <Loader2 size={20} className="animate-spin" /> : "Reset Password"}
                     </button>
 
                     <div className="text-center mt-4">

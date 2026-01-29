@@ -16,17 +16,27 @@ const VerifyEmail = () => {
             return;
         }
 
-        // Simulate API call to verify email
+        // API call to verify email
         const verifyToken = async () => {
             try {
-                // await api.verifyEmail(token);
-                setTimeout(() => {
+                const response = await fetch('http://localhost:5000/api/users/verify-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
                     setStatus("success");
-                    setMessage("Your email has been successfully verified!");
-                }, 1500);
+                    setMessage(data.message || "Your email has been successfully verified!");
+                } else {
+                    setStatus("error");
+                    setMessage(data.message || "Verification failed. The link may have expired.");
+                }
             } catch (error) {
                 setStatus("error");
-                setMessage("Verification failed. The link may have expired.");
+                setMessage("Something went wrong. Please try again later.");
             }
         };
 

@@ -203,7 +203,7 @@ const Login = () => {
           >
             <div className="flex items-center gap-2">
               <ArrowLeft size={14} />
-              <span> Back to home</span>
+              <span className="text-emerald-600"> Back to home</span>
             </div>
 
           </Link>

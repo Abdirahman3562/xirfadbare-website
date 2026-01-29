@@ -91,7 +91,7 @@ function App() {
           <Route path="/auth/signup" element={<Signup />} />
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/auth/verify-email/:token" element={<VerifyEmail />} />
+          <Route path="/auth/verify-email" element={<VerifyEmail />} />
           <Route path="/courses/:slug" element={<CourseDetails />} />
           <Route path="/course-content/:id" element={<CourseContent />} />
           <Route path="/instructor/:slug" element={<InstructorDetails />} />

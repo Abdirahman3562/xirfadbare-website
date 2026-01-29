@@ -204,7 +204,8 @@ export const uploadImage = async (formData, token) => {
       throw new Error(errorMessage);
     }
 
-    return await response.text();
+    const data = await response.json();
+    return data.url;
   } catch (error) {
     console.error('Error uploading image:', error);
     throw error;

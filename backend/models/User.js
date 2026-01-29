@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 const userSchema = mongoose.Schema(
   {
@@ -20,7 +21,12 @@ const userSchema = mongoose.Schema(
     bio: { type: String },
     location: { type: String },
     website: { type: String },
-    verified: { type: Boolean, default: false },
+    verified: { type: Boolean, default: false }, // For author verification profile
+    isEmailVerified: { type: Boolean, default: false },
+    emailVerificationToken: String,
+    emailVerificationTokenExpires: Date,
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
     social: {
       github: { type: String },
       linkedin: { type: String },

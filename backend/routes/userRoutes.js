@@ -2,16 +2,19 @@ import express from 'express';
 import {
   authUser,
   verify2FA,
+  verifyEmail,
   registerUser,
   getUserProfile,
   getUsers,
   updateUserProfile,
-  createUserByAdmin,
   deleteUser,
   updateUserRole,
+  createUserByAdmin,
   toggleUserStatus,
   updateUserByAdmin,
-  getUserByUsername
+  getUserByUsername,
+  forgotPassword,
+  resetPassword,
 } from '../controllers/userController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 import { checkPermission } from '../middleware/permissionMiddleware.js';
@@ -24,6 +27,9 @@ router.route('/')
 
 router.post('/login', authUser);
 router.post('/verify-2fa', verify2FA);
+router.post('/verify-email', verifyEmail);
+router.post('/forgot-password', forgotPassword);
+router.put('/reset-password/:resetToken', resetPassword);
 router.post('/admin-create', protect, checkPermission('users.create'), createUserByAdmin);
 
 router.get('/profile', protect, getUserProfile);

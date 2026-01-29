@@ -6,7 +6,13 @@ import SupportWidget from '../components/SupportWidget';
 
 const PublicLayout = () => {
     const location = useLocation();
-    const isAuthPage = ['/auth/login', '/auth/signup'].includes(location.pathname);
+
+    // Check if current path matches any auth pages
+    const isAuthPage = [
+        '/auth/login',
+        '/auth/signup',
+        '/auth/forgot-password',
+    ].includes(location.pathname) || location.pathname.startsWith('/auth/verify-email') || location.pathname.startsWith('/auth/reset-password');
 
     return (
         <div className="flex flex-col min-h-screen">

@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import User from '../models/User.js';
 import Role from '../models/Role.js';
 import generateToken from '../config/generateToken.js';
@@ -115,26 +116,175 @@ const registerUser = async (req, res) => {
     return;
   }
 
+  // Generate verification token
+  const verificationToken = crypto.randomBytes(32).toString('hex');
+
+  // Hash token and save to database
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(verificationToken)
+    .digest('hex');
+
   const user = await User.create({
     firstName,
     lastName,
     email,
     phone,
     password,
+    isEmailVerified: false,
+    emailVerificationToken: hashedToken,
+    emailVerificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
   });
 
   if (user) {
-    res.status(201).json({
-      _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: user.role,
-      token: generateToken(user._id),
-    });
+    // Send verification email
+    const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5176'}/auth/verify-email?token=${verificationToken}`;
+
+    const message = `
+      <h1>Email Verification</h1>
+      <p>Please verify your email address by clicking the link below:</p>
+      <a href="${verificationUrl}" clicktracking=off>${verificationUrl}</a>
+    `;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Samafale Academy - Verify Your Email',
+        message: `Verify your email: ${verificationUrl}`,
+        html: message
+      });
+
+      res.status(201).json({
+        message: 'Registration successful! Please check your email to verify your account.'
+      });
+    } catch (error) {
+      console.error('Email send failed:', error);
+      // Still return success for registration, user can resend verification later (logic to be added if needed)
+      res.status(201).json({
+        message: 'Registration successful! Email sending failed, please contact support.'
+      });
+    }
   } else {
     res.status(400).json({ message: 'Invalid user data' });
   }
+};
+
+// @desc    Verify user email
+// @route   POST /api/users/verify-email
+// @access  Public
+const verifyEmail = async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ message: 'Invalid token' });
+  }
+
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    emailVerificationToken: hashedToken,
+    emailVerificationTokenExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: 'Invalid or expired token' });
+  }
+
+  user.isEmailVerified = true;
+  user.emailVerificationToken = undefined;
+  user.emailVerificationTokenExpires = undefined;
+
+  await user.save();
+
+  res.status(200).json({ message: 'Email verified successfully. You can now login.' });
+};
+
+// @desc    Forgot Password
+// @route   POST /api/users/forgot-password
+// @access  Public
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404).json({ message: 'User not found' });
+    return;
+  }
+
+  // Generate reset token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash and set to resetPasswordToken
+  user.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set expire
+  user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+  await user.save();
+
+  const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5176'}/auth/reset-password/${resetToken}`;
+
+  const message = `
+    <h1>You have requested a password reset</h1>
+    <p>Please go to this link to reset your password:</p>
+    <a href="${resetUrl}" clicktracking=off>${resetUrl}</a>
+  `;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Password Reset Request',
+      message: `Your password reset link: ${resetUrl}`,
+      html: message,
+    });
+
+    res.status(200).json({ success: true, data: 'Email sent' });
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(500).json({ message: 'Email could not be sent' });
+  }
+};
+
+// @desc    Reset Password
+// @route   PUT /api/users/reset-password/:resetToken
+// @access  Public
+const resetPassword = async (req, res) => {
+  const resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(req.params.resetToken)
+    .digest('hex');
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    res.status(400).json({ message: 'Invalid token' });
+    return;
+  }
+
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: 'Password Reset Success',
+    token: generateToken(user._id),
+  });
 };
 
 // @desc    Get user profile
@@ -498,6 +648,7 @@ const getUserByUsername = async (req, res) => {
 export {
   authUser,
   verify2FA,
+  verifyEmail,
   registerUser,
   getUserProfile,
   getUsers,
@@ -507,5 +658,7 @@ export {
   createUserByAdmin,
   toggleUserStatus,
   updateUserByAdmin,
-  getUserByUsername
+  getUserByUsername,
+  forgotPassword,
+  resetPassword,
 };
