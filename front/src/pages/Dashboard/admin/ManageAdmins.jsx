@@ -15,6 +15,7 @@ import {
     Upload,
     AlertTriangle
 } from 'lucide-react';
+import PremiumLoader from '../../../components/ui/PremiumLoader';
 import { getUsers, adminCreateUser, deleteUser, updateUserRole, toggleUserStatus, adminUpdateUser } from '../../../api/userService';
 import { toast } from 'react-toastify';
 
@@ -249,9 +250,7 @@ const ManageAdmins = () => {
             </div>
 
             {loading ? (
-                <div className="h-64 flex items-center justify-center">
-                    <Loader2 className="animate-spin text-emerald-600" size={32} />
-                </div>
+                <PremiumLoader />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredUsers.map((user) => (

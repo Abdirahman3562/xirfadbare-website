@@ -18,6 +18,7 @@ import {
 import { toast } from "react-toastify";
 import axios from "axios";
 import { getImageUrl } from "../../../utils/format";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 // Helper to format date
 const formatDate = (dateString) => {
@@ -209,12 +210,12 @@ const ManageContacts = () => {
     return (
         <div className="space-y-6 animate-in fade-in duration-500 overflow-x-hidden max-w-full">
             <div>
-                <h1 className="text-2xl font-bold text-gray-900 font-[Inter]">Contact Messages</h1>
-                <p className="text-gray-500 text-sm mt-1">Manage and reply to inquiries from the contact form.</p>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-[Inter]">Contact Messages</h1>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Manage and reply to inquiries from the contact form.</p>
             </div>
 
             {/* Filter Section */}
-            <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row gap-4 items-center">
+            <div className="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col md:flex-row gap-4 items-center transition-colors duration-300">
                 <div className="relative flex-1 w-full">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                     <input
@@ -222,7 +223,7 @@ const ManageContacts = () => {
                         placeholder="Search name, email, or subject..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 bg-gray-50/50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm transition-all"
+                        className="w-full pl-11 pr-4 py-3 bg-gray-50/50 dark:bg-slate-700/50 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                     />
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">
@@ -231,7 +232,7 @@ const ManageContacts = () => {
                         <select
                             value={filterStatus}
                             onChange={(e) => setFilterStatus(e.target.value)}
-                            className="w-full pl-9 pr-8 py-3 bg-white text-gray-600 rounded-2xl border border-gray-100 outline-none hover:border-emerald-200 transition-colors text-sm appearance-none cursor-pointer"
+                            className="w-full pl-9 pr-8 py-3 bg-white dark:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-2xl border border-gray-100 dark:border-gray-600 outline-none hover:border-emerald-200 dark:hover:border-emerald-500/30 transition-colors text-sm appearance-none cursor-pointer"
                         >
                             <option value="all">All Status</option>
                             <option value="unread">Unread</option>
@@ -243,22 +244,19 @@ const ManageContacts = () => {
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-20 gap-4">
-                    <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500 font-bold animate-pulse">Loading messages...</p>
-                </div>
+                <PremiumLoader text="Loading messages..." />
             ) : filteredContacts.length === 0 ? (
-                <div className="bg-white rounded-3xl border-2 border-dashed border-gray-100 py-20 text-center">
-                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <MessageSquare className="text-gray-300" size={32} />
+                <div className="bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-700 py-20 text-center transition-colors duration-300">
+                    <div className="w-16 h-16 bg-gray-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MessageSquare className="text-gray-300 dark:text-gray-500" size={32} />
                     </div>
-                    <h3 className="text-gray-900 font-bold">No messages found</h3>
-                    <p className="text-gray-400 text-sm mt-1">Try adjusting your search or filters.</p>
+                    <h3 className="text-gray-900 dark:text-white font-bold">No messages found</h3>
+                    <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Try adjusting your search or filters.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
                     {filteredContacts.map((contact) => (
-                        <div key={contact._id} className="group relative bg-white rounded-[2.5rem] border border-gray-100 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden flex flex-col">
+                        <div key={contact._id} className="group relative bg-white dark:bg-slate-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden flex flex-col">
                             {/* Card Header: User & Status */}
                             <div className="flex items-start justify-between mb-6">
                                 <div className="flex items-center gap-4">
@@ -271,7 +269,7 @@ const ManageContacts = () => {
                                                 className="w-14 h-14 rounded-2xl object-cover border-2 border-white shadow-md bg-gray-100"
                                             />
                                         ) : (
-                                            <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-black border-2 border-white shadow-md uppercase">
+                                            <div className="w-14 h-14 rounded-2xl bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-lg font-black border-2 border-white dark:border-slate-700 shadow-md uppercase">
                                                 {contact.name.charAt(0)}
                                             </div>
                                         )}
@@ -285,15 +283,15 @@ const ManageContacts = () => {
                                         </div>
                                     </div>
                                     <div className="min-w-0">
-                                        <h4 className="text-[15px] font-black text-gray-900 truncate tracking-tight">
+                                        <h4 className="text-[15px] font-black text-gray-900 dark:text-white truncate tracking-tight">
                                             {contact.name}
                                         </h4>
                                         <div className="flex flex-col gap-0.5 mt-0.5">
-                                            <p className="text-[11px] text-gray-500 font-medium truncate flex items-center gap-1">
+                                            <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium truncate flex items-center gap-1">
                                                 <Mail size={10} /> {contact.email}
                                             </p>
                                             {contact.phone && (
-                                                <p className="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
+                                                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
                                                     <Phone size={10} /> {contact.phone}
                                                 </p>
                                             )}
@@ -312,16 +310,16 @@ const ManageContacts = () => {
                             </div>
 
                             {/* Card Body: Message Content */}
-                            <div className="bg-gray-50/80 rounded-3xl p-5 border border-gray-100 mb-6 flex-1">
+                            <div className="bg-gray-50/80 dark:bg-slate-700/50 rounded-3xl p-5 border border-gray-100 dark:border-gray-700/50 mb-6 flex-1 transition-colors">
                                 <div className="mb-3">
-                                    <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest block mb-1">Subject</span>
-                                    <h5 className="text-sm font-bold text-gray-800 line-clamp-1">
+                                    <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block mb-1">Subject</span>
+                                    <h5 className="text-sm font-bold text-gray-800 dark:text-gray-200 line-clamp-1">
                                         {contact.about || "No Subject"}
                                     </h5>
                                 </div>
-                                <div className="pt-3 border-t border-gray-200/50">
-                                    <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Message</span>
-                                    <p className="text-xs text-gray-600 leading-relaxed line-clamp-3">
+                                <div className="pt-3 border-t border-gray-200/50 dark:border-gray-600/50">
+                                    <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-1">Message</span>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed line-clamp-3">
                                         {contact.message}
                                     </p>
                                 </div>
@@ -330,20 +328,20 @@ const ManageContacts = () => {
                             {/* Card Footer: Date & Actions */}
                             <div className="flex items-center justify-between gap-4 pt-2 mt-auto">
                                 <div>
-                                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Received</span>
-                                    <div className="flex items-center gap-1 text-gray-900 text-xs font-bold">
-                                        <Calendar size={12} className="text-gray-400" />
+                                    <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-0.5">Received</span>
+                                    <div className="flex items-center gap-1 text-gray-900 dark:text-gray-300 text-xs font-bold">
+                                        <Calendar size={12} className="text-gray-400 dark:text-gray-500" />
                                         {formatDate(contact.createdAt)}
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-1.5 bg-gray-50/80 p-1.5 rounded-2xl border border-gray-100/80 shadow-sm backdrop-blur-sm">
+                                <div className="flex items-center gap-1.5 bg-gray-50/80 dark:bg-slate-700/50 p-1.5 rounded-2xl border border-gray-100/80 dark:border-gray-700/50 shadow-sm backdrop-blur-sm transition-colors">
                                     {contact.status !== 'replied' && (
                                         <button
                                             onClick={() => handleMarkAsRead(contact)}
                                             className={`p-2.5 rounded-xl transition-all active:scale-90 ${contact.status === 'read'
-                                                ? 'text-blue-500 bg-blue-50'
-                                                : 'text-gray-400 hover:text-blue-500 hover:bg-white'
+                                                ? 'text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10'
+                                                : 'text-gray-400 dark:text-gray-500 hover:text-blue-500 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-slate-600/50'
                                                 }`}
                                             title={contact.status === 'read' ? "Mark as Unread" : "Mark as Read"}
                                         >
@@ -352,14 +350,14 @@ const ManageContacts = () => {
                                     )}
                                     <button
                                         onClick={() => openReplyModal(contact)}
-                                        className="p-2.5 text-gray-400 hover:text-emerald-600 hover:bg-white rounded-xl transition-all active:scale-90"
+                                        className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-white dark:hover:bg-slate-600/50 rounded-xl transition-all active:scale-90"
                                         title="View & Reply"
                                     >
                                         <Mail size={16} />
                                     </button>
                                     <button
                                         onClick={() => handleDeleteClick(contact)}
-                                        className="p-2.5 text-gray-400 hover:text-red-600 hover:bg-white rounded-xl transition-all active:scale-90"
+                                        className="p-2.5 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-white dark:hover:bg-slate-600/50 rounded-xl transition-all active:scale-90"
                                         title="Delete"
                                     >
                                         <Trash2 size={16} />
@@ -374,7 +372,7 @@ const ManageContacts = () => {
             {/* Reply Modal */}
             {showReplyModal && selectedContact && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in zoom-in duration-200">
-                    <div className="bg-white h-[550px] rounded-[2.5rem] w-full max-w-2xl shadow-2xl overflow-y-auto  border border-gray-100">
+                    <div className="bg-white dark:bg-slate-900 h-[550px] rounded-[2.5rem] w-full max-w-2xl shadow-2xl overflow-y-auto border border-gray-100 dark:border-gray-800 transition-colors">
                         {/* Modal Header */}
                         <div className="bg-emerald-600 p-6 flex items-center justify-between relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full -translate-y-1/2 translate-x-1/2 opacity-20"></div>
@@ -395,48 +393,48 @@ const ManageContacts = () => {
 
                         <div className="p-8 space-y-6">
                             {/* Original Message Context */}
-                            <div className="bg-gray-50 p-5 rounded-3xl border border-gray-100">
+                            <div className="bg-gray-50 dark:bg-slate-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700">
                                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Original Inquiry</p>
                                 <div className="max-h-32 overflow-y-auto pr-2 custom-scrollbar">
-                                    <p className="text-sm text-gray-700 italic leading-relaxed whitespace-pre-wrap break-words break-all">"{selectedContact.message}"</p>
+                                    <p className="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed whitespace-pre-wrap break-words break-all">"{selectedContact.message}"</p>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2 ml-1">Subject Line</label>
+                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 ml-1">Subject Line</label>
                                     <input
                                         type="text"
                                         value={replySubject}
                                         onChange={(e) => setReplySubject(e.target.value)}
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium"
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all font-medium text-gray-900 dark:text-white"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2 ml-1">Your Reply</label>
+                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2 ml-1">Your Reply</label>
                                     <textarea
                                         rows="6"
                                         value={replyMessage}
                                         onChange={(e) => setReplyMessage(e.target.value)}
                                         placeholder="Type your structured response here..."
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all resize-none font-medium"
+                                        className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all resize-none font-medium text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="px-8 py-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
+                        <div className="px-8 py-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-slate-800/50 flex justify-end gap-3">
                             <button
                                 onClick={closeReplyModal}
-                                className="px-6 py-3 text-gray-600 hover:bg-gray-200 rounded-2xl font-bold text-xs uppercase tracking-wider transition-colors"
+                                className="px-6 py-3 text-gray-600 cursor-pointer  dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-2xl font-bold text-xs uppercase tracking-wider transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleSendReply}
                                 disabled={sendingReply}
-                                className="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-emerald-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95"
+                                className="px-8 py-3 dark:shadow-none cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-emerald-200 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 active:scale-95"
                             >
                                 {sendingReply ? (
                                     <>Sending...</>
@@ -452,41 +450,41 @@ const ManageContacts = () => {
             {/* Delete Confirmation Modal */}
             {showDeleteModal && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-gray-100">
+                    <div className="bg-white dark:bg-slate-800 w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-gray-100 dark:border-gray-700">
                         <div className="p-8 text-center">
-                            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100 shadow-inner">
+                            <div className="w-20 h-20 bg-red-50 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100 dark:border-red-500/20 shadow-inner">
                                 <AlertTriangle size={40} className="text-red-500 animate-pulse" />
                             </div>
-                            <h3 className="text-xl font-black text-gray-900 mb-2 font-[Inter]">Are you sure?</h3>
-                            <p className="text-sm text-gray-500 font-medium">
+                            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 font-[Inter]">Are you sure?</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
                                 Once deleted, this message cannot be recovered. Do you want to proceed?
                             </p>
                         </div>
-                        <div className="p-8 bg-gray-50/50 border-t border-gray-100 flex gap-3">
+                        <div className="p-8 bg-gray-50/50 cursor-pointer dark:bg-slate-700/30 border-t border-gray-100 dark:border-gray-700 flex gap-3">
                             <button
                                 onClick={() => {
                                     setShowDeleteModal(false);
                                     setContactToDelete(null);
                                 }}
-                                className="flex-1 py-4 bg-white hover:bg-gray-100 text-gray-600 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-gray-200 active:scale-95"
+                                className="flex-1 py-4 bg-white cursor-pointer dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-gray-200 dark:border-gray-600 active:scale-95"
                                 disabled={isDeleting}
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={confirmDelete}
-                                className="flex-1 py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-red-200 active:scale-95 flex items-center justify-center gap-2"
+                                className="flex-1 py-4 bg-red-600 dark:shadow-none cursor-pointer hover:bg-red-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-red-200 active:scale-95 flex items-center justify-center gap-2"
                                 disabled={isDeleting}
                             >
                                 {isDeleting ? (
                                     <>
-                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        <div className="w-4 h-4 border-2 dark:shadow-none cursor-pointer border-white/30 border-t-white rounded-full animate-spin"></div>
                                         <span>Deleting...</span>
                                     </>
                                 ) : (
                                     <>
                                         <Trash2 size={14} />
-                                        <span>Yes, Delete</span>
+                                        <span className="cursor-pointer">Yes, Delete</span>
                                     </>
                                 )}
                             </button>

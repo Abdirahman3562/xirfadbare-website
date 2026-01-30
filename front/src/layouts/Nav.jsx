@@ -5,14 +5,17 @@ import {
 } from "lucide-react";
 import defaultLogo from "../assets/logo.png";
 import { useData } from "../contexts/DataContext";
+import { useTheme } from "../contexts/ThemeContext";
+
 
 function Nav() {
+  const { theme, setTheme } = useTheme();
   const [settings, setSettings] = useState({
     logo: "",
     websiteTitle: "Samafale Academy"
   });
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  // const [theme, setTheme] = useState(localStorage.getItem("theme") || "light"); // Removed local state
   const [openTheme, setOpenTheme] = useState(false);
   const [user, setUser] = useState(null);
   const [openProfile, setOpenProfile] = useState(false);
@@ -51,21 +54,7 @@ function Nav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 🌓 Theme handling
-  useEffect(() => {
-    console.log("NAV THEME STATE:", theme);
-    const root = window.document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else if (theme === "light") {
-      root.classList.remove("dark");
-    } else {
-      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      root.classList.toggle("dark", isDark);
-    }
-    localStorage.setItem("theme", theme);
-    window.dispatchEvent(new Event("themeChange"));
-  }, [theme]);
+  // 🌓 Theme handling (Removed - handled by Context)
 
   // 🔐 Load user
   useEffect(() => {

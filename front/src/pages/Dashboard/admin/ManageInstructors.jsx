@@ -16,6 +16,7 @@ import {
     Camera,
     Loader2
 } from 'lucide-react';
+import PremiumLoader from '../../../components/ui/PremiumLoader';
 import { getAllInstructors, createInstructor, updateInstructor, deleteInstructor } from '../../../api/instructorService';
 import { getAllCourses } from '../../../api/courseService';
 import { uploadImage } from '../../../api/userService';
@@ -200,14 +201,14 @@ const ManageInstructors = () => {
     return (
         <div className="space-y-8 animate-in fade-in duration-700 font-[Inter]">
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm transition-colors duration-300">
                 <div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">Instructors Management</h1>
-                    <p className="text-gray-500 text-sm mt-1 font-medium">Create, edit, and manage educators' status and profiles.</p>
+                    <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Instructors Management</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 font-medium">Create, edit, and manage educators' status and profiles.</p>
                 </div>
                 <button
                     onClick={() => handleOpenModal('create')}
-                    className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl shadow-emerald-200 active:scale-95"
+                    className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl shadow-emerald-200 dark:shadow-none active:scale-95"
                 >
                     <UserPlus size={20} />
                     <span className="uppercase tracking-widest">Add New Instructor</span>
@@ -221,7 +222,7 @@ const ManageInstructors = () => {
                     <input
                         type="text"
                         placeholder="Search instructors by name or email..."
-                        className="w-full pl-14 pr-6 py-4 bg-white border border-gray-100 rounded-[1.5rem] outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-medium transition-all shadow-sm"
+                        className="w-full pl-14 pr-6 py-4 bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700 rounded-[1.5rem] outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-medium text-gray-600 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 transition-all shadow-sm"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -229,15 +230,12 @@ const ManageInstructors = () => {
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center h-64 space-y-4">
-                    <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500 font-medium italic">Soo aqrinaya xogta...</p>
-                </div>
+                <PremiumLoader text="Soo aqrinaya xogta..." />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredInstructors.length > 0 ? (
                         filteredInstructors.map((ins) => (
-                            <div key={ins._id} className={`bg-white p-8 rounded-[2.5rem] border ${ins.isActive === false ? 'border-amber-100 grayscale-[0.5]' : 'border-gray-100'} shadow-sm hover:shadow-2xl hover:shadow-emerald-100/50 transition-all duration-500 group relative overflow-hidden flex flex-col h-full border-b-4 border-b-transparent hover:border-b-emerald-500`}>
+                            <div key={ins._id} className={`bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border ${ins.isActive === false ? 'border-amber-100 dark:border-amber-900/30 grayscale-[0.5]' : 'border-gray-100 dark:border-gray-700'} shadow-sm hover:shadow-2xl hover:shadow-emerald-100/50 dark:hover:shadow-none transition-all duration-500 group relative overflow-hidden flex flex-col h-full border-b-4 border-b-transparent hover:border-b-emerald-500`}>
                                 {/* Status Badge Overlay */}
                                 {ins.isActive === false && (
                                     <div className="absolute top-0 right-0 bg-amber-500 text-white text-[9px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-[0.2em] z-20">
@@ -246,10 +244,10 @@ const ManageInstructors = () => {
                                 )}
 
                                 {/* Background Decoration */}
-                                <div className="absolute -right-8 -top-8 w-32 h-32 bg-emerald-50/50 rounded-full group-hover:scale-150 transition-transform duration-700 opacity-50"></div>
+                                <div className="absolute -right-8 -top-8 w-32 h-32 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-full group-hover:scale-150 transition-transform duration-700 opacity-50"></div>
 
                                 <div className="relative flex items-start justify-between mb-8">
-                                    <div className="w-20 h-20 bg-emerald-50 rounded-3xl p-1 border-2 border-white shadow-lg overflow-hidden group-hover:rotate-3 transition-transform duration-500">
+                                    <div className="w-20 h-20 bg-emerald-50 dark:bg-slate-700/50 rounded-3xl p-1 border-2 border-white dark:border-slate-600 shadow-lg overflow-hidden group-hover:rotate-3 transition-transform duration-500">
                                         <img
                                             src={getImageUrl(ins.image)}
                                             alt={ins.name}
@@ -263,13 +261,13 @@ const ManageInstructors = () => {
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => handleOpenModal('edit', ins)}
-                                            className="p-3 text-gray-400 hover:text-emerald-600 bg-gray-50 hover:bg-emerald-50 rounded-2xl transition-all"
+                                            className="p-3 text-gray-400 hover:text-emerald-600 bg-gray-50 dark:bg-slate-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-2xl transition-all"
                                         >
                                             <Edit3 size={18} />
                                         </button>
                                         <button
                                             onClick={() => { setSelectedInstructor(ins); setShowDeleteModal(true); }}
-                                            className="p-3 text-gray-400 hover:text-rose-600 bg-gray-50 hover:bg-rose-50 rounded-2xl transition-all"
+                                            className="p-3 text-gray-400 hover:text-rose-600 bg-gray-50 dark:bg-slate-700/50 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-2xl transition-all"
                                         >
                                             <Trash2 size={18} />
                                         </button>
@@ -277,22 +275,22 @@ const ManageInstructors = () => {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <h3 className="text-xl font-bold text-gray-900 line-clamp-1 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">{ins.name}</h3>
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white line-clamp-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors uppercase tracking-tight">{ins.name}</h3>
                                     <div className="flex items-center gap-2">
-                                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{ins.instructorTitle || 'Course Instructor'}</p>
+                                        <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">{ins.instructorTitle || 'Course Instructor'}</p>
                                     </div>
                                 </div>
 
                                 <div className="space-y-3 mt-5 mb-8">
-                                    <div className="flex items-center gap-3 text-gray-400 bg-gray-50/50 py-2.5 px-4 rounded-2xl border border-gray-100 overflow-hidden">
+                                    <div className="flex items-center gap-3 text-gray-400 bg-gray-50/50 dark:bg-slate-700/30 py-2.5 px-4 rounded-2xl border border-gray-100 dark:border-gray-700 overflow-hidden">
                                         <Mail size={14} className="text-emerald-500 flex-shrink-0" />
                                         <span className="text-xs font-bold truncate">{ins.contactEmail || 'No email provided'}</span>
                                     </div>
                                     <button
                                         onClick={() => toggleStatus(ins)}
                                         className={`w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border transition-all ${ins.isActive !== false
-                                            ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                                            : 'bg-amber-50 border-amber-100 text-amber-600'
+                                            ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100 dark:border-emerald-500/20 text-emerald-600 dark:text-emerald-400'
+                                            : 'bg-amber-50 dark:bg-amber-500/10 border-amber-100 dark:border-amber-500/20 text-amber-600 dark:text-amber-400'
                                             }`}
                                     >
                                         <span className="text-[10px] font-black uppercase tracking-widest">
@@ -304,16 +302,16 @@ const ManageInstructors = () => {
                                     </button>
                                 </div>
 
-                                <div className="flex items-center justify-between p-5 bg-gray-50 rounded-[2rem] border border-gray-100 mb-8 mt-auto">
-                                    <div className="text-center flex-1 border-r border-gray-200 px-2">
+                                <div className="flex items-center justify-between p-5 bg-gray-50 dark:bg-slate-700/30 rounded-[2rem] border border-gray-100 dark:border-gray-700 mb-8 mt-auto">
+                                    <div className="text-center flex-1 border-r border-gray-200 dark:border-gray-600 px-2">
                                         <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1 leading-none">Courses</p>
-                                        <p className="text-lg font-black text-gray-900">{getCourseCount(ins._id)}</p>
+                                        <p className="text-lg font-black text-gray-900 dark:text-white">{getCourseCount(ins._id)}</p>
                                     </div>
                                     <div className="text-center flex-1 px-2">
                                         <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest mb-1 leading-none">Rating</p>
                                         <div className="flex items-center justify-center gap-1.5">
                                             <Star size={14} className="text-amber-500 fill-amber-500" strokeWidth={3} />
-                                            <p className="text-lg font-black text-gray-900">{calculateRating(ins.reviews)}</p>
+                                            <p className="text-lg font-black text-gray-900 dark:text-white">{calculateRating(ins.reviews)}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -345,12 +343,12 @@ const ManageInstructors = () => {
             {showModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setShowModal(false)}></div>
-                    <div className="relative bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="flex items-center justify-between p-8 border-b border-gray-50 bg-gray-50/50">
-                            <h2 className="text-2xl font-black text-gray-900 uppercase tracking-tight">
+                    <div className="relative bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="flex items-center justify-between p-8 border-b border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-slate-800/50">
+                            <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
                                 {modalMode === 'create' ? 'Add New Instructor' : 'Edit Instructor Profile'}
                             </h2>
-                            <button onClick={() => setShowModal(false)} className="p-3 text-gray-400 hover:text-gray-900 hover:bg-white rounded-2xl transition-all shadow-sm">
+                            <button onClick={() => setShowModal(false)} className="p-3 text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 rounded-2xl transition-all shadow-sm">
                                 <X size={24} />
                             </button>
                         </div>
@@ -365,7 +363,7 @@ const ManageInstructors = () => {
                                         <input
                                             required
                                             type="text"
-                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-emerald-500 transition-all font-bold text-gray-700"
+                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-2xl outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 dark:focus:border-emerald-500 transition-all font-bold text-gray-700 dark:text-gray-200"
                                             placeholder="e.g. Abdirahmaan Yusuf"
                                             value={formData.name}
                                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -380,7 +378,7 @@ const ManageInstructors = () => {
                                         <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500" size={18} />
                                         <input
                                             type="text"
-                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-emerald-500 transition-all font-bold text-gray-700"
+                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-2xl outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 dark:focus:border-emerald-500 transition-all font-bold text-gray-700 dark:text-gray-200"
                                             placeholder="e.g. Fullstack Developer"
                                             value={formData.instructorTitle}
                                             onChange={(e) => setFormData({ ...formData, instructorTitle: e.target.value })}
@@ -396,7 +394,7 @@ const ManageInstructors = () => {
                                         <input
                                             required
                                             type="email"
-                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-emerald-500 transition-all font-bold text-gray-700"
+                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-2xl outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 dark:focus:border-emerald-500 transition-all font-bold text-gray-700 dark:text-gray-200"
                                             placeholder="email@example.com"
                                             value={formData.contactEmail}
                                             onChange={(e) => setFormData({ ...formData, contactEmail: e.target.value })}
@@ -411,7 +409,7 @@ const ManageInstructors = () => {
                                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500" size={18} />
                                         <input
                                             type="text"
-                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-emerald-500 transition-all font-bold text-gray-700"
+                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-2xl outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 dark:focus:border-emerald-500 transition-all font-bold text-gray-700 dark:text-gray-200"
                                             placeholder="+252 61..."
                                             value={formData.contactPhone}
                                             onChange={(e) => setFormData({ ...formData, contactPhone: e.target.value })}
@@ -423,9 +421,9 @@ const ManageInstructors = () => {
                                 <div className="col-span-full space-y-4">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Profile Image</label>
 
-                                    <div className="flex flex-col md:flex-row items-center gap-8 p-8 bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200 hover:border-emerald-500/50 transition-all group">
+                                    <div className="flex flex-col md:flex-row items-center gap-8 p-8 bg-gray-50 dark:bg-slate-800 rounded-[2.5rem] border-2 border-dashed border-gray-200 dark:border-gray-700 hover:border-emerald-500/50 transition-all group">
                                         <div className="relative">
-                                            <div className="w-32 h-32 bg-white rounded-[2rem] shadow-xl overflow-hidden border-4 border-white relative group">
+                                            <div className="w-32 h-32 bg-white dark:bg-slate-700 rounded-[2rem] shadow-xl overflow-hidden border-4 border-white dark:border-slate-600 relative group">
                                                 {formData.image ? (
                                                     <img
                                                         src={getImageUrl(formData.image)}
@@ -462,7 +460,7 @@ const ManageInstructors = () => {
                                         </div>
 
                                         <div className="flex-1 text-center md:text-left">
-                                            <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-1">Upload New Photo</h4>
+                                            <h4 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest mb-1">Upload New Photo</h4>
                                             <p className="text-xs text-gray-400 font-medium">Recommended: Square image, max 2MB (JPG, PNG)</p>
                                             <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
                                                 {formData.image && (
@@ -486,7 +484,7 @@ const ManageInstructors = () => {
                                         <FileText className="absolute left-4 top-6 text-emerald-500" size={18} />
                                         <textarea
                                             rows="4"
-                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-emerald-500 transition-all font-bold text-gray-700 resize-none"
+                                            className="w-full pl-12 pr-6 py-4 bg-gray-50 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-2xl outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 dark:focus:border-emerald-500 transition-all font-bold text-gray-700 dark:text-gray-200 resize-none"
                                             placeholder="Write a brief professional summary..."
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -500,8 +498,8 @@ const ManageInstructors = () => {
                                         type="button"
                                         onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
                                         className={`w-full flex items-center justify-between p-6 rounded-3xl border-2 transition-all ${formData.isActive
-                                            ? 'bg-emerald-50 border-emerald-500/20 text-emerald-700'
-                                            : 'bg-amber-50 border-amber-500/20 text-amber-700'
+                                            ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-400'
+                                            : 'bg-amber-50 dark:bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-400'
                                             }`}
                                     >
                                         <div className="flex items-center gap-4 text-left">
@@ -526,14 +524,14 @@ const ManageInstructors = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShowModal(false)}
-                                    className="flex-1 py-4 rounded-2xl bg-gray-100 text-gray-600 font-black text-xs uppercase tracking-widest hover:bg-gray-200 transition-all"
+                                    className="flex-1 py-4 rounded-2xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 font-black text-xs uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-slate-600 transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     disabled={submitting}
                                     type="submit"
-                                    className="flex-[2] py-4 rounded-2xl bg-emerald-600 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-3 disabled:opacity-50"
+                                    className="flex-[2] py-4 rounded-2xl bg-emerald-600 text-white font-black text-xs uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 dark:shadow-none flex items-center justify-center gap-3 disabled:opacity-50"
                                 >
                                     {submitting ? <Loader2 className="animate-spin" size={20} /> : (modalMode === 'create' ? <UserPlus size={20} /> : <Check size={20} />)}
                                     <span>{modalMode === 'create' ? 'Create Instructor' : 'Save Changes'}</span>
@@ -548,25 +546,25 @@ const ManageInstructors = () => {
             {showDeleteModal && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setShowDeleteModal(false)}></div>
-                    <div className="relative bg-white w-full max-w-md rounded-[3rem] shadow-2xl p-10 text-center animate-in zoom-in-95 duration-300">
-                        <div className="w-24 h-24 bg-rose-50 text-rose-500 rounded-[2rem] flex items-center justify-center mx-auto mb-8 animate-bounce">
+                    <div className="relative bg-white dark:bg-slate-900 w-full max-w-md rounded-[3rem] shadow-2xl p-10 text-center animate-in zoom-in-95 duration-300">
+                        <div className="w-24 h-24 bg-rose-50 dark:bg-rose-500/10 text-rose-500 rounded-[2rem] flex items-center justify-center mx-auto mb-8 animate-bounce">
                             <Trash2 size={40} />
                         </div>
-                        <h3 className="text-2xl font-black text-gray-900 uppercase tracking-tight mb-4">Are you sure?</h3>
-                        <p className="text-gray-500 font-medium mb-10">
-                            You are about to delete <span className="font-bold text-gray-900">{selectedInstructor?.name}</span>. This action cannot be undone and will remove all their profile data.
+                        <h3 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight mb-4">Are you sure?</h3>
+                        <p className="text-gray-500 dark:text-gray-400 font-medium mb-10">
+                            You are about to delete <span className="font-bold text-gray-900 dark:text-white">{selectedInstructor?.name}</span>. This action cannot be undone and will remove all their profile data.
                         </p>
                         <div className="flex gap-4">
                             <button
                                 onClick={() => setShowDeleteModal(false)}
-                                className="flex-1 py-4 rounded-2xl bg-gray-100 text-gray-600 font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition-all"
+                                className="flex-1 py-4 rounded-2xl bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-slate-600 transition-all"
                             >
                                 No, Keep it
                             </button>
                             <button
                                 onClick={handleDelete}
                                 disabled={submitting}
-                                className="flex-1 py-4 rounded-2xl bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-rose-700 transition-all shadow-xl shadow-rose-100 flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="flex-1 py-4 rounded-2xl bg-rose-600 text-white font-black text-[10px] uppercase tracking-widest hover:bg-rose-700 transition-all shadow-xl shadow-rose-100 dark:shadow-none flex items-center justify-center gap-2 disabled:opacity-50"
                             >
                                 {submitting ? <Loader2 className="animate-spin" size={16} /> : <Trash2 size={16} />}
                                 <span>Yes, Delete</span>

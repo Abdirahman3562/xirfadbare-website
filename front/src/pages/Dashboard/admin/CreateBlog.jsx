@@ -10,8 +10,54 @@ import {
     User
 } from "lucide-react";
 import { toast } from "react-toastify";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+
+const quillDarkTheme = `
+    .dark .ql-snow .ql-stroke {
+        stroke: #e2e8f0;
+    }
+    .dark .ql-snow .ql-fill,
+    .dark .ql-snow .ql-stroke.ql-fill {
+        fill: #e2e8f0;
+    }
+    .dark .ql-snow .ql-picker {
+        color: #e2e8f0;
+    }
+    .dark .ql-snow .ql-picker-options {
+        background-color: #1e293b;
+        border-color: #475569;
+    }
+    .dark .ql-snow .ql-picker-item {
+        color: #cbd5e1;
+    }
+    .dark .ql-snow .ql-picker-item:hover,
+    .dark .ql-snow .ql-picker-item.ql-selected {
+        color: #10b981;
+    }
+    .dark .ql-toolbar.ql-snow {
+        border-color: #374151;
+    }
+    .dark .ql-container.ql-snow {
+        border-color: #374151;
+    }
+    .dark .ql-snow .ql-tooltip {
+        background-color: #1e293b;
+        color: #e2e8f0;
+        border-color: #475569;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    .dark .ql-snow .ql-tooltip input[type=text] {
+        background-color: #334155;
+        color: #fff;
+        border-color: #475569;
+    }
+    .dark .ql-editor.ql-blank::before {
+        color: #94a3b8;
+        font-style: italic;
+    }
+`;
 
 const CreateBlog = () => {
     const { id } = useParams();
@@ -221,11 +267,7 @@ const CreateBlog = () => {
     };
 
     if (fetching) {
-        return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
+        return <PremiumLoader />;
     }
 
 
@@ -236,15 +278,15 @@ const CreateBlog = () => {
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => navigate("/admin/blogs")}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-600 dark:text-gray-400"
                 >
                     <ArrowLeft size={24} />
                 </button>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                         {isEditing ? "Edit Blog" : "Create New Blog"}
                     </h1>
-                    <p className="text-gray-500 text-sm mt-1">
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                         {isEditing ? "Update blog details and status" : "Write a new blog post"}
                     </p>
                 </div>
@@ -255,8 +297,8 @@ const CreateBlog = () => {
                     {/* Main Content (Left) */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Title */}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 Blog Title
                             </label>
                             <input
@@ -265,13 +307,13 @@ const CreateBlog = () => {
                                 value={formData.title}
                                 onChange={handleChange}
                                 placeholder="e.g., The Future of Web Development"
-                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all"
+                                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none transition-all bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                             />
                         </div>
 
                         {/* Author (Disabled) */}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 Author (You)
                             </label>
                             <div className="relative">
@@ -279,7 +321,7 @@ const CreateBlog = () => {
                                     type="text"
                                     value={JSON.parse(localStorage.getItem('loggedInUser'))?.firstName + ' ' + JSON.parse(localStorage.getItem('loggedInUser'))?.lastName || "Admin"}
                                     disabled
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-500 font-medium cursor-not-allowed outline-none"
+                                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-slate-700/50 text-gray-500 dark:text-gray-400 font-medium cursor-not-allowed outline-none"
                                 />
                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
                                     <User size={20} />
@@ -288,18 +330,18 @@ const CreateBlog = () => {
                         </div>
 
                         {/* Content */}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 Content
                             </label>
-                            <div className="prose-editor">
+                            <div className="prose-editor dark:text-white">
                                 <ReactQuill
                                     ref={quillRef}
                                     theme="snow"
                                     value={formData.content}
                                     onChange={(content) => setFormData(prev => ({ ...prev, content }))}
                                     placeholder="Write your blog content here..."
-                                    className="h-[400px] mb-12"
+                                    className="h-[400px] mb-12 dark:text-white"
                                     modules={modules}
                                 />
                             </div>
@@ -309,17 +351,17 @@ const CreateBlog = () => {
                     {/* Sidebar (Right) */}
                     <div className="space-y-6">
                         {/* Publish Status */}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <h3 className="font-semibold text-gray-900 mb-4">Publish Status</h3>
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Publish Status</h3>
 
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm text-gray-600 mb-2">Status</label>
+                                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Status</label>
                                     <select
                                         name="status"
                                         value={formData.status}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
                                     >
                                         <option value="pending">Pending</option>
                                         <option value="active">Active</option>
@@ -328,18 +370,18 @@ const CreateBlog = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm text-gray-600 mb-2">Category</label>
+                                    <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">Category</label>
                                     <input
                                         type="text"
                                         name="category"
                                         value={formData.category}
                                         onChange={handleChange}
                                         placeholder="e.g. Technology"
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                                        className="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                     />
                                 </div>
 
-                                <div className="pt-4 border-t border-gray-100">
+                                <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
                                     <button
                                         type="submit"
                                         disabled={loading}
@@ -353,11 +395,11 @@ const CreateBlog = () => {
                         </div>
 
                         {/* Thumbnail Upload */}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <h3 className="font-semibold text-gray-900 mb-4">Featured Image</h3>
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Featured Image</h3>
 
                             <div className="space-y-4">
-                                <div className="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors relative">
+                                <div className="border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-xl p-4 text-center hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors relative">
                                     {previewUrl ? (
                                         <div className="relative">
                                             <img
@@ -386,13 +428,13 @@ const CreateBlog = () => {
                                                 disabled={uploading}
                                             />
                                             <div className="py-8">
-                                                <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                                                <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-3">
                                                     {uploading ? <Loader2 className="animate-spin" /> : <UploadCloud size={24} />}
                                                 </div>
-                                                <p className="text-sm font-medium text-gray-900">
+                                                <p className="text-sm font-medium text-gray-900 dark:text-white">
                                                     {uploading ? "Uploading..." : "Click to upload image"}
                                                 </p>
-                                                <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PNG, JPG up to 5MB</p>
                                             </div>
                                         </label>
                                     )}
@@ -402,6 +444,7 @@ const CreateBlog = () => {
                     </div>
                 </div>
             </form>
+            <style>{quillDarkTheme}</style>
         </div>
     );
 };

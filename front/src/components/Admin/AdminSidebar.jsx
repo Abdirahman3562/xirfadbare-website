@@ -104,9 +104,9 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
 
 
     const sidebarContent = (
-        <div className="h-full flex flex-col bg-white border-r border-gray-100 shadow-sm">
+        <div className="h-full flex flex-col bg-white dark:bg-slate-900 border-r border-gray-100 dark:border-gray-800 shadow-sm transition-colors duration-300">
             {/* Logo Area */}
-            <div className="p-6 flex items-center justify-center border-b border-gray-50 h-[80px]">
+            <div className="p-6 flex items-center justify-center border-b border-gray-50 dark:border-gray-800 h-[80px]">
                 {settings.logo ? (
                     <img
                         src={settings.logo}
@@ -115,7 +115,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
                     />
                 ) : (
                     <h1 className="text-2xl font-black text-emerald-600 tracking-tighter cursor-pointer hover:scale-105 transition-transform duration-300 font-[Outfit]">
-                        Samafale<span className="text-gray-900">Academy</span>
+                        Samafale<span className="text-gray-900 dark:text-white">Academy</span>
                     </h1>
                 )}
             </div>
@@ -129,8 +129,8 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
                         onClick={closeMobileSidebar}
                         className={({ isActive }) =>
                             `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium group ${isActive
-                                ? 'bg-emerald-50 text-emerald-600 shadow-sm'
-                                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                                ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white'
                             }`
                         }
                     >
@@ -154,7 +154,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
     return (
         <>
             {/* Desktop Sidebar */}
-            <div className="hidden lg:block w-64 fixed top-0 left-0 bottom-0 z-40 bg-white">
+            <div className="hidden lg:block w-64 fixed top-0 left-0 bottom-0 z-40 bg-white dark:bg-slate-900 transition-colors duration-300">
                 {sidebarContent}
             </div>
 
@@ -167,7 +167,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
 
             {/* Mobile Sidebar */}
             <div
-                className={`fixed top-0 left-0 bottom-0 w-64 bg-white z-50 lg:hidden transform transition-transform duration-300 shadow-2xl ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed top-0 left-0 bottom-0 w-64 bg-white dark:bg-slate-900 z-50 lg:hidden transform transition-transform duration-300 shadow-2xl ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
             >
                 <div className="relative h-full">

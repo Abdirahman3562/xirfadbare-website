@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Search, Send, User, MessageSquare, ShieldAlert, ShieldCheck, Loader, ArrowLeft } from 'lucide-react';
+import PremiumLoader from '../../../components/ui/PremiumLoader';
 import { getImageUrl } from '../../../utils/format';
 import { toast } from 'react-toastify';
 
@@ -171,12 +172,12 @@ export default function LiveChat() {
     );
 
     return (
-        <div className="flex flex-col lg:flex-row h-[calc(100vh-144px)] lg:h-[calc(100vh-160px)] w-full max-w-full bg-white lg:rounded-3xl overflow-hidden shadow-2xl border border-gray-100 font-[Inter] animate-in fade-in zoom-in duration-500">
+        <div className="flex flex-col lg:flex-row h-[calc(100vh-144px)] lg:h-[calc(100vh-160px)] w-full max-w-full bg-white dark:bg-slate-900 lg:rounded-3xl overflow-hidden shadow-2xl border border-gray-100 dark:border-gray-800 font-[Inter] animate-in fade-in zoom-in duration-500 transition-colors">
 
             {/* Sidebar */}
-            <div className={`${showMobileMessages ? "hidden" : "flex"} lg:flex w-full lg:w-1/3 border-r border-gray-100 flex-col bg-slate-50 min-w-0 h-full`}>
-                <div className="p-6 border-b border-gray-100 bg-white shrink-0">
-                    <h2 className="font-black text-2xl text-gray-900 mb-6 flex items-center gap-3">
+            <div className={`${showMobileMessages ? "hidden" : "flex"} lg:flex w-full lg:w-1/3 border-r border-gray-100 dark:border-gray-800 flex-col bg-slate-50 dark:bg-slate-800 min-w-0 h-full transition-colors`}>
+                <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-800 shrink-0 transition-colors">
+                    <h2 className="font-black text-2xl text-gray-900 dark:text-white mb-6 flex items-center gap-3">
                         <div className="p-2 bg-emerald-100 rounded-xl">
                             <MessageSquare className="text-emerald-600" size={24} />
                         </div>
@@ -189,31 +190,25 @@ export default function LiveChat() {
                             placeholder="Search active chats..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
-                            className="w-full pl-12 pr-4 py-3.5 bg-gray-100 border-2 border-transparent rounded-2xl text-sm focus:bg-white focus:border-emerald-500/30 outline-none transition-all placeholder:text-gray-400"
+                            className="w-full pl-12 pr-4 py-3.5 bg-gray-100 dark:bg-slate-700 border-2 border-transparent rounded-2xl text-sm focus:bg-white dark:focus:bg-slate-600 focus:border-emerald-500/30 outline-none transition-all placeholder:text-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-white"
                         />
                     </div>
                 </div>
 
-                {/* Users List */}
                 <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar p-3 space-y-2">
-                    {loading ? (
-                        <div className="p-12 text-center">
-                            <Loader className="animate-spin text-emerald-500 mx-auto mb-2" size={32} />
-                            <p className="text-gray-400 text-sm font-medium">Loading conversations...</p>
-                        </div>
-                    ) : filteredConvos.length === 0 ? (
-                        <div className="p-12 text-center bg-white rounded-2xl border border-dashed border-gray-200">
-                            <p className="text-gray-400 text-sm">No active chats found.</p>
+                    {filteredConvos.length === 0 ? (
+                        <div className="p-12 text-center bg-white dark:bg-slate-800 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700">
+                            <p className="text-gray-400 dark:text-gray-500 text-sm">No active chats found.</p>
                         </div>
                     ) : (
                         filteredConvos.map(c => (
                             <button
                                 key={c._id}
                                 onClick={() => handleSelectUser(c.user)}
-                                className={`w-full p-4 flex items-center gap-4 group transition-all rounded-2xl border border-transparent ${selectedUser?._id === c.user._id ? "bg-white shadow-md border-emerald-100 -translate-x-1" : "hover:bg-gray-100 active:scale-95"}`}
+                                className={`w-full p-4 flex items-center gap-4 group transition-all rounded-2xl border border-transparent ${selectedUser?._id === c.user._id ? "bg-white dark:bg-slate-700 shadow-md border-emerald-100 dark:border-emerald-500/30 -translate-x-1" : "hover:bg-gray-100 dark:hover:bg-slate-700/50 active:scale-95"}`}
                             >
                                 <div className="relative shrink-0">
-                                    <div className={`w-14 h-14 rounded-2xl overflow-hidden bg-white shadow-sm border-2 ${selectedUser?._id === c.user._id ? "border-emerald-500" : "border-white"}`}>
+                                    <div className={`w-14 h-14 rounded-2xl overflow-hidden bg-white dark:bg-slate-600 shadow-sm border-2 ${selectedUser?._id === c.user._id ? "border-emerald-500" : "border-white dark:border-slate-600"}`}>
                                         {c.user.image ? (
                                             <img src={getImageUrl(c.user.image)} alt={c.user.firstName} className="w-full h-full object-cover" />
                                         ) : (
@@ -228,14 +223,14 @@ export default function LiveChat() {
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-baseline mb-0.5">
-                                        <h3 className="font-bold text-gray-900 truncate pr-2 text-sm">
+                                        <h3 className={`font-bold truncate pr-2 text-sm ${selectedUser?._id === c.user._id ? "text-gray-900 dark:text-white" : "text-gray-900 dark:text-gray-200"}`}>
                                             {c.user.firstName} {c.user.lastName}
                                         </h3>
-                                        <span className="text-[10px] text-gray-400 font-bold uppercase shrink-0">
+                                        <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase shrink-0">
                                             {new Date(c.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>
-                                    <p className={`text-xs truncate leading-relaxed ${c.unreadCount > 0 ? "font-black text-gray-900" : "text-gray-400"}`}>
+                                    <p className={`text-xs truncate leading-relaxed ${c.unreadCount > 0 ? "font-black text-gray-900 dark:text-white" : "text-gray-400 dark:text-gray-500"}`}>
                                         {c.sender === 'admin' ? "You: " : c.sender === 'bot' ? "Bot: " : ""}{c.lastMessage}
                                     </p>
                                 </div>
@@ -249,28 +244,28 @@ export default function LiveChat() {
             </div>
 
             {/* Chat Window */}
-            <div className={`${!showMobileMessages ? "hidden" : "flex"} lg:flex lg:w-2/3 flex-col bg-white relative h-full overflow-hidden min-w-0`}>
+            <div className={`${!showMobileMessages ? "hidden" : "flex"} lg:flex lg:w-2/3 flex-col bg-white dark:bg-slate-900 relative h-full overflow-hidden min-w-0 transition-colors`}>
                 {selectedUser ? (
                     <div className="flex flex-col h-full w-full">
                         {/* Header */}
-                        <div className="p-4 lg:p-5 border-b border-gray-100 flex items-center justify-between shadow-sm z-20 bg-white/80 backdrop-blur-md shrink-0">
+                        <div className="p-4 lg:p-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shadow-sm z-20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shrink-0 transition-colors">
                             <div className="flex items-center gap-3 lg:gap-4">
                                 {/* Back Button for Mobile */}
                                 <button
                                     onClick={() => setShowMobileMessages(false)}
-                                    className="lg:hidden p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-500"
+                                    className="lg:hidden p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-colors text-gray-500 dark:text-gray-400"
                                 >
                                     <ArrowLeft size={24} />
                                 </button>
 
-                                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shadow-sm relative shrink-0">
+                                <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-2xl overflow-hidden bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-gray-700 shadow-sm relative shrink-0">
                                     {selectedUser.image ? (
                                         <img src={getImageUrl(selectedUser.image)} alt={selectedUser.firstName} className="w-full h-full object-cover" />
-                                    ) : <div className="w-full h-full flex items-center justify-center text-emerald-600 bg-emerald-50 font-bold text-lg uppercase">{selectedUser.firstName[0]}</div>}
-                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                                    ) : <div className="w-full h-full flex items-center justify-center text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-slate-700 font-bold text-lg uppercase">{selectedUser.firstName[0]}</div>}
+                                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full"></div>
                                 </div>
                                 <div className="min-w-0">
-                                    <h3 className="font-black text-gray-900 tracking-tight text-sm lg:text-base truncate">{selectedUser.firstName} {selectedUser.lastName}</h3>
+                                    <h3 className="font-black text-gray-900 dark:text-white tracking-tight text-sm lg:text-base truncate">{selectedUser.firstName} {selectedUser.lastName}</h3>
                                     <p className="text-[10px] lg:text-[11px] text-emerald-600 font-bold flex items-center gap-1.5 mt-0.5">
                                         <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shrink-0"></span> {selectedUser.isChatPausedByAdmin ? "HANDLED BY YOU" : "MONITORED BY BOT"}
                                     </p>
@@ -280,7 +275,7 @@ export default function LiveChat() {
                             {hasPermission('chat.manage') && (
                                 <button
                                     onClick={handleTakeOver}
-                                    className={`flex items-center gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl font-bold text-[10px] lg:text-xs transition-all active:scale-95 shadow-lg shrink-0 ${selectedUser.isChatPausedByAdmin
+                                    className={`flex items-center dark:shadow-none cursor-pointer gap-2 px-3 lg:px-5 py-2 lg:py-2.5 rounded-2xl font-bold text-[10px] lg:text-xs transition-all active:scale-95 shadow-lg shrink-0 ${selectedUser.isChatPausedByAdmin
                                         ? "bg-gray-100 text-gray-600 hover:bg-gray-200 shadow-gray-200/50"
                                         : "bg-amber-500 text-white hover:bg-amber-600 shadow-amber-200"
                                         }`}
@@ -293,16 +288,15 @@ export default function LiveChat() {
                         </div>
 
                         {/* Messages Area */}
-                        <div className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6 lg:space-y-8 bg-slate-50/50 overscroll-contain min-h-0" style={{ backgroundImage: 'radial-gradient(#e2e8f0 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
+                        <div className="flex-1 overflow-y-auto p-4 lg:p-8 space-y-6 lg:space-y-8 bg-slate-50/50 dark:bg-slate-900 overscroll-contain min-h-0 transition-colors" style={{ backgroundImage: 'radial-gradient(circle, rgba(226, 232, 240, 0.4) 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
                             {msgLoading ? (
-                                <div className="flex h-full flex-col items-center justify-center text-gray-400">
-                                    <Loader className="animate-spin text-emerald-500 mb-4" size={32} lg:size={40} />
-                                    <p className="font-bold text-xs lg:text-sm">Securely fetching messages...</p>
+                                <div className="flex h-full items-center justify-center">
+                                    <PremiumLoader text="Securely fetching messages..." />
                                 </div>
                             ) : messages.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-48 bg-white/50 rounded-3xl border border-dashed border-gray-200 my-10">
-                                    <MessageSquare size={32} className="text-gray-200 mb-2" />
-                                    <p className="text-center text-gray-400 text-sm font-medium">Start the conversation by saying hi!</p>
+                                <div className="flex flex-col items-center justify-center h-48 bg-white/50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700 my-10">
+                                    <MessageSquare size={32} className="text-gray-200 dark:text-gray-600 mb-2" />
+                                    <p className="text-center text-gray-400 dark:text-gray-500 text-sm font-medium">Start the conversation by saying hi!</p>
                                 </div>
                             ) : (
                                 messages.map((m, i) => {
@@ -319,7 +313,7 @@ export default function LiveChat() {
 
                                                 {/* Avatar */}
                                                 <div className="shrink-0 mt-auto pb-6">
-                                                    <div className={`w-8 h-8 rounded-xl overflow-hidden bg-white shadow-sm border ${alignRight ? "border-emerald-100" : "border-gray-100"} flex items-center justify-center`}>
+                                                    <div className={`w-8 h-8 rounded-xl overflow-hidden bg-white dark:bg-slate-800 shadow-sm border ${alignRight ? "border-emerald-100 dark:border-emerald-500/20" : "border-gray-100 dark:border-gray-700"} flex items-center justify-center`}>
                                                         {isAdmin ? (
                                                             m.admin?.image ? (
                                                                 <img src={getImageUrl(m.admin.image)} alt="Admin" className="w-full h-full object-cover" />
@@ -344,12 +338,12 @@ export default function LiveChat() {
                                                     <div className={`relative px-5 py-3.5 rounded-3xl shadow-sm text-sm leading-relaxed break-all whitespace-pre-wrap ${isAdmin
                                                         ? "bg-emerald-600 text-white rounded-br-none"
                                                         : isBot
-                                                            ? "bg-slate-800 text-slate-100 rounded-br-none"
-                                                            : "bg-white text-gray-900 border border-gray-100 rounded-bl-none"
+                                                            ? "bg-slate-800 dark:bg-slate-700 text-slate-100 rounded-br-none"
+                                                            : "bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 border border-gray-100 dark:border-gray-700 rounded-bl-none"
                                                         }`}>
                                                         {m.message}
                                                     </div>
-                                                    <div className={`flex items-center gap-1.5 mt-2 px-1 text-[10px] font-bold uppercase tracking-wider ${alignRight ? "text-emerald-600" : "text-gray-400"}`}>
+                                                    <div className={`flex items-center gap-1.5 mt-2 px-1 text-[10px] font-bold uppercase tracking-wider ${alignRight ? "text-emerald-600 dark:text-emerald-400" : "text-gray-400 dark:text-gray-500"}`}>
                                                         <span>
                                                             {isAdmin ? (m.admin?.firstName || "Administrator") : isBot ? "Assistant" : selectedUser.firstName}
                                                         </span>
@@ -366,7 +360,7 @@ export default function LiveChat() {
                         </div>
 
                         {/* Message Input area */}
-                        <div className="p-4 lg:p-6 border-t border-gray-100 bg-white shrink-0">
+                        <div className="p-4 lg:p-6 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-slate-900 shrink-0 transition-colors">
                             <form onSubmit={handleSend} className="relative flex items-center gap-2 lg:gap-3">
                                 <div className="flex-1 relative group">
                                     <input
@@ -375,7 +369,7 @@ export default function LiveChat() {
                                         onChange={e => setInput(e.target.value)}
                                         disabled={!hasPermission('chat.manage')}
                                         placeholder={!hasPermission('chat.manage') ? "View only mode" : selectedUser.isChatPausedByAdmin ? "Type your reply..." : "Bot is active..."}
-                                        className="w-full bg-gray-50 border-2 border-transparent focus:border-emerald-500/30 focus:bg-white rounded-2xl lg:rounded-[1.5rem] px-4 lg:px-6 py-3 lg:py-4 outline-none transition-all text-xs lg:text-sm placeholder:text-gray-400 pr-12 lg:pr-14 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-emerald-500/30 dark:focus:border-emerald-500/30 focus:bg-white dark:focus:bg-slate-800 rounded-2xl lg:rounded-[1.5rem] px-4 lg:px-6 py-3 lg:py-4 outline-none transition-all text-xs lg:text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 pr-12 lg:pr-14 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 dark:text-white"
                                     />
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
                                         {!selectedUser.isChatPausedByAdmin && (
@@ -388,7 +382,7 @@ export default function LiveChat() {
                                 <button
                                     type="submit"
                                     disabled={!input.trim()}
-                                    className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-30 disabled:hover:bg-emerald-600 text-white p-3 lg:p-4 rounded-xl lg:rounded-[1.25rem] transition-all shadow-xl shadow-emerald-200 active:scale-95 shrink-0"
+                                    className="bg-emerald-600 dark:shadow-none cursor-pointer hover:bg-emerald-700 disabled:opacity-30 disabled:hover:bg-emerald-600 text-white p-3 lg:p-4 rounded-xl lg:rounded-[1.25rem] transition-all shadow-xl shadow-emerald-200 active:scale-95 shrink-0"
                                 >
                                     <Send size={20} lg:size={24} />
                                 </button>
@@ -399,16 +393,16 @@ export default function LiveChat() {
                         </div>
                     </div>
                 ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center p-20 text-center space-y-6">
+                    <div className="flex-1 flex flex-col items-center justify-center p-20 text-center space-y-6 bg-white dark:bg-slate-900 transition-colors">
                         <div className="relative">
-                            <div className="absolute inset-0 bg-emerald-100 rounded-full blur-3xl opacity-50 scale-150 animate-pulse"></div>
-                            <div className="relative w-32 h-32 bg-white rounded-full shadow-2xl flex items-center justify-center border border-gray-50">
+                            <div className="absolute inset-0 bg-emerald-100 dark:bg-emerald-500/10 rounded-full blur-3xl opacity-50 scale-150 animate-pulse"></div>
+                            <div className="relative w-32 h-32 bg-white dark:bg-slate-800 rounded-full shadow-2xl flex items-center justify-center border border-gray-50 dark:border-gray-700">
                                 <MessageSquare size={64} className="text-emerald-500" />
                             </div>
                         </div>
                         <div className="max-w-xs">
-                            <h3 className="text-2xl font-black text-gray-900 mb-2 mt-4 uppercase tracking-tighter italic">Select a Chat</h3>
-                            <p className="text-gray-400 text-sm font-medium leading-relaxed">
+                            <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2 mt-4 uppercase tracking-tighter italic">Select a Chat</h3>
+                            <p className="text-gray-400 dark:text-gray-500 text-sm font-medium leading-relaxed">
                                 Pick a student from the sidebar to view history or provide manual assistance.
                             </p>
                         </div>

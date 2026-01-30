@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import PremiumLoader from '../../../components/ui/PremiumLoader';
 import { API_BASE_URL } from '../../../config';
 import {
     Plus,
@@ -137,8 +138,8 @@ const ManagePayments = () => {
         <div className="space-y-8 animate-in fade-in duration-500 w-full">
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">Payment Methods</h1>
-                    <p className="text-gray-500 font-medium mt-1">Maaree qababka lacag bixinta iyo tilmaamahooda.</p>
+                    <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Payment Methods</h1>
+                    <p className="text-gray-500 dark:text-gray-400 font-medium mt-1">Maaree qababka lacag bixinta iyo tilmaamahooda.</p>
                 </div>
                 {hasPermission('payments.create') && (
                     <button
@@ -147,7 +148,7 @@ const ManagePayments = () => {
                             setFormData({ name: '', instruction: '', isActive: true, type: 'local', icon: 'CreditCard' });
                             setIsModalOpen(true);
                         }}
-                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-200 transition-all active:scale-95"
+                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-200 dark:shadow-none transition-all active:scale-95 cursor-pointer"
                     >
                         <Plus size={16} />
                         Method Cusub
@@ -156,27 +157,25 @@ const ManagePayments = () => {
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                </div>
+                <PremiumLoader />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {methods.map((method) => (
-                        <div key={method._id} className="group relative bg-white rounded-[2.5rem] border border-gray-100 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden flex flex-col">
+                        <div key={method._id} className="group relative bg-white dark:bg-slate-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 p-6 shadow-sm hover:shadow-xl dark:hover:shadow-none dark:hover:bg-slate-700/50 hover:-translate-y-1 transition-all duration-500 overflow-hidden flex flex-col">
                             <div className="flex justify-between items-start mb-6">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border-2 border-white shadow-md">
+                                    <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border-2 border-white dark:border-gray-600 shadow-md dark:shadow-none">
                                         <CreditCard size={24} />
                                     </div>
                                     <div>
-                                        <h3 className="text-[15px] font-black text-gray-900">{method.name}</h3>
+                                        <h3 className="text-[15px] font-black text-gray-900 dark:text-white">{method.name}</h3>
                                         <div className="flex gap-2 mt-1">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${method.isActive ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-gray-50 text-gray-400 border border-gray-100'
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${method.isActive ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20' : 'bg-gray-50 dark:bg-slate-700 text-gray-400 dark:text-gray-500 border border-gray-100 dark:border-gray-600'
                                                 }`}>
                                                 <div className={`w-1 h-1 rounded-full ${method.isActive ? 'bg-emerald-500' : 'bg-gray-400'}`} />
                                                 {method.isActive ? 'Active' : 'Inactive'}
                                             </span>
-                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border ${method.type === 'online' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-amber-50 text-amber-600 border-amber-100'
+                                            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border ${method.type === 'online' ? 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20' : 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-500/20'
                                                 }`}>
                                                 {method.type || 'local'}
                                             </span>
@@ -203,21 +202,21 @@ const ManagePayments = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-gray-50/80 rounded-3xl p-5 border border-gray-100 flex-1">
-                                <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-2">Instructions</span>
-                                <p className="text-sm font-medium text-gray-600 leading-relaxed italic line-clamp-4">
+                            <div className="bg-gray-50/80 dark:bg-slate-700/30 rounded-3xl p-5 border border-gray-100 dark:border-gray-600 flex-1">
+                                <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block mb-2">Instructions</span>
+                                <p className="text-sm font-medium text-gray-600 dark:text-gray-300 leading-relaxed italic line-clamp-4">
                                     "{method.instruction}"
                                 </p>
                             </div>
                         </div>
                     ))}
                     {methods.length === 0 && (
-                        <div className="col-span-full bg-white rounded-[2.5rem] border-2 border-dashed border-gray-100 py-20 text-center">
-                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <CreditCard className="text-gray-300" size={32} />
+                        <div className="col-span-full bg-white dark:bg-slate-800 rounded-[2.5rem] border-2 border-dashed border-gray-100 dark:border-gray-700 py-20 text-center">
+                            <div className="w-16 h-16 bg-gray-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <CreditCard className="text-gray-300 dark:text-gray-500" size={32} />
                             </div>
-                            <h3 className="text-gray-900 font-bold">Ma jiraan methods lacag bixin</h3>
-                            <p className="text-gray-400 text-sm mt-1">Ku dar method-kaaga ugu horeeya adigoo riixaya badhanka kore.</p>
+                            <h3 className="text-gray-900 dark:text-white font-bold">Ma jiraan methods lacag bixin</h3>
+                            <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Ku dar method-kaaga ugu horeeya adigoo riixaya badhanka kore.</p>
                         </div>
                     )}
                 </div>
@@ -226,7 +225,7 @@ const ManagePayments = () => {
             {/* Upsert Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-lg  rounded-[2.55rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-gray-100">
+                    <div className="bg-white dark:bg-slate-800 w-full max-w-lg  rounded-[2.55rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-gray-100 dark:border-gray-700">
                         <div className="relative h-32 bg-emerald-600 p-8 flex items-end justify-between overflow-hidden">
                             <div className="absolute top-0 right-0 w-48 h-26 bg-emerald-500 rounded-full -translate-y-1/2 translate-x-1/2 opacity-20"></div>
                             <div className="relative z-10">
@@ -242,7 +241,7 @@ const ManagePayments = () => {
                             <div className="flex flex-col md:flex-row gap-4">
                                 {/* Method Name */}
                                 <div className="w-full md:w-1/2 space-y-1.5">
-                                    <label className="ml-1 text-[11px] font-black uppercase tracking-wider text-gray-400">
+                                    <label className="ml-1 text-[11px] font-black uppercase tracking-wider text-gray-400 dark:text-gray-500">
                                         Method Name
                                     </label>
                                     <input
@@ -252,14 +251,14 @@ const ManagePayments = () => {
                                             setFormData({ ...formData, name: e.target.value })
                                         }
                                         placeholder="E.g. EVC Plus, Sahal, Premier Wallet"
-                                        className="w-full rounded-2xl border border-gray-100 bg-gray-50 px-5 py-3.5 text-sm font-bold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10"
+                                        className="w-full rounded-2xl border border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-slate-700 px-5 py-3.5 text-sm font-bold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                         required
                                     />
                                 </div>
 
                                 {/* Payment Instructions */}
                                 <div className="w-full md:w-1/2 space-y-1.5">
-                                    <label className="ml-1 text-[11px] font-black uppercase tracking-wider text-gray-400">
+                                    <label className="ml-1 text-[11px] font-black uppercase tracking-wider text-gray-400 dark:text-gray-500">
                                         Payment Instructions
                                     </label>
                                     <textarea
@@ -268,7 +267,7 @@ const ManagePayments = () => {
                                             setFormData({ ...formData, instruction: e.target.value })
                                         }
                                         placeholder="Tilmaam sida ardaygu u soo dirayo lacagta"
-                                        className="w-full rounded-2xl border border-gray-100 bg-gray-50 px-5 py-3 text-sm font-bold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 resize-none"
+                                        className="w-full rounded-2xl border border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-slate-700 px-5 py-3 text-sm font-bold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                         required
                                     />
                                 </div>
@@ -276,14 +275,14 @@ const ManagePayments = () => {
 
 
                             <div className="space-y-1.5">
-                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-wider ml-1">Payment Method Category</label>
+                                <label className="text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider ml-1">Payment Method Category</label>
                                 <div className="grid grid-cols-2 gap-3">
                                     <button
                                         type="button"
                                         onClick={() => setFormData({ ...formData, type: 'local' })}
-                                        className={`py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${formData.type === 'local'
-                                            ? 'bg-emerald-50 border-emerald-500 text-emerald-600 shadow-sm'
-                                            : 'bg-white border-gray-100 text-gray-400 hover:bg-gray-50'
+                                        className={`py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border cursor-pointer ${formData.type === 'local'
+                                            ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                                            : 'bg-white dark:bg-slate-700 border-gray-100 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-slate-600'
                                             }`}
                                     >
                                         Local Payment
@@ -291,9 +290,9 @@ const ManagePayments = () => {
                                     <button
                                         type="button"
                                         onClick={() => setFormData({ ...formData, type: 'online' })}
-                                        className={`py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border ${formData.type === 'online'
-                                            ? 'bg-blue-50 border-blue-500 text-blue-600 shadow-sm'
-                                            : 'bg-white border-gray-100 text-gray-400 hover:bg-gray-50'
+                                        className={`py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border cursor-pointer ${formData.type === 'online'
+                                            ? 'bg-blue-50 dark:bg-blue-500/10 border-blue-500 text-blue-600 dark:text-blue-400 shadow-sm'
+                                            : 'bg-white dark:bg-slate-700 border-gray-100 dark:border-gray-600 text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-slate-600'
                                             }`}
                                     >
                                         Online Payment
@@ -301,15 +300,15 @@ const ManagePayments = () => {
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-2xl border border-gray-100 dark:border-gray-600">
                                 <div className="flex flex-col">
-                                    <span className="text-[11px] font-black text-gray-700">Status-ka Method-ka</span>
-                                    <span className="text-[10px] text-gray-400 font-bold">Active ama Inactive ka dhig</span>
+                                    <span className="text-[11px] font-black text-gray-700 dark:text-gray-200">Status-ka Method-ka</span>
+                                    <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold">Active ama Inactive ka dhig</span>
                                 </div>
                                 <button
                                     type="button"
                                     onClick={() => setFormData({ ...formData, isActive: !formData.isActive })}
-                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.isActive ? 'bg-emerald-600' : 'bg-gray-200'}`}
+                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${formData.isActive ? 'bg-emerald-600' : 'bg-gray-200 dark:bg-slate-500'}`}
                                 >
                                     <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.isActive ? 'translate-x-6' : 'translate-x-1'}`} />
                                 </button>
@@ -319,13 +318,13 @@ const ManagePayments = () => {
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 py-4 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
+                                    className="flex-1 py-4 cursor-pointer bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
-                                    className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-100 active:scale-95 flex items-center justify-center gap-2"
+                                    className="flex-1 py-4 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-100 dark:shadow-none active:scale-95 flex items-center justify-center gap-2"
                                 >
                                     <Save size={14} />
                                     {editingMethod ? 'Update' : 'Save Method'}
@@ -339,27 +338,27 @@ const ManagePayments = () => {
             {/* Delete Modal */}
             {showDeleteModal && (
                 <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-gray-100">
+                    <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-gray-100 dark:border-gray-700">
                         <div className="p-8 text-center">
-                            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100">
-                                <AlertTriangle size={32} className="text-red-500 animate-pulse" />
+                            <div className="w-16 h-16 bg-red-50 dark:bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100 dark:border-red-500/30">
+                                <AlertTriangle size={32} className="text-red-500 dark:text-red-400 animate-pulse" />
                             </div>
-                            <h3 className="text-lg font-black text-gray-900 mb-2">Ma hubtaa boss?</h3>
-                            <p className="text-[13px] text-gray-500 font-medium">
+                            <h3 className="text-lg font-black text-gray-900 dark:text-white mb-2">Ma hubtaa boss?</h3>
+                            <p className="text-[13px] text-gray-500 dark:text-gray-400 font-medium">
                                 Method-kan "{methodToDelete?.name}" mar haddii la tirtiro lama soo celin karo.
                             </p>
                         </div>
-                        <div className="p-8 bg-gray-50/50 border-t border-gray-100 flex gap-3">
+                        <div className="p-8 bg-gray-50/50 dark:bg-slate-700/50 border-t border-gray-100 dark:border-gray-700 flex gap-3">
                             <button
                                 onClick={() => setShowDeleteModal(false)}
-                                className="flex-1 py-3.5 bg-white hover:bg-gray-100 text-gray-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-gray-200"
+                                className="flex-1 py-3.5 cursor-pointer bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-200 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-gray-200 dark:border-gray-600"
                                 disabled={isDeleting}
                             >
                                 Jooji
                             </button>
                             <button
                                 onClick={confirmDelete}
-                                className="flex-1 py-3.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-100 flex items-center justify-center gap-2"
+                                className="flex-1 py-3.5 cursor-pointer bg-red-600 hover:bg-red-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-100 dark:shadow-none flex items-center justify-center gap-2"
                                 disabled={isDeleting}
                             >
                                 {isDeleting ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Trash2 size={14} />}

@@ -40,6 +40,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getFullCourseDetails, updateCourse } from '../../../api/courseService';
+import PremiumLoader from '../../../components/ui/PremiumLoader';
 import { getAllInstructors } from '../../../api/instructorService';
 import { API_BASE_URL } from '../../../config';
 import { toast } from 'react-toastify';
@@ -65,7 +66,7 @@ const SortableLesson = ({ lesson, lIndex, sIndex, handleLessonChange, removeLess
         <div
             ref={setNodeRef}
             style={style}
-            className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 group/lesson transition-all hover:border-emerald-200"
+            className="bg-white dark:bg-slate-700/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-600 shadow-sm flex items-center gap-4 group/lesson transition-all hover:border-emerald-200 dark:hover:border-emerald-500/30"
         >
             <div
                 {...attributes}
@@ -75,7 +76,7 @@ const SortableLesson = ({ lesson, lIndex, sIndex, handleLessonChange, removeLess
             >
                 <GripVertical size={16} />
             </div>
-            <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 text-[10px] font-black">
+            <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-[10px] font-black">
                 {lIndex + 1}
             </div>
             <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -83,26 +84,26 @@ const SortableLesson = ({ lesson, lIndex, sIndex, handleLessonChange, removeLess
                     type="text"
                     value={lesson.title}
                     onChange={(e) => handleLessonChange(sIndex, lIndex, 'title', e.target.value)}
-                    className="text-sm font-semibold text-gray-900 outline-none border-none py-1 h-full"
+                    className="text-sm font-semibold text-gray-900 dark:text-white bg-transparent outline-none border-none py-1 h-full placeholder-gray-400 dark:placeholder-gray-500"
                     placeholder="Lesson title..."
                 />
-                <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl">
+                <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-transparent dark:border-gray-700">
                     <Clock size={14} className="text-gray-400" />
                     <input
                         type="text"
                         value={lesson.duration}
                         onChange={(e) => handleLessonChange(sIndex, lIndex, 'duration', e.target.value)}
-                        className="bg-transparent text-xs font-bold text-gray-600 w-16 outline-none"
+                        className="bg-transparent text-xs font-bold text-gray-600 dark:text-gray-300 w-16 outline-none"
                         placeholder="00:00"
                     />
                 </div>
-                <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-xl">
+                <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-transparent dark:border-gray-700 overflow-hidden">
                     <Video size={14} className="text-gray-400" />
                     <input
                         type="text"
                         value={lesson.videoUrl}
                         onChange={(e) => handleLessonChange(sIndex, lIndex, 'videoUrl', e.target.value)}
-                        className="bg-transparent text-[10px] font-medium text-gray-500 flex-1 outline-none truncate"
+                        className="bg-transparent text-[10px] font-medium text-gray-500 dark:text-gray-400 flex-1 outline-none w-full min-w-0"
                         placeholder="Vimeo/YouTube ID"
                     />
                 </div>
@@ -146,7 +147,7 @@ const SortableSection = ({ section, sIndex, handleSectionTitleChange, removeSect
         <div
             ref={setNodeRef}
             style={style}
-            className="bg-gray-50/50 rounded-[2rem] border border-gray-100/50 p-8 space-y-6 relative group/section"
+            className="bg-gray-50/50 dark:bg-slate-800/50 rounded-[2rem] border border-gray-100/50 dark:border-gray-700/50 p-8 space-y-6 relative group/section transition-colors duration-300"
         >
             <div className="flex items-center gap-4">
                 <div
@@ -160,7 +161,7 @@ const SortableSection = ({ section, sIndex, handleSectionTitleChange, removeSect
                     type="text"
                     value={section.title}
                     onChange={(e) => handleSectionTitleChange(sIndex, e.target.value)}
-                    className="bg-transparent border-none outline-none text-lg font-bold text-gray-900 flex-1"
+                    className="bg-transparent border-none outline-none text-lg font-bold text-gray-900 dark:text-white flex-1 placeholder-gray-400 dark:placeholder-gray-500"
                     placeholder="Section Title..."
                 />
                 <button
@@ -501,30 +502,25 @@ const EditCourse = () => {
     };
 
     if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center h-screen space-y-4">
-                <Loader2 className="animate-spin text-emerald-600" size={48} />
-                <p className="text-gray-500 font-bold italic">Checking course data...</p>
-            </div>
-        );
+        return <PremiumLoader text="Checking course data..." />;
     }
 
     return (
         <div className="w-full space-y-8 pb-20 animate-in fade-in duration-700 font-[Inter]">
             {/* Top Toolbar */}
-            <div className="flex items-center justify-between bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm sticky top-4 z-40">
+            <div className="flex items-center justify-between bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-gray-100 dark:border-gray-700 shadow-sm sticky top-4 z-40 transition-colors duration-300">
                 <div className="flex items-center gap-4">
                     <Link
                         to="/admin/courses"
-                        className="p-3 hover:bg-gray-50 rounded-2xl text-gray-400 hover:text-gray-900 transition-all border border-transparent hover:border-gray-100"
+                        className="p-3 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-2xl text-gray-400 hover:text-gray-900 dark:hover:text-white transition-all border border-transparent hover:border-gray-100 dark:hover:border-gray-600"
                     >
                         <ChevronLeft size={24} />
                     </Link>
                     <div>
-                        <h1 className="text-xl font-black text-gray-900 line-clamp-1">
+                        <h1 className="text-xl font-black text-gray-900 dark:text-white line-clamp-1">
                             {id === 'new' ? 'DIWANGELI KOORSO CUSUB' : (courseData.title || 'BEDEL KOORSADA')}
                         </h1>
-                        <p className={`text-[10px] font-bold uppercase tracking-widest mt-0.5 ${id === 'new' ? 'text-blue-600' : 'text-emerald-600'}`}>
+                        <p className={`text-[10px] font-bold uppercase tracking-widest mt-0.5 ${id === 'new' ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                             {id === 'new' ? 'ADD MODE — CREATE CONTENT' : 'EDIT MODE — UPDATE CONTENT'}
                         </p>
                     </div>
@@ -533,7 +529,7 @@ const EditCourse = () => {
                     {id !== 'new' && (
                         <button
                             onClick={() => navigate(`/courses/${courseData.slug}`)}
-                            className="hidden md:flex items-center gap-2 px-6 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all font-bold text-xs uppercase tracking-widest border border-gray-100"
+                            className="hidden md:flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 rounded-xl transition-all font-bold text-xs uppercase tracking-widest border border-gray-100 dark:border-gray-700"
                         >
                             <Video size={16} />
                             Preview
@@ -542,7 +538,7 @@ const EditCourse = () => {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl transition-all font-bold text-xs uppercase tracking-widest shadow-xl shadow-emerald-200 disabled:opacity-50"
+                        className="flex items-center gap-2 bg-emerald-600 dark:shadow-none cursor-pointer hover:bg-emerald-700 text-white px-8 py-3 rounded-xl transition-all font-bold text-xs uppercase tracking-widest shadow-xl shadow-emerald-200 disabled:opacity-50"
                     >
                         {saving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
                         {saving ? (id === 'new' ? "Daabacaya..." : "Cusboonaysiinaya...") : (id === 'new' ? "PUBLISH COURSE" : "UPDATE COURSE")}
@@ -554,12 +550,12 @@ const EditCourse = () => {
                 {/* Main Content */}
                 <div className="lg:col-span-2 space-y-8">
                     {/* Basic Info */}
-                    <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-8">
-                        <div className="flex items-center gap-4 border-b border-gray-50 pb-6">
-                            <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
+                    <div className="bg-white dark:bg-slate-800 p-10 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm space-y-8 transition-colors duration-300">
+                        <div className="flex items-center gap-4 border-b border-gray-50 dark:border-gray-700/50 pb-6">
+                            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                                 <Layout size={24} />
                             </div>
-                            <h2 className="text-xl font-black text-gray-900">General Information</h2>
+                            <h2 className="text-xl font-black text-gray-900 dark:text-white">General Information</h2>
                         </div>
 
                         <div className="space-y-6">
@@ -570,7 +566,7 @@ const EditCourse = () => {
                                     name="title"
                                     value={courseData.title}
                                     onChange={handleInputChange}
-                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all"
+                                    className="w-full px-6 py-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                     placeholder="e.g. Master React in 30 Days"
                                 />
                             </div>
@@ -582,7 +578,7 @@ const EditCourse = () => {
                                     value={courseData.description}
                                     onChange={handleInputChange}
                                     rows="6"
-                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all resize-none"
+                                    className="w-full px-6 py-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                     placeholder="Provide a detailed roadmap of the course..."
                                 />
                             </div>
@@ -595,7 +591,7 @@ const EditCourse = () => {
                                     name="type"
                                     value={courseData.type}
                                     onChange={handleInputChange}
-                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all appearance-none cursor-pointer"
+                                    className="w-full px-6 py-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all appearance-none cursor-pointer text-gray-900 dark:text-white"
                                 >
                                     <option value="">Select Category</option>
                                     {categories.map(cat => (
@@ -610,7 +606,7 @@ const EditCourse = () => {
                                     name="technology"
                                     value={courseData.technology}
                                     onChange={handleInputChange}
-                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all"
+                                    className="w-full px-6 py-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                     placeholder="e.g. React, Node.js"
                                 />
                             </div>
@@ -621,7 +617,7 @@ const EditCourse = () => {
                                     name="price"
                                     value={courseData.price}
                                     onChange={handleInputChange}
-                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all font-[Outfit] text-lg"
+                                    className="w-full px-6 py-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all font-[Outfit] text-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                     placeholder="0.00"
                                 />
                             </div>
@@ -632,7 +628,7 @@ const EditCourse = () => {
                                     name="discountPercentage"
                                     value={courseData.discountPercentage}
                                     onChange={handleInputChange}
-                                    className="w-full px-6 py-4 bg-emerald-50/30 border border-emerald-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold transition-all text-emerald-700"
+                                    className="w-full px-6 py-4 bg-emerald-50/30 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/20 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold transition-all text-emerald-700 dark:text-emerald-400 placeholder-emerald-300 dark:placeholder-emerald-500/50"
                                     placeholder="0"
                                     max="100"
                                 />
@@ -648,7 +644,7 @@ const EditCourse = () => {
                                     name="discountCode"
                                     value={courseData.discountCode}
                                     onChange={handleInputChange}
-                                    className="w-full px-6 py-4 bg-emerald-50/30 border border-emerald-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold transition-all text-emerald-700 uppercase tracking-widest"
+                                    className="w-full px-6 py-4 bg-emerald-50/30 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/20 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold transition-all text-emerald-700 dark:text-emerald-400 uppercase tracking-widest placeholder-emerald-300 dark:placeholder-emerald-500/50"
                                     placeholder="e.g. SAVE20"
                                 />
                             </div>
@@ -661,7 +657,7 @@ const EditCourse = () => {
                                         name="discountExpiry"
                                         value={courseData.discountExpiry}
                                         onChange={handleInputChange}
-                                        className="w-full pl-10 pr-6 py-4 bg-emerald-50/30 border border-emerald-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold transition-all text-emerald-700 placeholder-emerald-300"
+                                        className="w-full pl-10 pr-6 py-4 bg-emerald-50/30 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/20 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold transition-all text-emerald-700 dark:text-emerald-400 placeholder-emerald-300 dark:placeholder-emerald-500/50"
                                     />
                                 </div>
                             </div>
@@ -669,13 +665,13 @@ const EditCourse = () => {
                     </div>
 
                     {/* Curriculum Builder */}
-                    <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-8">
-                        <div className="flex items-center justify-between border-b border-gray-50 pb-6">
+                    <div className="bg-white dark:bg-slate-800 p-10 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm space-y-8 transition-colors duration-300">
+                        <div className="flex items-center justify-between border-b border-gray-50 dark:border-gray-700/50 pb-6">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                                <div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400">
                                     <Video size={24} />
                                 </div>
-                                <h2 className="text-xl font-black text-gray-900">Curriculum Structure</h2>
+                                <h2 className="text-xl font-black text-gray-900 dark:text-white">Curriculum Structure</h2>
                             </div>
                             <button
                                 onClick={addSection}
@@ -713,20 +709,20 @@ const EditCourse = () => {
                             </DndContext>
 
                             {courseData.curriculum.length === 0 && (
-                                <div className="text-center py-12 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-                                    <p className="text-gray-400 font-medium italic">Qeybeha koorsadu hadda waa madhan yihiin.</p>
+                                <div className="text-center py-12 bg-gray-50 dark:bg-slate-700/50 rounded-3xl border border-dashed border-gray-200 dark:border-gray-700">
+                                    <p className="text-gray-400 dark:text-gray-500 font-medium italic">Qeybeha koorsadu hadda waa madhan yihiin.</p>
                                 </div>
                             )}
                         </div>
                     </div>
 
                     {/* Course Extras Card */}
-                    <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-8">
-                        <div className="flex items-center gap-4 border-b border-gray-50 pb-6">
-                            <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
+                    <div className="bg-white dark:bg-slate-800 p-10 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm space-y-8 transition-colors duration-300">
+                        <div className="flex items-center gap-4 border-b border-gray-50 dark:border-gray-700/50 pb-6">
+                            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                                 <Users size={24} />
                             </div>
-                            <h2 className="text-xl font-black text-gray-900">Course Extras & Outcomes</h2>
+                            <h2 className="text-xl font-black text-gray-900 dark:text-white">Course Extras & Outcomes</h2>
                         </div>
 
                         <div className="space-y-8">
@@ -739,7 +735,7 @@ const EditCourse = () => {
                                         name="communityLink"
                                         value={courseData.communityLink}
                                         onChange={handleInputChange}
-                                        className="w-full pl-14 pr-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all"
+                                        className="w-full pl-14 pr-6 py-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                         placeholder="https://chat.whatsapp.com/..."
                                     />
                                 </div>
@@ -767,7 +763,7 @@ const EditCourse = () => {
                                                 type="text"
                                                 value={outcome}
                                                 onChange={(e) => handleOutcomeChange(index, e.target.value)}
-                                                className="flex-1 px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all"
+                                                className="flex-1 px-5 py-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-semibold transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                                 placeholder={`Outcome ${index + 1}...`}
                                             />
                                             <button
@@ -780,8 +776,8 @@ const EditCourse = () => {
                                         </div>
                                     ))}
                                     {courseData.learningOutcomes.length === 0 && (
-                                        <div className="col-span-full py-8 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-center">
-                                            <p className="text-gray-400 text-xs font-medium italic">No outcomes added yet. Help students understand what they will learn!</p>
+                                        <div className="col-span-full py-8 bg-gray-50 dark:bg-slate-700/50 rounded-2xl border border-dashed border-gray-200 dark:border-gray-700 text-center">
+                                            <p className="text-gray-400 dark:text-gray-500 text-xs font-medium italic">No outcomes added yet. Help students understand what they will learn!</p>
                                         </div>
                                     )}
                                 </div>
@@ -793,9 +789,9 @@ const EditCourse = () => {
                 {/* Sidebar Controls */}
                 <div className="space-y-8">
                     {/* Settings Card */}
-                    <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-8">
-                        <div className="flex items-center gap-4 underline decoration-emerald-200 decoration-4 underline-offset-8">
-                            <h2 className="text-lg font-black text-gray-900 uppercase tracking-tighter">Publishing Settings</h2>
+                    <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm space-y-8 transition-colors duration-300">
+                        <div className="flex items-center gap-4 underline decoration-emerald-200 dark:decoration-emerald-500/30 decoration-4 underline-offset-8">
+                            <h2 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tighter">Publishing Settings</h2>
                         </div>
 
                         <div className="space-y-6">
@@ -807,7 +803,7 @@ const EditCourse = () => {
                                         name="instructor"
                                         value={courseData.instructor}
                                         onChange={handleInputChange}
-                                        className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold appearance-none cursor-pointer"
+                                        className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold appearance-none cursor-pointer text-gray-900 dark:text-white"
                                     >
                                         <option value="">Select Instructor</option>
                                         {instructors.map(ins => (
@@ -826,8 +822,8 @@ const EditCourse = () => {
                                             type="button"
                                             onClick={() => setCourseData(prev => ({ ...prev, accessType: type }))}
                                             className={`flex-1 py-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${courseData.accessType === type
-                                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-200'
-                                                : 'bg-white border-gray-100 text-gray-400 hover:border-emerald-200'
+                                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-200 dark:shadow-none'
+                                                : 'bg-white dark:bg-slate-700 border-gray-100 dark:border-gray-600 text-gray-400 dark:text-gray-400 hover:border-emerald-200 dark:hover:border-emerald-500/50'
                                                 }`}
                                         >
                                             {type}
@@ -842,7 +838,7 @@ const EditCourse = () => {
                                     name="level"
                                     value={courseData.level}
                                     onChange={handleInputChange}
-                                    className="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold"
+                                    className="w-full px-6 py-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold text-gray-900 dark:text-white"
                                 >
                                     <option value="Beginner">Beginner</option>
                                     <option value="Intermediate">Intermediate</option>
@@ -854,15 +850,15 @@ const EditCourse = () => {
                     </div>
 
                     {/* Thumbnail Card */}
-                    <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-6">
+                    <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm space-y-6 transition-colors duration-300">
                         <div className="flex items-center gap-3">
                             <ImageIcon className="text-gray-400" size={20} />
-                            <h2 className="text-lg font-black text-gray-900">Featured Media</h2>
+                            <h2 className="text-lg font-black text-gray-900 dark:text-white">Featured Media</h2>
                         </div>
 
                         <div
                             onClick={() => fileInputRef.current?.click()}
-                            className="relative group overflow-hidden rounded-3xl border-2 border-dashed border-gray-100 p-2 cursor-pointer hover:border-emerald-500 transition-colors"
+                            className="relative group overflow-hidden rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-700 p-2 cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500 transition-colors"
                         >
                             {uploading && (
                                 <div className="absolute inset-0 bg-white/80 z-20 flex items-center justify-center backdrop-blur-sm rounded-2xl">
@@ -879,7 +875,7 @@ const EditCourse = () => {
                                     alt="Thumbnail"
                                 />
                             ) : (
-                                <div className="w-full aspect-video bg-gray-50 rounded-2xl flex items-center justify-center text-gray-300">
+                                <div className="w-full aspect-video bg-gray-50 dark:bg-slate-700 rounded-2xl flex items-center justify-center text-gray-300 dark:text-gray-600">
                                     <ImageIcon size={40} />
                                 </div>
                             )}
@@ -897,7 +893,7 @@ const EditCourse = () => {
                             <button
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={uploading}
-                                className="w-full flex items-center justify-center gap-2 py-3 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest border border-gray-100"
+                                className="w-full flex items-center justify-center gap-2 py-3 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-xl transition-all text-[10px] font-black uppercase tracking-widest border border-gray-100 dark:border-gray-600"
                             >
                                 <Upload size={14} />
                                 {uploading ? "Upload course Thumbnail..." : "Upload course Thumbnail"}
@@ -910,7 +906,7 @@ const EditCourse = () => {
                                     name="thumbnail"
                                     value={courseData.thumbnail}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-1 focus:ring-emerald-500 text-[10px] font-bold text-gray-500"
+                                    className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-xl outline-none focus:ring-1 focus:ring-emerald-500 text-[10px] font-bold text-gray-500 dark:text-gray-400 placeholder-gray-400 dark:placeholder-gray-600"
                                     placeholder="Paste image link here..."
                                 />
                             </div>

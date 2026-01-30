@@ -19,6 +19,7 @@ import {
     Send,
     X
 } from "lucide-react";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 import { toast } from "react-toastify";
 
 const CommentItem = ({ comment, depth = 0, ...props }) => {
@@ -39,7 +40,7 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
             <div className={`flex gap-3 ${depth > 0 ? '' : ''}`}>
                 <div className="flex-shrink-0 relative">
                     {/* User Avatar */}
-                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center overflow-hidden border border-gray-200">
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700">
                         {comment.author?.image ? (
                             <img
                                 src={getImageUrl(comment.author.image)}
@@ -52,25 +53,25 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
                     </div>
                     {/* Vertical line for threading if it has replies and is expanded */}
                     {hasReplies && isExpanded && (
-                        <div className="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 bg-gray-200 -z-10 h-[calc(100%+8px)]"></div>
+                        <div className="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 bg-gray-200 dark:bg-gray-700 -z-10 h-[calc(100%+8px)]"></div>
                     )}
                     {/* Curve connector for child */}
                     {depth > 0 && (
-                        <div className="absolute -left-[22px] top-4 w-5 h-0.5 bg-gray-200"></div>
+                        <div className="absolute -left-[22px] top-4 w-5 h-0.5 bg-gray-200 dark:bg-gray-700"></div>
                     )}
                     {depth > 0 && (
-                        <div className="absolute -left-[22px] -top-8 w-0.5 h-12 bg-gray-200"></div>
+                        <div className="absolute -left-[22px] -top-8 w-0.5 h-12 bg-gray-200 dark:bg-gray-700"></div>
                     )}
                 </div>
 
                 <div className="flex-1 min-w-0">
                     {/* Comment Box */}
-                    <div className="bg-gray-50 rounded-2xl rounded-tl-none p-3 px-4 inline-block max-w-full relative group">
+                    <div className="bg-gray-50 dark:bg-slate-800 rounded-2xl rounded-tl-none p-3 px-4 inline-block max-w-full relative group transition-colors duration-200">
                         <div className="flex items-center justify-between gap-4 mb-1">
-                            <h4 className="text-sm font-bold text-gray-900 cursor-pointer hover:underline">
+                            <h4 className="text-sm font-bold text-gray-900 dark:text-white cursor-pointer hover:underline">
                                 {comment.author ? `${comment.author.firstName} ${comment.author.lastName}` : 'Unknown User'}
                             </h4>
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
                                 {new Date(comment.createdAt).toLocaleDateString()}
                             </span>
                         </div>
@@ -80,13 +81,13 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
                                 <textarea
                                     value={editContent}
                                     onChange={(e) => setEditContent(e.target.value)}
-                                    className="w-full p-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none resize-none bg-white"
+                                    className="w-full p-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none resize-none bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
                                     rows="2"
                                 />
                                 <div className="flex justify-end gap-2 mt-2">
                                     <button
                                         onClick={() => setEditingComment(null)}
-                                        className="text-xs px-2 py-1 text-gray-500 hover:bg-gray-200 rounded"
+                                        className="text-xs px-2 py-1 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-slate-600 rounded"
                                     >
                                         Cancel
                                     </button>
@@ -99,12 +100,12 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
                                 </div>
                             </div>
                         ) : (
-                            <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{comment.content}</p>
+                            <p className="text-sm text-gray-800 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{comment.content}</p>
                         )}
 
                         {/* Hover Actions */}
                         {!editingComment && (
-                            <div className="absolute -right-16 top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white shadow-sm p-1 rounded-full border border-gray-100">
+                            <div className="absolute -right-16 top-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 bg-white dark:bg-slate-700 shadow-sm p-1 rounded-full border border-gray-100 dark:border-gray-600">
                                 {(currentUser?._id === comment.author?._id || hasPermission('blogs.delete')) && (
                                     <button
                                         onClick={() => handleDeleteComment(comment._id)}
@@ -140,7 +141,7 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
                                     setEditingComment(null);
                                     setReplyContent(`@${comment.author?.firstName || 'User'} `);
                                 }}
-                                className={`text-xs font-bold ${replyingTo === comment._id ? 'text-emerald-600' : 'text-gray-500 hover:text-gray-800'} transition-colors`}
+                                className={`text-xs font-bold ${replyingTo === comment._id ? 'text-emerald-600' : 'text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'} transition-colors`}
                             >
                                 Reply
                             </button>
@@ -149,7 +150,7 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
                         {hasReplies && (
                             <button
                                 onClick={() => toggleReplies(comment._id)}
-                                className="text-xs font-bold text-gray-500 hover:text-gray-800 flex items-center gap-1 transition-colors"
+                                className="text-xs font-bold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 flex items-center gap-1 transition-colors"
                             >
                                 {isExpanded ? (
                                     <>Hide {comment.replies.length} replies</>
@@ -163,7 +164,7 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
                     {/* Reply Input */}
                     {replyingTo === comment._id && (
                         <div className="mt-3 flex gap-3 animate-in fade-in slide-in-from-top-2">
-                            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                            <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-slate-700 flex items-center justify-center flex-shrink-0">
                                 <User size={14} className="text-gray-400" />
                             </div>
                             <div className="flex-1 relative">
@@ -171,7 +172,7 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
                                     value={replyContent}
                                     onChange={(e) => setReplyContent(e.target.value)}
                                     placeholder={`Reply to ${comment.author?.firstName}...`}
-                                    className="w-full p-2 pr-10 text-sm border border-gray-200 rounded-xl focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none bg-white min-h-[40px]"
+                                    className="w-full p-2 pr-10 text-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 outline-none resize-none bg-white dark:bg-slate-700 text-gray-900 dark:text-white min-h-[40px] placeholder-gray-400 dark:placeholder-gray-500"
                                     rows="1"
                                     autoFocus
                                     onKeyDown={(e) => {
@@ -272,10 +273,10 @@ const ManageBlogs = () => {
             const response = await fetch("http://localhost:5000/api/blogs");
             const data = await response.json();
             setBlogs(data.blogs || []);
-            setLoading(false);
         } catch (error) {
             console.error("Error fetching blogs:", error);
             toast.error("Failed to load blogs");
+        } finally {
             setLoading(false);
         }
     };
@@ -469,11 +470,7 @@ const ManageBlogs = () => {
     };
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[400px]">
-                <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
+        return <PremiumLoader text="Loading blogs..." />;
     }
 
     return (
@@ -481,8 +478,8 @@ const ManageBlogs = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 font-[Outfit]">Manage Blogs</h1>
-                    <p className="text-gray-500 text-sm mt-1">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-[Outfit]">Manage Blogs</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                         Create, edit, and manage your blog posts
                     </p>
                 </div>
@@ -498,7 +495,7 @@ const ManageBlogs = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row gap-4 justify-between sticky top-0 z-10 backdrop-blur-md bg-white/90">
+            <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col sm:flex-row gap-4 justify-between sticky top-0 z-10 backdrop-blur-md bg-white/90 dark:bg-slate-800/90 transition-colors duration-300">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                     <input
@@ -506,7 +503,7 @@ const ManageBlogs = () => {
                         placeholder="Search blogs..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                     />
                 </div>
                 <div className="flex items-center gap-2">
@@ -514,7 +511,7 @@ const ManageBlogs = () => {
                     <select
                         value={filterStatus}
                         onChange={(e) => setFilterStatus(e.target.value)}
-                        className="px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none bg-transparent cursor-pointer hover:bg-gray-50 transition-colors"
+                        className="px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none bg-transparent cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-gray-900 dark:text-gray-200"
                     >
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
@@ -528,9 +525,9 @@ const ManageBlogs = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 {filteredBlogs.length > 0 ? (
                     filteredBlogs.map((blog) => (
-                        <div key={blog._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all duration-300 group flex flex-col h-full">
+                        <div key={blog._id} className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-md transition-all duration-300 group flex flex-col h-full">
                             {/* Image Area */}
-                            <div className="relative aspect-video overflow-hidden bg-gray-100">
+                            <div className="relative aspect-video overflow-hidden bg-gray-100 dark:bg-slate-700">
                                 {blog.thumbnail ? (
                                     <img
                                         src={getImageUrl(blog.thumbnail)}
@@ -542,7 +539,7 @@ const ManageBlogs = () => {
                                         }}
                                     />
                                 ) : (
-                                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-slate-700/50">
                                         <FileText size={48} className="mb-2 opacity-50" />
                                         <span className="text-xs font-medium uppercase tracking-wider opacity-70">No Image</span>
                                     </div>
@@ -564,8 +561,8 @@ const ManageBlogs = () => {
 
                             {/* Content Area */}
                             <div className="p-5 flex flex-col flex-1">
-                                <div className="flex items-center justify-between gap-4 mb-3 text-xs text-gray-500 font-medium">
-                                    <span className="bg-gray-100 px-2 py-1 rounded-md text-gray-700 truncate max-w-[50%]">
+                                <div className="flex items-center justify-between gap-4 mb-3 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                                    <span className="bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded-md text-gray-700 dark:text-gray-300 truncate max-w-[50%]">
                                         {blog.category || "Uncategorized"}
                                     </span>
                                     <span className="flex items-center gap-1 shrink-0">
@@ -574,19 +571,19 @@ const ManageBlogs = () => {
                                     </span>
                                 </div>
 
-                                <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-emerald-600 transition-colors cursor-pointer" title={blog.title}>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2 leading-tight group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors cursor-pointer" title={blog.title}>
                                     <Link to={`/admin/blogs/edit/${blog._id}`}>
                                         {blog.title}
                                     </Link>
                                 </h3>
 
-                                <p className="text-sm text-gray-500 line-clamp-3 mb-4 flex-1">
+                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-3 mb-4 flex-1">
                                     {blog.content ? blog.content.replace(/<[^>]*>?/gm, "") : "No content available..."}
                                 </p>
 
-                                <div className="pt-4 mt-auto border-t border-gray-100 flex items-center justify-between">
-                                    <div className="flex items-center gap-2 text-xs font-medium text-gray-600">
-                                        <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center overflow-hidden">
+                                <div className="pt-4 mt-auto border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-xs font-medium text-gray-600 dark:text-gray-300">
+                                        <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center overflow-hidden">
                                             {blog.author?.image ? (
                                                 <img
                                                     src={getImageUrl(blog.author.image)}
@@ -605,7 +602,7 @@ const ManageBlogs = () => {
                                     <div className="flex items-center gap-1">
                                         <button
                                             onClick={() => handleViewComments(blog)}
-                                            className="flex items-center gap-1 px-2 py-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            className="flex items-center gap-1 px-2 py-1.5 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                                             title="View Comments"
                                         >
                                             <MessageCircle size={16} />
@@ -614,7 +611,7 @@ const ManageBlogs = () => {
                                         {hasPermission('blogs.edit') && (
                                             <Link
                                                 to={`/admin/blogs/edit/${blog._id}`}
-                                                className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                                className="p-2 text-gray-500 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
                                                 title="Edit Blog"
                                             >
                                                 <Edit size={16} />
@@ -626,7 +623,7 @@ const ManageBlogs = () => {
                                                     setBlogToDelete(blog);
                                                     setShowDeleteModal(true);
                                                 }}
-                                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                                 title="Delete Blog"
                                             >
                                                 <Trash2 size={16} />
@@ -638,13 +635,13 @@ const ManageBlogs = () => {
                         </div>
                     ))
                 ) : (
-                    <div className="col-span-full py-16 text-center bg-white rounded-3xl border-2 border-dashed border-gray-200">
+                    <div className="col-span-full py-16 text-center bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700 transition-colors duration-300">
                         <div className="flex flex-col items-center gap-4 max-w-sm mx-auto p-6">
-                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-2">
-                                <FileText className="w-10 h-10 text-gray-300" />
+                            <div className="w-20 h-20 bg-gray-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mb-2">
+                                <FileText className="w-10 h-10 text-gray-300 dark:text-gray-500" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900">No blogs found</h3>
-                            <p className="text-gray-500 text-center mb-4">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">No blogs found</h3>
+                            <p className="text-gray-500 dark:text-gray-400 text-center mb-4">
                                 {searchTerm
                                     ? `No results found for "${searchTerm}". Try different keywords.`
                                     : "Get started by creating your first blog post to share with your audience."}
@@ -672,17 +669,17 @@ const ManageBlogs = () => {
             {/* Comments Modal */}
             {showCommentsModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-end z-50 backdrop-blur-sm">
-                    <div className="bg-white h-full w-full max-w-md shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col">
-                        <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white/80 backdrop-blur-md sticky top-0 z-10">
+                    <div className="bg-white dark:bg-slate-900 h-full w-full max-w-md shadow-2xl animate-in slide-in-from-right duration-300 flex flex-col transition-colors">
+                        <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-10">
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900">Comments</h3>
-                                <p className="text-sm text-gray-500 truncate max-w-[250px]">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Comments</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[250px]">
                                     {selectedBlogForComments?.title}
                                 </p>
                             </div>
                             <button
                                 onClick={() => setShowCommentsModal(false)}
-                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                             >
                                 <XCircle size={24} className="text-gray-400" />
                             </button>
@@ -732,18 +729,18 @@ const ManageBlogs = () => {
             {/* Delete Confirmation Modal */}
             {showDeleteModal && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl animate-in fade-in zoom-in duration-200">
-                        <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 max-w-sm w-full shadow-xl animate-in fade-in zoom-in duration-200 border border-gray-100 dark:border-gray-700">
+                        <div className="w-12 h-12 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center mb-4 mx-auto">
                             <Trash2 size={24} />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 text-center">Delete Blog?</h3>
-                        <p className="text-gray-600 mb-6 text-center text-sm">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 text-center">Delete Blog?</h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6 text-center text-sm">
                             Are you sure you want to delete this blog? This action cannot be undone and will remove the post permanently.
                         </p>
                         <div className="flex justify-center gap-3">
                             <button
                                 onClick={() => setShowDeleteModal(false)}
-                                className="px-5 py-2.5 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors font-medium text-sm"
+                                className="px-5 py-2.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-xl transition-colors font-medium text-sm"
                             >
                                 Cancel
                             </button>
@@ -760,13 +757,13 @@ const ManageBlogs = () => {
             {/* Delete Confirmation Modal for Comments */}
             {showDeleteCommentModal && (
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200">
-                    <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl transform transition-all scale-100 opacity-100 animate-in zoom-in-95 duration-200">
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-sm p-6 shadow-2xl transform transition-all scale-100 opacity-100 animate-in zoom-in-95 duration-200 border border-gray-100 dark:border-gray-700">
                         <div className="flex flex-col items-center text-center">
-                            <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mb-4 text-red-500 ring-4 ring-red-50">
+                            <div className="w-12 h-12 bg-red-50 dark:bg-red-500/20 rounded-full flex items-center justify-center mb-4 text-red-500 dark:text-red-400 ring-4 ring-red-50 dark:ring-red-500/10">
                                 <Trash2 size={24} />
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Comment?</h3>
-                            <p className="text-gray-500 mb-6 text-sm">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Delete Comment?</h3>
+                            <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm">
                                 Are you sure you want to delete this comment? This action cannot be undone.
                             </p>
                             <div className="flex gap-3 w-full">
@@ -775,7 +772,7 @@ const ManageBlogs = () => {
                                         setShowDeleteCommentModal(false);
                                         setCommentToDelete(null);
                                     }}
-                                    className="flex-1 px-4 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold text-sm transition-colors"
+                                    className="flex-1 px-4 py-2.5 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 rounded-xl font-semibold text-sm transition-colors"
                                 >
                                     Cancel
                                 </button>

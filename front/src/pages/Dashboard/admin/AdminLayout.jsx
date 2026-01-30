@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import AdminSidebar from '../../../components/Admin/AdminSidebar';
-import { Bell, Search, User, LogOut, Settings, ChevronDown, ShoppingCart, Clock, Menu } from 'lucide-react';
+import { useTheme } from '../../../contexts/ThemeContext';
+import { Bell, Search, User, LogOut, Settings, ChevronDown, ShoppingCart, Clock, Menu, Sun, Moon, Monitor } from 'lucide-react';
+
 
 const AdminLayout = () => {
+    const { theme, setTheme } = useTheme();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
@@ -12,6 +15,8 @@ const AdminLayout = () => {
     const [isSuperAdmin, setIsSuperAdmin] = useState(false);
     const [stats, setStats] = useState(null);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('loggedInUser') || '{}'));
+    // const [theme, setTheme] = useState(localStorage.getItem("theme") || "light"); // Removed local state
+    const [openTheme, setOpenTheme] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -82,6 +87,8 @@ const AdminLayout = () => {
         };
     }, []);
 
+    // 🌓 Theme handling (Removed - handled by Context)
+
     // Route Protection
     useEffect(() => {
         if (isSuperAdmin) return;
@@ -134,7 +141,7 @@ const AdminLayout = () => {
     const pendingCount = stats?.pendingOrders || 0;
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex transition-colors duration-300">
             {/* Mobile Overlay */}
             {isMobileOpen && (
                 <div
@@ -156,7 +163,7 @@ const AdminLayout = () => {
             {/* Main Content Area */}
             <div className={`flex-1 transition-all duration-300 ${isCollapsed ? 'md:ml-20' : 'md:ml-64'} ml-0 flex flex-col min-h-screen overflow-x-hidden`}>
                 {/* Header */}
-                <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 gap-4 shrink-0">
+                <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 gap-4 shrink-0 transition-colors duration-300">
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMobileOpen(true)}
@@ -164,21 +171,62 @@ const AdminLayout = () => {
                     >
                         <Menu size={24} />
                     </button>
-                    <div className="hidden md:flex items-center gap-4 bg-gray-50 px-4 py-2 rounded-xl border border-gray-100 w-96">
+                    <div className="hidden md:flex items-center gap-4 bg-gray-50 dark:bg-slate-800 px-4 py-2 rounded-xl border border-gray-100 dark:border-gray-700 w-96 transition-colors duration-300">
                         <Search size={18} className="text-gray-400" />
                         <input
                             type="text"
                             placeholder="Search anything..."
-                            className="bg-transparent border-none outline-none text-sm w-full text-gray-600"
+                            className="bg-transparent border-none outline-none text-sm w-full text-gray-600 dark:text-gray-300 placeholder-gray-400"
                         />
                     </div>
 
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-4 md:gap-6">
+                        {/* Theme Toggle */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setOpenTheme(!openTheme)}
+                                className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                            >
+                                {theme === "light" && <Sun className="w-5 h-5 text-emerald-600" />}
+                                {theme === "dark" && <Moon className="w-5 h-5 text-emerald-400" />}
+                                {theme === "system" && <Monitor className="w-5 h-5 text-blue-500" />}
+                            </button>
+
+                            {openTheme && (
+                                <>
+                                    <div className="fixed inset-0 z-10" onClick={() => setOpenTheme(false)}></div>
+                                    <div className="absolute right-0 mt-3 w-40 bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl p-2 z-20 animate-in fade-in zoom-in slide-in-from-top-2 duration-300">
+                                        <button
+                                            onClick={() => { setTheme("light"); setOpenTheme(false); }}
+                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "light" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
+                                        >
+                                            <Sun size={18} />
+                                            Light
+                                        </button>
+                                        <button
+                                            onClick={() => { setTheme("dark"); setOpenTheme(false); }}
+                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "dark" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
+                                        >
+                                            <Moon size={18} />
+                                            Dark
+                                        </button>
+                                        <button
+                                            onClick={() => { setTheme("system"); setOpenTheme(false); }}
+                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "system" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
+                                        >
+                                            <Monitor size={18} />
+                                            System
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
                         {/* Notifications */}
                         <div className="relative">
                             <button
                                 onClick={() => setShowNotifications(!showNotifications)}
-                                className={`relative p-2.5 rounded-xl transition-all ${showNotifications ? 'bg-emerald-50 text-emerald-600' : 'text-gray-500 hover:bg-gray-50'}`}
+                                className={`relative p-2.5 rounded-xl transition-all ${showNotifications ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800'}`}
                             >
                                 <Bell size={22} className={pendingCount > 0 ? 'animate-bounce-subtle' : ''} />
                                 {pendingCount > 0 && (
@@ -192,7 +240,7 @@ const AdminLayout = () => {
                             {showNotifications && (
                                 <>
                                     <div className="fixed inset-0 z-10" onClick={() => setShowNotifications(false)}></div>
-                                    <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-gray-50 dark:border-gray-800 py-2 z-20 animate-in fade-in slide-in-from-top-5 duration-300">
+                                    <div className="fixed top-22 left-4 right-4 sm:absolute sm:top-full sm:right-0 sm:left-auto sm:w-80 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-gray-50 dark:border-gray-800 py-2 z-50 animate-in fade-in slide-in-from-top-5 duration-300">
                                         <div className="px-5 py-3 border-b border-gray-50 dark:border-gray-800 flex items-center justify-between">
                                             <h3 className="font-bold text-gray-900 dark:text-white">Notifications</h3>
                                             <span className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -260,7 +308,7 @@ const AdminLayout = () => {
                             )}
                         </div>
 
-                        <div className="h-8 w-[1px] bg-gray-100 mx-2"></div>
+                        <div className="h-8 w-[1px] bg-gray-100 dark:bg-gray-800 mx-2"></div>
 
                         {/* Profile Section */}
                         <div className="relative">
@@ -301,22 +349,22 @@ const AdminLayout = () => {
                                         className="fixed inset-0 z-10"
                                         onClick={() => setShowProfileDropdown(false)}
                                     ></div>
-                                    <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-xl border border-gray-50 py-2 z-20 animate-in fade-in zoom-in-95 duration-200">
-                                        <div className="px-4 py-3 border-b border-gray-50 mb-1">
-                                            <p className="text-xs text-gray-400 font-medium">Logged in as</p>
-                                            <p className="text-sm font-bold text-gray-900 truncate">{user.email}</p>
+                                    <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-50 dark:border-gray-800 py-2 z-20 animate-in fade-in zoom-in-95 duration-200">
+                                        <div className="px-4 py-3 border-b border-gray-50 dark:border-gray-800 mb-1">
+                                            <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Logged in as</p>
+                                            <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{user.email}</p>
                                         </div>
                                         <Link
                                             to="/admin/profile"
                                             onClick={() => setShowProfileDropdown(false)}
-                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-colors"
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                                         >
                                             <Settings size={18} />
                                             <span>Profile Settings</span>
                                         </Link>
                                         <button
                                             onClick={handleLogout}
-                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"
+                                            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
                                         >
                                             <LogOut size={18} />
                                             <span>Logout</span>

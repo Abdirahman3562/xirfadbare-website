@@ -14,6 +14,7 @@ import {
     Loader2,
     Infinity
 } from 'lucide-react';
+import PremiumLoader from '../../../components/ui/PremiumLoader';
 import { getAllCourses, deleteCourse } from '../../../api/courseService';
 import { toast } from 'react-toastify';
 import UserAvatar from '../../../components/UserAvatar';
@@ -121,12 +122,7 @@ const ManageCourses = () => {
     const levels = ['Beginner', 'Intermediate', 'Advanced'];
 
     if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center h-64 space-y-4">
-                <Loader2 className="animate-spin text-emerald-600" size={40} />
-                <p className="text-gray-500 font-medium italic">Soo aqrinaya koorsooyinka...</p>
-            </div>
-        );
+        return <PremiumLoader text="Soo aqrinaya koorsooyinka..." />;
     }
 
     const handleDelete = (id) => {
@@ -153,15 +149,15 @@ const ManageCourses = () => {
     return (
         <div className="space-y-8 animate-in fade-in duration-700 font-[Inter]">
             {/* Header section */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm transition-colors duration-300">
                 <div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">Course Catalog</h1>
-                    <p className="text-gray-500 text-sm mt-1 font-medium">Manage and monitor all educational content on the platform.</p>
+                    <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Course Catalog</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 font-medium">Manage and monitor all educational content on the platform.</p>
                 </div>
                 {hasPermission('courses.create') && (
                     <button
                         onClick={() => navigate('/admin/courses/create/new')} // Placeholder for create
-                        className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl shadow-emerald-200 active:scale-95"
+                        className="flex items-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl shadow-emerald-200 dark:shadow-none active:scale-95"
                     >
                         <Plus size={20} strokeWidth={3} />
                         <span className="uppercase tracking-widest">Create Course</span>
@@ -176,7 +172,7 @@ const ManageCourses = () => {
                     <input
                         type="text"
                         placeholder="Search by title, technology or instructor..."
-                        className="w-full pl-14 pr-6 py-4 bg-white border border-gray-100 rounded-[1.5rem] outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-medium transition-all shadow-sm"
+                        className="w-full pl-14 pr-6 py-4 bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700 rounded-[1.5rem] outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-medium text-gray-600 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 transition-all shadow-sm"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -185,8 +181,8 @@ const ManageCourses = () => {
                     <button
                         onClick={() => setShowFilters(!showFilters)}
                         className={`flex items-center gap-2 px-6 py-4 rounded-[1.5rem] border transition-all font-bold text-xs uppercase tracking-widest w-full md:w-auto justify-center shadow-sm ${showFilters
-                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-200'
-                            : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-100'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-200 dark:shadow-none'
+                            : 'bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 border-gray-100 dark:border-gray-700'
                             }`}
                     >
                         <Filter size={18} />
@@ -198,12 +194,12 @@ const ManageCourses = () => {
 
                     {/* Filter Dropdown */}
                     {showFilters && (
-                        <div className="absolute top-full right-0 mt-4 w-full md:w-[480px] bg-white rounded-[2rem] shadow-2xl border border-gray-100 p-8 animate-in slide-in-from-top-4 duration-300 z-50">
+                        <div className="absolute top-full right-0 mt-4 w-full md:w-[480px] bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl border border-gray-100 dark:border-gray-700 p-8 animate-in slide-in-from-top-4 duration-300 z-50">
                             <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Advanced Filters</h3>
+                                <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Advanced Filters</h3>
                                 <button
                                     onClick={() => setFilters({ level: '', technology: '', priceType: 'all', sortBy: 'newest' })}
-                                    className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline"
+                                    className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest hover:underline"
                                 >
                                     Clear All
                                 </button>
@@ -216,7 +212,7 @@ const ManageCourses = () => {
                                     <select
                                         value={filters.level}
                                         onChange={(e) => setFilters({ ...filters, level: e.target.value })}
-                                        className="w-full p-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-emerald-500 transition-all text-xs font-bold text-gray-700 cursor-pointer appearance-none"
+                                        className="w-full p-4 bg-gray-50 dark:bg-slate-700 border border-transparent rounded-2xl outline-none focus:bg-white dark:focus:bg-slate-600 focus:border-emerald-500 transition-all text-xs font-bold text-gray-700 dark:text-gray-200 cursor-pointer appearance-none"
                                     >
                                         <option value="">All Levels</option>
                                         {levels.map(l => <option key={l} value={l}>{l}</option>)}
@@ -229,7 +225,7 @@ const ManageCourses = () => {
                                     <select
                                         value={filters.technology}
                                         onChange={(e) => setFilters({ ...filters, technology: e.target.value })}
-                                        className="w-full p-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-emerald-500 transition-all text-xs font-bold text-gray-700 cursor-pointer appearance-none"
+                                        className="w-full p-4 bg-gray-50 dark:bg-slate-700 border border-transparent rounded-2xl outline-none focus:bg-white dark:focus:bg-slate-600 focus:border-emerald-500 transition-all text-xs font-bold text-gray-700 dark:text-gray-200 cursor-pointer appearance-none"
                                     >
                                         <option value="">All Tech</option>
                                         {uniqueTechnologies.map(t => <option key={t} value={t}>{t}</option>)}
@@ -239,14 +235,14 @@ const ManageCourses = () => {
                                 {/* Price Filter */}
                                 <div className="space-y-3">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Pricing</label>
-                                    <div className="flex bg-gray-50 p-1 rounded-2xl">
+                                    <div className="flex bg-gray-50 dark:bg-slate-700 p-1 rounded-2xl">
                                         {['all', 'free', 'paid'].map((type) => (
                                             <button
                                                 key={type}
                                                 onClick={() => setFilters({ ...filters, priceType: type })}
                                                 className={`flex-1 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${filters.priceType === type
-                                                    ? 'bg-white text-emerald-600 shadow-sm'
-                                                    : 'text-gray-400 hover:text-gray-600'
+                                                    ? 'bg-white dark:bg-slate-600 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                                                    : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
                                                     }`}
                                             >
                                                 {type}
@@ -261,7 +257,7 @@ const ManageCourses = () => {
                                     <select
                                         value={filters.sortBy}
                                         onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
-                                        className="w-full p-4 bg-gray-50 border border-transparent rounded-2xl outline-none focus:bg-white focus:border-emerald-500 transition-all text-xs font-bold text-gray-700 cursor-pointer appearance-none"
+                                        className="w-full p-4 bg-gray-50 dark:bg-slate-700 border border-transparent rounded-2xl outline-none focus:bg-white dark:focus:bg-slate-600 focus:border-emerald-500 transition-all text-xs font-bold text-gray-700 dark:text-gray-200 cursor-pointer appearance-none"
                                     >
                                         <option value="newest">Newest First</option>
                                         <option value="oldest">Oldest First</option>
@@ -273,7 +269,7 @@ const ManageCourses = () => {
 
                             <button
                                 onClick={() => setShowFilters(false)}
-                                className="w-full mt-8 bg-gray-900 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-emerald-600 transition-all active:scale-95 shadow-xl shadow-gray-200"
+                                className="w-full mt-8 bg-gray-900 dark:bg-white text-white dark:text-gray-900 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-emerald-600 dark:hover:bg-emerald-500 hover:text-white dark:hover:text-white transition-all active:scale-95 shadow-xl shadow-gray-200 dark:shadow-none"
                             >
                                 Apply Filters
                             </button>
@@ -286,7 +282,7 @@ const ManageCourses = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
                 {filteredCourses.length > 0 ? (
                     filteredCourses.map((course) => (
-                        <div key={course._id} className="group bg-white rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-2xl hover:shadow-emerald-100/50 transition-all duration-500 overflow-hidden flex flex-col h-full border-b-4 border-b-transparent hover:border-b-emerald-500">
+                        <div key={course._id} className="group bg-white dark:bg-slate-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-2xl hover:shadow-emerald-100/50 dark:hover:shadow-black/30 transition-all duration-500 overflow-hidden flex flex-col h-full border-b-4 border-b-transparent hover:border-b-emerald-500">
                             {/* Card Hero */}
                             <div className="relative h-56 overflow-hidden">
                                 <img
@@ -348,61 +344,61 @@ const ManageCourses = () => {
                             {/* Card Body */}
                             <div className="p-8 flex flex-col flex-1 space-y-6">
                                 <div className="space-y-3">
-                                    <h3 className="text-xl font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-emerald-600 transition-colors h-14">
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors h-14">
                                         {course.title}
                                     </h3>
-                                    <p className="text-gray-500 text-sm line-clamp-2 font-medium leading-relaxed">
+                                    <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 font-medium leading-relaxed">
                                         {course.description || "No description provided for this course. Start learning today!"}
                                     </p>
                                 </div>
 
-                                <div className="flex items-center gap-4 py-2 border-y border-gray-50">
+                                <div className="flex items-center gap-4 py-2 border-y border-gray-50 dark:border-gray-700/50">
                                     <UserAvatar
                                         image={course.instructor?.image}
                                         name={course.instructor?.name || 'Instructor'}
                                         size="w-12 h-12"
-                                        className="ring-2 ring-emerald-50"
+                                        className="ring-2 ring-emerald-50 dark:ring-emerald-500/20"
                                     />
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-bold text-gray-900">{course.instructor?.name || 'Unknown Instructor'}</span>
-                                        <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{course.instructor?.instructorTitle || 'Course Instructor'}</span>
+                                        <span className="text-sm font-bold text-gray-900 dark:text-white">{course.instructor?.name || 'Unknown Instructor'}</span>
+                                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">{course.instructor?.instructorTitle || 'Course Instructor'}</span>
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-2">
-                                    <div className="flex flex-col items-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                                    <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-slate-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
                                         <Users size={16} className="text-emerald-500 mb-1" />
-                                        <span className="text-xs font-bold text-gray-900">{course.enrolledCount || 0}</span>
-                                        <span className="text-[9px] text-gray-400 font-bold uppercase">Students</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{course.enrolledCount || 0}</span>
+                                        <span className="text-[9px] text-gray-400 inline-block w-full text-center overflow-hidden font-bold uppercase truncate">Students</span>
                                     </div>
-                                    <div className="flex flex-col items-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                                    <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-slate-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
                                         <PlayCircle size={16} className="text-blue-500 mb-1" />
-                                        <span className="text-xs font-bold text-gray-900">{calculateLessons(course.curriculum)}</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white">{calculateLessons(course.curriculum)}</span>
                                         <span className="text-[9px] text-gray-400 font-bold uppercase">Lessons</span>
                                     </div>
-                                    <div className="flex flex-col items-center p-3 bg-gray-50 rounded-2xl border border-gray-100">
+                                    <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-slate-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
                                         <Clock size={16} className="text-amber-500 mb-1" />
-                                        <span className="text-xs font-bold text-gray-900 whitespace-nowrap">{calculateDuration(course.curriculum)}</span>
+                                        <span className="text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap">{calculateDuration(course.curriculum)}</span>
                                         <span className="text-[9px] text-gray-400 font-bold uppercase">Total</span>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center justify-between mt-auto pt-2">
-                                    <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-2xl">
-                                        <Infinity size={14} className="text-emerald-600" />
-                                        <span className="text-[10px] font-black uppercase text-emerald-700 tracking-wider">Lifetime Access</span>
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-2xl">
+                                        <Infinity size={14} className="text-emerald-600 dark:text-emerald-400" />
+                                        <span className="text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-400 tracking-wider">Lifetime Access</span>
                                     </div>
                                     <div className="flex flex-col items-end">
                                         {course.discountPercentage > 0 ? (
                                             <>
                                                 <span className="text-[10px] font-bold text-gray-400 line-through tracking-wider">${course.price}</span>
-                                                <div className="text-2xl font-black text-emerald-600 leading-none">
+                                                <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 leading-none">
                                                     <span className="text-sm align-top mr-0.5">$</span>
                                                     {(course.price * (1 - course.discountPercentage / 100)).toFixed(2)}
                                                 </div>
                                             </>
                                         ) : (
-                                            <div className="text-2xl font-black text-emerald-600">
+                                            <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
                                                 <span className="text-sm align-top mr-0.5">$</span>
                                                 {course.price}
                                             </div>
@@ -421,13 +417,13 @@ const ManageCourses = () => {
                         </div>
                     ))
                 ) : (
-                    <div className="col-span-full py-20 bg-white rounded-[3rem] border border-gray-100 shadow-sm text-center flex flex-col items-center space-y-4">
-                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center text-gray-300">
+                    <div className="col-span-full py-20 bg-white dark:bg-slate-800 rounded-[3rem] border border-gray-100 dark:border-gray-700 shadow-sm text-center flex flex-col items-center space-y-4">
+                        <div className="w-20 h-20 bg-gray-50 dark:bg-slate-700 rounded-full flex items-center justify-center text-gray-300 dark:text-gray-500">
                             <Plus size={40} />
                         </div>
                         <div>
-                            <p className="text-xl font-bold text-gray-900">No courses found</p>
-                            <p className="text-gray-500 font-medium">Try adjusting your search or create a new course.</p>
+                            <p className="text-xl font-bold text-gray-900 dark:text-white">No courses found</p>
+                            <p className="text-gray-500 dark:text-gray-400 font-medium">Try adjusting your search or create a new course.</p>
                         </div>
                     </div>
                 )}
@@ -449,20 +445,20 @@ const ManageCourses = () => {
             {/* Custom Delete Modal */}
             {showDeleteModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-gray-100">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-gray-100 dark:border-gray-800">
                         <div className="p-10 text-center">
-                            <div className="w-20 h-20 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6 transform -rotate-6 border border-red-100">
+                            <div className="w-20 h-20 bg-red-50 dark:bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 transform -rotate-6 border border-red-100 dark:border-red-500/20">
                                 <Trash2 size={40} className="text-red-500" />
                             </div>
-                            <h3 className="text-xl font-black text-gray-900 mb-2">Ma hubtaa boss?</h3>
-                            <p className="text-sm text-gray-500 font-medium leading-relaxed">
+                            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">Ma hubtaa boss?</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
                                 Koorsadan mar haddii la tirtiro lama soo celin karo. Dhamaan xogta ardayda iyo casharada way lumayaan.
                             </p>
                         </div>
-                        <div className="p-8 bg-gray-50/80 border-t border-gray-100 flex gap-4">
+                        <div className="p-8 bg-gray-50/80 dark:bg-slate-800/80 border-t border-gray-100 dark:border-gray-700 flex gap-4">
                             <button
                                 onClick={() => setShowDeleteModal(false)}
-                                className="flex-1 py-4 bg-white hover:bg-gray-100 text-gray-600 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-gray-200 transition-all active:scale-95"
+                                className="flex-1 py-4 bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-gray-200 dark:border-slate-600 transition-all active:scale-95"
                                 disabled={isDeleting}
                             >
                                 Jooji

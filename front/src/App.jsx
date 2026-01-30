@@ -1,9 +1,9 @@
 import React from "react";
-import { BrowserRouter, Route, Routes, useLocation, Link } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation, Link, Navigate } from "react-router-dom";
 import { useLayoutEffect, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import { useTheme } from "./contexts/ThemeContext";
 // ---------------------------
 // Existing Imports (Assuming these valid)
 // ---------------------------
@@ -72,43 +72,7 @@ const ScrollToTop = () => {
 
 // Main App Component
 function App() {
-  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
-
-  useEffect(() => {
-    const applyTheme = () => {
-      const storedTheme = localStorage.getItem("theme") || "light";
-      const root = window.document.documentElement;
-      let effectiveTheme = storedTheme;
-
-      if (storedTheme === "system") {
-        effectiveTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      }
-
-      if (effectiveTheme === "dark") {
-        root.classList.add("dark");
-        setTheme("dark");
-      } else {
-        root.classList.remove("dark");
-        setTheme("light");
-      }
-    };
-
-    applyTheme();
-
-    // Watch for storage changes (e.g. from Nav.jsx toggle)
-    window.addEventListener("storage", applyTheme);
-    // Custom event for same-window theme changes
-    window.addEventListener("themeChange", applyTheme);
-
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    mediaQuery.addEventListener("change", applyTheme);
-
-    return () => {
-      window.removeEventListener("storage", applyTheme);
-      window.removeEventListener("themeChange", applyTheme);
-      mediaQuery.removeEventListener("change", applyTheme);
-    };
-  }, []);
+  const { theme } = useTheme();
 
   // 🌍 Fetch & Apply System Settings (Title & Favicon)
   useEffect(() => {
@@ -164,6 +128,7 @@ function App() {
           <Route path="/blog/:title" element={<SinglePostPage />} />
           <Route path="/u/:username" element={<AuthorPage />} />
           <Route path="/auth/login" element={<Login />} />
+          <Route path="/login" element={<Navigate to="/auth/login" replace />} />
           <Route path="/auth/signup" element={<Signup />} />
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           <Route path="/auth/reset-password/:token" element={<ResetPassword />} />

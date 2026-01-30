@@ -20,6 +20,7 @@ import { getImageUrl } from '../../../utils/format';
 import { Link } from 'react-router-dom';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { getDashboardStats } from '../../../api/adminService';
+import PremiumLoader from '../../../components/ui/PremiumLoader';
 
 const AdminDashboard = () => {
     const { hasPermission, loading: permissionsLoading } = usePermissions();
@@ -59,11 +60,7 @@ const AdminDashboard = () => {
     };
 
     if (loading || permissionsLoading) {
-        return (
-            <div className="flex items-center justify-center h-[60vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
-            </div>
-        );
+        return <PremiumLoader text="Loading Dashboard..." />;
     }
 
     const allStats = [
@@ -153,8 +150,8 @@ const AdminDashboard = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Dashboard Overview</h1>
-                    <p className="text-gray-500 mt-1 flex items-center gap-2">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Dashboard Overview</h1>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
                         <Calendar size={16} />
                         {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                     </p>
@@ -178,7 +175,7 @@ const AdminDashboard = () => {
                     <motion.div
                         key={idx}
                         variants={itemVariants}
-                        className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 group relative overflow-hidden"
+                        className="bg-white dark:bg-slate-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl transition-all duration-300 group relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 p-8 transform translate-x-4 -translate-y-4 opacity-5 group-hover:scale-150 transition-transform duration-500">
                             {stat.icon}
@@ -193,8 +190,8 @@ const AdminDashboard = () => {
                                 {stat.change}
                             </div>
                         </div>
-                        <p className="text-gray-500 text-sm font-semibold uppercase tracking-wider">{stat.label}</p>
-                        <h3 className="text-3xl font-bold text-gray-900 mt-2">{stat.value}</h3>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm font-semibold uppercase tracking-wider">{stat.label}</p>
+                        <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stat.value}</h3>
                     </motion.div>
                 ))}
             </div>
@@ -204,10 +201,10 @@ const AdminDashboard = () => {
                 {(hasPermission('orders.view') || hasPermission('dashboard.view')) ? (
                     <motion.div
                         variants={itemVariants}
-                        className="lg:col-span-2 bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden"
+                        className="lg:col-span-2 bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden"
                     >
-                        <div className="p-6 border-b border-gray-50 flex items-center justify-between">
-                            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <div className="p-6 border-b border-gray-50 dark:border-gray-700 flex items-center justify-between">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                                 <Package className="text-emerald-500" size={22} />
                                 Recent Orders
                             </h3>
@@ -218,7 +215,7 @@ const AdminDashboard = () => {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
-                                    <tr className="bg-gray-50 text-gray-500 text-[11px] uppercase tracking-widest font-bold">
+                                    <tr className="bg-gray-50 dark:bg-slate-900/50 text-gray-500 dark:text-gray-400 text-[11px] uppercase tracking-widest font-bold">
                                         <th className="px-6 py-4">Course</th>
                                         <th className="px-6 py-4">Student</th>
                                         <th className="px-6 py-4">Amount</th>
@@ -227,7 +224,7 @@ const AdminDashboard = () => {
                                 </thead>
                                 <tbody className="divide-y divide-gray-50">
                                     {stats?.recentOrders?.map((order) => (
-                                        <tr key={order._id} className="hover:bg-gray-50/50 transition-colors group">
+                                        <tr key={order._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 transition-colors group">
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-3">
                                                     <img
@@ -236,8 +233,8 @@ const AdminDashboard = () => {
                                                         className="w-10 h-10 rounded-lg object-cover shadow-sm"
                                                     />
                                                     <div>
-                                                        <p className="text-sm font-bold text-gray-900 line-clamp-1">{order.courseTitle || order.courseDetails?.title}</p>
-                                                        <p className="text-[10px] text-gray-400 font-medium">{new Date(order.createdAt).toLocaleDateString()}</p>
+                                                        <p className="text-sm font-bold text-gray-900 dark:text-white line-clamp-1">{order.courseTitle || order.courseDetails?.title}</p>
+                                                        <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">{new Date(order.createdAt).toLocaleDateString()}</p>
                                                     </div>
                                                 </div>
                                             </td>
@@ -248,18 +245,18 @@ const AdminDashboard = () => {
                                                         <img
                                                             src={getImageUrl(order.userDetails?.image || order.user?.image)}
                                                             alt=""
-                                                            className="w-8 h-8 rounded-full object-cover border border-gray-100 shadow-sm"
+                                                            className="w-8 h-8 rounded-full object-cover border border-gray-100 dark:border-gray-700 shadow-sm"
                                                         />
                                                     ) : (
                                                         <div className="w-8 h-8 bg-emerald-50 rounded-full flex items-center justify-center text-[10px] font-bold text-emerald-600 uppercase border border-emerald-100">
                                                             {order.userDetails?.firstName?.[0] || order.userName?.[0] || 'U'}
                                                         </div>
                                                     )}
-                                                    <span className="text-sm text-gray-600 font-medium">{order.userName || `${order.userDetails?.firstName} ${order.userDetails?.lastName}`}</span>
+                                                    <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">{order.userName || `${order.userDetails?.firstName} ${order.userDetails?.lastName}`}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className="text-sm font-bold text-gray-900">${(order.finalPrice || order.totalToPay || 0).toLocaleString()}</span>
+                                                <span className="text-sm font-bold text-gray-900 dark:text-white">${(order.finalPrice || order.totalToPay || 0).toLocaleString()}</span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${order.status === 'active' ? 'bg-emerald-50 text-emerald-600' :
@@ -293,10 +290,10 @@ const AdminDashboard = () => {
                 {(hasPermission('users.view') || hasPermission('dashboard.view')) ? (
                     <motion.div
                         variants={itemVariants}
-                        className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden"
+                        className="bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden"
                     >
-                        <div className="p-6 border-b border-gray-50">
-                            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <div className="p-6 border-b border-gray-50 dark:border-gray-700">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                                 <UserCheck className="text-blue-500" size={22} />
                                 New Students
                             </h3>
@@ -320,8 +317,8 @@ const AdminDashboard = () => {
                                             <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full"></span>
                                         </div>
                                         <div>
-                                            <h4 className="text-sm font-bold text-gray-900">{student.firstName} {student.lastName}</h4>
-                                            <p className="text-xs text-gray-500 truncate max-w-[120px]">{student.email}</p>
+                                            <h4 className="text-sm font-bold text-gray-900 dark:text-white">{student.firstName} {student.lastName}</h4>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[120px]">{student.email}</p>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end">
@@ -329,7 +326,7 @@ const AdminDashboard = () => {
                                             <Clock size={10} />
                                             Joined
                                         </p>
-                                        <p className="text-[11px] font-bold text-gray-600">
+                                        <p className="text-[11px] font-bold text-gray-600 dark:text-gray-300">
                                             {new Date(student.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                         </p>
                                     </div>
@@ -340,12 +337,12 @@ const AdminDashboard = () => {
                             )}
                         </div>
                         <div className="p-6 pt-0 mt-4">
-                            <div className="bg-gray-50 rounded-2xl p-4 border border-dashed border-gray-200">
-                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest text-center mb-1">Pending Approval</p>
+                            <div className="bg-gray-50 dark:bg-slate-700/30 rounded-2xl p-4 border border-dashed border-gray-200 dark:border-gray-700">
+                                <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest text-center mb-1">Pending Approval</p>
                                 <div className="text-2xl font-black text-amber-600 text-center">
                                     {stats?.pendingOrders || 0}
                                 </div>
-                                <p className="text-[10px] text-gray-400 text-center mt-1">Orders waiting for manual review</p>
+                                <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center mt-1">Orders waiting for manual review</p>
                             </div>
                         </div>
                     </motion.div>

@@ -50,6 +50,12 @@ const getDashboardStats = async (req, res) => {
         // 5. Pending Orders
         const pendingOrders = await Order.countDocuments({ status: 'pending' });
 
+        const pendingOrderDetails = await Order.find({ status: 'pending' })
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate('user', 'firstName lastName email image')
+            .populate('course', 'title thumbnail');
+
         // 6. Recent Orders (last 5)
         const recentOrders = await Order.find({})
             .sort({ createdAt: -1 })
@@ -78,6 +84,7 @@ const getDashboardStats = async (req, res) => {
             totalCourses,
             totalOrders,
             pendingOrders,
+            pendingOrderDetails,
             recentOrders,
             recentStudents,
             totalInstructors,
