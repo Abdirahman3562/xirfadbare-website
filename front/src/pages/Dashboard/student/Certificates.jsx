@@ -138,7 +138,7 @@ export default function Certificates() {
     return (
         <div className="max-w-5xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8">
             {/* Header Section */}
-            <div className="mb-10 text-center sm:text-left relative overflow-hidden bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 sm:p-12 border border-gray-100 dark:border-slate-800 shadow-xl shadow-emerald-500/5 transition-colors">
+            <div className="mb-10 text-center sm:text-left relative overflow-hidden bg-white/10 border border-gray-300 dark:bg-slate-900 rounded-[2.5rem] p-8 sm:p-12 border border-gray-100 dark:border-slate-800 shadow-xl shadow-emerald-500/5 transition-colors">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
 
@@ -160,7 +160,7 @@ export default function Certificates() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Selector Section */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-lg shadow-gray-200/50 dark:shadow-none transition-colors lg:sticky lg:top-24">
+                    <div className="bg-white/10 border border-gray-300 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-lg shadow-gray-200/50 dark:shadow-none transition-colors lg:sticky lg:top-24">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                                 <Search className="w-5 h-5" />
@@ -176,7 +176,7 @@ export default function Certificates() {
                                 <select
                                     value={selectedCourse}
                                     onChange={(e) => setSelectedCourse(e.target.value)}
-                                    className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-emerald-500/20 rounded-2xl px-5 py-4 text-gray-700 dark:text-gray-300 font-bold focus:outline-none transition-all appearance-none cursor-pointer"
+                                    className="w-full bg-white/10 border border-gray-300 dark:bg-slate-800 border-2 border-gray-300 focus:border-emerald-500/20 rounded-2xl px-5 py-4 text-gray-700 dark:text-gray-300 font-bold focus:outline-none transition-all appearance-none cursor-pointer"
                                 >
                                     <option value="">-- Dooro Course --</option>
                                     {completedCourses.map((course) => (
@@ -255,8 +255,8 @@ export default function Certificates() {
                             </div>
                         </div>
                     ) : (
-                        <div className="bg-gray-50 dark:bg-slate-800/30 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-[2.5rem] p-16 flex flex-col items-center justify-center text-center transition-colors">
-                            <div className="w-24 h-24 bg-white dark:bg-slate-900 rounded-3xl flex items-center justify-center shadow-sm mb-8 text-gray-300 dark:text-slate-700">
+                        <div className="bg-white/10 dark:bg-slate-800/30 border-2 border-dashed border-gray-200 dark:border-slate-800 rounded-[2.5rem] p-16 flex flex-col items-center justify-center text-center transition-colors">
+                            <div className="w-24 h-24 bg-white/10 dark:bg-slate-900 rounded-3xl flex items-center justify-center shadow-sm mb-8 text-gray-300 dark:text-slate-700">
                                 <Medal className="w-12 h-12" />
                             </div>
                             <h3 className="text-2xl font-black text-gray-400 dark:text-slate-700 mb-2">Ma jiro Course la doortay</h3>
@@ -273,7 +273,7 @@ export default function Certificates() {
                             <h4 className="font-black text-xl mb-2">Baro & Guulayso</h4>
                             <p className="text-emerald-50 text-sm font-medium leading-relaxed opacity-90">Kobar aqoontaada si aad u noqoto qof ku tartama suuqa xirfadaha casriga ah.</p>
                         </div>
-                        <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-8 rounded-[2rem] shadow-lg shadow-gray-200/50 dark:shadow-none hover:-translate-y-1 transition-all group transition-colors">
+                        <div className="bg-white/10 border border-gray-300 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-8 rounded-[2rem] shadow-lg shadow-gray-200/50 dark:shadow-none hover:-translate-y-1 transition-all group transition-colors">
                             <Medal className="w-10 h-10 text-emerald-500 mb-6 group-hover:scale-110 transition-transform" />
                             <h4 className="font-black text-xl text-gray-900 dark:text-white mb-2">Mustaqbal Iftaya</h4>
                             <p className="text-gray-500 dark:text-gray-400 text-sm font-medium leading-relaxed opacity-90">Xirfad walba oo aad barato waxay kuu furaysaa albaab cusub oo guul ah.</p>

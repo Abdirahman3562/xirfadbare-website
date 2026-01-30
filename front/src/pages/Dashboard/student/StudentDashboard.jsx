@@ -218,7 +218,7 @@ export default function StudentDashboard() {
           </div>
 
           {/* Active */}
-          <div className="relative bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-500">
+          <div className="relative bg-white/10 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-500">
             <h3 className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400">
               {activeCourses}
             </h3>
@@ -232,7 +232,7 @@ export default function StudentDashboard() {
           </div>
 
           {/* Completed */}
-          <div className="relative bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-500">
+          <div className="relative bg-white/10 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-500">
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
               Completed Courses
             </h3>
@@ -275,7 +275,7 @@ export default function StudentDashboard() {
               return (
                 <div
                   key={course._id || course.id}
-                  className="group relative bg-white dark:bg-slate-800/50 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col md:flex-row"
+                  className="group relative bg-white/10 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col md:flex-row"
                 >
                   {/* Thumbnail */}
                   <div className="md:w-64 w-full h-44 md:h-auto relative">

@@ -15,7 +15,7 @@ const Sidebar = () => {
         top: "calc(4rem + var(--top-banner-height, 0px))",
         height: "calc(100vh - 4rem - var(--top-banner-height, 0px))"
       }}
-      className="hidden md:flex lg:flex fixed left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex-col transition-all duration-300">
+      className="hidden md:flex lg:flex fixed left-0 w-64 bg-white/10 dark:bg-slate-900 border-r-2 mt-6 border-gray-300 dark:border-slate-800 flex-col transition-all duration-300">
       <div className="flex-1 overflow-y-auto">
         {/* Navigation */}
         <nav className="px-4 text-sm">
