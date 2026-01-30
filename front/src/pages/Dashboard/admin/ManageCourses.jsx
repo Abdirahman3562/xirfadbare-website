@@ -12,7 +12,8 @@ import {
     Trash2,
     Eye,
     Loader2,
-    Infinity
+    Infinity,
+    Award
 } from 'lucide-react';
 import PremiumLoader from '../../../components/ui/PremiumLoader';
 import { getAllCourses, deleteCourse } from '../../../api/courseService';
@@ -301,7 +302,7 @@ const ManageCourses = () => {
                                         {course.level || 'Beginner'}
                                     </span>
                                     {course.discountPercentage > 0 && (
-                                        <span className="px-4 py-1.5 bg-red-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg animate-pulse">
+                                        <span className="px-4 py-1.5 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg animate-pulse">
                                             {course.discountPercentage}% OFF
                                         </span>
                                     )}
@@ -342,8 +343,8 @@ const ManageCourses = () => {
                             </div>
 
                             {/* Card Body */}
-                            <div className="p-8 flex flex-col flex-1 space-y-6">
-                                <div className="space-y-3">
+                            <div className="p-6 flex flex-col flex-1 space-y-4">
+                                <div className="space-y-1.5">
                                     <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors h-14">
                                         {course.title}
                                     </h3>
@@ -366,24 +367,24 @@ const ManageCourses = () => {
                                 </div>
 
                                 <div className="grid grid-cols-3 gap-2">
-                                    <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-slate-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                    <div className="flex flex-col items-center p-2.5 bg-gray-50 dark:bg-slate-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
                                         <Users size={16} className="text-emerald-500 mb-1" />
                                         <span className="text-xs font-bold text-gray-900 dark:text-white">{course.enrolledCount || 0}</span>
                                         <span className="text-[9px] text-gray-400 inline-block w-full text-center overflow-hidden font-bold uppercase truncate">Students</span>
                                     </div>
-                                    <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-slate-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                    <div className="flex flex-col items-center p-2.5 bg-gray-50 dark:bg-slate-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
                                         <PlayCircle size={16} className="text-blue-500 mb-1" />
                                         <span className="text-xs font-bold text-gray-900 dark:text-white">{calculateLessons(course.curriculum)}</span>
                                         <span className="text-[9px] text-gray-400 font-bold uppercase">Lessons</span>
                                     </div>
-                                    <div className="flex flex-col items-center p-3 bg-gray-50 dark:bg-slate-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
+                                    <div className="flex flex-col items-center p-2.5 bg-gray-50 dark:bg-slate-700/50 rounded-2xl border border-gray-100 dark:border-gray-700">
                                         <Clock size={16} className="text-amber-500 mb-1" />
                                         <span className="text-xs font-bold text-gray-900 dark:text-white whitespace-nowrap">{calculateDuration(course.curriculum)}</span>
                                         <span className="text-[9px] text-gray-400 font-bold uppercase">Total</span>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between mt-auto pt-2">
+                                <div className="flex items-center justify-between mt-auto">
                                     <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 rounded-2xl">
                                         <Infinity size={14} className="text-emerald-600 dark:text-emerald-400" />
                                         <span className="text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-400 tracking-wider">Lifetime Access</span>
@@ -406,9 +407,16 @@ const ManageCourses = () => {
                                     </div>
                                 </div>
 
+                                {course.hasCertificate && (
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 rounded-2xl w-fit">
+                                        <Award size={14} className="text-amber-600 dark:text-amber-400" strokeWidth={3} />
+                                        <span className="text-[10px] font-black uppercase text-amber-700 dark:text-amber-400 tracking-wider">Certificate</span>
+                                    </div>
+                                )}
+
                                 <button
                                     onClick={() => navigate(`/admin/courses/edit/${course._id}`)}
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg hover:shadow-emerald-200 flex items-center justify-center gap-3 active:scale-95 group/btn mt-4"
+                                    className="w-full bg-emerald-600 dark:shadow-none cursor-pointer hover:bg-emerald-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg hover:shadow-emerald-200 flex items-center justify-center gap-3 active:scale-95 group/btn mt-2"
                                 >
                                     <span className="uppercase tracking-widest text-xs">View Details</span>
                                     <Eye size={18} className="group-hover/btn:scale-110 transition-transform" />

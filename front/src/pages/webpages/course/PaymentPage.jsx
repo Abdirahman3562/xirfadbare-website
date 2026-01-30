@@ -8,6 +8,7 @@ import {
   FaClock,
   FaGraduationCap,
   FaUserGraduate,
+  FaAward,
 } from "react-icons/fa";
 import {
   getFullCourseDetails,
@@ -291,6 +292,14 @@ function PaymentPage() {
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                 </span>
                 {Math.round((course.discountPercentage || totalDiscount * 100))}% Discount
+              </div>
+            )}
+
+            {course.hasCertificate && (
+              <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-400 text-white font-black px-3.5 py-1.5 rounded-lg shadow-lg border border-amber-300/30 transition-all hover:scale-105 duration-300">
+                <FaAward className="text-white text-sm animate-pulse" />
+                <span className="text-[9px] uppercase tracking-[0.1em] font-black">Certificate Included</span>
+                <div className="w-1 h-1 bg-white rounded-full animate-pulse"></div>
               </div>
             )}
           </div>

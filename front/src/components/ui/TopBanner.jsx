@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { X, Clock, Zap } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { API_BASE_URL } from "../../config";
 
 const TopBanner = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -8,7 +9,7 @@ const TopBanner = () => {
 
     // Hide on Dashboard/Admin/Instructor pages
     const isDashboard = location.pathname.startsWith("/admin") ||
-        location.pathname.startsWith("/instructor") ||
+        ["/instructor/dashboard", "/instructor/create-course", "/instructor/manage-courses", "/instructor/edit-course", "/instructor/profile"].some(path => location.pathname.startsWith(path)) ||
         location.pathname.startsWith("/auth") ||
         location.pathname.startsWith("/watch");
 
@@ -27,7 +28,7 @@ const TopBanner = () => {
     useEffect(() => {
         const fetchExpiry = async () => {
             try {
-                const res = await fetch("http://localhost:5000/api/courses");
+                const res = await fetch(`${API_BASE_URL}/courses`);
                 const data = await res.json();
 
                 // Find all courses with future discount expiry AND active discount > 0
@@ -92,25 +93,22 @@ const TopBanner = () => {
 
     useEffect(() => {
         const updateHeight = () => {
-            if (bannerRef.current && isVisible && !isClosing) {
+            if (bannerRef.current && isVisible && !isClosing && !isDashboard) {
                 const height = bannerRef.current.offsetHeight;
                 document.documentElement.style.setProperty("--top-banner-height", `${height}px`);
-            } else if (!isVisible || isClosing) {
+            } else {
                 document.documentElement.style.setProperty("--top-banner-height", "0px");
             }
         };
 
-        // Run initially and on resize
         updateHeight();
         window.addEventListener("resize", updateHeight);
 
         return () => {
             window.removeEventListener("resize", updateHeight);
-            if (!isVisible) {
-                document.documentElement.style.setProperty("--top-banner-height", "0px");
-            }
+            document.documentElement.style.setProperty("--top-banner-height", "0px");
         };
-    }, [isVisible, isClosing]);
+    }, [isVisible, isClosing, isDashboard]);
 
     if (!isVisible || isDashboard) return null;
 

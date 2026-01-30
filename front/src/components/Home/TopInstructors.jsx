@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useData } from "../../contexts/DataContext";
+import { getImageUrl } from "../../utils/format";
 
 export default function TopInstructors() {
   const { instructors } = useData();
@@ -32,7 +33,7 @@ export default function TopInstructors() {
             >
               <div className="relative overflow-hidden">
                 <img
-                  src={instructor.image}
+                  src={getImageUrl(instructor.image)}
                   alt={instructor.name}
                   className="w-full h-64 object-cover rounded-t-3xl transition-transform duration-700 group-hover:scale-110"
                 />

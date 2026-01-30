@@ -7,6 +7,8 @@ import {
   FaInfinity,
   FaCode,
   FaCalendarAlt,
+  FaAward,
+  FaUserGraduate
 } from "react-icons/fa";
 import { getInstructorBySlug } from "../../api/instructorService";
 import { getAllCourses } from "../../api/courseService";
@@ -175,12 +177,16 @@ const InstructorCourses = ({ instructorSlug }) => {
               {/* ✅ Lessons + Duration */}
               <div className="flex justify-between text-sm text-gray-700 mb-4">
                 <div className="flex items-center gap-2">
+                  <FaUserGraduate className="text-emerald-500 text-[14px]" />
+                  <span>{course.enrolledCount || 0} Students</span>
+                </div>
+                <div className="flex items-center gap-2">
                   <FaPlayCircle className="text-emerald-500" />
                   <span>{course.totalLessons || 0} Lessons</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <FaClock className="text-emerald-500" />
-                  <span>Total: {totalDuration}</span>
+                  <span>{totalDuration}</span>
                 </div>
               </div>
 
@@ -233,6 +239,17 @@ const InstructorCourses = ({ instructorSlug }) => {
                   )}
                 </div>
               </div>
+
+              {course.hasCertificate && (
+                <div className="group/cert relative flex items-center gap-2 bg-gradient-to-r from-amber-100/50 to-orange-50/50 dark:from-amber-500/10 dark:to-orange-500/5 text-amber-700 dark:text-amber-400 font-black px-3.5 py-1.5 rounded-xl shadow-sm border border-amber-200/50 dark:border-amber-500/20 w-fit mb-4 transition-all hover:shadow-md hover:shadow-amber-200/40 dark:hover:shadow-none group-hover:scale-[1.02] duration-300">
+                  <div className="relative">
+                    <FaAward className="text-amber-500 text-sm animate-pulse" />
+                    <div className="absolute inset-0 bg-amber-400 blur-md opacity-20 group-hover/cert:opacity-40 animate-pulse"></div>
+                  </div>
+                  <span className="text-[9px] uppercase tracking-[0.05em] relative z-10">Certificate</span>
+                  <div className="ml-0.5 w-1 h-1 bg-amber-500 rounded-full animate-[pulse_2s_infinite]"></div>
+                </div>
+              )}
 
               <div className="border-t border-gray-100 mb-4"></div>
 

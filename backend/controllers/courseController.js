@@ -73,6 +73,8 @@ const createCourse = async (req, res) => {
     discountCode,
     discountPercentage,
     discountExpiry,
+    hasCertificate,
+    certificateTemplate,
   } = req.body;
 
   const course = new Course({
@@ -91,6 +93,8 @@ const createCourse = async (req, res) => {
     curriculum,
     communityLink,
     learningOutcomes,
+    hasCertificate,
+    certificateTemplate,
     user: req.user._id,
   });
 
@@ -117,6 +121,8 @@ const updateCourse = async (req, res) => {
     type,
     discountCode,
     discountPercentage,
+    hasCertificate,
+    certificateTemplate,
   } = req.body;
 
   const course = await Course.findById(req.params.id);
@@ -137,6 +143,8 @@ const updateCourse = async (req, res) => {
     if (discountCode !== undefined) course.discountCode = discountCode;
     if (discountPercentage !== undefined) course.discountPercentage = discountPercentage;
     if (req.body.discountExpiry !== undefined) course.discountExpiry = req.body.discountExpiry;
+    if (hasCertificate !== undefined) course.hasCertificate = hasCertificate;
+    if (certificateTemplate !== undefined) course.certificateTemplate = certificateTemplate;
 
     const updatedCourse = await course.save();
     res.json(updatedCourse);

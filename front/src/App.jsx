@@ -52,6 +52,8 @@ import ManageContacts from "./pages/Dashboard/admin/ManageContacts";
 import ManageBotResponses from "./pages/Dashboard/admin/ManageBotResponses";
 import LiveChat from "./pages/Dashboard/admin/LiveChat";
 import ManagePayments from "./pages/Dashboard/admin/ManagePayments";
+import ManageCertificates from "./pages/Dashboard/admin/ManageCertificates";
+import CertificateBuilder from "./pages/Dashboard/admin/CertificateBuilder";
 // ManageSettings removed
 import PublicLayout from "./layouts/PublicLayout";
 import Orders from "./pages/Dashboard/student/Orders";
@@ -185,6 +187,8 @@ function App() {
           <Route path="contacts" element={<ManageContacts />} />
           <Route path="payments" element={<ManagePayments />} />
           <Route path="system-settings" element={<SystemSettings />} />
+          <Route path="certificates" element={<ManageCertificates />} />
+          <Route path="certificates/builder" element={<CertificateBuilder />} />
           {/* Settings route removed */}
           <Route path="profile" element={<Profile />} />
           <Route path="bot-responses" element={<ManageBotResponses />} />

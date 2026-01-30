@@ -19,7 +19,8 @@ import {
     PlusCircle,
     Upload,
     Users,
-    GripVertical
+    GripVertical,
+    Award
 } from 'lucide-react';
 import {
     DndContext,
@@ -212,6 +213,7 @@ const EditCourse = () => {
     const [uploading, setUploading] = useState(false);
     const [instructors, setInstructors] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [certificateTemplates, setCertificateTemplates] = useState([]);
     const [courseData, setCourseData] = useState({
         title: '',
         type: '',
@@ -227,17 +229,22 @@ const EditCourse = () => {
         instructor: '',
         communityLink: '',
         learningOutcomes: [],
-        curriculum: []
+        curriculum: [],
+        hasCertificate: false,
+        certificateTemplate: ''
     });
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const [course, allInstructors, allCategories] = await Promise.all([
+                const [course, allInstructors, allCategories, templatesRes] = await Promise.all([
                     id === 'new' ? Promise.resolve(null) : getFullCourseDetails(id),
                     getAllInstructors(),
-                    fetch('http://localhost:5000/api/categories').then(res => res.json())
+                    fetch('http://localhost:5000/api/categories').then(res => res.json()),
+                    fetch('http://localhost:5000/api/certificates/templates', {
+                        headers: { 'Authorization': `Bearer ${JSON.parse(localStorage.getItem('loggedInUser'))?.token}` }
+                    }).then(res => res.json())
                 ]);
 
                 if (course) {
@@ -252,8 +259,10 @@ const EditCourse = () => {
                             return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
                         })() : '',
                         instructor: course.instructor?._id || course.instructor || '',
+                        communityLink: course.communityLink || '',
                         learningOutcomes: course.learningOutcomes || [],
-                        communityLink: course.communityLink || ''
+                        hasCertificate: course.hasCertificate || false,
+                        certificateTemplate: course.certificateTemplate?._id || course.certificateTemplate || ''
                     });
                 } else {
                     // Reset to empty for new courses specifically
@@ -271,11 +280,14 @@ const EditCourse = () => {
                         instructor: '',
                         communityLink: '',
                         learningOutcomes: [],
-                        curriculum: []
+                        curriculum: [],
+                        hasCertificate: false,
+                        certificateTemplate: ''
                     });
                 }
                 setInstructors(allInstructors);
                 setCategories(allCategories || []);
+                setCertificateTemplates(templatesRes || []);
             } catch (error) {
                 toast.error("Failed to load data");
             } finally {
@@ -847,6 +859,52 @@ const EditCourse = () => {
                                 </select>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Certificate Settings Card */}
+                    <div className="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm space-y-6 transition-colors duration-300">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <Award className="text-emerald-500" size={20} />
+                                <h2 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tighter">Certificate</h2>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setCourseData(prev => ({ ...prev, hasCertificate: !prev.hasCertificate }))}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${courseData.hasCertificate ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-slate-700'}`}
+                            >
+                                <span
+                                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${courseData.hasCertificate ? 'translate-x-6' : 'translate-x-1'}`}
+                                />
+                            </button>
+                        </div>
+
+                        {courseData.hasCertificate && (
+                            <div className="space-y-4 animate-in slide-in-from-top-2 duration-300">
+                                <div className="space-y-2">
+                                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Template</label>
+                                    <div className="relative">
+                                        <Award className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                        <select
+                                            name="certificateTemplate"
+                                            value={courseData.certificateTemplate}
+                                            onChange={handleInputChange}
+                                            className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold appearance-none cursor-pointer text-gray-900 dark:text-white"
+                                        >
+                                            <option value="">Choose Template...</option>
+                                            {certificateTemplates.map(tpl => (
+                                                <option key={tpl._id} value={tpl._id}>
+                                                    {tpl.name} {tpl.isActive ? '(Default)' : ''}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <p className="text-[10px] text-gray-400 font-medium px-2 italic">
+                                        Ardaydu waxay heli doonaan shahaadadan markay dhamaystiraan koorsada.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Thumbnail Card */}

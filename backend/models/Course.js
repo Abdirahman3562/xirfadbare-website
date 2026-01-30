@@ -31,6 +31,8 @@ const courseSchema = mongoose.Schema(
     discountCode: { type: String },
     discountPercentage: { type: Number, default: 0 },
     discountExpiry: { type: Date },
+    hasCertificate: { type: Boolean, default: false },
+    certificateTemplate: { type: mongoose.Schema.Types.ObjectId, ref: 'CertificateTemplate' },
     curriculum: [curriculumSchema],
   },
   { timestamps: true }

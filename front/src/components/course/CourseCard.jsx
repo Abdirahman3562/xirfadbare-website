@@ -4,6 +4,7 @@ import {
   FaCode,
   FaInfinity,
   FaCalendarAlt,
+  FaAward,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useMemo } from "react";
@@ -54,7 +55,7 @@ function CourseCard({ course }) {
   return (
     <div className="group relative bg-[#edf4f5] dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
       {/* Thumbnail */}
-      <div className="relative h-52 w-full overflow-hidden z-0">
+      <div className="relative h-48 w-full overflow-hidden z-0">
         <Link to={`/courses/${course.slug}`}>
           <img
             src={getImageUrl(course.thumbnail) || "/default-course.jpg"}
@@ -75,7 +76,7 @@ function CourseCard({ course }) {
         )}
       </div>
 
-      <div className="relative z-20 p-6">
+      <div className="relative z-20 p-5">
         {course.type && (
           <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest block mb-1">
             {course.type}
@@ -88,12 +89,12 @@ function CourseCard({ course }) {
           {course.title}
         </Link>
 
-        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-3 line-clamp-2">
+        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-2.5 line-clamp-2">
           {course.description}
         </p>
 
         {/* 👨‍🏫 Instructor row (NEW) */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-3">
           {instructor.image ? (
             <img
               src={getImageUrl(instructor.image)}
@@ -117,7 +118,7 @@ function CourseCard({ course }) {
             </p>
             {instructor.instructorTitle && (
               <p
-                className="text-xs bg-[#edf4f5] dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold px-2 py-1 text-center rounded-full shadow-sm truncate"
+                className="text-xs bg-[#edf4f5] dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold px-2 py-0.5 text-center rounded-full shadow-sm truncate"
                 title={instructor.instructorTitle}
               >
                 {instructor.instructorTitle}
@@ -127,28 +128,28 @@ function CourseCard({ course }) {
         </div>
 
         {/* Lessons + Duration */}
-        <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-4 transition-colors">
+        <div className="flex justify-between text-[13px] text-gray-700 dark:text-gray-300 mb-3.5 transition-colors">
           <div className="flex gap-1 items-center">
-            <FaUserGraduate className="text-emerald-500 text-[13px]" />
+            <FaUserGraduate className="text-emerald-500 text-[12px]" />
             <span className="text-gray-700 dark:text-gray-300 font-medium ml-1">
               {course.enrolledCount}
             </span>
-            <span className="text-gray-500 dark:text-gray-400 text-sm">Enrolled</span>
+            <span className="text-gray-500 dark:text-gray-400 text-xs">Enrolled</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <FaPlayCircle className="text-emerald-500" />
             <span>{totalLessons} Lessons</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <FaClock className="text-emerald-500" />
-            <span>Total: {totalDuration}</span>
+            <span>{totalDuration}</span>
           </div>
         </div>
 
         {/* Access Type / Tech + Price */}
-        <div className="flex justify-between items-center mb-5 text-sm font-medium">
+        <div className="flex justify-between items-center mb-4 text-sm font-medium">
           {course.accessType ? (
-            <span className="flex items-center gap-2 bg-[#edf4f5] dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-semibold px-3 py-1 rounded-full shadow-sm transition-colors">
+            <span className="flex items-center gap-2 bg-[#edf4f5] dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-semibold px-3 py-1 rounded-full shadow-sm transition-colors text-[12px]">
               {course.accessType.toLowerCase() === "lifetime" ? (
                 <FaInfinity className="text-emerald-600 dark:text-emerald-400" />
               ) : (
@@ -156,14 +157,14 @@ function CourseCard({ course }) {
               )}
               <span>
                 {course.accessType === "Lifetime"
-                  ? "Lifetime Access"
-                  : `${course.accessType} Access`}
+                  ? "Lifetime"
+                  : `${course.accessType}`}
               </span>
             </span>
           ) : (
             <span
               title={course.technology}
-              className="flex items-center gap-2 bg-[#edf4f5] dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-semibold px-3 py-1 rounded-full shadow-sm max-w-[180px] truncate transition-colors"
+              className="flex items-center gap-2 bg-[#edf4f5] dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-semibold px-3 py-1 rounded-full shadow-sm max-w-[180px] truncate transition-colors text-[12px]"
             >
               <FaCode className="text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
               <span className="truncate">{course.technology || "Tech"}</span>
@@ -174,16 +175,16 @@ function CourseCard({ course }) {
           <div className="flex flex-col items-end">
             {course.discountPercentage > 0 ? (
               <>
-                <span className="text-gray-400 text-xs line-through font-bold">
+                <span className="text-gray-400 text-[10px] line-through font-bold">
                   ${course.price}
                 </span>
-                <span className="text-[18px] font-black text-emerald-600 dark:text-emerald-400">
+                <span className="text-[17px] font-black text-emerald-600 dark:text-emerald-400 leading-none">
                   ${(course.price * (1 - course.discountPercentage / 100)).toFixed(2)}
                 </span>
               </>
             ) : (
               <span
-                className={`text-[18px] font-semibold ${isFree
+                className={`text-[17px] font-semibold ${isFree
                   ? "bg-[#edf4f5] dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 px-6 py-0 rounded-full shadow-sm"
                   : "text-emerald-600 dark:text-emerald-400"
                   }`}
@@ -194,11 +195,22 @@ function CourseCard({ course }) {
           </div>
         </div>
 
-        <div className="border-t border-gray-100 dark:border-gray-800 mb-4 transition-colors"></div>
+        {course.hasCertificate && (
+          <div className="group/cert relative flex items-center gap-2 bg-gradient-to-r from-amber-100/50 to-orange-50/50 dark:from-amber-500/10 dark:to-orange-500/5 text-amber-700 dark:text-amber-400 font-black px-3.5 py-1.5 rounded-xl shadow-sm border border-amber-200/50 dark:border-amber-500/20 w-fit mb-4 transition-all hover:shadow-md hover:shadow-amber-200/40 dark:hover:shadow-none group-hover:scale-[1.02] duration-300">
+            <div className="relative">
+              <FaAward className="text-amber-500 text-sm animate-pulse" />
+              <div className="absolute inset-0 bg-amber-400 blur-md opacity-20 group-hover/cert:opacity-40 animate-pulse"></div>
+            </div>
+            <span className="text-[9px] uppercase tracking-[0.05em] relative z-10">Certificate</span>
+            <div className="ml-0.5 w-1 h-1 bg-amber-500 rounded-full animate-[pulse_2s_infinite]"></div>
+          </div>
+        )}
+
+        <div className="border-t border-gray-100 dark:border-gray-800 mb-3.5 transition-colors"></div>
 
         <Link
           to={`/courses/${course.slug}`}
-          className="block text-center bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-full transition duration-300 transform hover:-translate-y-0.5 relative z-30"
+          className="block text-center bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-full transition duration-300 transform hover:-translate-y-0.5 relative z-30 text-sm"
         >
           View Details →
         </Link>

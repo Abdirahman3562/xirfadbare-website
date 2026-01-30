@@ -18,7 +18,8 @@ import {
     Newspaper,
     Mail,
     Bot,
-    CreditCard
+    CreditCard,
+    Award
 } from 'lucide-react';
 
 const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], isSuperAdmin = false }) => {
@@ -89,6 +90,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
         { title: 'Testimonials', icon: <MessageSquareQuote size={20} />, path: '/admin/testimonials', permission: 'testimonials.view' },
         { title: 'FAQs', icon: <MessageCircleQuestion size={20} />, path: '/admin/faqs', permission: 'faqs.view' },
         { title: 'Payment Methods', icon: <CreditCard size={20} />, path: '/admin/payments', permission: 'payments.view' },
+        { title: 'Certificates', icon: <Award size={20} />, path: '/admin/certificates', permission: 'settings.edit' },
         { title: 'System Settings', icon: <Settings size={20} />, path: '/admin/system-settings', permission: 'settings.view' },
     ];
 
