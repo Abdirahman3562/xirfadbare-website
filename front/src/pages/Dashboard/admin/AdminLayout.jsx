@@ -16,6 +16,7 @@ const AdminLayout = () => {
     const [stats, setStats] = useState(null);
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('loggedInUser') || '{}'));
     // const [theme, setTheme] = useState(localStorage.getItem("theme") || "light"); // Removed local state
+    const [loadingPermissions, setLoadingPermissions] = useState(true);
     const [openTheme, setOpenTheme] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
@@ -53,8 +54,12 @@ const AdminLayout = () => {
 
     const fetchUserProfile = async () => {
         const token = user?.token;
-        if (!token) return;
+        if (!token) {
+            setLoadingPermissions(false);
+            return;
+        }
         try {
+            setLoadingPermissions(true);
             const response = await fetch("http://localhost:5000/api/users/profile", {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -63,6 +68,8 @@ const AdminLayout = () => {
             setIsSuperAdmin(data.isSuperAdmin || data.role === 'admin');
         } catch (error) {
             console.error("Error fetching profile:", error);
+        } finally {
+            setLoadingPermissions(false);
         }
     };
 
@@ -91,6 +98,9 @@ const AdminLayout = () => {
 
     // Route Protection
     useEffect(() => {
+        // Wait for permissions to load before checking
+        if (loadingPermissions) return;
+
         if (isSuperAdmin) return;
 
         const currentPath = location.pathname;
@@ -119,7 +129,7 @@ const AdminLayout = () => {
                 navigate('/admin/dashboard');
             }
         }
-    }, [location.pathname, userPermissions, isSuperAdmin]);
+    }, [location.pathname, userPermissions, isSuperAdmin, loadingPermissions]);
 
     // Close mobile sidebar on route change
     useEffect(() => {

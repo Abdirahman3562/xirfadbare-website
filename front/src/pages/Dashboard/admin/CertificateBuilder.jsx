@@ -359,14 +359,17 @@ const CertificateBuilder = () => {
                 </div>
             </div>
 
-            <div className="flex flex-1 overflow-hidden">
-                {/* Sidebar - Dynamic Fields */}
-                <div className={`bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out shrink-0 z-20 ${sidebarOpen ? 'w-64 sm:w-72 lg:w-80 opacity-100' : 'w-0 opacity-0 overflow-hidden border-none'}`}>
+            <div className="flex flex-1 flex-col lg:flex-row overflow-hidden relative">
+                {/* Sidebar - Dynamic Fields & Settings */}
+                <div className={`bg-white dark:bg-slate-800 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out shrink-0 z-20 ${sidebarOpen
+                        ? 'h-[40vh] lg:h-full w-full lg:w-80 opacity-100'
+                        : 'h-0 lg:w-0 opacity-0 overflow-hidden border-none'
+                    }`}>
                     <div className="p-4 sm:p-6 flex flex-col gap-5 overflow-y-auto h-full scrollbar-hide no-scrollbar min-w-[256px]">
-                        <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center justify-between shrink-0">
                             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Dynamic Fields</h3>
                             <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                                <ArrowLeft size={16} />
+                                <ArrowLeft size={16} className="rotate-90 lg:rotate-0" />
                             </button>
                         </div>
 
@@ -516,7 +519,7 @@ const CertificateBuilder = () => {
                 {/* Workspace / Canvas Area */}
                 <div
                     ref={workspaceRef}
-                    className="flex-1 bg-slate-100 dark:bg-slate-900 overflow-hidden flex items-center justify-center relative shadow-inner"
+                    className="flex-1 bg-slate-100 dark:bg-slate-900 overflow-auto flex items-center justify-center relative shadow-inner p-8"
                     style={{
                         backgroundImage: `
                             linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),

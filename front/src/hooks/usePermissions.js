@@ -1,53 +1,38 @@
 import { useState, useEffect } from 'react';
 
+/**
+ * Custom hook to check user permissions for specific modules and actions.
+ * @returns {Object} - contains canAccess function and user metadata
+ */
 export const usePermissions = () => {
-    const [userPermissions, setUserPermissions] = useState([]);
-    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
-    const token = loggedInUser?.token;
-
-    const fetchUserProfile = async () => {
-        if (!token) {
-            setLoading(false);
-            return;
-        }
-        try {
-            const response = await fetch("http://localhost:5000/api/users/profile", {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const data = await response.json();
-            if (response.ok) {
-                setUserPermissions(data.permissions || []);
-                setIsSuperAdmin(data.isSuperAdmin || data.role === 'admin');
-            } else {
-                // Fallback to localStorage if API fails but we have data
-                setUserPermissions(loggedInUser.permissions || []);
-                setIsSuperAdmin(loggedInUser.role === 'admin');
-            }
-        } catch (error) {
-            console.error("Error fetching profile in hook:", error);
-            // Fallback to localStorage
-            setUserPermissions(loggedInUser.permissions || []);
-            setIsSuperAdmin(loggedInUser.role === 'admin');
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [user, setUser] = useState(null);
 
     useEffect(() => {
-        fetchUserProfile();
+        const storedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
+            JSON.parse(localStorage.getItem('user'));
+        setUser(storedUser);
+    }, []);
 
-        // Listen for login events to refresh
-        const handleLogin = () => fetchUserProfile();
-        window.addEventListener('userLogin', handleLogin);
-        return () => window.removeEventListener('userLogin', handleLogin);
-    }, [token]);
+    /**
+     * Checks if the user has permission for a specific module and action.
+     * @param {string} moduleId - e.g., 'certificates', 'courses'
+     * @param {string} action - e.g., 'create', 'edit', 'delete', 'view'
+     * @returns {boolean}
+     */
+    const canAccess = (moduleId, action) => {
+        if (!user) return false;
 
-    const hasPermission = (permissionKey) => {
-        if (isSuperAdmin) return true;
-        return userPermissions.includes(permissionKey);
+        // Super Admin Bypass
+        if (user.role === 'admin' || user.isSuperAdmin) return true;
+
+        // Check granular permissions
+        const permissionKey = `${moduleId}.${action}`;
+        return user.permissions && user.permissions.includes(permissionKey);
     };
 
-    return { userPermissions, isSuperAdmin, hasPermission, loading };
+    return {
+        canAccess,
+        role: user?.role,
+        isSuperAdmin: user?.role === 'admin' || user?.isSuperAdmin
+    };
 };

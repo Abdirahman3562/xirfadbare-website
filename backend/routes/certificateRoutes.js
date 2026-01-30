@@ -9,18 +9,19 @@ import {
     updateTemplateStatus
 } from '../controllers/certificateController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
+import { checkPermission } from '../middleware/permissionMiddleware.js';
 
-router.route('/templates').get(protect, admin, getCertificateTemplates);
+router.route('/templates').get(protect, checkPermission('certificates.view'), getCertificateTemplates);
 
 router.route('/template')
-    .get(protect, admin, getCertificateTemplate)
-    .post(protect, admin, saveCertificateTemplate);
+    .get(protect, checkPermission('certificates.view'), getCertificateTemplate)
+    .post(protect, checkPermission('certificates.edit'), saveCertificateTemplate);
 
 router.route('/template/:id')
     .get(protect, getCertificateTemplateById)
-    .delete(protect, admin, deleteCertificateTemplate);
+    .delete(protect, checkPermission('certificates.delete'), deleteCertificateTemplate);
 
 router.route('/template/:id/status')
-    .patch(protect, admin, updateTemplateStatus);
+    .patch(protect, checkPermission('certificates.status'), updateTemplateStatus);
 
 export default router;

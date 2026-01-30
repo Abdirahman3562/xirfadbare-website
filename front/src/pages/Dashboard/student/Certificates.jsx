@@ -84,6 +84,11 @@ export default function Certificates() {
                 throw new Error("Template not found");
             }
 
+            if (!template.isActive) {
+                toast.info("Shahaadada hadda diyaar ma ahan. Fadlan la xiriir maamulka.");
+                return;
+            }
+
             // Get full name from firstName and lastName and format it nicely
             const rawName = (userData?.firstName && userData?.lastName)
                 ? `${userData.firstName} ${userData.lastName}`
@@ -131,7 +136,7 @@ export default function Certificates() {
     }
 
     return (
-        <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8">
             {/* Header Section */}
             <div className="mb-10 text-center sm:text-left relative overflow-hidden bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 sm:p-12 border border-gray-100 dark:border-slate-800 shadow-xl shadow-emerald-500/5 transition-colors">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -141,8 +146,8 @@ export default function Certificates() {
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-3xl mb-6 shadow-lg shadow-emerald-100 dark:shadow-none transition-transform hover:rotate-6">
                         <Medal className="w-8 h-8" />
                     </div>
-                    <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-4 tracking-tight leading-tight">
-                        Shahaadooyinkaaga <br />
+                    <h1 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-white mb-4 tracking-tight leading-tight">
+                        Shahaadooyinkaaga <br className="hidden sm:block" />
                         <span className="text-emerald-600 dark:text-emerald-400">Guusha & Kobaca</span>
                     </h1>
                     <p className="text-gray-500 dark:text-gray-400 text-lg max-w-2xl font-medium leading-relaxed">
@@ -155,7 +160,7 @@ export default function Certificates() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Selector Section */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[2rem] p-8 shadow-lg shadow-gray-200/50 dark:shadow-none transition-colors sticky top-24">
+                    <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-lg shadow-gray-200/50 dark:shadow-none transition-colors lg:sticky lg:top-24">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                                 <Search className="w-5 h-5" />
@@ -225,7 +230,7 @@ export default function Certificates() {
                             <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-4 tracking-tight leading-snug max-w-md">
                                 {completedCourses.find(c => c._id === selectedCourse)?.title}
                             </h2>
-                            <p className="text-gray-500 dark:text-gray-400 font-medium mb-10 text-lg">
+                            <p className="text-gray-500 dark:text-gray-400 font-medium mb-10 text-base sm:text-lg">
                                 Shahaadadaadu waa mid caalami ah, waxaadna u isticmaali kartaa markhaati ahaan aqoontaada iyo xirfadaada.
                             </p>
 

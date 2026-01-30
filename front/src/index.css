@@ -111,15 +111,21 @@
 /* Custom Toastify Styles */
 .Toastify__toast {
   @apply !rounded-2xl !shadow-2xl !font-bold;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .Toastify__toast-theme--light {
   background: white !important;
-  color: #1e293b !important; /* Slate 800 - dark text */
+  color: #1e293b !important;
 }
 
 .Toastify__toast-theme--dark {
-  background: #0f172a !important; /* Slate 900 */
-  color: #f8fafc !important; /* Slate 50 - light text */
-  border: 1px solid #1e2937 !important;
+  background: #0f172a !important;
+  /* Solid Slate 900 */
+  color: #f8fafc !important;
+  border: 1px solid #1e293b !important;
+}
+
+.Toastify__progress-bar {
+  @apply !bg-emerald-500;
 }

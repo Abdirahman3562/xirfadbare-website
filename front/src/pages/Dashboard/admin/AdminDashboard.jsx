@@ -23,7 +23,15 @@ import { getDashboardStats } from '../../../api/adminService';
 import PremiumLoader from '../../../components/ui/PremiumLoader';
 
 const AdminDashboard = () => {
-    const { hasPermission, loading: permissionsLoading } = usePermissions();
+    const { canAccess, loading: permissionsLoading } = usePermissions();
+
+    // Helper to maintain compatibility with existing 'module.action' string format
+    const hasPermission = (permissionString) => {
+        if (!permissionString) return false;
+        const [module, action] = permissionString.split('.');
+        return canAccess(module, action);
+    };
+
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
 
