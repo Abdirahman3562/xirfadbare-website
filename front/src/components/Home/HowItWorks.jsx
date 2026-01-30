@@ -27,7 +27,7 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section id="how-it-works" className="py-16">
+    <section id="how-it-works" className="py-16 transition-colors duration-500">
 
       <div className="max-w-7xl mx-auto px-6">
         <Header title="How It Works" />
@@ -37,13 +37,13 @@ export default function HowItWorks() {
               key={i}
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 150 }}
-              className="rounded-2xl bg-[#edf4f5] border border-gray-200 hover:border-emerald-400 p-6 shadow hover:shadow-lg transition"
+              className="rounded-2xl bg-[#edf4f5] dark:bg-slate-900 border border-gray-200 dark:border-gray-800 hover:border-emerald-400 dark:hover:border-emerald-500 p-6 shadow hover:shadow-lg transition-all duration-300"
             >
-              <div className="w-10 h-10 grid place-content-center rounded-full bg-emerald-600 text-white font-bold">
+              <div className="w-10 h-10 grid place-content-center rounded-full bg-emerald-600 dark:bg-emerald-500 text-white font-bold">
                 {s.step || i + 1}
               </div>
-              <h3 className="mt-4 font-bold text-lg text-gray-800">{s.title}</h3>
-              <p className="text-gray-600 mt-2">{s.description}</p>
+              <h3 className="mt-4 font-bold text-lg text-gray-800 dark:text-white">{s.title}</h3>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">{s.description}</p>
             </motion.div>
           ))}
         </div>
@@ -56,10 +56,10 @@ function Header({ title }) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 text-center sm:text-left">
       <div>
-        <h2 className="text-3xl md:text-4xl font-extrabold text-[#00cc8f]">
+        <h2 className="text-3xl md:text-4xl font-extrabold text-[#00cc8f] dark:text-emerald-400">
           {title}
         </h2>
-        <div className="mt-2 h-1 w-24 bg-[#00cc8f] rounded-full mx-auto sm:mx-0" />
+        <div className="mt-2 h-1 w-24 bg-[#00cc8f] dark:bg-emerald-500 rounded-full mx-auto sm:mx-0" />
       </div>
     </div>
   );

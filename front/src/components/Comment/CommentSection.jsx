@@ -98,28 +98,28 @@ const CommentSection = ({ article }) => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 transition-colors duration-300 border border-gray-100 dark:border-slate-700">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Comments ({comments.length})
         </h2>
       </div>
 
 
       <div className="mb-14">
-         {/* Comments List - Show after form when loaded */}
-      {!loading && !error && (
-        <div className="mt-8">
-          <CommentList
-            comments={comments}
-            user={user}
-            article={article}
-            onCommentUpdated={handleCommentUpdated}
-            onCommentDeleted={handleCommentDeleted}
-            onReplyAdded={handleReplyAdded}
-          />
-        </div>
-      )}
+        {/* Comments List - Show after form when loaded */}
+        {!loading && !error && (
+          <div className="mt-8">
+            <CommentList
+              comments={comments}
+              user={user}
+              article={article}
+              onCommentUpdated={handleCommentUpdated}
+              onCommentDeleted={handleCommentDeleted}
+              onReplyAdded={handleReplyAdded}
+            />
+          </div>
+        )}
       </div>
 
       {/* Comment Form - Show first for logged-in users */}
@@ -149,7 +149,7 @@ const CommentSection = ({ article }) => {
         </div>
       )}
 
-     
+
     </div>
   );
 };

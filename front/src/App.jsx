@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Routes, useLocation, Link } from "react-router-dom";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -58,6 +58,7 @@ import Orders from "./pages/Dashboard/student/Orders";
 import CourseDashboard from "./pages/Dashboard/student/CourseDashboard";
 import SinglePostPage from "./pages/webpages/Blog/SinglePostPage";
 import AuthorPage from "./pages/webpages/Author/AuthorPage";
+import TopBanner from "./components/ui/TopBanner";
 
 
 // ScrollToTop Component
@@ -71,13 +72,88 @@ const ScrollToTop = () => {
 
 // Main App Component
 function App() {
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+
+  useEffect(() => {
+    const applyTheme = () => {
+      const storedTheme = localStorage.getItem("theme") || "light";
+      const root = window.document.documentElement;
+      let effectiveTheme = storedTheme;
+
+      if (storedTheme === "system") {
+        effectiveTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+
+      if (effectiveTheme === "dark") {
+        root.classList.add("dark");
+        setTheme("dark");
+      } else {
+        root.classList.remove("dark");
+        setTheme("light");
+      }
+    };
+
+    applyTheme();
+
+    // Watch for storage changes (e.g. from Nav.jsx toggle)
+    window.addEventListener("storage", applyTheme);
+    // Custom event for same-window theme changes
+    window.addEventListener("themeChange", applyTheme);
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    mediaQuery.addEventListener("change", applyTheme);
+
+    return () => {
+      window.removeEventListener("storage", applyTheme);
+      window.removeEventListener("themeChange", applyTheme);
+      mediaQuery.removeEventListener("change", applyTheme);
+    };
+  }, []);
+
+  // 🌍 Fetch & Apply System Settings (Title & Favicon)
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/settings");
+        const data = await response.json();
+
+        // Update Title
+        if (data.websiteTitle) {
+          document.title = data.websiteTitle;
+        }
+
+        // Update Favicon
+        if (data.logo) {
+          const faviconUrl = data.logo.startsWith("/")
+            ? `http://localhost:5000${data.logo}`
+            : data.logo;
+
+          let link = document.querySelector("link[rel~='icon']");
+          if (!link) {
+            link = document.createElement("link");
+            link.rel = "icon";
+            document.getElementsByTagName("head")[0].appendChild(link);
+          }
+          link.href = faviconUrl;
+        }
+      } catch (error) {
+        console.error("Error fetching system settings:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
   return (
     <BrowserRouter>
+      {/* Top Banner (Fixed) */}
+      <TopBanner />
+
       {/* Scroll Logic */}
       <ScrollToTop />
 
       {/* Global Toast */}
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} theme={theme} />
 
       <Routes>
         <Route element={<PublicLayout />}>

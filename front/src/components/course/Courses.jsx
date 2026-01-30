@@ -81,24 +81,24 @@ function Courses({ IsHome }) {
   }
 
   return (
-    <section className="min-h-screen bg-[#f8fafb] pt-28 pb-20 px-4 md:px-8">
+    <section className="min-h-screen bg-[#f8fafb] dark:bg-slate-900 pt-28 pb-20 px-4 md:px-8 transition-colors duration-500">
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}
         <div className="mb-12">
-          <h1 className="text-2xl font-black text-gray-900 mb-2">All Courses</h1>
+          <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-2">All Courses</h1>
           <div className="h-1.5 w-20 bg-emerald-500 rounded-full"></div>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Courses Main Area */}
           <div className="flex-1 order-2 lg:order-1">
-            <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-              <p className="text-sm font-bold text-gray-500">
-                Waxaa jira <span className="text-emerald-600">{filteredCourses.length}</span> koorso oo la helay
+            <div className="flex justify-between items-center mb-6 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+              <p className="text-sm font-bold text-gray-500 dark:text-gray-400">
+                Waxaa jira <span className="text-emerald-600 dark:text-emerald-400">{filteredCourses.length}</span> koorso oo la helay
               </p>
               <button
                 onClick={() => setIsSidebarOpen(true)}
-                className="lg:hidden flex items-center gap-2 text-emerald-600 font-bold text-sm"
+                className="lg:hidden flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm"
               >
                 <Filter size={18} /> Shaandhey
               </button>
@@ -111,11 +111,11 @@ function Courses({ IsHome }) {
                 ))
               ) : (
                 <div className="col-span-full py-20 text-center">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto text-gray-400 mb-4">
+                  <div className="w-20 h-20 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-gray-400 dark:text-gray-600 mb-4 transition-colors">
                     <Search size={32} />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-800">Koorso looma helin</h3>
-                  <p className="text-sm text-gray-400">Fadlan isku day inaad raadis kale sameyso.</p>
+                  <h3 className="text-lg font-bold text-gray-800 dark:text-white transition-colors">Koorso looma helin</h3>
+                  <p className="text-sm text-gray-400 dark:text-gray-500 transition-colors">Fadlan isku day inaad raadis kale sameyso.</p>
                 </div>
               )}
             </div>
@@ -124,15 +124,15 @@ function Courses({ IsHome }) {
           {/* Right Sidebar Filter */}
           <aside className={`
             order-1 lg:order-2
-            fixed lg:static inset-y-0 right-0 w-[300px] lg:w-80 bg-white lg:bg-transparent z-[1000] lg:z-auto
+            fixed lg:static inset-y-0 right-0 w-[300px] lg:w-80 bg-white dark:bg-slate-900 lg:bg-transparent z-[1000] lg:z-auto
             p-6 lg:p-0 transition-transform duration-300 transform
             ${isSidebarOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
             lg:block
           `}>
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-xl lg:shadow-sm p-6 space-y-8 lg:sticky lg:top-28">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl lg:shadow-sm p-6 space-y-8 lg:sticky lg:top-28 transition-colors">
               <div className="flex lg:hidden justify-between items-center mb-4">
-                <h3 className="font-black text-gray-900">Shaandhaynta</h3>
-                <button onClick={() => setIsSidebarOpen(false)} className="p-2 bg-gray-50 rounded-lg text-gray-400">
+                <h3 className="font-black text-gray-900 dark:text-white">Shaandhaynta</h3>
+                <button onClick={() => setIsSidebarOpen(false)} className="p-2 bg-gray-50 dark:bg-slate-800 rounded-lg text-gray-400">
                   <X size={20} />
                 </button>
               </div>
@@ -143,26 +143,26 @@ function Courses({ IsHome }) {
 
               {/* Search */}
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Search Title</label>
+                <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Search Title</label>
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Raadi magaca..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-gray-50 border border-transparent rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:bg-white focus:border-emerald-500/20 transition-all"
+                    className="w-full bg-gray-50 dark:bg-slate-900 border border-transparent dark:border-gray-800 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500/20 transition-all placeholder:text-gray-400"
                   />
-                  <Search className="absolute right-3 top-3 text-gray-300" size={18} />
+                  <Search className="absolute right-3 top-3 text-gray-300 dark:text-gray-600" size={18} />
                 </div>
               </div>
 
               {/* Categories */}
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Categories</label>
+                <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Categories</label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:bg-white focus:border-emerald-500/20 transition-all appearance-none cursor-pointer"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-gray-800 rounded-xl text-sm font-semibold text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500/20 transition-all appearance-none cursor-pointer"
                 >
                   <option value="All">All Categories</option>
                   {dbCategories.map((cat) => (
@@ -182,8 +182,8 @@ function Courses({ IsHome }) {
                       key={lvl}
                       onClick={() => setSelectedLevel(lvl)}
                       className={`py-2 rounded-xl text-xs font-bold border transition-all ${selectedLevel === lvl
-                        ? "bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-100"
-                        : "bg-white border-gray-100 text-gray-400 hover:border-emerald-200"
+                        ? "bg-emerald-500 text-white border-emerald-500 shadow-md dark:shadow-none"
+                        : "bg-white dark:bg-slate-900 border-gray-100 dark:border-gray-800 text-gray-400 dark:text-gray-500 hover:border-emerald-200"
                         }`}
                     >
                       {lvl}
@@ -201,8 +201,8 @@ function Courses({ IsHome }) {
                       key={p}
                       onClick={() => setSelectedPrice(p)}
                       className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-all ${selectedPrice === p
-                        ? "bg-emerald-500 text-white border-emerald-500 shadow-md shadow-emerald-100"
-                        : "bg-white border-gray-100 text-gray-400 hover:border-emerald-200"
+                        ? "bg-emerald-500 text-white border-emerald-500 shadow-md dark:shadow-none"
+                        : "bg-white dark:bg-slate-900 border-gray-100 dark:border-gray-800 text-gray-400 dark:text-gray-500 hover:border-emerald-200"
                         }`}
                     >
                       {p}
@@ -220,7 +220,7 @@ function Courses({ IsHome }) {
                     setSelectedLevel("All");
                     setSelectedPrice("All");
                   }}
-                  className="w-full py-3 text-xs font-black text-red-500 hover:underline border-t border-gray-50 mt-4"
+                  className="w-full py-3 text-xs font-black text-red-500 hover:underline border-t border-gray-50 dark:border-gray-800 mt-4 transition-colors"
                 >
                   Clear All Filters
                 </button>
@@ -243,16 +243,16 @@ function Courses({ IsHome }) {
 
 function Header({ title, cta, center }) {
   return (
-    <div className={`flex items-end justify-between mb-10`}>
+    <div className={`flex items-end justify-between mb-10 transition-colors`}>
       <div className={center ? "w-full text-center" : ""}>
-        <h2 className={`text-4xl font-black text-gray-900 tracking-tighter`}>{title}</h2>
+        <h2 className={`text-4xl font-black text-emerald-600  tracking-tighter`}>{title}</h2>
         <div className={`h-1.5 w-20 bg-emerald-500 rounded-full mt-2 ${center ? "mx-auto" : ""}`} />
       </div>
 
       {cta && (
         <a
           href={cta.href}
-          className="hidden sm:flex items-center gap-2 bg-[#00cc8f] text-white px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-100"
+          className="hidden dark:bg-slate-900 sm:flex items-center gap-2 bg-[#00cc8f] text-white px-8 py-2.5 rounded-xl font-bold text-sm hover:bg-emerald-600 transition-all shadow-lg dark:shadow-none border dark:border-slate-800 shadow-emerald-100"
         >
           {cta.label}
         </a>

@@ -27,7 +27,7 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
   const hasMore = paragraphs.length > 2;
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 relative overflow-hidden transition-colors duration-500">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-20 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl animate-pulse"></div>
@@ -41,10 +41,10 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-4 backdrop-blur-sm"
           >
-            <Sparkles className="w-4 h-4 text-emerald-600" />
-            <span className="text-emerald-700 font-bold text-sm uppercase tracking-wider">Our Story</span>
+            <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span className="text-emerald-700 dark:text-emerald-400 font-bold text-sm uppercase tracking-wider">Our Story</span>
           </motion.div>
 
           <motion.h2
@@ -52,9 +52,9 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-black text-gray-900 mb-4"
+            className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white mb-4"
           >
-            Meet the <span className="text-emerald-600">Founder</span>
+            Meet the <span className="text-emerald-600 dark:text-emerald-400">Founder</span>
           </motion.h2>
 
           <motion.div
@@ -72,7 +72,7 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3 }}
-          className="bg-white rounded-3xl shadow-2xl shadow-emerald-900/5 overflow-hidden border border-gray-100"
+          className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-emerald-900/5 overflow-hidden border border-gray-100 dark:border-slate-800"
         >
           <div className="grid lg:grid-cols-5 gap-0">
             {/* Left: Image Section */}
@@ -99,9 +99,9 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
                 </div>
 
                 {/* Name & Role Card */}
-                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl">
-                  <h3 className="text-2xl font-black text-gray-900 mb-1">{founder.name}</h3>
-                  <p className="text-emerald-600 font-bold text-sm uppercase tracking-wider mb-3">{founder.role}</p>
+                <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/10">
+                  <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-1">{founder.name}</h3>
+                  <p className="text-emerald-600 dark:text-emerald-400 font-bold text-sm uppercase tracking-wider mb-3">{founder.role}</p>
                   <div className="w-16 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
                 </div>
               </div>
@@ -110,15 +110,15 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
             {/* Right: Content Section */}
             <div className="lg:col-span-3 p-8 lg:p-12">
               {/* Quote */}
-              <div className="relative mb-8 p-6 bg-emerald-50/50 rounded-2xl border-l-4 border-emerald-500">
-                <Quote className="absolute top-4 right-4 w-8 h-8 text-emerald-200" fill="currentColor" />
-                <p className="text-lg text-gray-700 italic font-medium leading-relaxed relative z-10">
+              <div className="relative mb-8 p-6 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-2xl border-l-4 border-emerald-500">
+                <Quote className="absolute top-4 right-4 w-8 h-8 text-emerald-200 dark:text-emerald-900/20" fill="currentColor" />
+                <p className="text-lg text-gray-700 dark:text-gray-300 italic font-medium leading-relaxed relative z-10">
                   "{founder.bio}"
                 </p>
               </div>
 
               {/* Story Content */}
-              <div className="space-y-5 text-gray-600 leading-relaxed">
+              <div className="space-y-5 text-gray-600 dark:text-gray-400 leading-relaxed">
                 {visibleParagraphs.map((paragraph, index) => (
                   <motion.p
                     key={index}
@@ -147,27 +147,27 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
               )}
 
               {/* Stats Row with Icons */}
-              <div className="mt-10 pt-8 border-t border-gray-100 grid grid-cols-3 gap-6">
+              <div className="mt-10 pt-8 border-t border-gray-100 dark:border-slate-800 grid grid-cols-3 gap-6">
                 <div className="text-center group">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
-                    <Award className="w-6 h-6 text-emerald-600 group-hover:text-white transition-colors" />
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                    <Award className="w-6 h-6 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
                   </div>
-                  <div className="text-3xl font-black text-emerald-600 mb-1">5+</div>
-                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Years Experience</div>
+                  <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-1">5+</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider">Years Experience</div>
                 </div>
                 <div className="text-center group">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
-                    <Users className="w-6 h-6 text-emerald-600 group-hover:text-white transition-colors" />
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                    <Users className="w-6 h-6 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
                   </div>
-                  <div className="text-3xl font-black text-emerald-600 mb-1">1000+</div>
-                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Students Helped</div>
+                  <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-1">1000+</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider">Students Helped</div>
                 </div>
                 <div className="text-center group">
-                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
-                    <Heart className="w-6 h-6 text-emerald-600 group-hover:text-white transition-colors" />
+                  <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                    <Heart className="w-6 h-6 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" />
                   </div>
-                  <div className="text-3xl font-black text-emerald-600 mb-1">100%</div>
-                  <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Dedicated</div>
+                  <div className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-1">100%</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-semibold uppercase tracking-wider">Dedicated</div>
                 </div>
               </div>
             </div>

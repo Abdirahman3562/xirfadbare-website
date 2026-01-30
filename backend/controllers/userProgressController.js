@@ -36,18 +36,22 @@ const updateUserProgress = async (req, res) => {
   try {
     const { completedLessons, currentLesson, progress, timeSpent } = req.body;
 
+    // Clamp progress between 0 and 100
+    const clampedProgress = Math.min(100, Math.max(0, progress || 0));
+
     const progressData = {
       user: req.user._id,
       course: req.params.courseId,
-      completedLessons: completedLessons || [],
+      completedLessons: Array.isArray(completedLessons) ? completedLessons : [],
       currentLesson,
-      progress: progress || 0,
+      progress: clampedProgress,
       timeSpent: timeSpent || 0,
       lastAccess: new Date()
     };
 
-    // If progress is 100%, set completedAt
-    if (progress === 100) {
+    // If progress is 100%, set completedAt if not already set
+    if (clampedProgress === 100) {
+      // We check if it already exists or just set it
       progressData.completedAt = new Date();
     }
 

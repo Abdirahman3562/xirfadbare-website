@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
-  Menu, X, Sun, Moon, LogIn, Rocket, Bell, User as UserIcon, LayoutDashboard, LogOut, Loader2, BookOpen, FileText, User, Settings, Phone, Info, Home
+  Menu, X, Sun, Moon, LogIn, Rocket, Bell, User as UserIcon, LayoutDashboard, LogOut, Loader2, BookOpen, FileText, User, Settings, Phone, Info, Home, Monitor
 } from "lucide-react";
 import defaultLogo from "../assets/logo.png";
 import { useData } from "../contexts/DataContext";
@@ -12,13 +12,15 @@ function Nav() {
     websiteTitle: "Samafale Academy"
   });
   const [open, setOpen] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
+  const [openTheme, setOpenTheme] = useState(false);
   const [user, setUser] = useState(null);
   const [openProfile, setOpenProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
+  const themeRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -49,10 +51,21 @@ function Nav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 🌓 Dark mode
+  // 🌓 Theme handling
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode);
-  }, [darkMode]);
+    console.log("NAV THEME STATE:", theme);
+    const root = window.document.documentElement;
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else if (theme === "light") {
+      root.classList.remove("dark");
+    } else {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      root.classList.toggle("dark", isDark);
+    }
+    localStorage.setItem("theme", theme);
+    window.dispatchEvent(new Event("themeChange"));
+  }, [theme]);
 
   // 🔐 Load user
   useEffect(() => {
@@ -100,8 +113,11 @@ function Nav() {
   // ✋ Outside click close
   useEffect(() => {
     const handler = (e) => {
-      if (!dropdownRef.current?.contains(e.target)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpenProfile(false);
+      }
+      if (themeRef.current && !themeRef.current.contains(e.target)) {
+        setOpenTheme(false);
       }
     };
     document.addEventListener("mousedown", handler);
@@ -117,6 +133,7 @@ function Nav() {
     setOpenProfile(false);
     setSidebarOpen(false);
     setOpen(false);
+    setTheme("light");
     navigate("/auth/login", { replace: true });
   };
 
@@ -133,8 +150,8 @@ function Nav() {
 
   const linkClass = ({ isActive }) =>
     `relative px-3 py-2 font-medium transition-all duration-200 ease-in-out ${isActive
-      ? "text-emerald-600 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-emerald-500"
-      : "text-gray-600 hover:text-emerald-600 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-emerald-400 hover:after:w-full after:transition-all after:duration-300"
+      ? "text-emerald-600 dark:text-emerald-400 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-emerald-500"
+      : "text-gray-600 dark:text-gray-400 hover:text-emerald-600 dark:hover:text-emerald-400 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-0 after:h-[2px] after:bg-emerald-400 hover:after:w-full after:transition-all after:duration-300"
     }`;
 
   const isStaff = user?.role === "admin" || (user?.permissions && user?.permissions.length > 0);
@@ -143,8 +160,10 @@ function Nav() {
     : "/dashboard/student";
 
   return (
-    <nav className={`bg-[#f0f7f8] shadow-sm fixed w-full top-0 z-50 border-b border-gray-100 transition-all duration-300 ${scrolled ? "py-2 shadow-lg" : "py-0"
-      }`}>
+    <nav
+      style={{ top: "var(--top-banner-height, 0px)" }}
+      className={`bg-[#f0f7f8] dark:bg-slate-900 shadow-sm fixed w-full left-0 z-50 border-b border-gray-100 dark:border-gray-800 transition-all duration-300 ${scrolled ? "py-2 shadow-lg dark:shadow-emerald-950/20" : "py-0"
+        }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`flex justify-between items-center transition-all duration-300 ${scrolled ? "h-14" : "h-16"
           }`}>
@@ -180,16 +199,43 @@ function Nav() {
 
           {/* ✅ Right Section */}
           <div className="hidden md:flex items-center gap-3">
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full border border-gray-300 hover:bg-gray-100"
-            >
-              {darkMode ? (
-                <Sun className="w-5 h-5 text-yellow-400" />
-              ) : (
-                <Moon className="w-5 h-5 text-emerald-600" />
+            {/* Theme Switcher Dropdown */}
+            <div className="relative" ref={themeRef}>
+              <button
+                onClick={() => setOpenTheme(!openTheme)}
+                className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition-colors text-emerald-600 dark:text-emerald-400 dark:border-gray-600 dark:hover:bg-gray-800"
+              >
+                {theme === "light" && <Sun className="w-5 h-5" />}
+                {theme === "dark" && <Moon className="w-5 h-5" />}
+                {theme === "system" && <Monitor className="w-5 h-5" />}
+              </button>
+
+              {openTheme && (
+                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl p-2 z-[60] animate-in fade-in zoom-in slide-in-from-top-2 duration-300">
+                  <button
+                    onClick={() => { setTheme("light"); setOpenTheme(false); }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "light" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                  >
+                    <Sun size={18} />
+                    Light
+                  </button>
+                  <button
+                    onClick={() => { setTheme("dark"); setOpenTheme(false); }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "dark" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                  >
+                    <Moon size={18} />
+                    Dark
+                  </button>
+                  <button
+                    onClick={() => { setTheme("system"); setOpenTheme(false); }}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "system" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                  >
+                    <Monitor size={18} />
+                    System
+                  </button>
+                </div>
               )}
-            </button>
+            </div>
 
             {/* User Area */}
             {loadingUser ? (
@@ -231,20 +277,20 @@ function Nav() {
                   )}
                 </button>
                 {openProfile && (
-                  <div className="absolute right-0 mt-2 w-64 bg-[#edf4f5] border border-gray-200  rounded-xl shadow-lg   p-3 z-50">
-                    <div className="px-3 py-2 bg-emerald-50 text-emerald-700 mb-2 rounded">
+                  <div className="absolute right-0 mt-2 w-64 bg-[#edf4f5] dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-lg p-3 z-50">
+                    <div className="px-3 py-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 mb-2 rounded">
                       <div className="font-semibold">
                         {user.firstName} {user.lastName}
                       </div>
-                      <div className="text-sm text-emerald-900/70 truncate">
+                      <div className="text-sm text-emerald-900/70 dark:text-emerald-400/70 truncate">
                         {user.email}
                       </div>
                     </div>
-                    <div className="h-px  bg-gray-200 my-2 m" />
+                    <div className="h-px bg-gray-200 dark:bg-gray-800 my-2" />
                     <Link
                       to={dashboardLink}
                       onClick={() => setOpenProfile(false)}
-                      className=" cursor-pointer w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-600 font-medium"
+                      className="cursor-pointer w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium hover:bg-emerald-100 dark:hover:bg-emerald-500/20"
                     >
                       <LayoutDashboard size={18} />
                       Dashboard
@@ -252,7 +298,7 @@ function Nav() {
 
                     <button
                       onClick={handleLogout}
-                      className="mt-2 cursor-pointer w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 text-emerald-600 font-medium"
+                      className="mt-2 cursor-pointer w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-medium hover:bg-emerald-100 dark:hover:bg-emerald-500/20"
                     >
                       <LogOut className="w-4 h-4" /> Log out
                     </button>
@@ -265,14 +311,16 @@ function Nav() {
           {/* ✅ Mobile */}
           <div className="md:hidden flex items-center gap-2">
             <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="p-2 rounded-full border border-gray-300 hover:bg-gray-100"
+              onClick={() => {
+                const themes = ['light', 'dark', 'system'];
+                const next = themes[(themes.indexOf(theme) + 1) % themes.length];
+                setTheme(next);
+              }}
+              className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800 text-emerald-600 dark:text-emerald-400"
             >
-              {darkMode ? (
-                <Sun className="w-5 h-5 text-yellow-400" />
-              ) : (
-                <Moon className="w-5 h-5 text-emerald-600" />
-              )}
+              {theme === "light" && <Sun className="w-5 h-5" />}
+              {theme === "dark" && <Moon className="w-5 h-5" />}
+              {theme === "system" && <Monitor className="w-5 h-5" />}
             </button>
 
             {user ? (
@@ -318,15 +366,21 @@ function Nav() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="lg:hidden md:hidden fixed top-0 bottom-0 left-0 w-[300px] bg-white z-[9999] border-r border-gray-100 p-6 shadow-lg">
+        <div
+          style={{
+            top: "calc(var(--top-banner-height, 0px))",
+            height: "calc(100vh - var(--top-banner-height, 0px))"
+          }}
+          className="lg:hidden md:hidden fixed left-0 w-[300px] bg-white dark:bg-slate-900 z-[9999] border-r border-gray-100 dark:border-slate-800 p-6 shadow-lg overflow-y-auto"
+        >
           {/* ✅ Mobile Menu Links */}
           <NavLink
             to="/"
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
               `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
-                ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                ? "bg-[#e5f9f3] dark:bg-slate-800 text-emerald-500 dark:text-emerald-400"
+                : "text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
               }`
             }
           >
@@ -338,8 +392,8 @@ function Nav() {
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
               `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
-                ? "bg-[#e5f9f3] text-emerald-500"
-                : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                ? "bg-[#e5f9f3] dark:bg-slate-800 text-emerald-500 dark:text-emerald-400"
+                : "text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
               }`
             }
           >
@@ -351,8 +405,8 @@ function Nav() {
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
               `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
-                ? "bg-[#e5f9f3] text-emerald-500"
-                : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                ? "bg-[#e5f9f3] dark:bg-slate-800 text-emerald-500 dark:text-emerald-400"
+                : "text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
               }`
             }
           >
@@ -364,8 +418,8 @@ function Nav() {
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
               `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
-                ? "bg-[#e5f9f3] text-emerald-500"
-                : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                ? "bg-[#e5f9f3] dark:bg-slate-800 text-emerald-500 dark:text-emerald-400"
+                : "text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
               }`
             }
           >
@@ -376,7 +430,7 @@ function Nav() {
             <Link
               to="/courses"
               onClick={() => setOpen(false)}
-              className="flex items-center justify-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-full font-medium hover:bg-emerald-600 transition"
+              className="flex items-center justify-center gap-2 bg-emerald-500 dark:bg-emerald-500/10 text-white dark:text-emerald-400 px-4 py-2 rounded-full font-medium hover:bg-emerald-600 dark:hover:bg-emerald-500/20 transition"
             >
               <Rocket className="w-4 h-4" /> Get Started
             </Link>
@@ -394,7 +448,13 @@ function Nav() {
 
       {/* Sidebar (Mobile) */}
       {sidebarOpen && (
-        <aside className="fixed lg:hidden md:hidden left-0 top-0 h-screen w-[280px] bg-white z-[1000] flex flex-col shadow-2xl animate-in slide-in-from-left duration-300">
+        <aside
+          style={{
+            top: "calc(var(--top-banner-height, 0px))",
+            height: "calc(100vh - var(--top-banner-height, 0px))"
+          }}
+          className="fixed lg:hidden md:hidden left-0 w-[280px] bg-white dark:bg-slate-900 z-[1000] flex flex-col shadow-2xl animate-in slide-in-from-left duration-300"
+        >
           <div className="flex-1 overflow-y-auto py-10">
             <nav className="px-4 space-y-1">
               {/* Overview */}
@@ -407,8 +467,8 @@ function Nav() {
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     `w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${isActive
-                      ? "bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-emerald-600"
+                      ? "bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-100 dark:border-slate-800"
+                      : "text-gray-600 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
                     }`
                   }
                 >
@@ -427,8 +487,8 @@ function Nav() {
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     `w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${isActive
-                      ? "bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-emerald-600"
+                      ? "bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-100 dark:border-slate-800"
+                      : "text-gray-600 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
                     }`
                   }
                 >
@@ -447,8 +507,8 @@ function Nav() {
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     `w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${isActive
-                      ? "bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-emerald-600"
+                      ? "bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-100 dark:border-slate-800"
+                      : "text-gray-600 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
                     }`
                   }
                 >
@@ -467,8 +527,8 @@ function Nav() {
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     `w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${isActive
-                      ? "bg-emerald-50 text-emerald-600 shadow-sm border border-emerald-100"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-emerald-600"
+                      ? "bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-100 dark:border-slate-800"
+                      : "text-gray-600 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
                     }`
                   }
                 >
@@ -479,13 +539,13 @@ function Nav() {
             </nav>
           </div>
 
-          <div className="p-4 border-t border-gray-100">
+          <div className="p-4 border-t border-gray-100 dark:border-gray-800">
             <button
               onClick={() => {
                 handleLogout();
                 setSidebarOpen(false);
               }}
-              className="flex items-center justify-center gap-2 bg-red-50 text-red-600 px-4 py-3 rounded-xl hover:bg-red-100 transition-colors w-full font-bold text-sm"
+              className="flex items-center justify-center gap-2 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors w-full font-bold text-sm"
             >
               <LogOut size={18} /> Logout Account
             </button>

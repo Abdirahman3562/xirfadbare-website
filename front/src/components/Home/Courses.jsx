@@ -56,23 +56,21 @@ function Courses({ IsHome }) {
 
 function Header({ title, cta, center, IsHome }) {
   const titleClasses = IsHome
-    ? "text-3xl md:text-3xl lg:text-3xl font-extrabold text-[#00cc8f] drop-shadow-sm"
-    : "md:text-3xl lg:text-3xl text-3xl font-bold text-[#00cc8f]";
+    ? "text-3xl md:text-3xl lg:text-3xl font-extrabold text-[#00cc8f] dark:text-emerald-400 drop-shadow-sm"
+    : "md:text-3xl lg:text-3xl text-3xl font-bold text-[#00cc8f] dark:text-emerald-400";
 
   return (
     <div
-      className={`flex ${
-        center
+      className={`flex ${center
           ? "flex-col items-center text-center mt-10"
           : "items-end justify-between"
-      }`}
+        }`}
     >
       <div>
         <h2 className={`${titleClasses} ${center ? "mb-3" : ""}`}>{title}</h2>
         <div
-          className={`h-1 w-24 bg-[#00cc8f] rounded-full ${
-            center ? "mx-auto" : ""
-          }`}
+          className={`h-1 w-24 bg-[#00cc8f] dark:bg-emerald-500 rounded-full ${center ? "mx-auto" : ""
+            }`}
         />
       </div>
 

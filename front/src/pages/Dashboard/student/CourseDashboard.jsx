@@ -14,6 +14,7 @@ import { FaBookOpen, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { getAllCourses } from "../../../api/courseService";
 import { getMyOrders } from "../../../api/orderService";
 import { getUserProgress, updateUserProgress } from "../../../api/userProgressService";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 const CourseDashboard = () => {
   const { courseSlug, lessonSlug } = useParams();
@@ -105,24 +106,25 @@ const CourseDashboard = () => {
       const allLessons = curriculumData.flatMap((section) =>
         (section.lessons || []).map((lesson) => ({
           ...lesson,
-          sectionId: section._id || section.id,
+          id: String(lesson._id || lesson.id),
+          sectionId: String(section._id || section.id),
         }))
       );
 
       // ✅ Add slugs to lessons for navigation
       const lessonsWithSlugs = allLessons.map((lesson) => ({
         ...lesson,
-        id: lesson._id || lesson.id,
         slug: lesson.slug || slugify(lesson.title),
-        curriculumId: lesson.curriculumId || lesson.sectionId
+        curriculumId: String(lesson.curriculumId || lesson.sectionId)
       }));
 
       // ✅ Group lessons by curriculum sections
       const grouped = curriculumData.map((section) => {
+        const sId = String(section._id || section.id);
         const sectionLessons = lessonsWithSlugs.filter(
-          (lesson) => lesson.curriculumId === section._id || lesson.curriculumId === section.id
+          (lesson) => String(lesson.curriculumId) === sId
         );
-        return { ...section, lessons: sectionLessons };
+        return { ...section, id: sId, lessons: sectionLessons };
       });
 
       setCourse(courseInfo);
@@ -134,11 +136,14 @@ const CourseDashboard = () => {
 
       let savedCurrentLessonId = null;
       if (userProgress && userProgress.completedLessons) {
-        setCompletedLessons(userProgress.completedLessons);
+        // Normalize completed lessons to strings
+        const normalizedCompleted = (userProgress.completedLessons || []).map(id => String(id));
+        setCompletedLessons(normalizedCompleted);
+
         if (userProgress.currentLesson) {
-          savedCurrentLessonId = userProgress.currentLesson;
-          const current = allLessons.find(
-            (l) => String(l.id) === String(userProgress.currentLesson)
+          savedCurrentLessonId = String(userProgress.currentLesson);
+          const current = lessonsWithSlugs.find(
+            (l) => String(l.id) === savedCurrentLessonId
           );
           if (current) setCurrentLesson(current);
         }
@@ -179,7 +184,7 @@ const CourseDashboard = () => {
     }
 
     fetchCourseData();
-  }, [courseSlug, lessonSlug, navigate]);
+  }, [courseSlug, navigate]);
 
   // -----------------------------
   // Persist progress for this course
@@ -211,13 +216,13 @@ const CourseDashboard = () => {
 
     const syncProgress = async () => {
       try {
-        if (!course?._id) return;
+        if (loading || !course?._id || totalLessonsCount === 0) return;
 
         const progressData = {
-          completedLessons: savedData.completedLessons || [],
-          currentLesson: savedData.currentLesson,
-          progress: Math.round((savedData.completedLessons.length / totalLessonsCount) * 100),
-          timeSpent: 0, // Could be tracked separately
+          completedLessons: completedLessons.map(id => String(id)),
+          currentLesson: String(currentLesson.id),
+          progress: progress, // Use the already calculated progress state/variable
+          timeSpent: 0,
         };
 
         await updateUserProgress(course._id, progressData);
@@ -226,8 +231,10 @@ const CourseDashboard = () => {
       }
     };
 
-    syncProgress();
-  }, [completedLessons, currentLesson, courseSlug]);
+    if (!loading) {
+      syncProgress();
+    }
+  }, [completedLessons, currentLesson, courseSlug, loading]);
 
   // -----------------------------
   // Auto open active lesson's section (and close others)
@@ -290,28 +297,34 @@ const CourseDashboard = () => {
 
   const goPrev = () => {
     if (!currentLesson) return;
-    const idx = allLessonIds.indexOf(currentLesson.id);
-    const prevId = allLessonIds[idx - 1];
-    const prev = lessons.find((l) => l.id === prevId) || null;
-    if (prev) goToLesson(prev);
+    const idx = allLessonIds.indexOf(String(currentLesson.id));
+    if (idx > 0) {
+      const prevId = allLessonIds[idx - 1];
+      const prev = lessons.find((l) => String(l.id) === String(prevId)) || null;
+      if (prev) goToLesson(prev);
+    }
   };
 
   const goNext = () => {
     if (!currentLesson) return;
-    const idx = allLessonIds.indexOf(currentLesson.id);
-    const nextId = allLessonIds[idx + 1];
-    const next = lessons.find((l) => l.id === nextId) || null;
-    if (next) goToLesson(next);
+    const idx = allLessonIds.indexOf(String(currentLesson.id));
+    if (idx !== -1 && idx < allLessonIds.length - 1) {
+      const nextId = allLessonIds[idx + 1];
+      const next = lessons.find((l) => String(l.id) === String(nextId)) || null;
+      if (next) goToLesson(next);
+    }
   };
 
   // 🟢 Next button: Move to next lesson only (no completion)
   const goNextLessonOnly = () => {
     if (!currentLesson) return;
-    const idx = allLessonIds.indexOf(currentLesson.id);
-    const nextId = allLessonIds[idx + 1];
-    const nextLesson = lessons.find((l) => l.id === nextId);
-    if (nextLesson) {
-      goToLesson(nextLesson);
+    const idx = allLessonIds.indexOf(String(currentLesson.id));
+    if (idx !== -1 && idx < allLessonIds.length - 1) {
+      const nextId = allLessonIds[idx + 1];
+      const nextLesson = lessons.find((l) => String(l.id) === String(nextId));
+      if (nextLesson) {
+        goToLesson(nextLesson);
+      }
     }
   };
 
@@ -321,23 +334,26 @@ const CourseDashboard = () => {
   const handleMarkAsCompleted = async () => {
     if (!currentLesson) return;
 
+    const lessonId = String(currentLesson.id);
+
     // already done? just move to next lesson
-    if (completedLessons.includes(currentLesson.id)) {
+    if (completedLessons.includes(lessonId)) {
       goNext();
       return;
     }
 
-    const updated = [...completedLessons, currentLesson.id];
+    // Use a Set to ensure unique IDs and filter out any potential nulls/undefineds
+    const updated = Array.from(new Set([...completedLessons, lessonId])).filter(id => id);
     setCompletedLessons(updated);
 
     setShowAlert(true);
     setTimeout(() => setShowAlert(false), 1400);
 
     // auto go next if exists
-    const idx = allLessonIds.indexOf(currentLesson.id);
-    const nextId = allLessonIds[idx + 1];
-    if (nextId) {
-      const nextLesson = lessons.find((l) => l.id === nextId);
+    const idx = allLessonIds.indexOf(lessonId);
+    if (idx !== -1 && idx < allLessonIds.length - 1) {
+      const nextId = allLessonIds[idx + 1];
+      const nextLesson = lessons.find((l) => String(l.id) === String(nextId));
       if (nextLesson) goToLesson(nextLesson);
     }
 
@@ -358,16 +374,12 @@ const CourseDashboard = () => {
   // Loading / not found
   // -----------------------------
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen text-gray-600">
-        Loading course content...
-      </div>
-    );
+    return <PremiumLoader text={null} />;
   }
 
   if (!course) {
     return (
-      <div className="flex items-center justify-center h-screen text-red-500">
+      <div className="flex items-center justify-center h-screen bg-[#f8fafc] dark:bg-slate-900 text-red-500 dark:text-red-400 font-bold transition-colors">
         Course not found!
       </div>
     );
@@ -376,20 +388,20 @@ const CourseDashboard = () => {
   const isPaid = course.status === "locked"; // if you need to lock future lessons
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col relative">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-slate-900 flex flex-col relative transition-colors duration-500">
       {/* Alert */}
       {showAlert && (
-        <div className="fixed top-20 right-5 bg-emerald-500 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+        <div className="fixed top-24 right-5 bg-emerald-600 text-white px-6 py-3 rounded-xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-4 duration-300 font-bold text-sm tracking-tight">
           Lesson marked as completed!
         </div>
       )}
 
       {/* HEADER */}
-      <header className="flex mt-15 items-center justify-between px-4 py-2 pt-5 bg-[#edf4f5] shadow-sm fixed top-0 left-0 w-full z-40">
+      <header className="flex items-center justify-between px-4 py-4 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 shadow-sm fixed top-0 left-0 w-full z-40 transition-colors">
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate("/dashboard/student")}
-            className="flex items-center text-gray-700 hover:text-emerald-600 font-medium"
+            className="flex items-center text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-1" />
             <span className="text-sm">Back</span>
@@ -400,15 +412,15 @@ const CourseDashboard = () => {
           <button
             onClick={handleMarkAsCompleted}
             disabled={completedLessons.includes(currentLesson?.id)}
-            className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-medium transition
+            className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-bold transition
               ${completedLessons.includes(currentLesson?.id)
-                ? "bg-emerald-200 text-emerald-900 cursor-not-allowed"
-                : "bg-emerald-500 hover:bg-emerald-600 text-white"
+                ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 cursor-not-allowed"
+                : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 dark:shadow-none"
               }`}
           >
             {completedLessons.includes(currentLesson?.id) ? (
               <>
-                <CheckCircle className="w-5 h-5 text-emerald-900" />
+                <CheckCircle className="w-5 h-5" />
                 Completed
               </>
             ) : (
@@ -418,7 +430,7 @@ const CourseDashboard = () => {
 
           <button
             onClick={() => setShowLessons(true)}
-            className="block lg:hidden text-gray-700 hover:text-emerald-600"
+            className="block lg:hidden text-gray-700 dark:text-gray-300 hover:text-emerald-600 transition-colors"
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -426,29 +438,29 @@ const CourseDashboard = () => {
       </header>
 
       {/* LAYOUT */}
-      <main className="flex flex-1 pt-[72px] mt-12 bg-[#edf4f5]">
+      <main className="flex flex-1 pt-[72px] bg-[#f8fafc] dark:bg-slate-900 transition-colors">
         {/* SIDEBAR */}
         <aside
-          className="hidden lg:block scrollbar-hide w-[500px] border-r border-[#d6dedf] bg-[#edf4f5]
-           p-5 sticky top-[90px] self-start max-h-[calc(100vh-100px)] overflow-y-auto
-           scrollbar-thin scrollbar-thumb-emerald-400 scrollbar-track-gray-100"
+          className="hidden lg:block scrollbar-hide w-[450px] border-r border-gray-100 dark:border-slate-800 bg-white dark:bg-slate-900
+           p-5 sticky top-[72px] self-start h-[calc(100vh-72px)] overflow-y-auto
+           scrollbar-thin scrollbar-thumb-emerald-400 scrollbar-track-transparent"
         >
           {/* Progress card */}
-          <div className="bg-[#edf4f5] mt-2 shadow-sm rounded-xl p-7 mb-6 border border-gray-100">
-            <h1 className="text-lg sm:text-xl font-semibold text-[#0f172a] mb-1">
+          <div className="bg-gray-50 dark:bg-slate-800/50 mt-2 shadow-sm rounded-xl p-6 mb-6 border border-gray-100 dark:border-slate-800 transition-colors">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">
               {course.title}
             </h1>
-            <div className="flex items-center text-sm text-gray-600 mb-3">
+            <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-3">
               <span className="flex items-center gap-1">
                 <FaBookOpen className="text-emerald-500 w-4 h-4" />
                 {totalLessonsCount} Lessons
               </span>
-              <span className="mx-2 text-gray-300">|</span>
-              <span className="font-medium text-emerald-600">
+              <span className="mx-2 text-gray-300 dark:text-slate-700">|</span>
+              <span className="font-bold text-emerald-600 dark:text-emerald-400">
                 {progress}% Complete
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-2 overflow-hidden">
+            <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 mb-2 overflow-hidden">
               <div
                 className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
@@ -466,21 +478,21 @@ const CourseDashboard = () => {
               return (
                 <div
                   key={section.id ?? index}
-                  className="group border border-gray-200 rounded-xl hover:border-emerald-400 hover:bg-emerald-50/40 transition"
+                  className="group border border-gray-100 dark:border-slate-800 rounded-xl hover:border-emerald-500/50 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-all"
                 >
                   <button
                     onClick={() => toggleSection(index)}
                     className="w-full flex justify-between items-center p-4"
                   >
                     <div className="flex items-center gap-3 text-left">
-                      <span className="bg-emerald-100 text-emerald-600 font-semibold w-8 h-8 flex items-center justify-center rounded-full">
+                      <span className="bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
                         {index + 1}
                       </span>
                       <div>
-                        <h3 className="font-semibold text-gray-800 group-hover:text-emerald-400">
+                        <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                           {section.title}
                         </h3>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
                           {sectionDuration}
                         </p>
                       </div>
@@ -488,7 +500,7 @@ const CourseDashboard = () => {
                     {openSections[index] ? (
                       <FaChevronUp className="text-emerald-500 text-sm" />
                     ) : (
-                      <FaChevronDown className="text-gray-400 text-sm" />
+                      <FaChevronDown className="text-gray-400 dark:text-slate-600 text-sm" />
                     )}
                   </button>
 
@@ -503,39 +515,35 @@ const CourseDashboard = () => {
                           <div
                             key={lesson.id}
                             onClick={() => goToLesson(lesson)}
-                            className={`flex justify-between items-center border rounded-lg p-2 transition duration-300 cursor-pointer
+                            className={`flex justify-between items-center border rounded-xl p-3 transition-all duration-300 cursor-pointer
                               ${isActive
-                                ? "bg-emerald-100 border-emerald-500"
+                                ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 dark:border-emerald-500/50 shadow-sm"
                                 : isCompleted
-                                  ? "bg-emerald-50 border-emerald-300"
-                                  : "border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/50"
+                                  ? "bg-gray-50 dark:bg-slate-800/30 border-gray-200 dark:border-slate-700"
+                                  : "border-transparent hover:bg-gray-50 dark:hover:bg-slate-800/50"
                               }`}
                           >
-                            <div className="flex items-center gap-2 text-gray-700 text-sm">
+                            <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">
                               {isActive ? (
-                                <span className="text-emerald-600 font-bold">
-                                  ▶
-                                </span>
+                                <span className="text-emerald-600 font-bold">▶</span>
                               ) : isCompleted ? (
-                                <span className="text-emerald-500 font-bold">
-                                  ✔
-                                </span>
+                                <span className="text-emerald-500 font-bold">✔</span>
                               ) : (
                                 <PlayCircle className="text-emerald-500 w-4 h-4" />
                               )}
                               <span
                                 className={
                                   isCompleted
-                                    ? "line-through text-gray-400"
+                                    ? "line-through text-gray-400 dark:text-gray-600"
                                     : isActive
-                                      ? "font-semibold text-emerald-700"
-                                      : ""
+                                      ? "font-bold text-emerald-700 dark:text-emerald-400"
+                                      : "font-medium"
                                 }
                               >
                                 {lesson.title}
                               </span>
                             </div>
-                            <span className="text-gray-500 text-xs">
+                            <span className="text-gray-500 dark:text-gray-500 text-xs font-medium">
                               {lesson.duration}
                             </span>
                           </div>
@@ -550,34 +558,34 @@ const CourseDashboard = () => {
         </aside>
 
         {/* MAIN CONTENT */}
-        <section className="flex-1 overflow-y-auto p-5 md:p-8 flex flex-col">
-          <div className="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+        <section className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10 flex flex-col bg-[#f8fafc] dark:bg-slate-900 transition-colors">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden mb-8 border border-gray-100 dark:border-slate-800 transition-colors">
             <iframe
-              className="w-full h-[240px] sm:h-[320px] md:h-[480px]"
+              className="w-full aspect-video"
               src={formatVideoUrl(currentLesson?.videoUrl)}
               title="Lesson Player"
               allowFullScreen
             />
             {/* Lesson title below the video */}
-            <div className="p-4 border-t border-gray-100 bg-[#edf4f5]">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+            <div className="p-6 bg-white dark:bg-slate-800 transition-colors">
+              <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
                 {currentLesson?.title || "Select a lesson to start learning"}
               </h2>
             </div>
           </div>
 
-          <div className="flex justify-between items-center mb-10">
+          <div className="flex justify-between items-center mb-12">
             <button
               disabled={!currentLesson}
               onClick={goPrev}
-              className="flex items-center px-5 py-2 rounded-md text-sm font-medium bg-gray-200 hover:bg-gray-300 disabled:opacity-60"
+              className="flex items-center px-6 py-3 rounded-xl text-sm font-bold bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-all active:scale-95 shadow-sm"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Previous
             </button>
 
             <button
               onClick={goNextLessonOnly}
-              className="flex items-center px-5 py-2 rounded-md text-sm font-medium bg-emerald-500 hover:bg-emerald-600 text-white"
+              className="flex items-center px-6 py-3 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-100 dark:shadow-none transition-all active:scale-95"
             >
               Next <ArrowRight className="w-4 h-4 ml-2" />
             </button>
@@ -585,28 +593,28 @@ const CourseDashboard = () => {
 
           {/* Course Community Section */}
           {course?.communityLink && (
-            <div className="bg-[#edf4f5] border border-gray-200 rounded-xl p-5 shadow-sm mt-10">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-semibold text-gray-800 text-base">
-                  Course Community
-                </h3>
+            <div className="bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm mt-4 transition-colors">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                  <Users className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-black text-gray-900 dark:text-white text-lg">
+                    Course Community
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-widest mt-0.5">Halkan ka hel caawinaad</p>
+                </div>
               </div>
-              <p className="text-gray-600 text-sm mb-3">Join our community</p>
 
               <a
                 href={course.communityLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-emerald-50 text-emerald-700 font-medium px-4 py-3 rounded-lg hover:bg-emerald-100 transition"
+                className="flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-widest px-6 py-4 rounded-xl transition-all shadow-lg shadow-emerald-100 dark:shadow-none active:scale-95"
               >
                 <MessageCircle className="w-5 h-5" />
                 Join WhatsApp Group
               </a>
-
-              <p className="text-xs text-gray-500 mt-2">
-                Connect with other students and get help from instructors.
-              </p>
             </div>
           )}
         </section>
@@ -614,37 +622,37 @@ const CourseDashboard = () => {
 
       {/* 📱 Mobile Sidebar Overlay */}
       {showLessons && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex lg:hidden md:hidden">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex lg:hidden">
           {/* Sidebar panel */}
-          <div className="w-[85%] sm:w-[400px] bg-[#edf4f5] p-5 overflow-y-auto scrollbar-hide">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-semibold text-gray-800">Course Content</h2>
-              <button onClick={() => setShowLessons(false)}>
-                <X className="w-6 h-6 text-gray-600 hover:text-emerald-600" />
+          <div className="w-[85%] sm:w-[400px] bg-white dark:bg-slate-900 p-6 overflow-y-auto scrollbar-hide border-r border-gray-100 dark:border-slate-800 animate-in slide-in-from-left duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-bold text-gray-900 dark:text-white text-lg">Course Content</h2>
+              <button onClick={() => setShowLessons(false)} className="p-2 bg-gray-50 dark:bg-slate-800 rounded-lg text-gray-500 hover:text-emerald-600 transition-colors">
+                <X className="w-6 h-6" />
               </button>
             </div>
 
-            <div className="bg-[#edf4f5] mt-2 shadow-sm rounded-xl p-7 mb-6 border border-gray-100">
-              <h1 className="text-lg sm:text-xl font-semibold text-[#0f172a] mb-1">
+            <div className="bg-gray-50 dark:bg-slate-800/50 mt-2 shadow-sm rounded-2xl p-6 mb-6 border border-gray-100 dark:border-slate-800 transition-colors">
+              <h1 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 {course.title}
               </h1>
-              <div className="flex items-center text-sm text-gray-600 mb-3">
+              <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-3">
                 <span className="flex items-center gap-1">
                   <FaBookOpen className="text-emerald-500 w-4 h-4" />
                   {totalLessonsCount} Lessons
                 </span>
-                <span className="mx-2 text-gray-300">|</span>
-                <span className="font-medium text-emerald-600">
+                <span className="mx-2 text-gray-300 dark:text-slate-700">|</span>
+                <span className="font-bold text-emerald-600">
                   {progress}% Complete
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2 mb-2 overflow-hidden">
+              <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 mb-2 overflow-hidden">
                 <div
                   className="bg-emerald-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {completedLessonsCount} of {totalLessonsCount} lessons completed
               </p>
             </div>
@@ -656,21 +664,21 @@ const CourseDashboard = () => {
                 return (
                   <div
                     key={section.id ?? index}
-                    className="group border border-gray-200 rounded-xl hover:border-emerald-400 hover:bg-emerald-50/40 transition"
+                    className="group border border-gray-100 dark:border-slate-800 rounded-xl hover:border-emerald-500/50 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-all mb-4"
                   >
                     <button
                       onClick={() => toggleSection(index)}
                       className="w-full flex justify-between items-center p-4"
                     >
                       <div className="flex items-center gap-3 text-left">
-                        <span className="bg-emerald-100 text-emerald-600 font-semibold w-8 h-8 flex items-center justify-center rounded-full">
+                        <span className="bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
                           {index + 1}
                         </span>
                         <div>
-                          <h3 className="font-semibold text-gray-800 group-hover:text-emerald-400">
+                          <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                             {section.title}
                           </h3>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
                             {sectionDuration}
                           </p>
                         </div>
@@ -678,7 +686,7 @@ const CourseDashboard = () => {
                       {openSections[index] ? (
                         <FaChevronUp className="text-emerald-500 text-sm" />
                       ) : (
-                        <FaChevronDown className="text-gray-400 text-sm" />
+                        <FaChevronDown className="text-gray-400 dark:text-slate-600 text-sm" />
                       )}
                     </button>
 
@@ -703,39 +711,35 @@ const CourseDashboard = () => {
 
                                 setShowLessons(false);
                               }}
-                              className={`flex justify-between items-center border rounded-lg p-2 transition duration-300 cursor-pointer
+                              className={`flex justify-between items-center border rounded-xl p-3 transition-all duration-300 cursor-pointer mb-2
                                 ${isActive
-                                  ? "bg-emerald-100 border-emerald-500"
+                                  ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 dark:border-emerald-500/50 shadow-sm"
                                   : isCompleted
-                                    ? "bg-emerald-50 border-emerald-300"
-                                    : "border-gray-200 hover:border-emerald-400 hover:bg-emerald-50/50"
+                                    ? "bg-gray-50 dark:bg-slate-800/30 border-gray-200 dark:border-slate-700"
+                                    : "border-transparent hover:bg-gray-50 dark:hover:bg-slate-800/50"
                                 }`}
                             >
-                              <div className="flex items-center gap-2 text-gray-700 text-sm">
+                              <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">
                                 {isActive ? (
-                                  <span className="text-emerald-600 font-bold">
-                                    ▶
-                                  </span>
+                                  <span className="text-emerald-600 font-bold">▶</span>
                                 ) : isCompleted ? (
-                                  <span className="text-emerald-500 font-bold">
-                                    ✔
-                                  </span>
+                                  <span className="text-emerald-500 font-bold">✔</span>
                                 ) : (
                                   <PlayCircle className="text-emerald-500 w-4 h-4" />
                                 )}
                                 <span
                                   className={
                                     isCompleted
-                                      ? "line-through text-gray-400"
+                                      ? "line-through text-gray-400 dark:text-gray-600"
                                       : isActive
-                                        ? "font-semibold text-emerald-700"
-                                        : ""
+                                        ? "font-bold text-emerald-700 dark:text-emerald-400"
+                                        : "font-medium"
                                   }
                                 >
                                   {lesson.title}
                                 </span>
                               </div>
-                              <span className="text-gray-500 text-xs">
+                              <span className="text-gray-500 dark:text-gray-500 text-xs font-medium">
                                 {lesson.duration}
                               </span>
                             </div>

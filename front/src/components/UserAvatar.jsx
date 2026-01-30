@@ -39,7 +39,7 @@ const UserAvatar = ({ image, name, size = "w-10 h-10", className = "" }) => {
             <img
                 src={imageUrl}
                 alt={name}
-                className={`${size} rounded-full object-cover border border-gray-200 shadow-sm ${className}`}
+                className={`${size} rounded-full object-cover border border-gray-200 dark:border-slate-800 shadow-sm ${className}`}
                 onError={() => setHasError(true)}
             />
         );
@@ -47,7 +47,7 @@ const UserAvatar = ({ image, name, size = "w-10 h-10", className = "" }) => {
 
     return (
         <div
-            className={`${size} rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold border border-emerald-200 uppercase shadow-sm ${className}`}
+            className={`${size} rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-xs font-bold border border-emerald-200 dark:border-emerald-500/20 uppercase shadow-sm ${className}`}
         >
             {initials}
         </div>

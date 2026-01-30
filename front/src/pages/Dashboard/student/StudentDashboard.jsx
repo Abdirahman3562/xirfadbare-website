@@ -15,6 +15,7 @@ import { getImageUrl } from "../../../utils/format";
 import { getMyOrders } from "../../../api/orderService";
 import { getAllCourses } from "../../../api/courseService";
 import { getUserProgress } from "../../../api/userProgressService";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 export default function StudentDashboard() {
   const [courses, setCourses] = useState([]);
@@ -172,74 +173,74 @@ export default function StudentDashboard() {
     <div className="space-y-8">
       {/* Breadcrumb */}
       <div className="flex gap-1 items-center">
-        <Home className="w-5 h-5 text-emerald-600" />
+        <Home className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
         <ChevronRight className="w-5 h-5 text-emerald-600" />
-        <span className="text-lg font-semibold mb-1 text-gray-700">
+        <span className="text-lg font-semibold mb-1 text-gray-700 dark:text-gray-300">
           Student
         </span>
         <ChevronRight className="w-5 h-5 text-emerald-600" />
-        <span className="text-lg font-semibold mb-1 text-gray-700">
+        <span className="text-lg font-semibold mb-1 text-gray-700 dark:text-gray-300">
           Dashboard
         </span>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2">My Learning</h1>
-      <p className="text-gray-500 text-[14px] mb-6">
+      <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">My Learning</h1>
+      <p className="text-gray-500 dark:text-gray-400 text-[14px] mb-6">
         Access your enrolled courses and track your learning progress.
       </p>
 
       {/* Stats Section */}
       <section>
-        <h1 className="text-2xl font-semibold mb-2">My Courses</h1>
-        <p className="text-gray-500 text-sm mb-6">
+        <h1 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">My Courses</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
           View and continue your enrolled courses
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* User Level */}
-          <div className="relative overflow-hidden rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-emerald-100/40 p-5 flex flex-col justify-between shadow-sm">
+          <div className="relative overflow-hidden rounded-xl border border-emerald-100 dark:border-emerald-500/20 bg-gradient-to-br from-emerald-50 to-emerald-100/40 dark:from-emerald-950/20 dark:to-emerald-900/10 p-5 flex flex-col justify-between shadow-sm transition-colors duration-500">
             <div>
               <h3 className={`${levelColor} font-semibold text-lg`}>
                 {userLevel}
               </h3>
-              <p className="text-gray-700 font-medium">
+              <p className="text-gray-700 dark:text-gray-300 font-medium">
                 {userLevel === "Not Started"
                   ? "Start learning today"
                   : "Current Learning Level"}
               </p>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                 {avgProgress}% overall progress
               </p>
             </div>
-            <div className="absolute top-4 right-4 bg-emerald-100 p-2 rounded-full">
-              <GraduationCap className="w-5 h-5 text-emerald-600" />
+            <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-500/20 p-2 rounded-full">
+              <GraduationCap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
 
           {/* Active */}
-          <div className="relative bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <h3 className="text-2xl font-semibold text-emerald-600">
+          <div className="relative bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-500">
+            <h3 className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400">
               {activeCourses}
             </h3>
-            <p className="text-gray-700 font-medium">Active Courses</p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-gray-700 dark:text-gray-300 font-medium">Active Courses</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {completedCourses} completed
             </p>
-            <div className="absolute top-4 right-4 bg-emerald-50 p-2 rounded-full">
-              <BookOpen className="w-5 h-5 text-emerald-600" />
+            <div className="absolute top-4 right-4 bg-emerald-50 dark:bg-emerald-500/20 p-2 rounded-full">
+              <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
 
           {/* Completed */}
-          <div className="relative bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800">
+          <div className="relative bg-white dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-500">
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
               Completed Courses
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {completedCourses} completed · {avgProgress}% avg progress
             </p>
-            <div className="absolute top-4 right-4 bg-emerald-50 p-2 rounded-full">
-              <Settings className="w-5 h-5 text-emerald-600" />
+            <div className="absolute top-4 right-4 bg-emerald-50 dark:bg-emerald-500/20 p-2 rounded-full">
+              <Settings className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
         </div>
@@ -248,17 +249,19 @@ export default function StudentDashboard() {
       {/* Course List */}
       <section className="mt-4">
         <div className="flex items-center gap-2 mb-2">
-          <BookOpen className="w-5 h-5 text-emerald-600" />
-          <h2 className="text-lg font-semibold text-gray-800">My Courses</h2>
+          <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">My Courses</h2>
         </div>
-        <p className="text-sm text-gray-500 mb-5">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
           Your enrolled courses and available content.
         </p>
 
         {loading ? (
-          <p>Loading...</p>
+          <div className="flex justify-center py-12">
+            <PremiumLoader text={null} fullScreen={false} />
+          </div>
         ) : courses.length === 0 ? (
-          <div className="p-6 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 text-center">
+          <div className="p-6 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-800 rounded-xl text-gray-600 dark:text-gray-400 text-center transition-colors duration-500">
             <p>No courses found for your account.</p>
           </div>
         ) : (
@@ -272,7 +275,7 @@ export default function StudentDashboard() {
               return (
                 <div
                   key={course._id || course.id}
-                  className="group relative bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col md:flex-row"
+                  className="group relative bg-white dark:bg-slate-800/50 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col md:flex-row"
                 >
                   {/* Thumbnail */}
                   <div className="md:w-64 w-full h-44 md:h-auto relative">
@@ -305,22 +308,22 @@ export default function StudentDashboard() {
                   <div className="flex-1 p-6 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold group-hover:text-emerald-600 text-gray-900 text-lg">
+                        <h3 className="font-semibold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 text-gray-900 dark:text-white text-lg transition-colors">
                           {course.title}
                         </h3>
-                        <span className="text-emerald-600 font-semibold text-sm">
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-sm">
                           {progressValue}%
                         </span>
                       </div>
 
-                      <p className="text-gray-600 text-sm mb-3 leading-relaxed">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 leading-relaxed">
                         {course.description}
                       </p>
 
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Course Progress
                       </span>
-                      <div className="bg-gray-200 rounded-full h-2 w-full mt-1">
+                      <div className="bg-gray-200 dark:bg-slate-700 rounded-full h-2 w-full mt-1">
                         <div
                           className={`h-2 rounded-full ${course.status === "pending"
                             ? "bg-yellow-400"
@@ -330,39 +333,39 @@ export default function StudentDashboard() {
                         ></div>
                       </div>
 
-                      <div className="flex justify-between text-xs text-gray-500 mt-2">
+                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
                         <span className="flex gap-2 items-center">
-                          <BookOpen className="w-4 h-4 text-emerald-600 mt-1" />
+                          <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-1" />
                           {done} of {totalLessons} lessons
                         </span>
                         <span>{remaining} remaining</span>
                       </div>
 
                       {/* Completion & Last Access */}
-                      <div className="flex flex-wrap items-center gap-8 mt-5 text-sm text-gray-800">
+                      <div className="flex flex-wrap items-center gap-8 mt-5 text-sm text-gray-800 dark:text-gray-200">
                         <div className="flex items-center gap-2">
-                          <div className="bg-emerald-50 p-2 rounded-full shadow-sm">
-                            <CheckCircle className="w-4 h-4 text-emerald-600" />
+                          <div className="bg-emerald-50 dark:bg-emerald-500/10 p-2 rounded-full shadow-sm">
+                            <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                           </div>
                           <div>
-                            <p className="text-[13px] font-medium text-gray-500">
+                            <p className="text-[13px] font-medium text-gray-500 dark:text-gray-400">
                               Completion
                             </p>
-                            <p className="text-[14px] font-semibold text-gray-800">
+                            <p className="text-[14px] font-semibold text-gray-800 dark:text-gray-200">
                               {progressValue}%
                             </p>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-2">
-                          <div className="bg-emerald-50 p-2 rounded-full shadow-sm">
-                            <CalendarClock className="w-4 h-4 text-emerald-600" />
+                          <div className="bg-emerald-50 dark:bg-emerald-500/10 p-2 rounded-full shadow-sm">
+                            <CalendarClock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                           </div>
                           <div>
-                            <p className="text-[13px] font-medium text-gray-500">
+                            <p className="text-[13px] font-medium text-gray-500 dark:text-gray-400">
                               Last access
                             </p>
-                            <p className="text-[14px] font-semibold text-gray-800">
+                            <p className="text-[14px] font-semibold text-gray-800 dark:text-gray-200">
                               {course.lastAccess
                                 ? new Date(
                                   course.lastAccess.date || course.lastAccess

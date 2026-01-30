@@ -53,7 +53,7 @@ export default function MissionVision() {
   ];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white dark:bg-slate-900 transition-colors duration-500">
       <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-8">
         {data.map((item, i) => {
           const Icon = item.icon;
@@ -61,7 +61,7 @@ export default function MissionVision() {
             <div
               key={i}
               className={[
-                "rounded-2xl p-6 border border-emerald-100 bg-white/70 transition-all duration-300 shadow-sm group hover:bg-emerald-50/80 hover:-translate-y-1 hover:shadow-md",
+                "rounded-2xl p-6 border border-emerald-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900 transition-all duration-300 shadow-sm group hover:bg-emerald-50/80 dark:hover:bg-emerald-500/10 hover:-translate-y-1 hover:shadow-md",
               ].join(" ")}
             >
               {/* Icon + Title */}
@@ -69,51 +69,51 @@ export default function MissionVision() {
                 <div
                   className={[
                     "w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300",
-                    "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white",
+                    "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white",
                   ].join(" ")}
                 >
                   <Icon className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className="font-semibold text-slate-900 dark:text-white">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-slate-500">{item.subtitle}</p>
+                  <p className="text-xs text-slate-500 dark:text-gray-400">{item.subtitle}</p>
                 </div>
               </div>
 
               {/* Description */}
-              <p className="text-slate-600 text-sm mb-2 leading-relaxed">
+              <p className="text-slate-600 dark:text-gray-300 text-sm mb-2 leading-relaxed">
                 {item.desc}
               </p>
-              <p className="text-slate-500 text-[13px] italic mb-6 leading-snug">
+              <p className="text-slate-500 dark:text-gray-400 text-[13px] italic mb-6 leading-snug">
                 {item.descSo}
               </p>
 
               {/* Stats with Icons */}
               <div className="flex items-center gap-8 pt-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 transition-colors">
-                    {React.createElement(item.icon1, { className: "w-5 h-5 text-emerald-600 group-hover:text-white transition-colors" })}
+                  <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 transition-colors">
+                    {React.createElement(item.icon1, { className: "w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" })}
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-emerald-600">
+                    <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                       {item.stat1}
                     </div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-slate-500 dark:text-gray-400">
                       {item.label1}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 transition-colors">
-                    {React.createElement(item.icon2, { className: "w-5 h-5 text-emerald-600 group-hover:text-white transition-colors" })}
+                  <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 transition-colors">
+                    {React.createElement(item.icon2, { className: "w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:text-white transition-colors" })}
                   </div>
                   <div>
-                    <div className="text-2xl font-bold text-emerald-600">
+                    <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                       {item.stat2}
                     </div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-slate-500 dark:text-gray-400">
                       {item.label2}
                     </div>
                   </div>

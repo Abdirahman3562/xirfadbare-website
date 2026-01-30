@@ -10,7 +10,12 @@ import {
 
 const Sidebar = () => {
   return (
-    <aside className="hidden md:flex lg:flex fixed left-0 top-16 h-[calc(100vh-64px)] w-64 bg-white border-r border-gray-200 flex-col">
+    <aside
+      style={{
+        top: "calc(4rem + var(--top-banner-height, 0px))",
+        height: "calc(100vh - 4rem - var(--top-banner-height, 0px))"
+      }}
+      className="hidden md:flex lg:flex fixed left-0 w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex-col transition-all duration-300">
       <div className="flex-1 overflow-y-auto">
         {/* Navigation */}
         <nav className="px-4 text-sm">
@@ -23,8 +28,8 @@ const Sidebar = () => {
               to="/dashboard/student"
               className={({ isActive }) =>
                 `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
-                  ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                  ? "bg-[#e5f9f3] dark:bg-emerald-500/10 text-emerald-500" // Active state
+                  : "text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
                 }`
               }
             >
@@ -42,8 +47,8 @@ const Sidebar = () => {
               to="/dashboard/courses"
               className={({ isActive }) =>
                 `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
-                  ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                  ? "bg-[#e5f9f3] dark:bg-emerald-500/10 text-emerald-500" // Active state
+                  : "text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
                 }`
               }
             >
@@ -61,8 +66,8 @@ const Sidebar = () => {
               to="/dashboard/orders"
               className={({ isActive }) =>
                 `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
-                  ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                  ? "bg-[#e5f9f3] dark:bg-emerald-500/10 text-emerald-500" // Active state
+                  : "text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
                 }`
               }
             >
@@ -80,8 +85,8 @@ const Sidebar = () => {
               to="/dashboard/profile"
               className={({ isActive }) =>
                 `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
-                  ? "bg-[#e5f9f3] text-emerald-500" // Active state
-                  : "text-gray-700 hover:bg-gray-50 hover:text-emerald-600"
+                  ? "bg-[#e5f9f3] dark:bg-emerald-500/10 text-emerald-500" // Active state
+                  : "text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
                 }`
               }
             >

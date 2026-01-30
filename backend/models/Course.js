@@ -30,6 +30,7 @@ const courseSchema = mongoose.Schema(
     isBestSeller: { type: Boolean, default: false },
     discountCode: { type: String },
     discountPercentage: { type: Number, default: 0 },
+    discountExpiry: { type: Date },
     curriculum: [curriculumSchema],
   },
   { timestamps: true }

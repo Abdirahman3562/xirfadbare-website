@@ -60,8 +60,13 @@ const authUser = async (req, res) => {
       is2FAEnabled: user.is2FAEnabled,
       isChatPausedByAdmin: user.isChatPausedByAdmin,
       createdAt: user.createdAt,
+      lastLogin: user.lastLogin,
       token: generateToken(user._id),
     });
+
+    // Update last login
+    user.lastLogin = Date.now();
+    await user.save();
   } else {
     res.status(401).json({ message: 'Invalid email or password' });
   }
@@ -96,8 +101,13 @@ const verify2FA = async (req, res) => {
       is2FAEnabled: user.is2FAEnabled,
       isChatPausedByAdmin: user.isChatPausedByAdmin,
       createdAt: user.createdAt,
+      lastLogin: user.lastLogin,
       token: generateToken(user._id),
     });
+
+    // Update last login
+    user.lastLogin = Date.now();
+    await user.save();
   } else {
     res.status(401).json({ message: 'Invalid or expired verification code' });
   }
@@ -311,6 +321,7 @@ const getUserProfile = async (req, res) => {
       is2FAEnabled: user.is2FAEnabled,
       isChatPausedByAdmin: user.isChatPausedByAdmin,
       createdAt: user.createdAt,
+      lastLogin: user.lastLogin,
     });
   } else {
     res.status(404).json({ message: 'User not found' });
@@ -399,6 +410,7 @@ const updateUserProfile = async (req, res) => {
         image: updatedUser.image,
         is2FAEnabled: updatedUser.is2FAEnabled,
         createdAt: updatedUser.createdAt,
+        lastLogin: updatedUser.lastLogin,
         token: generateToken(updatedUser._id),
       });
     } catch (saveError) {

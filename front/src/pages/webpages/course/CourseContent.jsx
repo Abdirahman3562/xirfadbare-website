@@ -15,6 +15,7 @@ import {
 import { getFullCourseDetails } from '../../../api/courseService';
 // import { markLessonComplete } from '../../../api/userProgressService'; // Assuming this exists or will exist
 import { toast } from 'react-toastify';
+import PremiumLoader from '../../../components/ui/PremiumLoader';
 
 const CourseContent = () => {
     const { id } = useParams();
@@ -58,11 +59,7 @@ const CourseContent = () => {
     };
 
     if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-                <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
+        return <PremiumLoader text={null} />;
     }
 
     if (!course) {
@@ -188,8 +185,8 @@ const CourseContent = () => {
                                             key={lesson._id}
                                             onClick={() => handleLessonChange(lesson)}
                                             className={`w-full flex items-start gap-3 p-4 text-left transition-colors hover:bg-gray-700/50 ${activeLesson?._id === lesson._id
-                                                    ? 'bg-emerald-900/20 border-l-2 border-emerald-500'
-                                                    : 'border-l-2 border-transparent'
+                                                ? 'bg-emerald-900/20 border-l-2 border-emerald-500'
+                                                : 'border-l-2 border-transparent'
                                                 }`}
                                         >
                                             <div className="mt-0.5">

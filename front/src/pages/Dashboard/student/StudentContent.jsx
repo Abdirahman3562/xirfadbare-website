@@ -15,6 +15,7 @@ import { getImageUrl } from "../../../utils/format";
 import { getMyOrders } from "../../../api/orderService";
 import { getAllCourses } from "../../../api/courseService";
 import { getUserProgress } from "../../../api/userProgressService";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 export default function StudentContent() {
   const [courses, setCourses] = useState([]);
@@ -253,7 +254,9 @@ export default function StudentContent() {
         </p>
 
         {loading ? (
-          <p>Loading...</p>
+          <div className="flex justify-center py-12">
+            <PremiumLoader text={null} fullScreen={false} />
+          </div>
         ) : courses.length === 0 ? (
           <div className="p-6 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 text-center">
             <p>No courses found for your account.</p>

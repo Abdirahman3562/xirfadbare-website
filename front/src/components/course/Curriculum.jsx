@@ -82,40 +82,38 @@ export default function Curriculum({
   })();
 
   return (
-    <div className="bg-[#edf4f5] mt-10 p-8 rounded-2xl shadow-lg border border-gray-100">
+    <div className="bg-[#edf4f5] dark:bg-slate-900 mt-10 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-slate-800 transition-colors duration-500">
       {/* ✅ Summary Boxes */}
       <div className="grid sm:grid-cols-4 gap-4 mb-8 text-center">
 
         {/* ✅ Students Enrolled (Box Afraad) */}
-        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] transition">
-          <FaUserGraduate className="text-emerald-500 text-2xl mx-auto mb-2" />
-          <p className="text-xl font-semibold text-gray-800">
+        <div className="p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-[#edf4f5] dark:bg-slate-900 transition">
+          <FaUserGraduate className="text-emerald-500 dark:text-emerald-400 text-2xl mx-auto mb-2" />
+          <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">
             {enrolledCount || 0}
           </p>
-          <p className="text-gray-500 text-sm">Students Enrolled</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Students Enrolled</p>
         </div>
 
-
-
         {/* Total Duration */}
-        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] transition">
-          <FaClock className="text-emerald-500 text-2xl mx-auto mb-2" />
-          <p className="text-xl font-semibold text-gray-800">{totalDuration}</p>
-          <p className="text-gray-500 text-sm">Total Duration</p>
+        <div className="p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-[#edf4f5] dark:bg-slate-900 transition">
+          <FaClock className="text-emerald-500 dark:text-emerald-400 text-2xl mx-auto mb-2" />
+          <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">{totalDuration}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Total Duration</p>
         </div>
 
         {/* Video Lessons */}
-        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] transition">
-          <FaPlayCircle className="text-emerald-500 text-2xl mx-auto mb-2" />
-          <p className="text-xl font-semibold text-gray-800">{totalLessons}</p>
-          <p className="text-gray-500 text-sm">Video Lessons</p>
+        <div className="p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-[#edf4f5] dark:bg-slate-900 transition">
+          <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-2xl mx-auto mb-2" />
+          <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">{totalLessons}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Video Lessons</p>
         </div>
 
         {/* Skill Level */}
-        <div className="p-5 rounded-xl border border-gray-200 hover:border-emerald-400 bg-[#edf4f5] transition">
-          <FaSignal className="text-emerald-500 text-2xl mx-auto mb-2" />
-          <p className="text-xl font-semibold text-gray-800">{level}</p>
-          <p className="text-gray-500 text-sm">Skill Level</p>
+        <div className="p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-[#edf4f5] dark:bg-slate-900 transition">
+          <FaSignal className="text-emerald-500 dark:text-emerald-400 text-2xl mx-auto mb-2" />
+          <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">{level}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Skill Level</p>
         </div>
 
 
@@ -123,12 +121,12 @@ export default function Curriculum({
 
       {/* ✅ Curriculum Header */}
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-xl font-bold text-emerald-600">
+        <h2 className="text-xl font-bold text-emerald-600 dark:text-emerald-400">
           Course Curriculum ({curriculum.length} Sections)
         </h2>
         <button
           onClick={handleToggleAll}
-          className="text-sm text-emerald-600 font-medium"
+          className="text-sm text-emerald-600 dark:text-emerald-400 font-medium"
         >
           {allOpen ? "Collapse All" : "Expand All"}
         </button>
@@ -141,23 +139,23 @@ export default function Curriculum({
           return (
             <div
               key={index}
-              className="group border border-gray-200 rounded-xl hover:border-emerald-400 hover:bg-emerald-50/40 transition"
+              className="group border border-gray-200 dark:border-slate-800 rounded-xl hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50/40 dark:hover:bg-emerald-500/10 transition"
             >
               <button
                 onClick={() => toggleSection(index)}
                 className="w-full flex justify-between items-center p-5"
               >
                 <div className="flex items-center gap-3 text-left">
-                  <span className="bg-emerald-100 text-emerald-600 font-semibold w-8 h-8 flex items-center justify-center rounded-full">
+                  <span className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold w-8 h-8 flex items-center justify-center rounded-full">
                     {index + 1}
                   </span>
 
                   {/* Titles & duration */}
                   <div className="flex flex-col">
-                    <h3 className="font-semibold text-gray-800 group-hover:text-emerald-400">
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-emerald-400">
                       {section.title}
                     </h3>
-                    <p className="text-sm text-gray-500 ">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {section.lessons.length} lessons • {sectionDuration}
                     </p>
                   </div>
@@ -176,19 +174,19 @@ export default function Curriculum({
                   {section.lessons.map((lesson, i) => (
                     <div
                       key={i}
-                      className={`flex justify-between items-center border border-gray-200 rounded-lg p-3 transition duration-300 
-          hover:border-emerald-400 hover:bg-emerald-50/50 shadow-sm
+                      className={`flex justify-between items-center border border-gray-200 dark:border-slate-800 rounded-lg p-3 transition duration-300 
+          hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 shadow-sm
           ${isPaid ? "cursor-not-allowed opacity-95" : "cursor-pointer"}`}
                     >
-                      <div className="flex items-center gap-2 text-gray-700 text-sm">
+                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
                         {isPaid ? (
-                          <FaLock className="text-emerald-500 text-xs" />
+                          <FaLock className="text-emerald-500 dark:text-emerald-400 text-xs" />
                         ) : (
-                          <FaPlayCircle className="text-emerald-500 text-xs" />
+                          <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-xs" />
                         )}
                         <span>{lesson.title}</span>
                       </div>
-                      <span className="text-gray-500 text-xs">
+                      <span className="text-gray-500 dark:text-gray-400 text-xs">
                         {lesson.duration}
                       </span>
                     </div>
@@ -201,14 +199,14 @@ export default function Curriculum({
       </div>
 
       {/* ✅ CTA Section */}
-      <div className="border border-gray-200 hover:border-emerald-400 rounded-xl p-6 text-gray-800">
+      <div className="border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 rounded-xl p-6 text-gray-800 dark:text-gray-200 transition-all duration-300">
         <div className="flex items-start gap-3 mb-4">
-          <div className="bg-emerald-100 text-emerald-600 p-3 rounded-full">
+          <div className="bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 p-3 rounded-full">
             <FaCheckCircle className="text-xl" />
           </div>
           <div>
             <h3 className="text-lg font-semibold mb-1">What You’ll Learn</h3>
-            <p className="text-gray-600 text-sm">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
               Below is an overview of the core skills you’ll gain from this
               course.
             </p>
@@ -216,31 +214,31 @@ export default function Curriculum({
         </div>
 
         {Array.isArray(learningOutcomes) && (
-          <ul className="space-y-2 text-sm text-gray-700 mb-6 pl-10">
+          <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300 mb-6 pl-10">
             {learningOutcomes.map((point, idx) => (
               <li key={idx} className="flex items-start gap-2">
-                <FaCheckCircle className="text-emerald-500 text-sm mt-0.5" />
+                <FaCheckCircle className="text-emerald-500 dark:text-emerald-400 text-sm mt-0.5" />
                 <span>{point}</span>
               </li>
             ))}
           </ul>
         )}
 
-        <div className="border-t border-gray-100 pt-4">
+        <div className="border-t border-gray-100 dark:border-slate-800 pt-4">
           <div className="mb-4 flex items-center justify-between">
-            <span className="text-gray-500 font-medium">Course Price:</span>
+            <span className="text-gray-500 dark:text-gray-400 font-medium">Course Price:</span>
             <div className="flex flex-col items-end">
               {discountPercentage > 0 ? (
                 <>
                   <span className="text-sm text-gray-400 line-through font-bold">
                     ${price}
                   </span>
-                  <span className="text-3xl font-black text-emerald-600">
+                  <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">
                     ${(price * (1 - discountPercentage / 100)).toFixed(2)}
                   </span>
                 </>
               ) : (
-                <span className="text-3xl font-black text-emerald-600">
+                <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">
                   {Number(price) === 0 ? "Free" : `$${price}`}
                 </span>
               )}
@@ -257,12 +255,12 @@ export default function Curriculum({
                   );
                 }
               }}
-              className="w-full bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100"
+              className="w-full bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100 dark:shadow-none"
             >
               Buy Course To Get Full Access <FaArrowRight />
             </button>
           ) : (
-            <button className="w-full bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100">
+            <button className="w-full bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100 dark:shadow-none">
               Continue Learning <FaArrowRight />
             </button>
           )}

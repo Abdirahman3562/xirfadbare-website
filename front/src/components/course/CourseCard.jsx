@@ -52,7 +52,7 @@ function CourseCard({ course }) {
   }, [instructorTitle]);
 
   return (
-    <div className="group relative bg-[#edf4f5] border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+    <div className="group relative bg-[#edf4f5] dark:bg-slate-900 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
       {/* Thumbnail */}
       <div className="relative h-52 w-full overflow-hidden z-0">
         <Link to={`/courses/${course.slug}`}>
@@ -64,7 +64,7 @@ function CourseCard({ course }) {
         </Link>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none"></div>
 
-        <span className="absolute top-3 right-3 bg-white/90 text-emerald-600 text-xs font-semibold px-3 py-1 rounded-full shadow">
+        <span className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 text-emerald-600 dark:text-emerald-400 text-xs font-semibold px-3 py-1 rounded-full shadow transition-colors">
           {course.level || "Beginner"}
         </span>
 
@@ -83,12 +83,12 @@ function CourseCard({ course }) {
         )}
         <Link
           to={`/courses/${course.slug}`}
-          className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition"
+          className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition"
         >
           {course.title}
         </Link>
 
-        <p className="text-gray-600 text-sm leading-relaxed mb-3 line-clamp-2">
+        <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-3 line-clamp-2">
           {course.description}
         </p>
 
@@ -98,11 +98,11 @@ function CourseCard({ course }) {
             <img
               src={getImageUrl(instructor.image)}
               alt={instructorTitle}
-              className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-sm"
+              className="w-10 h-10 rounded-full object-cover ring-2 ring-white dark:ring-slate-800 shadow-sm"
             />
           ) : (
             <div
-              className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm font-semibold ring-2 ring-white shadow-sm"
+              className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold ring-2 ring-white dark:ring-slate-800 shadow-sm"
               aria-hidden="true"
             >
               {initials || "IN"}
@@ -110,14 +110,14 @@ function CourseCard({ course }) {
           )}
           <div className="min-w-0">
             <p
-              className="text-sm font-semibold text-gray-800 truncate"
+              className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate"
               title={instructorTitle}
             >
               {instructorTitle}
             </p>
             {instructor.instructorTitle && (
               <p
-                className="text-xs bg-[#edf4f5] text-emerald-600 font-semibold px-2 py-1 text-center rounded-full shadow-sm truncate"
+                className="text-xs bg-[#edf4f5] dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold px-2 py-1 text-center rounded-full shadow-sm truncate"
                 title={instructor.instructorTitle}
               >
                 {instructor.instructorTitle}
@@ -127,13 +127,13 @@ function CourseCard({ course }) {
         </div>
 
         {/* Lessons + Duration */}
-        <div className="flex justify-between text-sm text-gray-700 mb-4">
+        <div className="flex justify-between text-sm text-gray-700 dark:text-gray-300 mb-4 transition-colors">
           <div className="flex gap-1 items-center">
             <FaUserGraduate className="text-emerald-500 text-[13px]" />
-            <span className="text-gray-700 font-medium ml-1">
+            <span className="text-gray-700 dark:text-gray-300 font-medium ml-1">
               {course.enrolledCount}
             </span>
-            <span className="text-gray-500 text-sm">Enrolled</span>
+            <span className="text-gray-500 dark:text-gray-400 text-sm">Enrolled</span>
           </div>
           <div className="flex items-center gap-2">
             <FaPlayCircle className="text-emerald-500" />
@@ -148,11 +148,11 @@ function CourseCard({ course }) {
         {/* Access Type / Tech + Price */}
         <div className="flex justify-between items-center mb-5 text-sm font-medium">
           {course.accessType ? (
-            <span className="flex items-center gap-2 bg-[#edf4f5] text-emerald-600 font-semibold px-3 py-1 rounded-full shadow-sm">
+            <span className="flex items-center gap-2 bg-[#edf4f5] dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-semibold px-3 py-1 rounded-full shadow-sm transition-colors">
               {course.accessType.toLowerCase() === "lifetime" ? (
-                <FaInfinity className="text-emerald-600" />
+                <FaInfinity className="text-emerald-600 dark:text-emerald-400" />
               ) : (
-                <FaCalendarAlt className="text-emerald-600" />
+                <FaCalendarAlt className="text-emerald-600 dark:text-emerald-400" />
               )}
               <span>
                 {course.accessType === "Lifetime"
@@ -163,9 +163,9 @@ function CourseCard({ course }) {
           ) : (
             <span
               title={course.technology}
-              className="flex items-center gap-2 bg-[#edf4f5] text-emerald-600 font-semibold px-3 py-1 rounded-full shadow-sm max-w-[180px] truncate"
+              className="flex items-center gap-2 bg-[#edf4f5] dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 font-semibold px-3 py-1 rounded-full shadow-sm max-w-[180px] truncate transition-colors"
             >
-              <FaCode className="text-emerald-600 flex-shrink-0" />
+              <FaCode className="text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
               <span className="truncate">{course.technology || "Tech"}</span>
             </span>
           )}
@@ -177,15 +177,15 @@ function CourseCard({ course }) {
                 <span className="text-gray-400 text-xs line-through font-bold">
                   ${course.price}
                 </span>
-                <span className="text-[18px] font-black text-emerald-600">
+                <span className="text-[18px] font-black text-emerald-600 dark:text-emerald-400">
                   ${(course.price * (1 - course.discountPercentage / 100)).toFixed(2)}
                 </span>
               </>
             ) : (
               <span
                 className={`text-[18px] font-semibold ${isFree
-                  ? "bg-[#edf4f5] text-emerald-600 px-6 py-0 rounded-full shadow-sm"
-                  : "text-emerald-600"
+                  ? "bg-[#edf4f5] dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 px-6 py-0 rounded-full shadow-sm"
+                  : "text-emerald-600 dark:text-emerald-400"
                   }`}
               >
                 {isFree ? "free" : `$${course.price}`}
@@ -194,7 +194,7 @@ function CourseCard({ course }) {
           </div>
         </div>
 
-        <div className="border-t border-gray-100 mb-4"></div>
+        <div className="border-t border-gray-100 dark:border-gray-800 mb-4 transition-colors"></div>
 
         <Link
           to={`/courses/${course.slug}`}

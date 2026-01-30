@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../../utils/format";
 import { FaShoppingCart } from "react-icons/fa";
 import { API_BASE_URL } from "../../../config";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
@@ -100,27 +101,27 @@ export default function Orders() {
       <Toaster position="top-right" reverseOrder={false} />
 
       <div className="flex gap-1 items-center">
-        <Home className="w-5 h-5 text-emerald-600" />
+        <Home className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
         <ChevronRight className="w-5 h-5 text-emerald-600" />
-        <span className="text-lg font-semibold text-gray-700">Student</span>
+        <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">Student</span>
         <ChevronRight className="w-5 h-5 text-emerald-600" />
-        <span className="text-lg font-semibold text-gray-700">Orders</span>
+        <span className="text-lg font-semibold text-gray-700 dark:text-gray-300">Orders</span>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2">Purchase History</h1>
-      <p className="text-gray-500 text-[14px] mb-6">
+      <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Purchase History</h1>
+      <p className="text-gray-500 dark:text-gray-400 text-[14px] mb-6">
         View and manage your course purchases and payment history.
       </p>
 
       <section>
-        <h1 className="text-2xl font-semibold mb-2">My Orders</h1>
-        <p className="text-gray-500 text-sm mb-6">
+        <h1 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">My Orders</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
           View and manage your course orders
         </p>
 
         {loading && (
-          <div className="flex justify-center items-center py-20">
-            <p className="text-gray-500 text-lg">Loading orders...</p>
+          <div className="flex justify-center py-12">
+            <PremiumLoader text={null} fullScreen={false} />
           </div>
         )}
 
@@ -129,7 +130,7 @@ export default function Orders() {
             {orders.map((order) => (
               <div
                 key={order._id || order.id}
-                className="border border-gray-200 rounded-xl shadow-sm bg-white hover:shadow-md transition p-4 flex flex-col"
+                className="border border-gray-200 dark:border-slate-800 rounded-xl shadow-sm bg-white dark:bg-slate-800/50 hover:shadow-md dark:hover:bg-slate-800 transition p-4 flex flex-col"
               >
                 {/* ✅ Click image -> go to details page */}
                 <div
@@ -146,7 +147,7 @@ export default function Orders() {
                 <div className="flex justify-between items-center mb-2">
                   <h2
                     onClick={() => handleViewCourse(order.course)}
-                    className="text-lg font-semibold text-gray-800 cursor-pointer hover:text-emerald-600"
+                    className="text-lg font-semibold text-gray-800 dark:text-white cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400"
                   >
                     {order.courseTitle || order.courseDetails?.title}
                   </h2>
@@ -177,7 +178,7 @@ export default function Orders() {
                         ${order.finalPrice}
                       </span>
                       {order.discountApplied > 0 && (
-                        <span className="text-xs text-gray-500 ml-2">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
                           (Saved ${order.discountApplied})
                         </span>
                       )}
@@ -197,11 +198,11 @@ export default function Orders() {
         )}
 
         {!loading && orders.length === 0 && (
-          <div className="border border-gray-200 rounded-md bg-white py-10 flex flex-col items-center justify-center text-center">
-            <h2 className="text-[16px] font-semibold text-gray-800">
+          <div className="border border-gray-200 dark:border-slate-800 rounded-md bg-white dark:bg-slate-800/50 py-10 flex flex-col items-center justify-center text-center">
+            <h2 className="text-[16px] font-semibold text-gray-800 dark:text-white">
               No orders found
             </h2>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               You haven't placed any orders yet.
             </p>
 

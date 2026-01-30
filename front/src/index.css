@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg-primary: #f3f8f9;
+  --bg-secondary: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-color: #e2e8f0;
+  --brand-primary: #10b981;
+}
+
+.dark {
+  --bg-primary: #020617;
+  --bg-secondary: #0f172a;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: #1f2937;
+  --brand-primary: #34d399;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    @apply transition-colors duration-300;
+  }
+}
+
 
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -37,6 +65,20 @@
   }
 }
 
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out;
 }
@@ -51,10 +93,24 @@
 }
 
 @keyframes bounce-subtle {
-  0%, 100% { transform: translateY(-5%); }
-  50% { transform: translateY(0); }
+
+  0%,
+  100% {
+    transform: translateY(-5%);
+  }
+
+  50% {
+    transform: translateY(0);
+  }
 }
 
 .animate-bounce-subtle {
   animation: bounce-subtle 1s infinite ease-in-out;
+}
+
+/* Custom Toastify Dark Theme Override */
+.Toastify__toast-theme--dark {
+  @apply !bg-slate-900 !border !border-slate-700 !shadow-xl !shadow-black/20 !text-gray-100;
+  background-color: #0f172a !important;
+  /* Forces slate-900 if @apply fails priority */
 }

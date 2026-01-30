@@ -33,7 +33,7 @@ export default function AboutStats() {
   ];
 
   return (
-    <section className="py-10 bg-white">
+    <section className="py-10 bg-white dark:bg-slate-900 transition-colors duration-500">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
         {statsDisplay.map((item, i) => {
           const Icon = item.icon;
@@ -42,7 +42,7 @@ export default function AboutStats() {
             <div
               key={i}
               className={[
-                "rounded-2xl p-5 border shadow-sm bg-[#edf4f5]  border-gray-200 hover:border-emerald-400 transition-all duration-300",
+                "rounded-2xl p-5 border shadow-sm bg-[#edf4f5] dark:bg-slate-900 border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-300",
                 "hover:shadow-md hover:-translate-y-1 group",
               ].join(" ")}
             >
@@ -51,7 +51,7 @@ export default function AboutStats() {
                 <div
                   className={[
                     "w-12 h-12 rounded-xl flex items-center justify-center shrink-0",
-                    "bg-emerald-50 text-emerald-600 transition-all duration-300",
+                    "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 transition-all duration-300",
                     "group-hover:bg-emerald-500 group-hover:text-white",
                   ].join(" ")}
                 >
@@ -60,10 +60,10 @@ export default function AboutStats() {
 
                 {/* Value + label */}
                 <div className="flex-1">
-                  <div className="text-[22px] sm:text-[24px] font-extrabold text-emerald-600 leading-none">
+                  <div className="text-[22px] sm:text-[24px] font-extrabold text-emerald-600 dark:text-emerald-400 leading-none">
                     {item.value}
                   </div>
-                  <div className="mt-1 text-xs text-slate-500">
+                  <div className="mt-1 text-xs text-slate-500 dark:text-gray-400">
                     {item.label}
                   </div>
                 </div>

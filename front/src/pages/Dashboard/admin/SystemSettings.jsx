@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import { Save, Globe, Mail, Phone, MapPin, MessageCircle, Image as ImageIcon, Lock } from "lucide-react";
 import { toast } from "react-toastify";
 import { usePermissions } from "../../../hooks/usePermissions";

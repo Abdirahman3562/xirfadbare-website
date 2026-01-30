@@ -17,7 +17,10 @@ const PublicLayout = () => {
     return (
         <div className="flex flex-col min-h-screen">
             {!isAuthPage && <Nav />}
-            <main className={`flex-grow ${!isAuthPage ? 'pt-16' : ''}`}>
+            <main
+                className={`flex-grow ${!isAuthPage ? '' : ''}`}
+                style={{ paddingTop: !isAuthPage ? 'calc(4rem + var(--top-banner-height, 0px))' : '0px' }}
+            >
                 <Outlet />
             </main>
             {!isAuthPage && <Footer />}

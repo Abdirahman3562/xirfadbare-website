@@ -470,22 +470,16 @@ export default function SupportWidget() {
             {/* Trigger Button */}
             <button
                 onClick={toggleWidget}
-                className="group relative flex items-center justify-center p-2"
+                className="group relative flex items-center justify-center p-2 cursor-pointer"
             >
                 <div className="absolute inset-0 rounded-full bg-emerald-400 opacity-75 animate-ping group-hover:opacity-100 transition-opacity duration-1000 w-14 h-14 translate-x-1 translate-y-1"></div>
-                <div className="relative w-16 h-16 bg-emerald-600 rounded-full shadow-xl shadow-emerald-500/40 flex items-center justify-center text-white hover:bg-emerald-500 transition-transform group-hover:-translate-y-1 active:scale-95 border-4 border-white">
+                <div className="relative w-16 h-16 bg-emerald-600 rounded-full shadow-xl shadow-emerald-500/40 flex items-center justify-center text-white hover:bg-emerald-500 transition-transform group-hover:-translate-y-1 active:scale-95">
                     {isOpen ? (
                         <X size={28} className="animate-in rotate-90 duration-300" />
                     ) : (
                         <MessageSquare size={28} className="animate-in zoom-in duration-300" />
                     )}
 
-                    {/* Notification Badge */}
-                    {!isOpen && (
-                        <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 border-2 border-white rounded-full text-[10px] font-bold flex items-center justify-center animate-bounce shadow-sm">
-                            1
-                        </span>
-                    )}
                 </div>
             </button>
 

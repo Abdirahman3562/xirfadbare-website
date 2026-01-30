@@ -96,29 +96,29 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4faf7] py-12">
+    <div className="min-h-screen bg-[#f4faf7] dark:bg-slate-900 py-12 transition-colors duration-500">
       {/* Hero */}
       <section className="max-w-4xl mx-auto px-6 pt-16 pb-10 text-center">
-        <div className="inline-block mb-5 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-sm border border-emerald-100">
+        <div className="inline-block mb-5 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold text-sm border border-emerald-100 dark:border-emerald-500/20">
           ✨ Let’s Create Something Amazing
         </div>
-        <h1 className="mt-4 text-4xl md:text-5xl font-extrabold text-slate-900">
+        <h1 className="mt-4 text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white">
           Get in Touch
         </h1>
-        <p className="mt-4 text-slate-600">
+        <p className="mt-4 text-slate-600 dark:text-slate-400">
           Have questions about our services? Want to collaborate? Or just want
-          to say hello? <span className="text-emerald-600 font-semibold">We’re here to help you succeed!</span>
+          to say hello? <span className="text-emerald-600 dark:text-emerald-400 font-semibold">We’re here to help you succeed!</span>
         </p>
       </section>
 
       {/* Content */}
       <section className="max-w-7xl mx-auto px-6 pb-24 grid gap-10 lg:grid-cols-2">
         {/* Left: Form */}
-        <div className="bg-[#f4faf7] backdrop-blur rounded-2xl border border-emerald-100 shadow-sm hover:shadow-md transition p-6 md:p-8">
-          <h3 className="text-lg font-semibold text-slate-900">
+        <div className="bg-[#f4faf7] dark:bg-slate-900 backdrop-blur rounded-2xl border border-emerald-100 dark:border-slate-800 shadow-sm hover:shadow-md transition p-6 md:p-8">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
             Send Us a Message
           </h3>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             Fill out the form below and we’ll get back to you as soon as possible.
           </p>
 
@@ -126,7 +126,7 @@ export default function ContactPage() {
             {/* name + phone */}
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                   Full Name
                 </label>
                 <input
@@ -134,12 +134,12 @@ export default function ContactPage() {
                   value={form.name}
                   onChange={onChange}
                   placeholder="John Doe"
-                  className="w-full rounded-xl border border-emerald-100 bg-white/70 px-4 py-2.5 outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 transition"
+                  className="w-full rounded-xl border border-emerald-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900 px-4 py-2.5 outline-none focus:border-emerald-300 dark:focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 transition text-slate-900 dark:text-white"
                   required
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1">
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                   Phone Number
                 </label>
                 <input
@@ -147,14 +147,14 @@ export default function ContactPage() {
                   value={form.phone}
                   onChange={onChange}
                   placeholder="+252 XXX XXX XXX"
-                  className="w-full rounded-xl border border-emerald-100 bg-white/70 px-4 py-2.5 outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 transition"
+                  className="w-full rounded-xl border border-emerald-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900 px-4 py-2.5 outline-none focus:border-emerald-300 dark:focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 transition text-slate-900 dark:text-white"
                 />
               </div>
             </div>
 
             {/* email */}
             <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                 Email
               </label>
               <input
@@ -163,14 +163,14 @@ export default function ContactPage() {
                 value={form.email}
                 onChange={onChange}
                 placeholder="john@example.com"
-                className="w-full rounded-xl border border-emerald-100 bg-white/70 px-4 py-2.5 outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 transition"
+                className="w-full rounded-xl border border-emerald-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900 px-4 py-2.5 outline-none focus:border-emerald-300 dark:focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 transition text-slate-900 dark:text-white"
                 required
               />
             </div>
 
             {/* about */}
             <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                 About
               </label>
               <input
@@ -178,13 +178,13 @@ export default function ContactPage() {
                 value={form.about}
                 onChange={onChange}
                 placeholder="What’s this regarding?"
-                className="w-full rounded-xl border border-emerald-100 bg-white/70 px-4 py-2.5 outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 transition"
+                className="w-full rounded-xl border border-emerald-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900 px-4 py-2.5 outline-none focus:border-emerald-300 dark:focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 transition text-slate-900 dark:text-white"
               />
             </div>
 
             {/* message */}
             <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1">
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">
                 Message
               </label>
               <textarea
@@ -193,7 +193,7 @@ export default function ContactPage() {
                 onChange={onChange}
                 rows={6}
                 placeholder="Tell us more about your inquiry…"
-                className="w-full  rounded-xl border border-emerald-100 bg-white/70 px-4 py-3 outline-none focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 transition resize-none"
+                className="w-full  rounded-xl border border-emerald-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900 px-4 py-3 outline-none focus:border-emerald-300 dark:focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-900/30 transition resize-none text-slate-900 dark:text-white"
                 required
               />
             </div>
@@ -214,10 +214,10 @@ export default function ContactPage() {
 
         {/* Right: Other Ways to Connect */}
         <div>
-          <h3 className="text-lg font-semibold text-slate-900 mb-3">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
             Other Ways to Connect
           </h3>
-          <p className="text-sm text-slate-500 mb-6">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
             Choose the method that works best for you. We’re here to help!
           </p>
 
@@ -236,8 +236,8 @@ export default function ContactPage() {
                     "block rounded-2xl border p-5 transition-all duration-300 shadow-sm",
                     "hover:shadow-md hover:-translate-y-[2px]",
                     active
-                      ? "bg-emerald-100/70 border-emerald-200 ring-2 ring-emerald-100"
-                      : "bg-emerald-50/40 border-emerald-100 hover:bg-emerald-100/70",
+                      ? "bg-emerald-100/70 dark:bg-emerald-500/20 border-emerald-200 dark:border-emerald-500 ring-2 ring-emerald-100 dark:ring-emerald-900/30"
+                      : "bg-emerald-50/40 dark:bg-slate-800/50 border-emerald-100 dark:border-slate-800 hover:bg-emerald-100/70 dark:hover:bg-slate-800",
                     "group",
                   ].join(" ")}
                 >
@@ -258,13 +258,13 @@ export default function ContactPage() {
                     <div className="flex-1">
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <h4 className="font-semibold text-slate-900">{c.title}</h4>
-                          <p className="text-xs text-slate-500">{c.text}</p>
+                          <h4 className="font-semibold text-slate-900 dark:text-white">{c.title}</h4>
+                          <p className="text-xs text-slate-500 dark:text-slate-400">{c.text}</p>
                         </div>
                         <ArrowRight className="w-5 h-5 text-emerald-500 opacity-60 group-hover:opacity-100 transition" />
                       </div>
 
-                      <div className="mt-3 text-emerald-700 font-medium">
+                      <div className="mt-3 text-emerald-700 dark:text-emerald-400 font-medium">
                         {c.value}
                       </div>
                     </div>

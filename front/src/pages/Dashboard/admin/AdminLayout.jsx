@@ -182,7 +182,7 @@ const AdminLayout = () => {
                             >
                                 <Bell size={22} className={pendingCount > 0 ? 'animate-bounce-subtle' : ''} />
                                 {pendingCount > 0 && (
-                                    <span className="absolute top-1.5 right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-white flex items-center justify-center shadow-sm">
+                                    <span className="absolute top-1.5 right-1.5 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full border-2 border-white dark:border-slate-900 flex items-center justify-center shadow-sm">
                                         {pendingCount > 9 ? '9+' : pendingCount}
                                     </span>
                                 )}
@@ -192,10 +192,10 @@ const AdminLayout = () => {
                             {showNotifications && (
                                 <>
                                     <div className="fixed inset-0 z-10" onClick={() => setShowNotifications(false)}></div>
-                                    <div className="absolute right-0 mt-3 w-80 bg-white rounded-3xl shadow-2xl border border-gray-50 py-2 z-20 animate-in fade-in slide-in-from-top-5 duration-300">
-                                        <div className="px-5 py-3 border-b border-gray-50 flex items-center justify-between">
-                                            <h3 className="font-bold text-gray-900">Notifications</h3>
-                                            <span className="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                    <div className="absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-gray-50 dark:border-gray-800 py-2 z-20 animate-in fade-in slide-in-from-top-5 duration-300">
+                                        <div className="px-5 py-3 border-b border-gray-50 dark:border-gray-800 flex items-center justify-between">
+                                            <h3 className="font-bold text-gray-900 dark:text-white">Notifications</h3>
+                                            <span className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                                                 {pendingCount} New
                                             </span>
                                         </div>
@@ -204,7 +204,7 @@ const AdminLayout = () => {
                                                 stats.pendingOrderDetails.map((order) => (
                                                     <div
                                                         key={order._id}
-                                                        className="px-4 py-4 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0 group cursor-pointer"
+                                                        className="px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0 group cursor-pointer"
                                                         onClick={() => {
                                                             navigate('/admin/orders');
                                                             setShowNotifications(false);
@@ -222,10 +222,10 @@ const AdminLayout = () => {
                                                                 </div>
                                                             </div>
                                                             <div className="flex-1 min-w-0">
-                                                                <p className="text-xs font-bold text-gray-900 line-clamp-1">
+                                                                <p className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1">
                                                                     New order from {order.userName || `${order.userDetails?.firstName} ${order.userDetails?.lastName}`}
                                                                 </p>
-                                                                <p className="text-[10px] text-gray-500 font-medium truncate mt-0.5">
+                                                                <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium truncate mt-0.5">
                                                                     Bought: {order.courseTitle || order.courseDetails?.title}
                                                                 </p>
                                                                 <div className="flex items-center justify-between mt-2">
@@ -266,13 +266,13 @@ const AdminLayout = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                                className="flex items-center gap-3 p-1.5 hover:bg-gray-50 rounded-2xl transition-all group"
+                                className="flex items-center gap-3 p-1.5 hover:bg-gray-50 dark:hover:bg-slate-800 rounded-2xl transition-all group"
                             >
                                 <div className="text-right hidden sm:block">
-                                    <p className="text-sm font-bold text-gray-900 leading-tight">
+                                    <p className="text-sm font-bold text-gray-900 dark:text-white leading-tight">
                                         {user.firstName} {user.lastName}
                                     </p>
-                                    <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
+                                    <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
                                         {user.role}
                                     </p>
                                 </div>

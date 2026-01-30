@@ -35,22 +35,22 @@ export default function Herro({
   const subtitle = propSubtitle || "Transform Your Future";
 
   return (
-    <section className="relative bg-gradient-to-br from-purple-50 via-white to-blue-50 overflow-hidden">
+    <section className="relative  dark:bg-slate-900 overflow-hidden transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16 md:py-20 grid grid-cols-1 lg:grid-cols-2 items-center gap-8 md:gap-12">
         {/* LEFT CONTENT */}
         <div className="relative z-10 text-center lg:text-left">
           {/* Subtitle Badge */}
-          <div className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-emerald-50 text-emerald-600 font-semibold text-xs sm:text-sm border border-emerald-100 mb-4 sm:mb-0">
+          <div className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold text-xs sm:text-sm border border-emerald-100 dark:border-emerald-500/20 mb-4 sm:mb-0">
             {subtitle}
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-black text-gray-900 leading-tight mb-4 sm:mb-6 mt-3 sm:mt-4 px-2 sm:px-0 lg:ml-3">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-black text-gray-900 dark:text-white leading-tight mb-4 sm:mb-6 mt-3 sm:mt-4 px-2 sm:px-0 lg:ml-3">
             {title}
           </h1>
 
           {/* Description */}
-          <p className="text-gray-600 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-lg lg:ml-4   px-2 sm:px-0">
+          <p className="text-gray-600 dark:text-gray-400 text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 max-w-lg lg:ml-4   px-2 sm:px-0">
             Make learning and teaching more effective with active participation and student collaboration.
           </p>
 
@@ -100,7 +100,7 @@ export default function Herro({
 
 
           {/* Glassmorphism Card - Bottom Left (10k+ Students) */}
-          <div className="absolute animate-bounce bottom-[-10px] sm:bottom-[-20px] left-[-20px] sm:left-[-40px] z-20 backdrop-blur-md bg-white/80 border border-white/50 rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
+          <div className="absolute animate-bounce bottom-[-10px] sm:bottom-[-20px] left-[-20px] sm:left-[-40px] z-20 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border border-white/50 dark:border-slate-800/50 rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,7 +117,7 @@ export default function Herro({
           </div>
 
           {/* Glassmorphism Card - Top Right (Expert Tutors) */}
-          <div className="absolute animate-bounce top-[-20px] sm:top-[-40px] right-[-10px] sm:-right-4 z-20 backdrop-blur-md bg-white/80 border border-white/50 rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
+          <div className="absolute animate-bounce top-[-20px] sm:top-[-40px] right-[-10px] sm:-right-4 z-20 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border border-white/50 dark:border-slate-800/50 rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-xl">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl 
                 bg-gradient-to-br from-emerald-500 to-emerald-600 

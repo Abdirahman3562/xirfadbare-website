@@ -218,6 +218,7 @@ const EditCourse = () => {
         price: '',
         discountCode: '',
         discountPercentage: 0,
+        discountExpiry: '',
         technology: '',
         level: 'Beginner',
         accessType: 'Lifetime',
@@ -244,6 +245,11 @@ const EditCourse = () => {
                         type: course.type || '',
                         discountCode: course.discountCode || '',
                         discountPercentage: course.discountPercentage || 0,
+                        discountExpiry: course.discountExpiry ? (() => {
+                            const d = new Date(course.discountExpiry);
+                            const pad = (n) => n < 10 ? '0' + n : n;
+                            return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                        })() : '',
                         instructor: course.instructor?._id || course.instructor || '',
                         learningOutcomes: course.learningOutcomes || [],
                         communityLink: course.communityLink || ''
@@ -303,8 +309,10 @@ const EditCourse = () => {
 
             if (!res.ok) throw new Error('Upload failed');
 
-            const data = await res.text(); // Backend returns path as string
-            setCourseData(prev => ({ ...prev, thumbnail: data }));
+            const data = await res.json();
+            // Handle { url: "..." } or { image: "..." } or plain string if JSON parse fails (though res.json throws)
+            // Assuming simplified backend response:
+            setCourseData(prev => ({ ...prev, thumbnail: data.url || data.image || data }));
             toast.success("Sawirka waa la upload gareeyay!");
         } catch (error) {
             console.error(error);
@@ -626,10 +634,10 @@ const EditCourse = () => {
                                     onChange={handleInputChange}
                                     className="w-full px-6 py-4 bg-emerald-50/30 border border-emerald-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold transition-all text-emerald-700"
                                     placeholder="0"
-                                    min="0"
                                     max="100"
                                 />
                             </div>
+
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
@@ -643,6 +651,19 @@ const EditCourse = () => {
                                     className="w-full px-6 py-4 bg-emerald-50/30 border border-emerald-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold transition-all text-emerald-700 uppercase tracking-widest"
                                     placeholder="e.g. SAVE20"
                                 />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[11px] font-black text-emerald-600 uppercase tracking-widest ml-1">Discount Expiry</label>
+                                <div className="relative">
+                                    <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-500" size={16} />
+                                    <input
+                                        type="datetime-local"
+                                        name="discountExpiry"
+                                        value={courseData.discountExpiry}
+                                        onChange={handleInputChange}
+                                        className="w-full pl-10 pr-6 py-4 bg-emerald-50/30 border border-emerald-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-bold transition-all text-emerald-700 placeholder-emerald-300"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

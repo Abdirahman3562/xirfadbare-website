@@ -9,11 +9,11 @@ export default function Testimonials() {
   const activeTestimonials = testimonials.filter(t => t.isActive === true);
 
   return (
-    <section className="py-20 ">
+    <section className="py-20 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-6">
         {/* ✅ Header */}
         <div className="text-center mb-10">
-          <h2 className="text-3xl md:text-4xl font-extrabold text-emerald-600">
+          <h2 className="text-3xl md:text-4xl font-extrabold text-emerald-600 dark:text-emerald-400">
             What Our Students  Say
           </h2>
           <div className="mt-2 h-1 w-24 bg-[#00cc8f] rounded-full mx-auto"></div>
@@ -25,7 +25,7 @@ export default function Testimonials() {
             {activeTestimonials.map((t) => (
               <div
                 key={t._id}
-                className="bg-[#edf4f5] border border-gray-200 hover:border-emerald-400 rounded-2xl p-6 shadow-sm hover:shadow-md transition relative "
+                className="bg-[#edf4f5] dark:bg-slate-900 border border-gray-200 dark:border-gray-800 hover:border-emerald-400 dark:hover:border-emerald-500 rounded-2xl p-6 shadow-sm hover:shadow-md transition relative transition-all duration-500"
               >
                 {/* ⭐ Stars */}
                 <div className="flex gap-1 text-[#00cc8f] mb-3">
@@ -36,16 +36,16 @@ export default function Testimonials() {
 
                 {/* 🏷️ Tag */}
                 {t.tag && (
-                  <span className="inline-block text-xs font-semibold text-[#00cc8f] bg-emerald-50 px-3 py-1 rounded-full mb-4">
+                  <span className="inline-block text-xs font-semibold text-[#00cc8f] dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full mb-4">
                     {t.tag}
                   </span>
                 )}
 
                 {/* 💬 Quote */}
-                <p className="text-gray-700 italic leading-relaxed relative">
+                <p className="text-gray-700 dark:text-gray-300 italic leading-relaxed relative">
                   “{t.quote}”
                 </p>
-                <FaQuoteRight className="absolute text-5xl text-gray-200 top-4 right-4" />
+                <FaQuoteRight className="absolute text-5xl text-gray-200 dark:text-gray-800 top-4 right-4 transition-colors" />
 
                 {/* 👤 Author Info */}
                 <div className="flex items-center gap-4 mt-6">
@@ -62,8 +62,8 @@ export default function Testimonials() {
                     }}
                   />
                   <div>
-                    <h4 className="font-bold text-gray-900">{t.name}</h4>
-                    <p className="text-sm text-gray-500">{t.role}</p>
+                    <h4 className="font-bold text-gray-900 dark:text-white">{t.name}</h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t.role}</p>
                   </div>
                 </div>
               </div>

@@ -10,10 +10,19 @@ const getCourses = async (req, res) => {
   // Dynamically calculate enrolledCount for each course
   const coursesWithEnrolledCount = await Promise.all(
     courses.map(async (course) => {
+      const status = 'active';
+      // Calculate enrollment count
       const enrolledCount = await Order.countDocuments({
         course: course._id,
-        status: 'active',
+        status,
       });
+
+      // Check for discount expiry
+      if (course.discountExpiry && new Date(course.discountExpiry) < new Date()) {
+        course.discountPercentage = 0;
+        course.discountCode = '';
+      }
+
       return { ...course, enrolledCount };
     })
   );
@@ -32,6 +41,12 @@ const getCourseById = async (req, res) => {
       course: course._id,
       status: 'active',
     });
+    // Check for discount expiry
+    if (course.discountExpiry && new Date(course.discountExpiry) < new Date()) {
+      course.discountPercentage = 0;
+      course.discountCode = '';
+    }
+
     res.json({ ...course, enrolledCount });
   } else {
     res.status(404).json({ message: 'Course not found' });
@@ -57,6 +72,7 @@ const createCourse = async (req, res) => {
     type,
     discountCode,
     discountPercentage,
+    discountExpiry,
   } = req.body;
 
   const course = new Course({
@@ -64,6 +80,7 @@ const createCourse = async (req, res) => {
     type,
     discountCode,
     discountPercentage,
+    discountExpiry: discountExpiry || null,
     price,
     description,
     technology,
@@ -119,6 +136,7 @@ const updateCourse = async (req, res) => {
     if (learningOutcomes !== undefined) course.learningOutcomes = learningOutcomes;
     if (discountCode !== undefined) course.discountCode = discountCode;
     if (discountPercentage !== undefined) course.discountPercentage = discountPercentage;
+    if (req.body.discountExpiry !== undefined) course.discountExpiry = req.body.discountExpiry;
 
     const updatedCourse = await course.save();
     res.json(updatedCourse);

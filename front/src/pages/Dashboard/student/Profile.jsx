@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { API_BASE_URL } from "../../../config";
 import { uploadImage, updateUserProfile } from "../../../api/userService";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -135,32 +136,28 @@ export default function Profile() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-white">
-        <Loader2 className="animate-spin text-emerald-600" size={40} />
-      </div>
-    );
+    return <PremiumLoader text={null} />;
   }
 
   return (
     <div className="max-w-5xl mx-auto p-8 pt-24 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 font-[Inter]">
 
-      <div className="flex gap-1 items-center text-sm text-gray-500">
+      <div className="flex gap-1 items-center text-sm text-gray-500 dark:text-gray-400">
         <Home className="w-4 h-4" />
         <ChevronRight className="w-4 h-4" />
-        <span className="font-semibold text-emerald-600">Student Profile</span>
+        <span className="font-semibold text-emerald-600 dark:text-emerald-400">Student Profile</span>
       </div>
 
       <div>
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Account Settings</h1>
-        <p className="text-gray-500 text-sm mt-1">Manage your identity, security preferences, and student status.</p>
+        <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Account Settings</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Manage your identity, security preferences, and student status.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Card */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm text-center relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-full h-24 bg-emerald-600/5 group-hover:bg-emerald-600/10 transition-colors"></div>
+          <div className="bg-white dark:bg-slate-800/50 p-8 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm text-center relative overflow-hidden group transition-colors duration-500">
+            <div className="absolute top-0 left-0 w-full h-24 bg-emerald-600/5 dark:bg-emerald-500/5 group-hover:bg-emerald-600/10 dark:group-hover:bg-emerald-500/10 transition-colors"></div>
 
             <div className="relative z-10">
               <div className="relative inline-block mb-4">
@@ -176,10 +173,10 @@ export default function Profile() {
                     <img
                       src={getImageUrl(formData.image)}
                       alt="Profile"
-                      className={`w-32 h-32 rounded-[2rem] object-cover border-4 border-white shadow-xl ring-1 ring-gray-100 group-hover:scale-[1.02] transition-transform duration-500 ${uploading ? 'opacity-50' : ''}`}
+                      className={`w-32 h-32 rounded-[2rem] object-cover border-4 border-white dark:border-slate-800 shadow-xl ring-1 ring-gray-100 dark:ring-slate-700 group-hover:scale-[1.02] transition-transform duration-500 ${uploading ? 'opacity-50' : ''}`}
                     />
                   ) : (
-                    <div className="w-32 h-32 bg-emerald-50 rounded-[2rem] flex items-center justify-center text-emerald-600 border-4 border-white shadow-xl ring-1 ring-gray-100">
+                    <div className="w-32 h-32 bg-emerald-50 dark:bg-emerald-500/10 rounded-[2rem] flex items-center justify-center text-emerald-600 dark:text-emerald-400 border-4 border-white dark:border-slate-800 shadow-xl ring-1 ring-gray-100 dark:ring-slate-700">
                       <User size={48} />
                     </div>
                   )}
@@ -193,35 +190,35 @@ export default function Profile() {
                   onClick={handleUploadClick}
                   type="button"
                   disabled={uploading}
-                  className="absolute -bottom-2 -right-2 p-3 bg-white text-emerald-600 rounded-2xl shadow-xl border border-gray-100 hover:bg-emerald-600 hover:text-white transition-all duration-300 transform hover:rotate-12 disabled:opacity-50"
+                  className="absolute -bottom-2 -right-2 p-3 bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-600 hover:bg-emerald-600 dark:hover:bg-emerald-500 hover:text-white dark:hover:text-white transition-all duration-300 transform hover:rotate-12 disabled:opacity-50"
                 >
                   <Camera size={20} />
                 </button>
               </div>
-              <h2 className="text-xl font-bold text-gray-900">{formData.firstName} {formData.lastName}</h2>
-              <p className="text-emerald-600 font-bold text-[10px] uppercase tracking-[0.2em] mt-2 bg-emerald-50 inline-block px-3 py-1 rounded-full">Student Member</p>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{formData.firstName} {formData.lastName}</h2>
+              <p className="text-emerald-600 dark:text-emerald-400 font-bold text-[10px] uppercase tracking-[0.2em] mt-2 bg-emerald-50 dark:bg-emerald-500/10 inline-block px-3 py-1 rounded-full text-center">Student Member</p>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-50 grid grid-cols-2 gap-4 text-left">
+            <div className="mt-8 pt-6 border-t border-gray-50 dark:border-slate-800 grid grid-cols-2 gap-4 text-left">
               <div>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Status</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Status</p>
                 <div className="flex items-center gap-1.5 mt-1">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                  <p className="text-xs font-bold text-gray-700">Online</p>
+                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">Online</p>
                 </div>
               </div>
               <div>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Verified</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider">Verified</p>
                 <div className="flex items-center gap-1.5 mt-1">
-                  <ShieldCheck size={14} className="text-blue-500" />
-                  <p className="text-xs font-bold text-gray-700">Student</p>
+                  <ShieldCheck size={14} className="text-blue-500 dark:text-blue-400" />
+                  <p className="text-xs font-bold text-gray-700 dark:text-gray-300">Student</p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* 2FA Status Card */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-[2.5rem] shadow-xl text-white">
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 dark:from-slate-800 dark:to-slate-900 p-8 rounded-[2.5rem] shadow-xl text-white">
             <div className="flex items-center justify-between mb-6">
               <div className="p-3 bg-white/10 rounded-2xl">
                 <Shield size={24} className="text-emerald-400" />
@@ -231,14 +228,14 @@ export default function Profile() {
               </div>
             </div>
             <h3 className="text-lg font-bold mb-2">Two-Step Verification</h3>
-            <p className="text-gray-400 text-xs leading-relaxed mb-6">Secure your student account by requiring an email verification code upon every login attempt.</p>
+            <p className="text-gray-400 dark:text-gray-500 text-xs leading-relaxed mb-6">Secure your student account by requiring an email verification code upon every login attempt.</p>
 
             <button
               type="button"
               onClick={toggle2FA}
               className={`w-full py-4 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-3 ${formData.is2FAEnabled
-                ? 'bg-white text-gray-900 hover:bg-gray-100'
-                : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                ? 'bg-white dark:bg-slate-200 text-gray-900 hover:bg-gray-100 dark:hover:bg-white'
+                : 'bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600'
                 }`}
             >
               {formData.is2FAEnabled ? (
@@ -253,10 +250,10 @@ export default function Profile() {
         {/* Right Form */}
         <div className="lg:col-span-8">
           <form onSubmit={handleSave} className="space-y-6">
-            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-8">
+            <div className="bg-white dark:bg-slate-800/50 p-8 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm space-y-8 transition-colors duration-500">
               <div className="flex items-center gap-4">
-                <div className="w-1.5 h-8 bg-emerald-600 rounded-full"></div>
-                <h3 className="text-lg font-bold text-gray-900">Personal Data</h3>
+                <div className="w-1.5 h-8 bg-emerald-600 dark:bg-emerald-400 rounded-full"></div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Personal Data</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -269,7 +266,7 @@ export default function Profile() {
                       name="firstName"
                       value={formData.firstName}
                       onChange={handleChange}
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-emerald-500 transition-all text-sm font-medium"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-slate-900/50 border border-transparent dark:border-slate-800 rounded-[1.25rem] outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 transition-all text-sm font-medium text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     />
                   </div>
                 </div>
@@ -282,7 +279,7 @@ export default function Profile() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleChange}
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-emerald-500 transition-all text-sm font-medium"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-slate-900/50 border border-transparent dark:border-slate-800 rounded-[1.25rem] outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 transition-all text-sm font-medium text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -295,7 +292,7 @@ export default function Profile() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-emerald-500 transition-all text-sm font-medium"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-slate-900/50 border border-transparent dark:border-slate-800 rounded-[1.25rem] outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 transition-all text-sm font-medium text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -308,17 +305,17 @@ export default function Profile() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-emerald-500 transition-all text-sm font-medium"
+                      className="w-full pl-12 pr-4 py-4 bg-gray-50 dark:bg-slate-900/50 border border-transparent dark:border-slate-800 rounded-[1.25rem] outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 transition-all text-sm font-medium text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm space-y-8">
+            <div className="bg-white dark:bg-slate-800/50 p-8 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm space-y-8 transition-colors duration-500">
               <div className="flex items-center gap-4">
-                <div className="w-1.5 h-8 bg-blue-600 rounded-full"></div>
-                <h3 className="text-lg font-bold text-gray-900">Security</h3>
+                <div className="w-1.5 h-8 bg-blue-600 dark:bg-blue-400 rounded-full"></div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Security</h3>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -331,7 +328,7 @@ export default function Profile() {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-medium"
+                      className="w-full pl-12 pr-12 py-4 bg-gray-50 dark:bg-slate-900/50 border border-transparent dark:border-slate-800 rounded-[1.25rem] outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-blue-500 transition-all text-sm font-medium text-gray-900 dark:text-white"
                       placeholder="••••••••"
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -348,7 +345,7 @@ export default function Profile() {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      className="w-full pl-12 pr-12 py-4 bg-gray-50 border border-transparent rounded-[1.25rem] outline-none focus:bg-white focus:border-blue-500 transition-all text-sm font-medium"
+                      className="w-full pl-12 pr-12 py-4 bg-gray-50 dark:bg-slate-900/50 border border-transparent dark:border-slate-800 rounded-[1.25rem] outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-blue-500 transition-all text-sm font-medium text-gray-900 dark:text-white"
                       placeholder="••••••••"
                     />
                   </div>

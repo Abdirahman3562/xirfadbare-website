@@ -34,7 +34,8 @@ const userSchema = mongoose.Schema(
       youtube: { type: String },
       facebook: { type: String },
       instagram: { type: String }
-    }
+    },
+    lastLogin: { type: Date }
   },
   { timestamps: true }
 );

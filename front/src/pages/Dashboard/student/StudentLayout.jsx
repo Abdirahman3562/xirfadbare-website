@@ -4,7 +4,7 @@ import Nav from "../../../layouts/Nav";
 
 const StudentLayout = () => {
   return (
-    <div className="min-h-screen bg-[#edf4f5]">
+    <div className="min-h-screen bg-[#edf4f5] dark:bg-slate-900 transition-colors duration-500">
       <Nav />
       <div className="flex pt-16">
         {/* Sidebar */}
