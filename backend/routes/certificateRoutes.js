@@ -17,7 +17,7 @@ router.route('/template')
     .post(protect, admin, saveCertificateTemplate);
 
 router.route('/template/:id')
-    .get(protect, admin, getCertificateTemplateById)
+    .get(protect, getCertificateTemplateById)
     .delete(protect, admin, deleteCertificateTemplate);
 
 router.route('/template/:id/status')

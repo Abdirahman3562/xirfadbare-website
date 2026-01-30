@@ -6,6 +6,26 @@ import download from 'downloadjs';
  * Senior-Level PDF Generation: Fixed Canvas (WYSIWYG) Approach.
  * Uses 842x595 (A4 Landscape) 1:1 mapping between Frontend and PDF.
  */
+
+const FONT_CONFIG = {
+    'Montserrat': 'https://fonts.gstatic.com/s/montserrat/v25/JTUSjIg1_i6t8kCHKm459Wlhyw.ttf',
+    'Playfair Display': 'https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD7K6E7L9iY961z9t06666yK_q61zByM.ttf',
+    'Roboto': 'https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxP.ttf',
+    'Open Sans': 'https://fonts.gstatic.com/s/opensans/v35/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTSKmu1aB.ttf',
+    'Lora': 'https://fonts.gstatic.com/s/lora/v32/0QI6MX1D_JOuMw33.ttf',
+    'Great Vibes': 'https://fonts.gstatic.com/s/greatvibes/v14/RWm0oL7fu6dY_oW_pLhXl8X8.ttf',
+    'Dancing Script': 'https://fonts.gstatic.com/s/dancingscript/v24/If2cXTR6i95SJ9_D.ttf',
+    'Alex Brush': 'https://fonts.gstatic.com/s/alexbrush/v22/SZ_p9F7CV93f.ttf',
+    'Cinzel': 'https://fonts.gstatic.com/s/cinzel/v19/8vLecRE658B-JfWv.ttf',
+    'EB Garamond': 'https://fonts.gstatic.com/s/ebgaramond/v26/SlGDmQ6M_2_3oVHD.ttf',
+    'Poppins': 'https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrFJLM.ttf',
+    'Ubuntu': 'https://fonts.gstatic.com/s/ubuntu/v20/4iCs6KVjbNBYlgo6eA.ttf',
+    'Inter': 'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFufMZg.ttf',
+};
+
+// Caching to avoid duplicate network requests
+const embeddedFontCache = new Map();
+
 export const generateCertificate = async (template, data, filename = 'certificate.pdf') => {
     try {
         if (!template || !template.backgroundUrl) throw new Error('Invalid template data');
@@ -29,22 +49,6 @@ export const generateCertificate = async (template, data, filename = 'certificat
         page.drawImage(bgImage, { x: 0, y: 0, width: CANVAS_WIDTH, height: CANVAS_HEIGHT });
 
         // 4. Setup Multi-Font Support
-        const fontUrl = 'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuFufMZg.ttf';
-        const fontBoldUrl = 'https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGkyMZg.ttf';
-
-        let customInterRegular, customInterBold;
-        try {
-            const [regBytes, boldBytes] = await Promise.all([
-                fetch(fontUrl).then(res => res.arrayBuffer()),
-                fetch(fontBoldUrl).then(res => res.arrayBuffer())
-            ]);
-            customInterRegular = await pdfDoc.embedFont(regBytes);
-            customInterBold = await pdfDoc.embedFont(boldBytes);
-        } catch (e) {
-            console.warn('Custom Inter font failed, using Helvetica fallback');
-        }
-
-        // Standard Fonts Map
         const standardFonts = {
             'Helvetica': { regular: StandardFonts.Helvetica, bold: StandardFonts.HelveticaBold },
             'Courier': { regular: StandardFonts.Courier, bold: StandardFonts.CourierBold },
@@ -52,25 +56,37 @@ export const generateCertificate = async (template, data, filename = 'certificat
         };
 
         const getFont = async (family, weight) => {
-            if (family === 'Inter' && customInterRegular) {
-                return weight === 'bold' ? customInterBold : customInterRegular;
+            // Check if it's a configured Google Font
+            if (FONT_CONFIG[family]) {
+                const cacheKey = `${family}_${weight}`;
+                if (embeddedFontCache.has(cacheKey)) {
+                    // Re-embed from cached bytes for the new document
+                    return await pdfDoc.embedFont(embeddedFontCache.get(cacheKey));
+                }
+
+                try {
+                    const bytes = await fetch(FONT_CONFIG[family]).then(res => res.arrayBuffer());
+                    embeddedFontCache.set(cacheKey, bytes);
+                    return await pdfDoc.embedFont(bytes);
+                } catch (e) {
+                    console.warn(`Font loading failed for ${family}, using fallback`);
+                }
             }
 
+            // Fallback to Standard Fonts
             const std = standardFonts[family] || standardFonts['Helvetica'];
-            const fontName = weight === 'bold' ? std.bold : std.regular;
+            const fontName = (weight === 'bold' || weight === '700') ? std.bold : std.regular;
             return await pdfDoc.embedFont(fontName);
         };
 
         // 5. Map & Draw Elements (1:1 Coordinates)
         for (const el of template.layout) {
-            // WYSIWYG: Core positions are used directly (no scale factor)
             const x = el.x;
             const w = el.width;
             const h = el.height;
             const fontSize = el.fontSize;
 
             // COORDINATE MAPPING: Y-Axis Inversion ONLY
-            // Formula: pdfHeight - (screenY + screenHeight)
             const y = CANVAS_HEIGHT - (el.y + h);
 
             // A. Handle Images (Logo / Stamps)

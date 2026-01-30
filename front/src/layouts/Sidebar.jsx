@@ -55,6 +55,18 @@ const Sidebar = () => {
               <BookOpen size={18} />
               My Courses
             </NavLink>
+            <NavLink
+              to="/dashboard/certificates"
+              className={({ isActive }) =>
+                `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
+                  ? "bg-[#e5f9f3] dark:bg-emerald-500/10 text-emerald-500" // Active state
+                  : "text-gray-700 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
+                }`
+              }
+            >
+              <GraduationCap size={18} />
+              Certificates
+            </NavLink>
           </div>
 
           {/* Payments */}

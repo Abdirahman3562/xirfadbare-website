@@ -9,6 +9,7 @@ const userProgressSchema = mongoose.Schema(
     progress: { type: Number, default: 0, min: 0, max: 100 },
     lastAccess: { type: Date, default: Date.now },
     completedAt: { type: Date },
+    certificateId: { type: String },
     timeSpent: { type: Number, default: 0 }, // Time spent in minutes
   },
   { timestamps: true }

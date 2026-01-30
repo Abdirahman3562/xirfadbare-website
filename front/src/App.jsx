@@ -57,6 +57,7 @@ import CertificateBuilder from "./pages/Dashboard/admin/CertificateBuilder";
 // ManageSettings removed
 import PublicLayout from "./layouts/PublicLayout";
 import Orders from "./pages/Dashboard/student/Orders";
+import Certificates from "./pages/Dashboard/student/Certificates";
 import CourseDashboard from "./pages/Dashboard/student/CourseDashboard";
 import SinglePostPage from "./pages/webpages/Blog/SinglePostPage";
 import AuthorPage from "./pages/webpages/Author/AuthorPage";
@@ -150,6 +151,7 @@ function App() {
           <Route path="dashboard" element={<StudentDashboard />} />
           <Route path="courses" element={<StudentDashboard />} />
           <Route path="orders" element={<Orders />} />
+          <Route path="certificates" element={<Certificates />} />
           <Route path="profile" element={<Profile />} />
         </Route>
 

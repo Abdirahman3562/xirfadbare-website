@@ -100,7 +100,7 @@ const ManageCertificates = () => {
     ) : [];
 
     return (
-        <div className="p-4 md:p-8 min-h-screen bg-gray-50/50 dark:bg-slate-950 transition-colors duration-300">
+        <div className="p-4 md:p-8 min-h-screen bg-gray-50/50 dark:bg-slate-900 transition-colors duration-300">
             {/* Header Area */}
             <div className="max-w-7xl mx-auto space-y-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">

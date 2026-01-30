@@ -16,6 +16,7 @@ const CertificateBuilder = () => {
     const [uploadingElement, setUploadingElement] = useState(false);
     const [systemSettings, setSystemSettings] = useState(null);
     const [zoomScale, setZoomScale] = useState(1);
+    const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 1024);
     const workspaceRef = useRef(null);
 
     const [searchParams] = useSearchParams();
@@ -29,6 +30,15 @@ const CertificateBuilder = () => {
     const bgInputRef = useRef(null);
     const elementImgInputRef = useRef(null);
 
+    // Load Google Fonts for the builder
+    useEffect(() => {
+        const link = document.createElement('link');
+        link.href = 'https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cinzel:wght@400;700&family=Dancing+Script:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Great+Vibes&family=Inter:wght@400;700;900&family=Lora:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Poppins:wght@400;700;900&family=Roboto:wght@400;700;900&family=Ubuntu:wght@400;700&display=swap';
+        link.rel = 'stylesheet';
+        document.head.appendChild(link);
+        return () => document.head.removeChild(link);
+    }, []);
+
     // Initial load & Precision Resize Listener
     useEffect(() => {
         if (urlId) {
@@ -39,26 +49,23 @@ const CertificateBuilder = () => {
         const handleResize = () => {
             if (!workspaceRef.current) return;
             const container = workspaceRef.current;
-            const padding = 48; // Space around the canvas
+            const padding = 32; // Reduced padding for mobile
             const availW = container.clientWidth - padding;
             const availH = container.clientHeight - padding;
 
-            // Calculate scale to fit while maintaining aspect ratio
             const scaleX = availW / CANVAS_WIDTH;
             const scaleY = availH / CANVAS_HEIGHT;
 
-            // We want to fit it, but never exceed 100% size unless explicitly zoomed
             const newScale = Math.min(scaleX, scaleY, 1);
             setZoomScale(newScale);
         };
 
         handleResize();
-        // Use ResizeObserver for more reliable container-based scaling
         const observer = new ResizeObserver(handleResize);
         if (workspaceRef.current) observer.observe(workspaceRef.current);
 
         return () => observer.disconnect();
-    }, []);
+    }, [sidebarOpen]); // Re-calculate when sidebar toggles
 
     const fetchSystemSettings = async () => {
         try {
@@ -186,7 +193,7 @@ const CertificateBuilder = () => {
     };
 
     const updateElement = (id, updates) => {
-        setElements(elements.map(el => el.id === id ? { ...el, ...updates } : el));
+        setElements(prev => prev.map(el => el.id === id ? { ...el, ...updates } : el));
     };
 
     const removeElement = (id) => {
@@ -262,214 +269,254 @@ const CertificateBuilder = () => {
 
     return (
         <div className="flex flex-col h-[calc(100vh-5rem)] bg-gray-50 dark:bg-slate-900 overflow-hidden font-sans uppercase">
-            {/* Toolbar */}
-            <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-gray-700 p-4 flex flex-wrap justify-between items-center shadow-sm z-10 shrink-0 px-8 gap-4">
-                <div className="flex items-center gap-4">
+            {/* Refined Responsive Toolbar */}
+            <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-gray-700 p-3 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between shadow-sm z-30 shrink-0 px-4 sm:px-8 gap-4 overflow-x-hidden">
+
+                {/* Group 1: Navigation & Template Name */}
+                <div className="flex items-center gap-3 sm:gap-4 overflow-x-auto scrollbar-hide no-scrollbar shrink-0 min-w-0">
                     <button
                         onClick={() => navigate('/admin/certificates')}
-                        className="p-3 bg-gray-100 dark:bg-slate-800 rounded-2xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-all active:scale-95"
+                        className="p-2 sm:p-3 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-all active:scale-95 shrink-0"
+                        title="Back"
                     >
-                        <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                        <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600 dark:text-gray-300" />
                     </button>
-                    <h1 className="text-xl font-black text-gray-800 dark:text-white flex items-center gap-2">
-                        <Origami className="w-6 h-6 text-emerald-500" />
-                        Builder
-                    </h1>
-                    <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-2 shrink-0 hidden md:block"></div>
 
-                    {/* Template Name Input */}
-                    <div className="flex flex-col gap-1 min-w-[200px]">
+                    <button
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                        className={`p-2 sm:p-3 rounded-xl transition-all active:scale-95 shrink-0 ${sidebarOpen ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200 dark:shadow-none' : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-300'}`}
+                        title="Toggle Elements"
+                    >
+                        <Layout className="w-4 h-4 sm:w-5 sm:h-5" />
+                    </button>
+
+                    <div className="h-6 w-px bg-gray-200 dark:bg-slate-700 hidden sm:block shrink-0"></div>
+
+                    <div className="flex flex-col gap-0.5 min-w-[120px] sm:min-w-[180px] max-w-[250px] shrink truncate">
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="Certificate Name..."
-                            className="bg-transparent border-none text-sm font-black text-gray-800 dark:text-white focus:ring-0 p-0 placeholder:text-gray-300 dark:placeholder:text-gray-600"
+                            placeholder="Template Name..."
+                            className="bg-transparent border-none text-[10px] sm:text-xs lg:text-sm font-black text-gray-800 dark:text-white focus:ring-0 p-0 placeholder:text-gray-300 dark:placeholder:text-gray-600 uppercase truncate"
                         />
                         <div className="h-[2px] w-full bg-emerald-500/20 rounded-full"></div>
                     </div>
+                </div>
 
-                    <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-2 shrink-0 hidden md:block"></div>
-                    <div className="flex gap-2 shrink-0">
+                {/* Group 2: Elements & Actions Wrapper */}
+                <div className="flex flex-wrap items-center justify-between lg:justify-end gap-3 sm:gap-4 min-w-0">
+
+                    {/* Add Elements Subgroup */}
+                    <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide no-scrollbar py-0.5">
                         <button
                             onClick={() => addElement('text')}
-                            className="flex items-center gap-2 px-4 py-2 text-xs font-black text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-slate-700 hover:bg-emerald-600 hover:text-white border border-gray-200 dark:border-gray-600 rounded-xl transition-all"
+                            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-black text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-slate-700 hover:bg-emerald-600 hover:text-white border border-gray-200 dark:border-gray-600 rounded-lg sm:rounded-xl transition-all uppercase whitespace-nowrap"
                         >
-                            <Type size={16} /> Text
+                            <Type size={12} className="sm:size-4" /> <span className="hidden sm:inline">Text</span>
                         </button>
                         <button
                             onClick={() => bgInputRef.current?.click()}
                             disabled={uploading}
-                            className="flex items-center gap-2 px-4 py-2 text-xs font-black text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-slate-700 hover:bg-emerald-600 hover:text-white border border-gray-200 dark:border-gray-600 rounded-xl transition-all"
+                            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-black text-gray-700 dark:text-gray-200 bg-gray-50 dark:bg-slate-700 hover:bg-emerald-600 hover:text-white border border-gray-200 dark:border-gray-600 rounded-lg sm:rounded-xl transition-all uppercase whitespace-nowrap"
                         >
-                            <ImageIcon size={16} />
-                            {uploading ? '...' : 'BG'}
+                            <ImageIcon size={12} className="sm:size-4" />
+                            <span className="hidden sm:inline">{uploading ? '...' : 'Background'}</span>
+                            <span className="sm:hidden">{uploading ? '...' : 'BG'}</span>
                         </button>
-
-                        <div className="h-6 w-px bg-gray-200 dark:bg-gray-700 mx-1 hidden sm:block"></div>
-
                         <button
                             onClick={() => elementImgInputRef.current?.click()}
                             disabled={uploadingElement}
-                            className="flex items-center gap-2 px-4 py-2 text-xs font-black text-white bg-blue-600 hover:bg-blue-700 border border-blue-600 rounded-xl shadow-lg shadow-blue-200 dark:shadow-none transition-all active:scale-95"
+                            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-black text-white bg-blue-600 hover:bg-blue-700 border border-blue-600 rounded-lg sm:rounded-xl shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-95 uppercase whitespace-nowrap"
                         >
-                            <Origami size={16} />
-                            {uploadingElement ? '...' : 'Signature / Stamp'}
+                            <Origami size={12} className="sm:size-4" />
+                            <span className="hidden lg:inline">{uploadingElement ? '...' : 'Sign / Stamp'}</span>
+                            <span className="lg:hidden">{uploadingElement ? '...' : 'Sign'}</span>
                         </button>
-
-                        <input type="file" ref={bgInputRef} onChange={handleBackgroundUpload} className="hidden" accept="image/*" />
-                        <input type="file" ref={elementImgInputRef} onChange={handleElementImageUpload} className="hidden" accept="image/*" />
                     </div>
-                </div>
 
-                <div className="flex gap-3">
-                    <button
-                        className="flex items-center gap-2 px-6 py-2.5 text-xs font-black text-emerald-600 bg-emerald-50 hover:bg-emerald-100 rounded-xl transition-all border-2 border-emerald-100 active:scale-95 sm:flex"
-                        onClick={handlePreview}
-                    >
-                        <Eye size={18} /> Preview
-                    </button>
-                    <button
-                        onClick={saveTemplate}
-                        disabled={loading}
-                        className="flex items-center gap-2 px-8 py-2.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xl shadow-emerald-200 dark:shadow-none transition-all active:scale-95"
-                    >
-                        <Save size={18} /> {loading ? '...' : 'Save'}
-                    </button>
+                    <div className="h-6 w-px bg-gray-200 dark:bg-slate-700 hidden sm:block shrink-0"></div>
+
+                    {/* Action Buttons Subgroup */}
+                    <div className="flex items-center gap-2 sm:gap-3 ml-auto lg:ml-0 shrink-0">
+                        <button
+                            className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1 sm:py-1.5 text-[9px] sm:text-[10px] font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 rounded-lg sm:rounded-xl transition-all border border-emerald-100 dark:border-emerald-500/20 active:scale-95 uppercase whitespace-nowrap"
+                            onClick={handlePreview}
+                        >
+                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> <span className="hidden sm:inline">Preview</span>
+                        </button>
+                        <button
+                            onClick={saveTemplate}
+                            disabled={loading}
+                            className="flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1 sm:py-1.5 text-[9px] sm:text-[10px] font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg sm:rounded-xl shadow-lg shadow-emerald-100 dark:shadow-none transition-all active:scale-95 uppercase whitespace-nowrap"
+                        >
+                            <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" /> <span>{loading ? '...' : 'Save'}</span>
+                        </button>
+                    </div>
+
+                    <input type="file" ref={bgInputRef} onChange={handleBackgroundUpload} className="hidden" accept="image/*" />
+                    <input type="file" ref={elementImgInputRef} onChange={handleElementImageUpload} className="hidden" accept="image/*" />
                 </div>
             </div>
 
             <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar - Dynamic Fields */}
-                <div className="w-64 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-gray-700 p-6 flex flex-col gap-5 overflow-y-auto shrink-0 z-10 scrollbar-hide">
-                    <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Dynamic Fields</h3>
-
-                    <div className="space-y-3">
-                        {[
-                            { field: 'systemLogo', label: 'System Logo', icon: Globe, color: 'text-blue-500' },
-                            { field: 'studentName', label: 'Student Name', icon: Type, color: 'text-emerald-500' },
-                            { field: 'courseName', label: 'Course Name', icon: Layout, color: 'text-purple-500' },
-                            { field: 'completionDate', label: 'Date', icon: Move, color: 'text-orange-500' },
-                            { field: 'instructorName', label: 'Instructor', icon: Type, color: 'text-rose-500' },
-                            { field: 'certificateId', label: 'ID', icon: Type, color: 'text-blue-500' },
-                        ].map(field => (
-                            <button
-                                key={field.field}
-                                onClick={() => addElement('variable', field.field)}
-                                className="w-full flex items-center gap-4 p-4 text-[11px] font-black text-gray-700 dark:text-gray-200 bg-gray-50/50 dark:bg-slate-700/30 hover:bg-emerald-600/10 dark:hover:bg-slate-700 hover:shadow-xl hover:shadow-emerald-500/10 border border-gray-100 dark:border-gray-700 rounded-2xl transition-all text-left group"
-                            >
-                                <div className={`w-9 h-9 rounded-xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center ${field.color} shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-all`}>
-                                    <field.icon size={16} />
-                                </div>
-                                {field.label}
+                <div className={`bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out shrink-0 z-20 ${sidebarOpen ? 'w-64 sm:w-72 lg:w-80 opacity-100' : 'w-0 opacity-0 overflow-hidden border-none'}`}>
+                    <div className="p-4 sm:p-6 flex flex-col gap-5 overflow-y-auto h-full scrollbar-hide no-scrollbar min-w-[256px]">
+                        <div className="flex items-center justify-between mb-2">
+                            <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Dynamic Fields</h3>
+                            <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-2 text-gray-400 hover:text-gray-600 transition-colors">
+                                <ArrowLeft size={16} />
                             </button>
-                        ))}
-                    </div>
+                        </div>
 
-                    {selectedElement && (
-                        <div className="mt-4 border-t-2 border-dashed border-gray-100 dark:border-gray-700 pt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <div className="flex items-center justify-between mb-5">
-                                <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Settings</h3>
-                                <button onClick={() => removeElement(selectedElement.id)} className="p-2 text-white bg-red-500 hover:bg-red-600 rounded-xl shadow-lg shadow-red-100 dark:shadow-none transition-all active:scale-90"><Trash2 size={16} /></button>
-                            </div>
+                        <div className="grid grid-cols-1 gap-2 sm:gap-3">
+                            {[
+                                { field: 'systemLogo', label: 'System Logo', icon: Globe, color: 'text-blue-500' },
+                                { field: 'studentName', label: 'Student Name', icon: Type, color: 'text-emerald-500' },
+                                { field: 'courseName', label: 'Course Name', icon: Layout, color: 'text-purple-500' },
+                                { field: 'completionDate', label: 'Date', icon: Move, color: 'text-orange-500' },
+                                { field: 'instructorName', label: 'Instructor', icon: Type, color: 'text-rose-500' },
+                                { field: 'certificateId', label: 'ID', icon: Type, color: 'text-blue-500' },
+                            ].map(field => (
+                                <button
+                                    key={field.field}
+                                    onClick={() => {
+                                        addElement('variable', field.field);
+                                        if (window.innerWidth < 1024) setSidebarOpen(false);
+                                    }}
+                                    className="w-full flex items-center gap-3 sm:gap-4 p-3 sm:p-4 text-[11px] font-black text-gray-700 dark:text-gray-200 bg-gray-50/50 dark:bg-slate-700/30 hover:bg-emerald-600/10 dark:hover:bg-slate-700 hover:shadow-xl hover:shadow-emerald-500/10 border border-gray-100 dark:border-gray-700 rounded-xl sm:rounded-2xl transition-all text-left group"
+                                >
+                                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-gray-100 dark:bg-slate-800 flex items-center justify-center ${field.color} shadow-sm group-hover:bg-emerald-600 group-hover:text-white transition-all`}>
+                                        <field.icon size={14} className="sm:size-4" />
+                                    </div>
+                                    <span className="truncate">{field.label}</span>
+                                </button>
+                            ))}
+                        </div>
 
-                            <div className="space-y-5">
-                                {selectedElement.type !== 'image' && selectedElement.field !== 'systemLogo' && (
-                                    <>
-                                        <div>
-                                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2 ml-1">Content</label>
-                                            <input
-                                                type="text"
-                                                value={selectedElement.content}
-                                                onChange={(e) => updateElement(selectedElement.id, { content: e.target.value })}
-                                                className="w-full p-4 text-xs bg-gray-50 dark:bg-slate-900 border-2 border-gray-100 dark:border-gray-700 rounded-2xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white font-black"
-                                                disabled={selectedElement.type === 'variable'}
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3">
+                        {selectedElement && (
+                            <div className="mt-4 border-t-2 border-dashed border-gray-100 dark:border-gray-700 pt-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <div className="flex items-center justify-between mb-5">
+                                    <h3 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Settings</h3>
+                                    <button onClick={() => removeElement(selectedElement.id)} className="p-2 text-white bg-red-500 hover:bg-red-600 rounded-xl shadow-lg shadow-red-100 dark:shadow-none transition-all active:scale-90"><Trash2 size={16} /></button>
+                                </div>
+
+                                <div className="space-y-4 sm:space-y-5">
+                                    {selectedElement.type !== 'image' && selectedElement.field !== 'systemLogo' && (
+                                        <>
                                             <div>
-                                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2 ml-1">Size</label>
+                                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2 ml-1">Content</label>
                                                 <input
-                                                    type="number"
-                                                    value={selectedElement.fontSize}
-                                                    onChange={(e) => updateElement(selectedElement.id, { fontSize: parseInt(e.target.value) })}
-                                                    className="w-full p-4 text-xs bg-gray-50 dark:bg-slate-900 border-2 border-gray-100 dark:border-gray-700 rounded-2xl outline-none focus:border-emerald-500 dark:text-white font-black"
+                                                    type="text"
+                                                    value={selectedElement.content}
+                                                    onChange={(e) => updateElement(selectedElement.id, { content: e.target.value })}
+                                                    className="w-full p-3 sm:p-4 text-xs bg-gray-50 dark:bg-slate-900 border-2 border-gray-100 dark:border-gray-700 rounded-xl sm:rounded-2xl outline-none focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 dark:text-white font-black"
+                                                    disabled={selectedElement.type === 'variable'}
                                                 />
                                             </div>
-                                            <div>
-                                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2 ml-1">Color</label>
-                                                <div className="w-full p-1 bg-gray-50 dark:bg-slate-900 border-2 border-gray-100 dark:border-gray-700 rounded-2xl flex items-center justify-center">
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2 ml-1">Size</label>
                                                     <input
-                                                        type="color"
-                                                        value={selectedElement.color}
-                                                        onChange={(e) => updateElement(selectedElement.id, { color: e.target.value })}
-                                                        className="w-full h-10 bg-transparent border-none cursor-pointer rounded-xl"
+                                                        type="number"
+                                                        value={selectedElement.fontSize}
+                                                        onChange={(e) => updateElement(selectedElement.id, { fontSize: parseInt(e.target.value) })}
+                                                        className="w-full p-3 sm:p-4 text-xs bg-gray-50 dark:bg-slate-900 border-2 border-gray-100 dark:border-gray-700 rounded-xl sm:rounded-2xl outline-none focus:border-emerald-500 dark:text-white font-black"
                                                     />
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2 ml-1">Style</label>
-                                            <div className="flex flex-col gap-3">
-                                                <div className="flex gap-2">
-                                                    <div className="flex-1 flex bg-gray-100/50 dark:bg-slate-900 rounded-2xl p-1.5 border-2 border-gray-50 dark:border-gray-700">
-                                                        {['left', 'center', 'right'].map(align => (
-                                                            <button
-                                                                key={align}
-                                                                onClick={() => updateElement(selectedElement.id, { textAlign: align })}
-                                                                className={`flex-1 py-1.5 text-[10px] font-black capitalize rounded-xl transition-all ${selectedElement.textAlign === align ? 'bg-white dark:bg-slate-700 shadow-md text-emerald-600' : 'text-gray-400 hover:text-gray-600'}`}
-                                                            >
-                                                                {align[0]}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                    <button
-                                                        onClick={() => updateElement(selectedElement.id, { fontWeight: selectedElement.fontWeight === 'bold' ? 'normal' : 'bold' })}
-                                                        className={`px-5 rounded-2xl border-2 transition-all font-black text-xs ${selectedElement.fontWeight === 'bold' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-gray-50 dark:bg-slate-900 text-gray-400 border-gray-100 dark:border-gray-700'}`}
-                                                    >
-                                                        B
-                                                    </button>
-                                                </div>
-
-                                                {/* Font Family Dropdown */}
                                                 <div>
+                                                    <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2 ml-1">Color</label>
+                                                    <div className="w-full p-1 bg-gray-50 dark:bg-slate-900 border-2 border-gray-100 dark:border-gray-700 rounded-xl sm:rounded-2xl flex items-center justify-center">
+                                                        <input
+                                                            type="color"
+                                                            value={selectedElement.color}
+                                                            onChange={(e) => updateElement(selectedElement.id, { color: e.target.value })}
+                                                            className="w-full h-8 sm:h-10 bg-transparent border-none cursor-pointer rounded-lg"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2 ml-1">Style</label>
+                                                <div className="flex flex-col gap-3">
+                                                    <div className="flex gap-2">
+                                                        <div className="flex-1 flex bg-gray-100/50 dark:bg-slate-900 rounded-xl sm:rounded-2xl p-1.5 border-2 border-gray-50 dark:border-gray-700">
+                                                            {['left', 'center', 'right'].map(align => (
+                                                                <button
+                                                                    key={align}
+                                                                    onClick={() => updateElement(selectedElement.id, { textAlign: align })}
+                                                                    className={`flex-1 py-1 sm:py-1.5 text-[10px] font-black capitalize rounded-lg sm:rounded-xl transition-all ${selectedElement.textAlign === align ? 'bg-white dark:bg-slate-700 shadow-md text-emerald-600' : 'text-gray-400 hover:text-gray-600'}`}
+                                                                >
+                                                                    {align[0]}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                        <button
+                                                            onClick={() => updateElement(selectedElement.id, { fontWeight: selectedElement.fontWeight === 'bold' ? 'normal' : 'bold' })}
+                                                            className={`px-4 sm:px-5 rounded-xl sm:rounded-2xl border-2 transition-all font-black text-xs ${selectedElement.fontWeight === 'bold' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-gray-50 dark:bg-slate-900 text-gray-400 border-gray-100 dark:border-gray-700'}`}
+                                                        >
+                                                            B
+                                                        </button>
+                                                    </div>
+
                                                     <select
                                                         value={selectedElement.fontFamily || 'Inter'}
                                                         onChange={(e) => updateElement(selectedElement.id, { fontFamily: e.target.value })}
-                                                        className="w-full p-4 text-xs bg-gray-50 dark:bg-slate-900 border-2 border-gray-100 dark:border-gray-700 rounded-2xl outline-none focus:border-emerald-500 dark:text-white font-black"
+                                                        className="w-full p-3 sm:p-4 text-[10px] sm:text-xs bg-gray-50 dark:bg-slate-900 border-2 border-gray-100 dark:border-gray-700 rounded-xl sm:rounded-2xl outline-none focus:border-emerald-500 dark:text-white font-black"
                                                     >
-                                                        <option value="Inter">Inter (Modern)</option>
-                                                        <option value="Helvetica">Helvetica (Standard)</option>
-                                                        <option value="Courier">Courier (Typewriter)</option>
-                                                        <option value="Times-Roman">Times New Roman (Classic)</option>
+                                                        <optgroup label="Modern Sans">
+                                                            <option value="Inter">Inter</option>
+                                                            <option value="Montserrat">Montserrat</option>
+                                                            <option value="Roboto">Roboto</option>
+                                                            <option value="Poppins">Poppins</option>
+                                                            <option value="Ubuntu">Ubuntu</option>
+                                                            <option value="Open Sans">Open Sans</option>
+                                                        </optgroup>
+                                                        <optgroup label="Elegant Serif">
+                                                            <option value="Playfair Display">Playfair Display</option>
+                                                            <option value="Lora">Lora</option>
+                                                            <option value="EB Garamond">EB Garamond</option>
+                                                            <option value="Cinzel">Cinzel (Formal)</option>
+                                                        </optgroup>
+                                                        <optgroup label="Decorative Script">
+                                                            <option value="Great Vibes">Great Vibes</option>
+                                                            <option value="Alex Brush">Alex Brush</option>
+                                                            <option value="Dancing Script">Dancing Script</option>
+                                                        </optgroup>
+                                                        <optgroup label="Standard">
+                                                            <option value="Helvetica">Helvetica</option>
+                                                            <option value="Courier">Courier</option>
+                                                            <option value="Times-Roman">Times New Roman</option>
+                                                        </optgroup>
                                                     </select>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </>
-                                )}
+                                        </>
+                                    )}
 
-                                {(selectedElement.type === 'image' || selectedElement.field === 'systemLogo') && (
-                                    <div className="bg-emerald-50/50 dark:bg-slate-900/50 p-5 rounded-3xl border-2 border-dashed border-emerald-200 dark:border-emerald-500/20">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <ImageIcon size={14} className="text-emerald-600" />
-                                            <p className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">Image Element</p>
+                                    {(selectedElement.type === 'image' || selectedElement.field === 'systemLogo') && (
+                                        <div className="bg-emerald-50/50 dark:bg-slate-900/50 p-4 sm:p-5 rounded-[1.5rem] sm:rounded-3xl border-2 border-dashed border-emerald-200 dark:border-emerald-500/20">
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <ImageIcon size={14} className="text-emerald-600" />
+                                                <p className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">Image Element</p>
+                                            </div>
+                                            <div className="bg-white dark:bg-slate-800 p-2 rounded-xl sm:rounded-2xl shadow-sm mb-3">
+                                                <img src={selectedElement.src} alt="element" className="w-full h-24 sm:h-32 object-contain rounded-lg sm:rounded-xl" />
+                                            </div>
+                                            <p className="text-[9px] text-gray-400 text-center font-bold italic">Dimensions are proportional.</p>
                                         </div>
-                                        <div className="bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-sm mb-3">
-                                            <img src={selectedElement.src} alt="element" className="w-full h-32 object-contain rounded-xl" />
-                                        </div>
-                                        <p className="text-[9px] text-gray-400 text-center font-bold italic">Dimensions are proportional to resize handle.</p>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
                 {/* Workspace / Canvas Area */}
                 <div
                     ref={workspaceRef}
-                    className="flex-1 bg-slate-100 dark:bg-slate-950 overflow-hidden flex items-center justify-center relative shadow-inner"
+                    className="flex-1 bg-slate-100 dark:bg-slate-900 overflow-hidden flex items-center justify-center relative shadow-inner"
                     style={{
                         backgroundImage: `
                             linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
@@ -480,7 +527,7 @@ const CertificateBuilder = () => {
                 >
                     {/* Centered Scaling Wrapper */}
                     <div
-                        className="transition-all duration-500 ease-in-out flex items-center justify-center"
+                        className="flex items-center justify-center pointer-events-none"
                         style={{
                             transform: `scale(${zoomScale})`,
                             transformOrigin: 'center center',
@@ -489,7 +536,7 @@ const CertificateBuilder = () => {
                         }}
                     >
                         <div
-                            className="relative bg-white shadow-[0_50px_100px_rgba(0,0,0,0.2)] border border-gray-200"
+                            className="relative bg-white shadow-[0_50px_100px_rgba(0,0,0,0.2)] border border-gray-200 pointer-events-auto"
                             style={{
                                 width: `${CANVAS_WIDTH}px`,
                                 height: `${CANVAS_HEIGHT}px`,
@@ -507,14 +554,18 @@ const CertificateBuilder = () => {
                                     size={{ width: el.width, height: el.height }}
                                     position={{ x: el.x, y: el.y }}
                                     onDragStop={(e, d) => {
-                                        updateElement(el.id, { x: d.x, y: d.y });
+                                        updateElement(el.id, {
+                                            x: Math.round(d.x),
+                                            y: Math.round(d.y)
+                                        });
                                         setSelectedElementId(el.id);
                                     }}
                                     onResizeStop={(e, direction, ref, delta, position) => {
                                         updateElement(el.id, {
-                                            width: parseInt(ref.style.width),
-                                            height: parseInt(ref.style.height),
-                                            ...position,
+                                            width: Math.round(parseFloat(ref.style.width)),
+                                            height: Math.round(parseFloat(ref.style.height)),
+                                            x: Math.round(position.x),
+                                            y: Math.round(position.y)
                                         });
                                         setSelectedElementId(el.id);
                                     }}

@@ -39,6 +39,8 @@ const updateUserProgress = async (req, res) => {
     // Clamp progress between 0 and 100
     const clampedProgress = Math.min(100, Math.max(0, progress || 0));
 
+    const existingProgress = await UserProgress.findOne({ user: req.user._id, course: req.params.courseId });
+
     const progressData = {
       user: req.user._id,
       course: req.params.courseId,
@@ -49,10 +51,28 @@ const updateUserProgress = async (req, res) => {
       lastAccess: new Date()
     };
 
-    // If progress is 100%, set completedAt if not already set
+    // If progress is 100%, set completedAt and certificateId if not already set
     if (clampedProgress === 100) {
-      // We check if it already exists or just set it
-      progressData.completedAt = new Date();
+      if (!existingProgress || existingProgress.progress < 100) {
+        // First time finishing - generate sequential ID
+        const year = new Date().getFullYear();
+        const startOfYear = new Date(year, 0, 1);
+        const endOfYear = new Date(year, 11, 31, 23, 59, 59);
+
+        // Count certificates already issued THIS YEAR
+        const countThisYear = await UserProgress.countDocuments({
+          progress: 100,
+          completedAt: { $gte: startOfYear, $lte: endOfYear }
+        });
+
+        const sequence = String(countThisYear + 1).padStart(3, '0');
+        progressData.certificateId = `CERT-${year}-${sequence}`;
+        progressData.completedAt = new Date();
+      } else {
+        // Already finished once - keep existing data
+        progressData.certificateId = existingProgress.certificateId;
+        progressData.completedAt = existingProgress.completedAt;
+      }
     }
 
     const progressRecord = await UserProgress.findOneAndUpdate(
@@ -75,6 +95,28 @@ const getUserAllProgress = async (req, res) => {
     const progressRecords = await UserProgress.find({ user: req.user._id })
       .populate('course', 'title thumbnail description')
       .sort({ lastAccess: -1 });
+
+    // Check if any completed records are missing a certificateId and fix them
+    let updated = false;
+    for (const record of progressRecords) {
+      if (record.progress === 100 && !record.certificateId) {
+        const year = record.completedAt ? new Date(record.completedAt).getFullYear() : new Date().getFullYear();
+        const startOfYear = new Date(year, 0, 1);
+        const endOfYear = new Date(year, 11, 31, 23, 59, 59);
+
+        const countThisYear = await UserProgress.countDocuments({
+          progress: 100,
+          certificateId: { $exists: true }, // Count only items that ALREADY have an ID
+          completedAt: { $gte: startOfYear, $lte: endOfYear }
+        });
+
+        const sequence = String(countThisYear + 1).padStart(3, '0');
+        record.certificateId = `CERT-${year}-${sequence}`;
+        if (!record.completedAt) record.completedAt = new Date();
+        await record.save();
+        updated = true;
+      }
+    }
 
     res.json(progressRecords);
   } catch (error) {

@@ -108,9 +108,18 @@
   animation: bounce-subtle 1s infinite ease-in-out;
 }
 
-/* Custom Toastify Dark Theme Override */
+/* Custom Toastify Styles */
+.Toastify__toast {
+  @apply !rounded-2xl !shadow-2xl !font-bold;
+}
+
+.Toastify__toast-theme--light {
+  background: white !important;
+  color: #1e293b !important; /* Slate 800 - dark text */
+}
+
 .Toastify__toast-theme--dark {
-  @apply !bg-slate-900 !border !border-slate-700 !shadow-xl !shadow-black/20 !text-gray-100;
-  background-color: #0f172a !important;
-  /* Forces slate-900 if @apply fails priority */
+  background: #0f172a !important; /* Slate 900 */
+  color: #f8fafc !important; /* Slate 50 - light text */
+  border: 1px solid #1e2937 !important;
 }
