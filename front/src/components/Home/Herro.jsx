@@ -67,7 +67,7 @@ export default function Herro({
         {/* RIGHT IMAGE */}
         <div className="relative flex justify-center items-center mt-8 lg:mt-10 min-h-[300px] sm:min-h-[400px] lg:min-h-0">
           {/* Organic Blob Background */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[500px] lg:h-[500px] bg-gradient-to-br from-emerald-200/40 to-teal-200/40 rounded-[40%_60%_70%_30%/60%_30%_70%_40%] blur-2xl"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] lg:w-[500px] lg:h-[500px] bg-gradient-to-br from-emerald-400/20 to-teal-400/10 rounded-[40%_60%_70%_30%/60%_30%_70%_40%] blur-3xl"></div>
 
           {/* Dot Pattern Grid (Top Right Corner) - Hidden on mobile */}
           <div className="hidden md:block absolute top-8 right-0 w-24 lg:w-32 h-24 lg:h-32 opacity-20">
