@@ -192,7 +192,7 @@ function Nav() {
             <div className="relative" ref={themeRef}>
               <button
                 onClick={() => setOpenTheme(!openTheme)}
-                className="p-2 rounded-full border border-gray-300 hover:bg-gray-100 transition-colors text-emerald-600 dark:text-emerald-400 dark:border-gray-600 dark:hover:bg-gray-800"
+                className="p-2 rounded-full cursor-pointer border border-gray-300 hover:bg-gray-100 transition-colors text-emerald-600 dark:text-emerald-400 dark:border-gray-600 dark:hover:bg-gray-800"
               >
                 {theme === "light" && <Sun className="w-5 h-5" />}
                 {theme === "dark" && <Moon className="w-5 h-5" />}
@@ -203,21 +203,21 @@ function Nav() {
                 <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl p-2 z-[60] animate-in fade-in zoom-in slide-in-from-top-2 duration-300">
                   <button
                     onClick={() => { setTheme("light"); setOpenTheme(false); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "light" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                    className={`w-full flex items-center cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "light" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
                   >
                     <Sun size={18} />
                     Light
                   </button>
                   <button
                     onClick={() => { setTheme("dark"); setOpenTheme(false); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "dark" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                    className={`w-full flex items-center cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "dark" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
                   >
                     <Moon size={18} />
                     Dark
                   </button>
                   <button
                     onClick={() => { setTheme("system"); setOpenTheme(false); }}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "system" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                    className={`w-full flex items-center cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "system" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
                   >
                     <Monitor size={18} />
                     System

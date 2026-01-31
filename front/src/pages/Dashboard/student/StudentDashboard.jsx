@@ -9,8 +9,9 @@ import {
   Clock,
   CheckCircle,
   CalendarClock,
+  Search,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { getImageUrl } from "../../../utils/format";
 import { getMyOrders } from "../../../api/orderService";
 import { getAllCourses } from "../../../api/courseService";
@@ -20,6 +21,9 @@ import PremiumLoader from "../../../components/ui/PremiumLoader";
 export default function StudentDashboard() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+
+  const isCoursesPage = location.pathname.includes("/courses");
 
   // ✅ Helper function: slugify titles
   const slugify = (text) =>
@@ -180,89 +184,104 @@ export default function StudentDashboard() {
         </span>
         <ChevronRight className="w-5 h-5 text-emerald-600" />
         <span className="text-lg font-semibold mb-1 text-gray-700 dark:text-gray-300">
-          Dashboard
+          {isCoursesPage ? "My Courses" : "Dashboard"}
         </span>
       </div>
 
-      <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">My Learning</h1>
-      <p className="text-gray-500 dark:text-gray-400 text-[14px] mb-6">
-        Access your enrolled courses and track your learning progress.
-      </p>
-
-      {/* Stats Section */}
-      <section>
-        <h1 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">My Courses</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
-          View and continue your enrolled courses
+      <div>
+        <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
+          {isCoursesPage ? "My Courses" : "My Learning"}
+        </h1>
+        <p className="text-gray-500 dark:text-gray-400 text-[14px] mb-6">
+          {isCoursesPage
+            ? "Manage and access all your enrolled courses."
+            : "Access your enrolled courses and track your learning progress."}
         </p>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* User Level */}
-          <div className="relative overflow-hidden rounded-xl border border-emerald-100 dark:border-emerald-500/20 bg-gradient-to-br from-emerald-50 to-emerald-100/40 dark:from-emerald-950/20 dark:to-emerald-900/10 p-5 flex flex-col justify-between shadow-sm transition-colors duration-500">
-            <div>
-              <h3 className={`${levelColor} font-semibold text-lg`}>
-                {userLevel}
+      {/* Stats Section - ONLY SHOW ON DASHBOARD */}
+      {!isCoursesPage && (
+        <section>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* User Level */}
+            <div className="relative overflow-hidden rounded-xl border border-emerald-100 dark:border-emerald-500/20 bg-gradient-to-br from-emerald-50 to-emerald-100/40 dark:from-emerald-950/20 dark:to-emerald-900/10 p-5 flex flex-col justify-between shadow-sm transition-colors duration-500">
+              <div>
+                <h3 className={`${levelColor} font-semibold text-lg`}>
+                  {userLevel}
+                </h3>
+                <p className="text-gray-700 dark:text-gray-300 font-medium">
+                  {userLevel === "Not Started"
+                    ? "Start learning today"
+                    : "Current Learning Level"}
+                </p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  {avgProgress}% overall progress
+                </p>
+              </div>
+              <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-500/20 p-2 rounded-full">
+                <GraduationCap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+
+            {/* Active */}
+            <div className="relative bg-white/10 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-500">
+              <h3 className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400">
+                {activeCourses}
               </h3>
-              <p className="text-gray-700 dark:text-gray-300 font-medium">
-                {userLevel === "Not Started"
-                  ? "Start learning today"
-                  : "Current Learning Level"}
+              <p className="text-gray-700 dark:text-gray-300 font-medium">Active Courses</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {completedCourses} completed
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                {avgProgress}% overall progress
+              <div className="absolute top-4 right-4 bg-emerald-50 dark:bg-emerald-500/20 p-2 rounded-full">
+                <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
+            </div>
+
+            {/* Completed */}
+            <div className="relative bg-white/10 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-500">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                Completed Courses
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {completedCourses} completed · {avgProgress}% avg progress
               </p>
-            </div>
-            <div className="absolute top-4 right-4 bg-emerald-100 dark:bg-emerald-500/20 p-2 rounded-full">
-              <GraduationCap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-          </div>
-
-          {/* Active */}
-          <div className="relative bg-white/10 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-500">
-            <h3 className="text-2xl font-semibold text-emerald-600 dark:text-emerald-400">
-              {activeCourses}
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300 font-medium">Active Courses</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {completedCourses} completed
-            </p>
-            <div className="absolute top-4 right-4 bg-emerald-50 dark:bg-emerald-500/20 p-2 rounded-full">
-              <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <div className="absolute top-4 right-4 bg-emerald-50 dark:bg-emerald-500/20 p-2 rounded-full">
+                <Settings className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              </div>
             </div>
           </div>
-
-          {/* Completed */}
-          <div className="relative bg-white/10 dark:bg-slate-800/50 rounded-xl border border-gray-200 dark:border-slate-800 p-5 shadow-sm transition-colors duration-500">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-              Completed Courses
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {completedCourses} completed · {avgProgress}% avg progress
-            </p>
-            <div className="absolute top-4 right-4 bg-emerald-50 dark:bg-emerald-500/20 p-2 rounded-full">
-              <Settings className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Course List */}
       <section className="mt-4">
-        <div className="flex items-center gap-2 mb-2">
-          <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-white">My Courses</h2>
-        </div>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
-          Your enrolled courses and available content.
-        </p>
+        {!isCoursesPage && (
+          <div className="flex items-center gap-2 mb-2">
+            <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Recent Courses</h2>
+          </div>
+        )}
 
         {loading ? (
           <div className="flex justify-center py-12">
             <PremiumLoader text={null} fullScreen={false} />
           </div>
         ) : courses.length === 0 ? (
-          <div className="p-6 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-800 rounded-xl text-gray-600 dark:text-gray-400 text-center transition-colors duration-500">
-            <p>No courses found for your account.</p>
+          <div className="flex flex-col items-center justify-center p-12 bg-white/10 dark:bg-slate-800/50 border border-dashed border-gray-300 dark:border-slate-700 rounded-xl text-center transition-colors duration-500">
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-full mb-4">
+              <BookOpen className="w-10 h-10 text-emerald-500" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Start Your Learning Journey</h3>
+            <p className="text-gray-500 dark:text-gray-400 max-w-sm mb-6">
+              You haven't enrolled in any courses yet. Explore our catalog and find the perfect course for you.
+            </p>
+            <Link
+              to="/courses"
+              className="group flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-emerald-500/30 active:scale-95"
+            >
+              <Search className="w-5 h-5" />
+              Browse Courses
+            </Link>
           </div>
         ) : (
           <div className="flex flex-col space-y-6">

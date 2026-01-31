@@ -3,6 +3,8 @@ import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import AdminSidebar from '../../../components/Admin/AdminSidebar';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { Bell, Search, User, LogOut, Settings, ChevronDown, ShoppingCart, Clock, Menu, Sun, Moon, Monitor } from 'lucide-react';
+import { toast } from 'react-toastify';
+import PremiumLoader from '../../../components/ui/PremiumLoader';
 
 
 const AdminLayout = () => {
@@ -31,7 +33,11 @@ const AdminLayout = () => {
         '/admin/roles/create': 'roles.create',
         '/admin/roles/edit/:id': 'roles.edit',
         '/admin/courses': 'courses.view',
+        '/admin/courses/create/:id': 'courses.create',
+        '/admin/courses/edit/:id': 'courses.edit',
         '/admin/blogs': 'blogs.view',
+        '/admin/blogs/create': 'blogs.create',
+        '/admin/blogs/edit/:id': 'blogs.edit',
         '/admin/contacts': 'contacts.view',
         '/admin/live-chat': 'chat.view',
         '/admin/bot-responses': 'bot.view',
@@ -40,6 +46,8 @@ const AdminLayout = () => {
         '/admin/faqs': 'faqs.view',
         '/admin/payments': 'payments.view',
         '/admin/system-settings': 'settings.view',
+        '/admin/certificates': 'certificates.view',
+        '/admin/certificates/builder': 'certificates.create',
     };
 
     const fetchStats = async () => {
@@ -94,18 +102,13 @@ const AdminLayout = () => {
         };
     }, []);
 
-    // 🌓 Theme handling (Removed - handled by Context)
-
-    // Route Protection
-    useEffect(() => {
-        // Wait for permissions to load before checking
-        if (loadingPermissions) return;
-
-        if (isSuperAdmin) return;
+    // 🔒 Synchronous Permission Check (Prevents Flash)
+    const checkCurrentAccess = () => {
+        // While loading, we can't be sure, but we return true to let the loader show (handled in render)
+        if (loadingPermissions) return true;
+        if (isSuperAdmin) return true;
 
         const currentPath = location.pathname;
-
-        // Find if current path matches any pattern in PERMISSION_MAP
         let requiredPermission = null;
 
         // 1. Exact match
@@ -113,23 +116,35 @@ const AdminLayout = () => {
             requiredPermission = PERMISSION_MAP[currentPath];
         } else {
             // 2. Pattern match (e.g., /admin/roles/edit/:id)
-            Object.keys(PERMISSION_MAP).forEach(pattern => {
+            const patterns = Object.keys(PERMISSION_MAP);
+            for (const pattern of patterns) {
                 const regexPattern = pattern.replace(/:\w+/g, '[^/]+');
                 const regex = new RegExp(`^${regexPattern}$`);
                 if (regex.test(currentPath)) {
                     requiredPermission = PERMISSION_MAP[pattern];
+                    break;
                 }
-            });
+            }
         }
 
         if (requiredPermission && !userPermissions.includes(requiredPermission)) {
-            // Redirect to dashboard if they don't have access
-            // Skip redirect if already on dashboard or profile
-            if (currentPath !== '/admin/dashboard' && currentPath !== '/admin/profile') {
-                navigate('/admin/dashboard');
-            }
+            // Always allow dashboard and profile
+            if (currentPath === '/admin/dashboard' || currentPath === '/admin/profile') return true;
+            return false;
         }
-    }, [location.pathname, userPermissions, isSuperAdmin, loadingPermissions]);
+
+        return true;
+    };
+
+    const hasAccess = checkCurrentAccess();
+
+    // 🚀 Handle Redirect Loop & Side Effects
+    useEffect(() => {
+        if (!loadingPermissions && !hasAccess) {
+            toast.error("Ma haysatid ogolaansho aad boggan ku gasho.");
+            navigate('/admin/dashboard', { replace: true });
+        }
+    }, [hasAccess, loadingPermissions, navigate]);
 
     // Close mobile sidebar on route change
     useEffect(() => {
@@ -388,7 +403,13 @@ const AdminLayout = () => {
 
                 {/* Content Section */}
                 <main className="flex-1 p-4 md:p-8 min-w-0">
-                    <Outlet />
+                    {loadingPermissions ? (
+                        <div className="flex h-full items-center justify-center">
+                            <PremiumLoader />
+                        </div>
+                    ) : hasAccess ? (
+                        <Outlet />
+                    ) : null}
                 </main>
             </div>
         </div>

@@ -130,7 +130,7 @@ export default function Orders() {
             {orders.map((order) => (
               <div
                 key={order._id || order.id}
-                className="border border-gray-200 dark:border-slate-800 rounded-xl shadow-sm bg-white dark:bg-slate-800/50 hover:shadow-md dark:hover:bg-slate-800 transition p-4 flex flex-col"
+                className="border border-gray-200 dark:border-slate-800 rounded-xl shadow-sm bg-white/10 dark:bg-slate-800/50 hover:shadow-md dark:hover:bg-slate-800 transition p-4 flex flex-col"
               >
                 {/* ✅ Click image -> go to details page */}
                 <div
@@ -198,7 +198,7 @@ export default function Orders() {
         )}
 
         {!loading && orders.length === 0 && (
-          <div className="border border-gray-200 dark:border-slate-800 rounded-md bg-white dark:bg-slate-800/50 py-10 flex flex-col items-center justify-center text-center">
+          <div className="border border-gray-200 dark:border-slate-800 rounded-md bg-white/10 dark:bg-slate-800/50 py-10 flex flex-col items-center justify-center text-center">
             <h2 className="text-[16px] font-semibold text-gray-800 dark:text-white">
               No orders found
             </h2>

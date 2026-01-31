@@ -258,7 +258,7 @@ export default function StudentContent() {
             <PremiumLoader text={null} fullScreen={false} />
           </div>
         ) : courses.length === 0 ? (
-          <div className="p-6 bg-gray-50 border border-gray-200 rounded-xl text-gray-600 text-center">
+          <div className="p-6 bg-green-900 border border-gray-200 rounded-xl text-gray-600 text-center">
             <p>No courses found for your account.</p>
           </div>
         ) : (
