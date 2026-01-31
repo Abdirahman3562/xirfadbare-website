@@ -466,7 +466,7 @@ export default function SystemSettings() {
                         </div>
 
                         <div className="flex justify-end">
-                            {!hasPermission('settings.edit') ? (
+                            {!canAccess('settings', 'edit') ? (
                                 <div className="flex items-center gap-2 px-6 py-3 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl border border-amber-100 dark:border-amber-500/20 font-bold text-xs">
                                     <Lock size={14} />
                                     READ-ONLY MODE (RESTRICTED ACCESS)
