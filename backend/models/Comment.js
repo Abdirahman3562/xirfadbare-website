@@ -7,6 +7,11 @@ const commentSchema = mongoose.Schema(
     blog: { type: mongoose.Schema.Types.ObjectId, ref: 'Blog', required: true },
     parentComment: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment', default: null },
     replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending'
+    },
   },
   { timestamps: true }
 );

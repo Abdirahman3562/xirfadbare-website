@@ -95,6 +95,7 @@ export default function LiveChat() {
             });
             setMessages(data);
             // Update read count locally by re-fetching convos
+            window.dispatchEvent(new Event('refreshNotifications'));
             if (!silent) {
                 fetchConversations();
             }
@@ -367,8 +368,8 @@ export default function LiveChat() {
                                         type="text"
                                         value={input}
                                         onChange={e => setInput(e.target.value)}
-                                        disabled={!hasPermission('chat.manage')}
-                                        placeholder={!hasPermission('chat.manage') ? "View only mode" : selectedUser.isChatPausedByAdmin ? "Type your reply..." : "Bot is active..."}
+                                        disabled={!hasPermission('chat.manage') || !selectedUser.isChatPausedByAdmin}
+                                        placeholder={!hasPermission('chat.manage') ? "View only mode" : !selectedUser.isChatPausedByAdmin ? "Take over chat to reply..." : "Type your reply..."}
                                         className="w-full bg-gray-50 dark:bg-slate-800 border-2 border-transparent focus:border-emerald-500/30 dark:focus:border-emerald-500/30 focus:bg-white dark:focus:bg-slate-800 rounded-2xl lg:rounded-[1.5rem] px-4 lg:px-6 py-3 lg:py-4 outline-none transition-all text-xs lg:text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 pr-12 lg:pr-14 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 dark:text-white"
                                     />
                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
@@ -381,7 +382,7 @@ export default function LiveChat() {
                                 </div>
                                 <button
                                     type="submit"
-                                    disabled={!input.trim()}
+                                    disabled={!input.trim() || !selectedUser.isChatPausedByAdmin}
                                     className="bg-emerald-600 dark:shadow-none cursor-pointer hover:bg-emerald-700 disabled:opacity-30 disabled:hover:bg-emerald-600 text-white p-3 lg:p-4 rounded-xl lg:rounded-[1.25rem] transition-all shadow-xl shadow-emerald-200 active:scale-95 shrink-0"
                                 >
                                     <Send size={20} lg:size={24} />

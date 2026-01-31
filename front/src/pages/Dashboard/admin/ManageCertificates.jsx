@@ -141,7 +141,7 @@ const ManageCertificates = () => {
                             onClick={() => canCreate && navigate('/admin/certificates/builder')}
                             disabled={!canCreate}
                             title={!canCreate ? "Ma haysatid oggolaanshaha inaad abuurto template" : ""}
-                            className={`group flex items-center justify-center gap-3 px-8 py-4 text-white rounded-2xl font-black text-sm transition-all active:scale-95 overflow-hidden relative ${!canCreate ? 'bg-slate-300 dark:bg-slate-800 cursor-not-allowed grayscale' : 'bg-emerald-600 hover:bg-emerald-500 shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40'}`}
+                            className={`group flex dark:shadow-none cursor-pointer items-center justify-center gap-3 px-8 py-4 text-white rounded-2xl font-black text-sm transition-all active:scale-95 overflow-hidden relative ${!canCreate ? 'bg-slate-300 dark:bg-slate-800 cursor-not-allowed grayscale' : 'bg-emerald-600 hover:bg-emerald-500 shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40'}`}
                         >
                             {!canCreate ? <Lock className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                             <span>Create Template</span>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
     Search,
     Plus,
@@ -34,11 +34,24 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
         hasPermission
     } = props;
 
+    const location = useLocation();
+    const highlightId = location.state?.highlightCommentId;
+    const isHighlighted = highlightId === comment._id;
+    const itemRef = useRef(null);
+
+    useEffect(() => {
+        if (isHighlighted && itemRef.current) {
+            itemRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Remove state after delay to stop highlighting? Or keep it?
+            // Keep it until navigation changes is fine.
+        }
+    }, [isHighlighted]);
+
     const hasReplies = comment.replies && comment.replies.length > 0;
     const isExpanded = expandedComments.has(comment._id);
 
     return (
-        <div className={`relative ${depth > 0 ? 'mt-4' : 'mb-4'}`}>
+        <div ref={itemRef} className={`relative ${depth > 0 ? 'mt-4' : 'mb-4'} transition-all duration-500 ${isHighlighted ? 'ring-2 ring-emerald-500 ring-offset-2 rounded-xl bg-emerald-50/50 dark:bg-emerald-900/20' : ''}`}>
             <div className={`flex gap-3 ${depth > 0 ? '' : ''}`}>
                 <div className="flex-shrink-0 relative">
                     {/* User Avatar */}
@@ -104,6 +117,8 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
                         ) : (
                             <p className="text-sm text-gray-800 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{comment.content}</p>
                         )}
+
+
 
                         {/* Hover Actions */}
                         {!editingComment && (
@@ -221,6 +236,16 @@ const CommentItem = ({ comment, depth = 0, ...props }) => {
     );
 };
 
+const CommentList = ({ comments, ...props }) => {
+    return (
+        <div className="flex flex-col gap-4">
+            {comments.map((comment) => (
+                <CommentItem key={comment._id} comment={comment} depth={0} {...props} />
+            ))}
+        </div>
+    );
+};
+
 const ManageBlogs = () => {
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -289,6 +314,22 @@ const ManageBlogs = () => {
         setSelectedBlogForComments(blog);
         setShowCommentsModal(true);
         setLoadingComments(true);
+
+        // Mark as read in background if there are pending comments
+        // We can optimize by checking if blog has pending comments first, or just hit endpoint safely.
+        // Hitting endpoint is safer.
+        if (token) {
+            fetch(`http://localhost:5000/api/comments/mark-read/${blog._id}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            }).then(res => {
+                if (res.ok) {
+                    // Refresh notifications after marking as read
+                    window.dispatchEvent(new Event('refreshNotifications'));
+                }
+            }).catch(err => console.error("Error marking comments as read:", err));
+        }
+
         try {
             const response = await fetch(`http://localhost:5000/api/comments/${blog._id}`);
             if (response.ok) {
@@ -304,6 +345,31 @@ const ManageBlogs = () => {
             setLoadingComments(false);
         }
     };
+
+    // Auto-open modal if navigated from notification
+    useEffect(() => {
+        if (location.state?.openBlogId && blogs.length > 0) {
+            const targetBlog = blogs.find(b => b._id === location.state.openBlogId);
+            if (targetBlog) {
+                if (!showCommentsModal) {
+                    handleViewComments(targetBlog);
+                }
+
+                // Handle highlighting and expanding
+                if (location.state.highlightCommentId) {
+                    setEditingComment(null); // Just clear unrelated state
+                    // If it's a reply, expand the parent
+                    if (location.state.parentCommentId) {
+                        setExpandedComments(prev => {
+                            const newSet = new Set(prev);
+                            newSet.add(location.state.parentCommentId);
+                            return newSet;
+                        });
+                    }
+                }
+            }
+        }
+    }, [location.state, blogs]);
 
     const handleReply = async (parentId) => {
         if (!replyContent.trim()) return;
@@ -716,12 +782,15 @@ const ManageBlogs = () => {
                                         <div className="flex justify-center py-8">
                                             <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
                                         </div>
-                                    ) : comments.length > 0 ? (
-                                        comments.map((comment) => (
-                                            <CommentItem
-                                                key={comment._id}
-                                                comment={comment}
-                                                depth={0}
+                                    ) : comments.length === 0 ? (
+                                        <div className="text-center py-10 text-gray-500 dark:text-gray-400">
+                                            <MessageCircle size={40} className="mx-auto mb-3 opacity-20" />
+                                            <p>No comments yet</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-4">
+                                            <CommentList
+                                                comments={comments}
                                                 expandedComments={expandedComments}
                                                 toggleReplies={toggleReplies}
                                                 replyingTo={replyingTo}
@@ -739,12 +808,6 @@ const ManageBlogs = () => {
                                                 currentUser={currentUser}
                                                 hasPermission={hasPermission}
                                             />
-                                        ))
-
-                                    ) : (
-                                        <div className="text-center py-8 text-gray-400">
-                                            <MessageCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                                            <p>No comments yet</p>
                                         </div>
                                     )}
                                 </div>

@@ -193,7 +193,7 @@ const getMyOrders = async (req, res) => {
 // @route   GET /api/orders
 // @access  Private/Admin
 const getOrders = async (req, res) => {
-  const orders = await Order.find({}).populate('user', 'id firstName lastName image');
+  const orders = await Order.find({}).populate('user', 'id firstName lastName image').sort({ createdAt: -1 });
   res.json(orders);
 };
 

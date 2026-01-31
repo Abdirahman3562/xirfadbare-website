@@ -180,7 +180,7 @@ const createComment = async (req, res) => {
 // @access  Private
 const updateComment = async (req, res) => {
   try {
-    const { content } = req.body;
+    const { content, status } = req.body;
 
     // Find the blog that contains this comment
     const blog = await Blog.findOne({ 'comments._id': req.params.id });
@@ -201,7 +201,8 @@ const updateComment = async (req, res) => {
     }
 
     // Update the comment
-    comment.content = content || comment.content;
+    if (content) comment.content = content;
+    if (status && hasEditPermission) comment.status = status; // Only admins/editors can change status
     comment.updatedAt = new Date();
     await blog.save();
 
@@ -292,4 +293,102 @@ const deleteComment = async (req, res) => {
   }
 };
 
-export { getCommentsByBlog, createComment, updateComment, deleteComment };
+// @desc    Get unread/pending comments count
+// @route   GET /api/comments/unread-count
+// @access  Private
+const getUnreadCommentCount = async (req, res) => {
+  try {
+    // Check if we can use the Comment model directly if it's being used/saved separately
+    // If comments are ONLY embedded in Blog, we need to aggregate.
+    // Based on previous code, let's assume Comment model needs to be imported or we check Blog.
+    // Safer bet: Aggregate on Blog if embedded.
+
+    const result = await Blog.aggregate([
+      { $unwind: "$comments" },
+      { $match: { "comments.status": "pending" } },
+      { $sort: { "comments.createdAt": -1 } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "comments.author",
+          foreignField: "_id",
+          as: "authorDetails"
+        }
+      },
+      {
+        $unwind: {
+          path: "$authorDetails",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          count: { $sum: 1 },
+          latestBlogId: { $first: "$_id" },
+          latestComment: {
+            $first: {
+              _id: "$comments._id",
+              parentComment: "$comments.parentComment",
+              content: "$comments.content",
+              createdAt: "$comments.createdAt",
+              author: {
+                firstName: "$authorDetails.firstName",
+                lastName: "$authorDetails.lastName",
+                image: "$authorDetails.image"
+              }
+            }
+          }
+        }
+      }
+    ]);
+
+    const count = result.length > 0 ? result[0].count : 0;
+    const latestBlogId = result.length > 0 ? result[0].latestBlogId : null;
+    const latestComment = result.length > 0 ? result[0].latestComment : null;
+
+    res.json({ count, latestBlogId, latestComment });
+
+  } catch (error) {
+    console.error('Error fetching unread comment count:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// @desc    Mark all pending comments for a blog as approved (read)
+// @route   PUT /api/comments/mark-read/:blogId
+// @access  Private
+const markCommentsAsRead = async (req, res) => {
+  try {
+    const { blogId } = req.params;
+
+    // Check permission
+    const hasPermission = req.user.isSuperAdmin || (req.user.permissions && req.user.permissions.includes('blogs.edit'));
+    if (!hasPermission) {
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+
+    const blog = await Blog.findById(blogId);
+    if (!blog) return res.status(404).json({ message: 'Blog not found' });
+
+    let updated = false;
+    blog.comments.forEach(comment => {
+      if (comment.status === 'pending') {
+        comment.status = 'approved';
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      await blog.save();
+    }
+
+    res.json({ message: 'Comments marked as read' });
+
+  } catch (error) {
+    console.error('Error marking comments as read:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export { getCommentsByBlog, createComment, updateComment, deleteComment, getUnreadCommentCount, markCommentsAsRead };

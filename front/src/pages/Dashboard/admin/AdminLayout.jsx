@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import AdminSidebar from '../../../components/Admin/AdminSidebar';
 import { useTheme } from '../../../contexts/ThemeContext';
-import { Bell, Search, User, LogOut, Settings, ChevronDown, ShoppingCart, Clock, Menu, Sun, Moon, Monitor } from 'lucide-react';
+import { Bell, Search, User, LogOut, Settings, ChevronDown, ShoppingCart, Clock, Menu, Sun, Moon, Monitor, MessageSquare } from 'lucide-react';
 import { toast } from 'react-toastify';
 import PremiumLoader from '../../../components/ui/PremiumLoader';
 
@@ -50,6 +50,12 @@ const AdminLayout = () => {
         '/admin/certificates/builder': 'certificates.create',
     };
 
+    const [unreadChatCount, setUnreadChatCount] = useState(0);
+    const [latestChatMessage, setLatestChatMessage] = useState(null);
+    const [pendingCommentsCount, setPendingCommentsCount] = useState(0);
+    const [latestPendingBlogId, setLatestPendingBlogId] = useState(null);
+    const [latestComment, setLatestComment] = useState(null);
+
     const fetchStats = async () => {
         try {
             const { getDashboardStats } = await import('../../../api/adminService');
@@ -57,6 +63,41 @@ const AdminLayout = () => {
             setStats(data);
         } catch (error) {
             console.error("Failed to fetch notification stats:", error);
+        }
+    };
+
+    const fetchUnreadChatCount = async () => {
+        const token = user?.token;
+        if (!token) return;
+        try {
+            const response = await fetch("http://localhost:5000/api/chat/unread-count", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await response.json();
+            setUnreadChatCount(data.count || 0);
+            setLatestChatMessage(data.latestMessage || null);
+        } catch (error) {
+            console.error("Error fetching unread chat count:", error);
+        }
+    };
+
+    const fetchPendingCommentsCount = async () => {
+        const token = user?.token;
+        if (!token) return;
+        try {
+            // Assuming this endpoint exists or will be created to match the pattern
+            const response = await fetch("http://localhost:5000/api/comments/unread-count", {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setPendingCommentsCount(data.count || 0);
+                setLatestPendingBlogId(data.latestBlogId || null);
+                setLatestComment(data.latestComment || null);
+            }
+        } catch (error) {
+            // Silently fail if endpoint doesn't exist yet to avoid console spam
+            // console.error("Error fetching pending comments count:", error);
         }
     };
 
@@ -83,21 +124,33 @@ const AdminLayout = () => {
 
     useEffect(() => {
         fetchStats();
+        fetchUnreadChatCount();
+        fetchPendingCommentsCount();
         fetchUserProfile();
 
-        const interval = setInterval(fetchStats, 30000);
+        const interval = setInterval(() => {
+            fetchStats();
+            fetchUnreadChatCount();
+            fetchPendingCommentsCount();
+        }, 30000);
 
         const syncUser = () => {
             const updatedUser = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
             setUser(updatedUser);
         };
 
+        const handleRefresh = () => {
+            fetchStats();
+            fetchUnreadChatCount();
+            fetchPendingCommentsCount();
+        };
+
         window.addEventListener('userLogin', syncUser);
-        window.addEventListener('refreshNotifications', fetchStats);
+        window.addEventListener('refreshNotifications', handleRefresh);
 
         return () => {
             window.removeEventListener('userLogin', syncUser);
-            window.removeEventListener('refreshNotifications', fetchStats);
+            window.removeEventListener('refreshNotifications', handleRefresh);
             clearInterval(interval);
         };
     }, []);
@@ -163,7 +216,8 @@ const AdminLayout = () => {
         return `http://localhost:5000${image.startsWith('/') ? '' : '/'}${image}`;
     };
 
-    const pendingCount = stats?.pendingOrders || 0;
+    const pendingOrdersCount = stats?.pendingOrders || 0;
+    const pendingCount = pendingOrdersCount + unreadChatCount;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-slate-900 flex transition-colors duration-300">
@@ -210,7 +264,7 @@ const AdminLayout = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setOpenTheme(!openTheme)}
-                                className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
+                                className="p-2.5 rounded-xl cursor-pointer  text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors"
                             >
                                 {theme === "light" && <Sun className="w-5 h-5 text-emerald-600" />}
                                 {theme === "dark" && <Moon className="w-5 h-5 text-emerald-400" />}
@@ -223,21 +277,21 @@ const AdminLayout = () => {
                                     <div className="absolute right-0 mt-3 w-40 bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl p-2 z-20 animate-in fade-in zoom-in slide-in-from-top-2 duration-300">
                                         <button
                                             onClick={() => { setTheme("light"); setOpenTheme(false); }}
-                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "light" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
+                                            className={`w-full flex cursor-pointer items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "light" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
                                         >
                                             <Sun size={18} />
                                             Light
                                         </button>
                                         <button
                                             onClick={() => { setTheme("dark"); setOpenTheme(false); }}
-                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "dark" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
+                                            className={`w-full cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "dark" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
                                         >
                                             <Moon size={18} />
                                             Dark
                                         </button>
                                         <button
                                             onClick={() => { setTheme("system"); setOpenTheme(false); }}
-                                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "system" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
+                                            className={`w-full flex cursor-pointer items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "system" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
                                         >
                                             <Monitor size={18} />
                                             System
@@ -251,7 +305,7 @@ const AdminLayout = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setShowNotifications(!showNotifications)}
-                                className={`relative p-2.5 rounded-xl transition-all ${showNotifications ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800'}`}
+                                className={`relative p-2.5 cursor-pointer rounded-xl transition-all ${showNotifications ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800'}`}
                             >
                                 <Bell size={22} className={pendingCount > 0 ? 'animate-bounce-subtle' : ''} />
                                 {pendingCount > 0 && (
@@ -273,11 +327,57 @@ const AdminLayout = () => {
                                             </span>
                                         </div>
                                         <div className="max-h-[400px] overflow-y-auto scrollbar-hide">
+                                            {/* Chat Notifications */}
+                                            {/* Chat Notifications */}
+                                            {unreadChatCount > 0 && (
+                                                <div
+                                                    className="px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0 group cursor-pointer"
+                                                    onClick={() => {
+                                                        navigate('/admin/live-chat');
+                                                        setShowNotifications(false);
+                                                    }}
+                                                >
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="relative">
+                                                            {latestChatMessage?.sender?.image ? (
+                                                                <img
+                                                                    src={getImageUrl(latestChatMessage.sender.image)}
+                                                                    alt=""
+                                                                    className="w-10 h-10 rounded-xl object-cover border border-gray-100 shadow-sm"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-10 h-10 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                                                                    <MessageSquare size={20} />
+                                                                </div>
+                                                            )}
+                                                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
+                                                                <span className="text-white text-[8px] font-bold">{unreadChatCount}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1">
+                                                                {latestChatMessage ? `New message from ${latestChatMessage.sender.firstName} ${latestChatMessage.sender.lastName}` : 'Unread Messages'}
+                                                            </p>
+                                                            <p className="text-[11px] text-gray-500 dark:text-gray-400 font-medium truncate mt-0.5">
+                                                                {latestChatMessage ? latestChatMessage.content : `You have ${unreadChatCount} unread messageIn Live Chat`}
+                                                            </p>
+                                                            {latestChatMessage && (
+                                                                <span className="text-[9px] text-gray-400 font-medium flex items-center gap-1 mt-1.5">
+                                                                    <Clock size={10} />
+                                                                    {new Date(latestChatMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Order Notifications */}
                                             {stats?.pendingOrderDetails?.length > 0 ? (
                                                 stats.pendingOrderDetails.map((order) => (
                                                     <div
                                                         key={order._id}
-                                                        className="px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0 group cursor-pointer"
+                                                        className="px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0 group-cursor-pointer"
                                                         onClick={() => {
                                                             navigate('/admin/orders');
                                                             setShowNotifications(false);
@@ -298,7 +398,7 @@ const AdminLayout = () => {
                                                                 <p className="text-xs font-bold text-gray-900 dark:text-white line-clamp-1">
                                                                     New order from {order.userName || `${order.userDetails?.firstName} ${order.userDetails?.lastName}`}
                                                                 </p>
-                                                                <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium truncate mt-0.5">
+                                                                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium truncate mt-0.5">
                                                                     Bought: {order.courseTitle || order.courseDetails?.title}
                                                                 </p>
                                                                 <div className="flex items-center justify-between mt-2">
@@ -312,7 +412,7 @@ const AdminLayout = () => {
                                                         </div>
                                                     </div>
                                                 ))
-                                            ) : (
+                                            ) : (pendingOrdersCount === 0 && unreadChatCount === 0 && pendingCommentsCount === 0) && (
                                                 <div className="px-5 py-10 text-center">
                                                     <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
                                                         <Bell size={20} className="text-gray-300" />
@@ -324,7 +424,7 @@ const AdminLayout = () => {
                                         <Link
                                             to="/admin/orders"
                                             onClick={() => setShowNotifications(false)}
-                                            className="block text-center py-3 text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50/50 transition-colors mt-1"
+                                            className="block text-center py-3 text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50/50 dark:hover:bg-slate-800 transition-colors mt-1"
                                         >
                                             View All Orders
                                         </Link>

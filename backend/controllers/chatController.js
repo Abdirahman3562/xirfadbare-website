@@ -195,8 +195,27 @@ const takeOverChat = async (req, res) => {
 const getTotalUnreadMessages = async (req, res) => {
     try {
         const count = await Chat.countDocuments({ sender: 'user', read: false });
-        res.json({ count });
+
+        const latestChat = await Chat.findOne({ sender: 'user', read: false })
+            .sort({ createdAt: -1 })
+            .populate('user', 'firstName lastName image');
+
+        let latestMessage = null;
+        if (latestChat && latestChat.user) {
+            latestMessage = {
+                content: latestChat.message,
+                createdAt: latestChat.createdAt,
+                sender: {
+                    firstName: latestChat.user.firstName,
+                    lastName: latestChat.user.lastName,
+                    image: latestChat.user.image
+                }
+            };
+        }
+
+        res.json({ count, latestMessage });
     } catch (error) {
+        console.error("Error fetching unread messages:", error);
         res.status(500).json({ message: 'Server Error' });
     }
 };

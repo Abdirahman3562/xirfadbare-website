@@ -4,10 +4,18 @@ import {
   createComment,
   updateComment,
   deleteComment,
+  getUnreadCommentCount,
+  markCommentsAsRead
 } from '../controllers/commentController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// Get unread/pending comments count
+router.get('/unread-count', protect, getUnreadCommentCount);
+
+// Mark comments as read (approved) for a blog
+router.put('/mark-read/:blogId', protect, markCommentsAsRead);
 
 // Get all comments for a blog
 router.get('/:blogId', getCommentsByBlog);
