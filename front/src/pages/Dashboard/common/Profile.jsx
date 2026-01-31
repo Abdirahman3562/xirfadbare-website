@@ -184,7 +184,7 @@ const Profile = () => {
             </div>
 
             {/* Header Section */}
-            <div className="bg-white dark:bg-slate-800/50 p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden transition-all duration-500">
+            <div className="bg-white/10 dark:bg-slate-800/50 p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden transition-all duration-500">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
                 <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 relative z-10 text-center sm:text-left">
                     <div className="relative group">
@@ -244,7 +244,7 @@ const Profile = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Information Settings */}
                 <div className="lg:col-span-2 space-y-6 sm:space-y-8">
-                    <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800/50 p-6 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm space-y-6 sm:space-y-8 relative transition-colors duration-500">
+                    <form onSubmit={handleSubmit} className="bg-white/10 dark:bg-slate-800/50 p-6 sm:p-10 rounded-[1.5rem] sm:rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm space-y-6 sm:space-y-8 relative transition-colors duration-500">
                         <div className="flex items-center gap-4 border-b border-gray-50 dark:border-slate-800 pb-6 transition-colors">
                             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl sm:rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 transition-colors">
                                 <User size={20} className="sm:w-6 sm:h-6" />
@@ -363,7 +363,7 @@ const Profile = () => {
                 {/* Security & Stats */}
                 <div className="space-y-8">
                     {/* 2FA Security Card */}
-                    <div className="bg-white dark:bg-slate-800/50 p-8 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm space-y-6 overflow-hidden relative group transition-all duration-500">
+                    <div className="bg-white/10 dark:bg-slate-800/50 p-8 rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm space-y-6 overflow-hidden relative group transition-all duration-500">
                         <div className={`absolute top-0 right-0 w-32 h-32 ${profileData.is2FAEnabled ? 'bg-emerald-500/10' : 'bg-amber-500/10'} rounded-full blur-3xl -mr-16 -mt-16 transition-colors duration-500`}></div>
 
                         <div className="flex items-center justify-between pb-4 border-b border-gray-50 dark:border-slate-800 relative z-10 transition-colors">
