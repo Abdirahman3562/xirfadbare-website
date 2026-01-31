@@ -8,8 +8,8 @@ import { useTheme } from "./contexts/ThemeContext";
 // Existing Imports (Assuming these valid)
 // ---------------------------
 import HomePage from "./pages/webpages/Home/HomePage";
-import Login from "./pages/Auth/Login";
-import Signup from "./pages/Auth/Signup";
+import Login from "./pages/auth/Login";
+import Signup from "./pages/auth/Signup";
 import CourseDetails from "./pages/webpages/course/CourseDetails";
 import StudentDashboard from "./pages/Dashboard/student/StudentDashboard";
 import AdminDashboard from "./pages/Dashboard/admin/AdminDashboard";
@@ -28,8 +28,8 @@ import StudentLayout from "./pages/Dashboard/student/StudentLayout";
 import AboutusPage from "./pages/webpages/About/AboutusPage";
 import ContactPage from "./pages/webpages/contact/ContactPage";
 import BlogPage from "./pages/webpages/Blog/BlogPage";
-import ForgotPassword from "./pages/Auth/ForgotPassword";
-import ResetPassword from "./pages/Auth/ResetPassword";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 import Profile from "./pages/Dashboard/common/Profile";
 import EditCourse from "./pages/Dashboard/instructor/EditCourse";
 import EditCourseAdmin from "./pages/Dashboard/admin/EditCourse";
@@ -37,7 +37,7 @@ import InstructorDetails from "./pages/webpages/instructor/InstructorDetails";
 import InstructorList from "./pages/webpages/instructor/InstructorList";
 import CourseList from "./pages/webpages/course/CourseList";
 import PaymentPage from "./pages/webpages/course/PaymentPage";
-import VerifyEmail from "./pages/Auth/VerifyEmail";
+import VerifyEmail from "./pages/auth/VerifyEmail";
 // New Import
 import ManageTestimonials from "./pages/Dashboard/admin/ManageTestimonials";
 import ManageFAQs from "./pages/Dashboard/admin/ManageFAQs";
