@@ -11,6 +11,14 @@ const userProgressSchema = mongoose.Schema(
     completedAt: { type: Date },
     certificateId: { type: String },
     timeSpent: { type: Number, default: 0 }, // Time spent in minutes
+    quizResults: [
+      {
+        lessonId: { type: String, required: true },
+        score: { type: Number, required: true },
+        totalQuestions: { type: Number, required: true },
+        completedAt: { type: Date, default: Date.now }
+      }
+    ],
   },
   { timestamps: true }
 );

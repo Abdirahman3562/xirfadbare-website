@@ -60,6 +60,7 @@ import Orders from "./pages/Dashboard/student/Orders";
 import Certificates from "./pages/Dashboard/student/Certificates";
 import CourseDashboard from "./pages/Dashboard/student/CourseDashboard";
 import SinglePostPage from "./pages/webpages/Blog/SinglePostPage";
+import Quizzes from "./pages/Dashboard/student/Quizzes";
 import AuthorPage from "./pages/webpages/Author/AuthorPage";
 import TopBanner from "./components/ui/TopBanner";
 import NotFoundPage from "./pages/webpages/NotFound/NotFoundPage";
@@ -153,6 +154,7 @@ function App() {
           <Route path="courses" element={<StudentDashboard />} />
           <Route path="orders" element={<Orders />} />
           <Route path="certificates" element={<Certificates />} />
+          <Route path="quizzes" element={<Quizzes />} />
           <Route path="profile" element={<Profile />} />
         </Route>
 

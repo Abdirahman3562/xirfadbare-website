@@ -140,11 +140,63 @@ const deleteUserProgress = async (req, res) => {
   }
 };
 
+// @desc    Save quiz result for a lesson
+// @route   POST /api/progress/:courseId/quiz
+// @access  Private
+const saveQuizResult = async (req, res) => {
+  try {
+    const { lessonId, score, totalQuestions } = req.body;
+
+    let progressData = await UserProgress.findOne({
+      user: req.user._id,
+      course: req.params.courseId
+    });
+
+    if (!progressData) {
+      progressData = new UserProgress({
+        user: req.user._id,
+        course: req.params.courseId,
+        completedLessons: [],
+        progress: 0,
+        quizResults: []
+      });
+    }
+
+    // Ensure quizResults exists
+    if (!progressData.quizResults) {
+      progressData.quizResults = [];
+    }
+
+    // Check if result for this lesson already exists
+    const existingIndex = progressData.quizResults.findIndex(r => r.lessonId === String(lessonId));
+
+    const newResult = {
+      lessonId: String(lessonId),
+      score: Number(score),
+      totalQuestions: Number(totalQuestions),
+      completedAt: new Date()
+    };
+
+    if (existingIndex !== -1) {
+      // Update with latest result
+      progressData.quizResults[existingIndex] = newResult;
+    } else {
+      progressData.quizResults.push(newResult);
+    }
+
+    await progressData.save();
+    res.json(progressData);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 export {
   getUserProgress,
   updateUserProgress,
   getUserAllProgress,
   deleteUserProgress,
+  saveQuizResult,
 };
 
 

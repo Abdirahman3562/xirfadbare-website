@@ -1,4 +1,5 @@
 import { FaCode, FaArrowLeft } from "react-icons/fa6";
+import { FileText, Brain, Award, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { Link, useParams } from "react-router-dom";
 import { getImageUrl } from "../../../utils/format";
 import { useState, useEffect } from "react";
@@ -13,6 +14,16 @@ function CourseDetails() {
 
   // ✅ Hel course-ka si toos ah oo data preloaded ah
   const course = getCourseBySlug(slug);
+
+  // ✅ Check for features
+  const hasResources = course && ((course.courseResources?.length > 0) ||
+    course.curriculum?.some(section =>
+      section.lessons?.some(lesson => lesson.lessonResources?.length > 0)
+    ));
+
+  const hasQuizzes = course && course.curriculum?.some(section =>
+    section.lessons?.some(lesson => lesson.quizQuestions?.length > 0)
+  );
 
   // ✅ Update browser tab title
   useEffect(() => {
@@ -66,7 +77,7 @@ function CourseDetails() {
               Special Offer: {course.discountPercentage}% Off
             </div>
           )}
-          <h1 className="text-3xl md:text-5xl font-extrabold mb-3">
+          <h1 className="text-2xl md:text-4xl font-extrabold mb-3 max-w-4xl break-words">
             {course.title}
           </h1>
           <p className="mt-2 text-sm font-semibold text-emerald-400 uppercase tracking-wide bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">
@@ -202,6 +213,84 @@ function CourseDetails() {
                   </a>
                 </>
               )}
+            </div>
+          </div>
+
+          {/* ✅ Course Features Card */}
+          <div className="bg-white/10 dark:bg-slate-900/50 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-xl shadow-emerald-500/5 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-500 group overflow-hidden relative">
+            {/* Decoration */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-bl-[5rem] -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-700" />
+
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 bg-white/20 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 border border-white/20 dark:border-emerald-500/20 shadow-sm">
+                  <Info size={20} />
+                </div>
+                <h3 className="text-lg font-bold text-emerald-600 dark:text-white tracking-tight uppercase">
+                  Course Included
+                </h3>
+              </div>
+
+              <div className="space-y-4">
+                {/* Resources */}
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${hasResources ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
+                      <FileText size={16} />
+                    </div>
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300 break-all">Resources</span>
+                  </div>
+                  {hasResources ? (
+                    <span className="flex items-center gap-1.5 text-[11px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 w-fit">
+                      <CheckCircle2 size={14} /> Yes
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 text-[11px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-gray-100 dark:border-slate-800 w-fit">
+                      <XCircle size={14} /> No
+                    </span>
+                  )}
+                </div>
+
+                {/* Quizzes */}
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${hasQuizzes ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
+                      <Brain size={16} />
+                    </div>
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300 break-all">Quizzes</span>
+                  </div>
+                  {hasQuizzes ? (
+                    <span className="flex items-center gap-1.5 text-[11px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 w-fit">
+                      <CheckCircle2 size={14} /> Yes
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 text-[11px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-gray-100 dark:border-slate-800 w-fit">
+                      <XCircle size={14} /> No
+                    </span>
+                  )}
+                </div>
+
+                {/* Certificate */}
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${course.hasCertificate ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
+                      <Award size={16} />
+                    </div>
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300 break-all">Certificate</span>
+                  </div>
+                  {course.hasCertificate ? (
+                    <span className="flex items-center gap-1.5 text-[11px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 w-fit">
+                      <CheckCircle2 size={14} /> Yes
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1.5 text-[11px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-gray-100 dark:border-slate-800 w-fit">
+                      <XCircle size={14} /> No
+                    </span>
+                  )}
+                </div>
+              </div>
+
+
             </div>
           </div>
         </aside>

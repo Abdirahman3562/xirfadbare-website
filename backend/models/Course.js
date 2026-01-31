@@ -8,8 +8,17 @@ const resourceSchema = mongoose.Schema({
 
 const lessonSchema = mongoose.Schema({
   title: { type: String, required: true },
+  type: { type: String, enum: ['video', 'quiz', 'hybrid'], default: 'video' },
   duration: { type: String },
+  quizDuration: { type: Number, default: 10 },
   videoUrl: { type: String },
+  quizQuestions: [{
+    question: { type: String, required: true },
+    type: { type: String, enum: ['multiple-choice', 'true-false', 'short-answer'], default: 'multiple-choice' },
+    options: [String],
+    correctAnswer: { type: mongoose.Schema.Types.Mixed },
+    explanation: { type: String }
+  }],
   curriculumId: { type: mongoose.Schema.Types.ObjectId, ref: 'Curriculum' },
   lessonResources: [resourceSchema]
 });

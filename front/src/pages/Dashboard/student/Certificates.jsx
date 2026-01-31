@@ -78,6 +78,10 @@ export default function Certificates() {
 
         try {
             setGenerating(true);
+            const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3");
+            audio.volume = 0.5;
+            audio.play().catch(err => console.log("Download sound blocked:", err));
+
             const template = await getTemplateById(course.certificateTemplate);
 
             if (!template) {
@@ -136,7 +140,7 @@ export default function Certificates() {
     }
 
     return (
-        <div className="max-w-5xl mx-auto pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+        <div className="w-full">
             {/* Header Section */}
             <div className="mb-10 text-center sm:text-left relative overflow-hidden bg-white/10 border border-gray-300 dark:bg-slate-900 rounded-[2.5rem] p-8 sm:p-12 border border-gray-100 dark:border-slate-800 shadow-xl shadow-emerald-500/5 transition-colors">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />

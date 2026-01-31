@@ -4,7 +4,7 @@ import { API_BASE_URL } from '../config';
 export async function getUserProgress(courseId) {
   try {
     const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
-                      JSON.parse(localStorage.getItem('user'));
+      JSON.parse(localStorage.getItem('user'));
     const token = loggedUser?.token;
     if (!token) throw new Error('No authentication token found');
 
@@ -28,7 +28,7 @@ export async function getUserProgress(courseId) {
 export async function updateUserProgress(courseId, progressData) {
   try {
     const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
-                      JSON.parse(localStorage.getItem('user'));
+      JSON.parse(localStorage.getItem('user'));
     const token = loggedUser?.token;
     if (!token) throw new Error('No authentication token found');
 
@@ -54,7 +54,7 @@ export async function updateUserProgress(courseId, progressData) {
 export async function getAllUserProgress() {
   try {
     const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
-                      JSON.parse(localStorage.getItem('user'));
+      JSON.parse(localStorage.getItem('user'));
     const token = loggedUser?.token;
     if (!token) throw new Error('No authentication token found');
 
@@ -78,7 +78,7 @@ export async function getAllUserProgress() {
 export async function deleteUserProgress(courseId) {
   try {
     const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
-                      JSON.parse(localStorage.getItem('user'));
+      JSON.parse(localStorage.getItem('user'));
     const token = loggedUser?.token;
     if (!token) throw new Error('No authentication token found');
 
@@ -95,5 +95,30 @@ export async function deleteUserProgress(courseId) {
   } catch (error) {
     console.error('Error deleting user progress:', error);
     return false;
+  }
+}
+// ✅ Save quiz result for a lesson
+export async function saveQuizResult(courseId, quizData) {
+  try {
+    const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
+      JSON.parse(localStorage.getItem('user'));
+    const token = loggedUser?.token;
+    if (!token) throw new Error('No authentication token found');
+
+    const response = await fetch(`${API_BASE_URL}/progress/${courseId}/quiz`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(quizData),
+    });
+
+    if (!response.ok) throw new Error('Failed to save quiz result');
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error saving quiz result:', error);
+    return null;
   }
 }

@@ -4,6 +4,7 @@ import {
   updateUserProgress,
   getUserAllProgress,
   deleteUserProgress,
+  saveQuizResult,
 } from '../controllers/userProgressController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -16,6 +17,9 @@ router.route('/:courseId')
   .get(protect, getUserProgress)
   .put(protect, updateUserProgress)
   .delete(protect, deleteUserProgress);
+
+router.route('/:courseId/quiz')
+  .post(protect, saveQuizResult);
 
 export default router;
 

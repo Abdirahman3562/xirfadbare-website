@@ -242,7 +242,7 @@ const AdminLayout = () => {
             {/* Main Content Area */}
             <div className={`flex-1 transition-all duration-300 ${isCollapsed ? 'md:ml-20' : 'md:ml-64'} ml-0 flex flex-col min-h-screen overflow-x-hidden`}>
                 {/* Header */}
-                <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 md:px-8 sticky top-0 z-40 gap-4 shrink-0 transition-colors duration-300">
+                <header className="h-20 bg-white dark:bg-slate-900 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-4 md:px-8 sticky top-0 z-50 gap-4 shrink-0 transition-colors duration-300">
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setIsMobileOpen(true)}
@@ -274,7 +274,7 @@ const AdminLayout = () => {
                             {openTheme && (
                                 <>
                                     <div className="fixed inset-0 z-10" onClick={() => setOpenTheme(false)}></div>
-                                    <div className="absolute right-0 mt-3 w-40 bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl p-2 z-20 animate-in fade-in zoom-in slide-in-from-top-2 duration-300">
+                                    <div className="absolute right-0 mt-3 w-40 bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 rounded-2xl shadow-2xl p-2 z-[100] animate-in fade-in zoom-in slide-in-from-top-2 duration-300">
                                         <button
                                             onClick={() => { setTheme("light"); setOpenTheme(false); }}
                                             className={`w-full flex cursor-pointer items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "light" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
@@ -291,7 +291,7 @@ const AdminLayout = () => {
                                         </button>
                                         <button
                                             onClick={() => { setTheme("system"); setOpenTheme(false); }}
-                                            className={`w-full flex cursor-pointer items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "system" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-800"}`}
+                                            className={`w-full flex cursor-pointer items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "system" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700"}`}
                                         >
                                             <Monitor size={18} />
                                             System
@@ -319,8 +319,8 @@ const AdminLayout = () => {
                             {showNotifications && (
                                 <>
                                     <div className="fixed inset-0 z-10" onClick={() => setShowNotifications(false)}></div>
-                                    <div className="fixed top-22 left-4 right-4 sm:absolute sm:top-full sm:right-0 sm:left-auto sm:w-80 bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-gray-50 dark:border-gray-800 py-2 z-50 animate-in fade-in slide-in-from-top-5 duration-300">
-                                        <div className="px-5 py-3 border-b border-gray-50 dark:border-gray-800 flex items-center justify-between">
+                                    <div className="fixed top-22 left-4 right-4 sm:absolute sm:top-full sm:right-0 sm:left-auto sm:w-80 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-gray-50 dark:border-slate-700 py-2 z-[100] animate-in fade-in slide-in-from-top-5 duration-300">
+                                        <div className="px-5 py-3 border-b border-gray-50 dark:border-slate-700 flex items-center justify-between">
                                             <h3 className="font-bold text-gray-900 dark:text-white">Notifications</h3>
                                             <span className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                                                 {pendingCount} New
@@ -331,7 +331,7 @@ const AdminLayout = () => {
                                             {/* Chat Notifications */}
                                             {unreadChatCount > 0 && (
                                                 <div
-                                                    className="px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0 group cursor-pointer"
+                                                    className="px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors border-b border-gray-50 dark:border-slate-700 last:border-0 group cursor-pointer"
                                                     onClick={() => {
                                                         navigate('/admin/live-chat');
                                                         setShowNotifications(false);
@@ -377,7 +377,7 @@ const AdminLayout = () => {
                                                 stats.pendingOrderDetails.map((order) => (
                                                     <div
                                                         key={order._id}
-                                                        className="px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0 group-cursor-pointer"
+                                                        className="px-4 py-4 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors border-b border-gray-50 dark:border-slate-700 last:border-0 group-cursor-pointer"
                                                         onClick={() => {
                                                             navigate('/admin/orders');
                                                             setShowNotifications(false);
@@ -474,15 +474,15 @@ const AdminLayout = () => {
                                         className="fixed inset-0 z-10"
                                         onClick={() => setShowProfileDropdown(false)}
                                     ></div>
-                                    <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-gray-50 dark:border-gray-800 py-2 z-20 animate-in fade-in zoom-in-95 duration-200">
-                                        <div className="px-4 py-3 border-b border-gray-50 dark:border-gray-800 mb-1">
+                                    <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-50 dark:border-slate-700 py-2 z-[100] animate-in fade-in zoom-in-95 duration-200">
+                                        <div className="px-4 py-3 border-b border-gray-50 dark:border-slate-700 mb-1">
                                             <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">Logged in as</p>
                                             <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{user.email}</p>
                                         </div>
                                         <Link
                                             to="/admin/profile"
                                             onClick={() => setShowProfileDropdown(false)}
-                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                                         >
                                             <Settings size={18} />
                                             <span>Profile Settings</span>

@@ -152,7 +152,7 @@ export default function Curriculum({
 
                   {/* Titles & duration */}
                   <div className="flex flex-col">
-                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-emerald-400">
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-emerald-400 break-all whitespace-pre-wrap">
                       {section.title}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -184,7 +184,7 @@ export default function Curriculum({
                         ) : (
                           <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-xs" />
                         )}
-                        <span>{lesson.title}</span>
+                        <span className="break-all whitespace-pre-wrap">{lesson.title}</span>
                       </div>
                       <span className="text-gray-500 dark:text-gray-400 text-xs">
                         {lesson.duration}
@@ -217,8 +217,8 @@ export default function Curriculum({
           <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300 mb-6 pl-10">
             {learningOutcomes.map((point, idx) => (
               <li key={idx} className="flex items-start gap-2">
-                <FaCheckCircle className="text-emerald-500 dark:text-emerald-400 text-sm mt-0.5" />
-                <span>{point}</span>
+                <FaCheckCircle className="text-emerald-500 dark:text-emerald-400 text-lg mt-0.5 flex-shrink-0" />
+                <span className="break-all whitespace-pre-wrap">{point}</span>
               </li>
             ))}
           </ul>

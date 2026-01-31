@@ -344,7 +344,7 @@ const ManageCourses = () => {
                                     {/* Card Body */}
                                     <div className="p-6 flex flex-col flex-1 space-y-4">
                                         <div className="space-y-1.5">
-                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors h-14">
+                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-tight truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" title={course.title}>
                                                 {course.title}
                                             </h3>
                                             <p className="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 font-medium leading-relaxed">

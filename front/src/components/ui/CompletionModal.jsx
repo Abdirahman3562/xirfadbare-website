@@ -2,6 +2,14 @@ import React from 'react';
 import { Trophy, CheckCircle, ArrowRight, X, Star, Award } from 'lucide-react';
 
 const CompletionModal = ({ isOpen, onClose, courseTitle, onClaimCertificate, hasCertificate }) => {
+    React.useEffect(() => {
+        if (isOpen) {
+            const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
+            audio.volume = 0.5;
+            audio.play().catch(err => console.log("Congratulation sound blocked:", err));
+        }
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
@@ -59,10 +67,6 @@ const CompletionModal = ({ isOpen, onClose, courseTitle, onClaimCertificate, has
                         </button>
 
                     </div>
-
-                    <p className="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                        Xirfadbare Academy • Learn & Grow
-                    </p>
                 </div>
             </div>
         </div>

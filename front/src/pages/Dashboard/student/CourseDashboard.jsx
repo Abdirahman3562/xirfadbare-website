@@ -16,10 +16,11 @@ import {
 import { FaBookOpen, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { getAllCourses } from "../../../api/courseService";
 import { getMyOrders } from "../../../api/orderService";
-import { getUserProgress, updateUserProgress } from "../../../api/userProgressService";
+import { getUserProgress, updateUserProgress, saveQuizResult as saveQuizAPI } from "../../../api/userProgressService";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
 import CompletionModal from "../../../components/ui/CompletionModal";
 import ResourceItem from "../../../components/course/ResourceItem";
+import LessonQuizModal from "../../../components/course/LessonQuizModal";
 
 const CourseDashboard = () => {
   const { courseSlug, lessonSlug } = useParams();
@@ -39,7 +40,9 @@ const CourseDashboard = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [showResources, setShowResources] = useState(false);
+  const [showQuizModal, setShowQuizModal] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(false);
+  const [quizResults, setQuizResults] = useState([]); // [{lessonId, score, total}]
 
   // Helpers
   const allLessonIds = useMemo(
@@ -155,17 +158,35 @@ const CourseDashboard = () => {
           );
           if (current) setCurrentLesson(current);
         }
+
+        if (userProgress.quizResults) {
+          setQuizResults(userProgress.quizResults);
+        }
       } else {
         // fallback if no progress found
         setCompletedLessons([]);
+        setQuizResults([]);
       }
 
       // ✅ Initial lesson
       let initial =
-        allLessons.find((l) => slugify(l.title) === lessonSlug) ||
-        (savedCurrentLessonId ? allLessons.find((l) => String(l.id) === String(savedCurrentLessonId)) : null) ||
+        lessonsWithSlugs.find((l) => slugify(l.title) === lessonSlug) ||
+        (savedCurrentLessonId ? lessonsWithSlugs.find((l) => String(l.id) === String(savedCurrentLessonId)) : null) ||
         grouped?.[0]?.lessons?.[0] ||
         null;
+
+      // Check if this initial lesson has a quiz that isn't completed yet
+      if (initial && initial.quizQuestions && initial.quizQuestions.length > 0) {
+        const isQuizDone = (userProgress?.quizResults || []).some(
+          (r) => String(r.lessonId) === String(initial.id)
+        );
+        if (isQuizDone) {
+          // If quiz is already done, we can just show the lesson normally
+        } else if (userProgress?.completedLessons?.includes(String(initial.id))) {
+          // If lesson is marked completed but quiz isn't done, force show it
+          setShowQuizModal(true);
+        }
+      }
 
       setCurrentLesson(initial);
       setIsVideoLoading(true);
@@ -355,18 +376,63 @@ const CourseDashboard = () => {
     const updated = Array.from(new Set([...completedLessons, lessonId])).filter(id => id);
     setCompletedLessons(updated);
 
+    // Play completion sound
+    const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3");
+    audio.volume = 0.5;
+    audio.play().catch(err => console.log("Completion sound blocked:", err));
+
     setShowAlert(true);
     setTimeout(() => setShowAlert(false), 1400);
 
-    // auto go next if exists
-    const idx = allLessonIds.indexOf(lessonId);
-    if (idx !== -1 && idx < allLessonIds.length - 1) {
-      const nextId = allLessonIds[idx + 1];
-      const nextLesson = lessons.find((l) => String(l.id) === String(nextId));
-      if (nextLesson) goToLesson(nextLesson);
+    // If lesson has quiz, show quiz modal
+    if (currentLesson.quizQuestions && currentLesson.quizQuestions.length > 0) {
+      setShowQuizModal(true);
+    } else {
+      // auto go next if exists (only if no quiz)
+      const idx = allLessonIds.indexOf(lessonId);
+      if (idx !== -1 && idx < allLessonIds.length - 1) {
+        const nextId = allLessonIds[idx + 1];
+        const nextLesson = lessons.find((l) => String(l.id) === String(nextId));
+        if (nextLesson) goToLesson(nextLesson);
+      }
     }
 
     // Progress is now synced via UserProgress API in the useEffect above
+  };
+
+  const handleQuizComplete = async (quizData) => {
+    try {
+      if (!currentLesson || !course) return;
+
+      const data = {
+        lessonId: currentLesson.id,
+        score: quizData.score,
+        totalQuestions: quizData.totalQuestions
+      };
+
+      // Update local state immediately
+      setQuizResults(prev => {
+        const existing = prev.findIndex(r => r.lessonId === data.lessonId);
+        if (existing !== -1) {
+          const next = [...prev];
+          next[existing] = data;
+          return next;
+        }
+        return [...prev, data];
+      });
+
+      // Save to API
+      await saveQuizAPI(course._id, data);
+
+      // Close modal and go next
+      setShowQuizModal(false);
+      goNext();
+    } catch (error) {
+      console.error("❌ Error saving quiz complete:", error);
+      // Still go next to not block user
+      setShowQuizModal(false);
+      goNext();
+    }
   };
 
   useEffect(() => {
@@ -594,15 +660,23 @@ const CourseDashboard = () => {
                                   <PlayCircle className="text-emerald-500 w-4 h-4" />
                                 )}
                                 <span
-                                  className={
-                                    isCompleted
-                                      ? "line-through text-gray-400 dark:text-gray-600"
+                                  className={`flex items-center gap-2
+                                    ${isCompleted
+                                      ? "text-gray-400 dark:text-gray-600"
                                       : isActive
                                         ? "font-bold text-emerald-700 dark:text-emerald-400"
-                                        : "font-medium"
-                                  }
+                                        : "font-medium"}
+                                  `}
                                 >
-                                  {lesson.title}
+                                  <span className={isCompleted ? "line-through" : ""}>{lesson.title}</span>
+                                  {(() => {
+                                    const result = quizResults.find(r => String(r.lessonId) === String(lesson.id));
+                                    return result && (
+                                      <span className="inline-flex items-center text-[9px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-black no-underline whitespace-nowrap border border-emerald-100 dark:border-emerald-500/20">
+                                        Quiz Result: {result.score}/{result.totalQuestions}
+                                      </span>
+                                    );
+                                  })()}
                                 </span>
                               </div>
                               <span className="text-gray-500 dark:text-gray-500 text-xs font-medium">
@@ -834,15 +908,23 @@ const CourseDashboard = () => {
                                     <PlayCircle className="text-emerald-500 w-4 h-4" />
                                   )}
                                   <span
-                                    className={
-                                      isCompleted
-                                        ? "line-through text-gray-400 dark:text-gray-600"
+                                    className={`flex items-center gap-2
+                                      ${isCompleted
+                                        ? "text-gray-400 dark:text-gray-600"
                                         : isActive
                                           ? "font-bold text-emerald-700 dark:text-emerald-400"
-                                          : "font-medium"
-                                    }
+                                          : "font-medium"}
+                                    `}
                                   >
-                                    {lesson.title}
+                                    <span className={isCompleted ? "line-through" : ""}>{lesson.title}</span>
+                                    {(() => {
+                                      const result = quizResults.find(r => String(r.lessonId) === String(lesson.id));
+                                      return result && (
+                                        <span className="inline-flex items-center text-[9px] bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-black no-underline whitespace-nowrap border border-emerald-100 dark:border-emerald-500/20">
+                                          Quiz Result: {result.score}/{result.totalQuestions}
+                                        </span>
+                                      );
+                                    })()}
                                   </span>
                                 </div>
                                 <span className="text-gray-500 dark:text-gray-500 text-xs font-medium">
@@ -874,6 +956,13 @@ const CourseDashboard = () => {
         courseTitle={course.title}
         hasCertificate={course.hasCertificate}
         onClaimCertificate={handleClaimCertificate}
+      />
+
+      <LessonQuizModal
+        isOpen={showQuizModal}
+        onClose={() => setShowQuizModal(false)}
+        lesson={currentLesson}
+        onComplete={(res) => handleQuizComplete(res)}
       />
     </div>
   );
