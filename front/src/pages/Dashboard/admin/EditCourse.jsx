@@ -46,6 +46,7 @@ import { getAllInstructors } from '../../../api/instructorService';
 import { API_BASE_URL } from '../../../config';
 import { toast } from 'react-toastify';
 import { getImageUrl } from '../../../utils/format';
+import ResourceManager from '../../../components/course/ResourceManager';
 
 const SortableLesson = ({ lesson, lIndex, sIndex, handleLessonChange, removeLesson }) => {
     const {
@@ -67,54 +68,65 @@ const SortableLesson = ({ lesson, lIndex, sIndex, handleLessonChange, removeLess
         <div
             ref={setNodeRef}
             style={style}
-            className="bg-white dark:bg-slate-700/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-600 shadow-sm flex items-center gap-4 group/lesson transition-all hover:border-emerald-200 dark:hover:border-emerald-500/30"
+            className="bg-white dark:bg-slate-700/50 p-4 rounded-2xl border border-gray-100 dark:border-gray-600 shadow-sm space-y-4 group/lesson transition-all hover:border-emerald-200 dark:hover:border-emerald-500/30"
         >
-            <div
-                {...attributes}
-                {...listeners}
-                className="p-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-emerald-500 transition-colors"
-                title="Jiid si aad u kala bedesho"
-            >
-                <GripVertical size={16} />
+            <div className="flex items-center gap-4">
+                <div
+                    {...attributes}
+                    {...listeners}
+                    className="p-1 cursor-grab active:cursor-grabbing text-gray-300 hover:text-emerald-500 transition-colors"
+                    title="Jiid si aad u kala bedesho"
+                >
+                    <GripVertical size={16} />
+                </div>
+                <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-[10px] font-black">
+                    {lIndex + 1}
+                </div>
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <input
+                        type="text"
+                        value={lesson.title}
+                        onChange={(e) => handleLessonChange(sIndex, lIndex, 'title', e.target.value)}
+                        className="text-sm font-semibold text-gray-900 dark:text-white bg-transparent outline-none border-none py-1 h-full placeholder-gray-400 dark:placeholder-gray-500"
+                        placeholder="Lesson title..."
+                    />
+                    <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-transparent dark:border-gray-700">
+                        <Clock size={14} className="text-gray-400" />
+                        <input
+                            type="text"
+                            value={lesson.duration}
+                            onChange={(e) => handleLessonChange(sIndex, lIndex, 'duration', e.target.value)}
+                            className="bg-transparent text-xs font-bold text-gray-600 dark:text-gray-300 w-16 outline-none"
+                            placeholder="00:00"
+                        />
+                    </div>
+                    <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-transparent dark:border-gray-700 overflow-hidden">
+                        <Video size={14} className="text-gray-400" />
+                        <input
+                            type="text"
+                            value={lesson.videoUrl}
+                            onChange={(e) => handleLessonChange(sIndex, lIndex, 'videoUrl', e.target.value)}
+                            className="bg-transparent text-[10px] font-medium text-gray-500 dark:text-gray-400 flex-1 outline-none w-full min-w-0"
+                            placeholder="Vimeo/YouTube ID"
+                        />
+                    </div>
+                </div>
+                <button
+                    onClick={() => removeLesson(sIndex, lIndex)}
+                    className="p-2 text-gray-200 hover:text-red-400 transition-colors opacity-0 group-hover/lesson:opacity-100"
+                >
+                    <Trash2 size={16} />
+                </button>
             </div>
-            <div className="w-8 h-8 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-[10px] font-black">
-                {lIndex + 1}
-            </div>
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input
-                    type="text"
-                    value={lesson.title}
-                    onChange={(e) => handleLessonChange(sIndex, lIndex, 'title', e.target.value)}
-                    className="text-sm font-semibold text-gray-900 dark:text-white bg-transparent outline-none border-none py-1 h-full placeholder-gray-400 dark:placeholder-gray-500"
-                    placeholder="Lesson title..."
+
+            {/* Lesson Resources */}
+            <div className="pl-14 pr-4">
+                <ResourceManager
+                    label="Lesson Resources"
+                    resources={lesson.lessonResources || []}
+                    onUpdate={(newResources) => handleLessonChange(sIndex, lIndex, 'lessonResources', newResources)}
                 />
-                <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-transparent dark:border-gray-700">
-                    <Clock size={14} className="text-gray-400" />
-                    <input
-                        type="text"
-                        value={lesson.duration}
-                        onChange={(e) => handleLessonChange(sIndex, lIndex, 'duration', e.target.value)}
-                        className="bg-transparent text-xs font-bold text-gray-600 dark:text-gray-300 w-16 outline-none"
-                        placeholder="00:00"
-                    />
-                </div>
-                <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-800 px-3 py-2 rounded-xl border border-transparent dark:border-gray-700 overflow-hidden">
-                    <Video size={14} className="text-gray-400" />
-                    <input
-                        type="text"
-                        value={lesson.videoUrl}
-                        onChange={(e) => handleLessonChange(sIndex, lIndex, 'videoUrl', e.target.value)}
-                        className="bg-transparent text-[10px] font-medium text-gray-500 dark:text-gray-400 flex-1 outline-none w-full min-w-0"
-                        placeholder="Vimeo/YouTube ID"
-                    />
-                </div>
             </div>
-            <button
-                onClick={() => removeLesson(sIndex, lIndex)}
-                className="p-2 text-gray-200 hover:text-red-400 transition-colors opacity-0 group-hover/lesson:opacity-100"
-            >
-                <Trash2 size={16} />
-            </button>
         </div>
     );
 };
@@ -231,7 +243,8 @@ const EditCourse = () => {
         learningOutcomes: [],
         curriculum: [],
         hasCertificate: false,
-        certificateTemplate: ''
+        certificateTemplate: '',
+        courseResources: []
     });
 
     useEffect(() => {
@@ -262,7 +275,8 @@ const EditCourse = () => {
                         communityLink: course.communityLink || '',
                         learningOutcomes: course.learningOutcomes || [],
                         hasCertificate: course.hasCertificate || false,
-                        certificateTemplate: course.certificateTemplate?._id || course.certificateTemplate || ''
+                        certificateTemplate: course.certificateTemplate?._id || course.certificateTemplate || '',
+                        courseResources: course.courseResources || []
                     });
                 } else {
                     // Reset to empty for new courses specifically
@@ -282,7 +296,8 @@ const EditCourse = () => {
                         learningOutcomes: [],
                         curriculum: [],
                         hasCertificate: false,
-                        certificateTemplate: ''
+                        certificateTemplate: '',
+                        courseResources: []
                     });
                 }
                 setInstructors(allInstructors);
@@ -430,7 +445,7 @@ const EditCourse = () => {
 
     const handleSectionTitleChange = (sectionIndex, title) => {
         setCourseData(prev => {
-            const newCurriculum = [...prev.curriculum];
+            const newCurriculum = JSON.parse(JSON.stringify(prev.curriculum));
             newCurriculum[sectionIndex].title = title;
             return { ...prev, curriculum: newCurriculum };
         });
@@ -438,12 +453,13 @@ const EditCourse = () => {
 
     const addLesson = (sectionIndex) => {
         setCourseData(prev => {
-            const newCurriculum = [...prev.curriculum];
+            const newCurriculum = JSON.parse(JSON.stringify(prev.curriculum));
             newCurriculum[sectionIndex].lessons.push({
                 _id: `new-lesson-${Date.now()}`,
                 title: 'New Lesson',
                 duration: '00:00',
-                videoUrl: ''
+                videoUrl: '',
+                lessonResources: []
             });
             return { ...prev, curriculum: newCurriculum };
         });
@@ -459,7 +475,7 @@ const EditCourse = () => {
 
     const handleLessonChange = (sectionIndex, lessonIndex, field, value) => {
         setCourseData(prev => {
-            const newCurriculum = [...prev.curriculum];
+            const newCurriculum = JSON.parse(JSON.stringify(prev.curriculum));
             newCurriculum[sectionIndex].lessons[lessonIndex][field] = value;
             return { ...prev, curriculum: newCurriculum };
         });
@@ -673,6 +689,14 @@ const EditCourse = () => {
                                     />
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="pt-6 border-t border-gray-50 dark:border-gray-700/50 mt-6">
+                            <ResourceManager
+                                label="COURSE RESOURCES"
+                                resources={courseData.courseResources || []}
+                                onUpdate={(newResources) => setCourseData(prev => ({ ...prev, courseResources: newResources }))}
+                            />
                         </div>
                     </div>
 

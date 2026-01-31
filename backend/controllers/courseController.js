@@ -75,6 +75,7 @@ const createCourse = async (req, res) => {
     discountExpiry,
     hasCertificate,
     certificateTemplate,
+    courseResources,
   } = req.body;
 
   const course = new Course({
@@ -95,9 +96,12 @@ const createCourse = async (req, res) => {
     learningOutcomes,
     hasCertificate,
     certificateTemplate,
+    courseResources,
     user: req.user._id,
   });
 
+  course.markModified('curriculum');
+  course.markModified('courseResources');
   const createdCourse = await course.save();
   res.status(201).json(createdCourse);
 };
@@ -123,6 +127,7 @@ const updateCourse = async (req, res) => {
     discountPercentage,
     hasCertificate,
     certificateTemplate,
+    courseResources,
   } = req.body;
 
   const course = await Course.findById(req.params.id);
@@ -145,6 +150,10 @@ const updateCourse = async (req, res) => {
     if (req.body.discountExpiry !== undefined) course.discountExpiry = req.body.discountExpiry;
     if (hasCertificate !== undefined) course.hasCertificate = hasCertificate;
     if (certificateTemplate !== undefined) course.certificateTemplate = certificateTemplate;
+    if (courseResources !== undefined) course.courseResources = courseResources;
+
+    course.markModified('curriculum');
+    course.markModified('courseResources');
 
     const updatedCourse = await course.save();
     res.json(updatedCourse);

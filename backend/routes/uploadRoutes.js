@@ -17,14 +17,15 @@ const storage = multer.diskStorage({
 });
 
 function checkFileType(file, cb) {
-    const filetypes = /jpg|jpeg|png/;
+    const filetypes = /jpg|jpeg|png|pdf|zip|doc|docx|ppt|pptx|txt|xls|xlsx|rar/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
+    // Mimetype check can be tricky for some files, so we'll rely mostly on extension for now or expand the regex
+    // const mimetype = filetypes.test(file.mimetype);
 
-    if (extname && mimetype) {
+    if (extname) { // Relaxed check to allow various file types
         return cb(null, true);
     } else {
-        cb('Images only!');
+        cb('Supported files: Images, PDF, Docs, Zip');
     }
 }
 

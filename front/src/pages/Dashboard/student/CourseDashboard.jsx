@@ -10,6 +10,8 @@ import {
   Users,
   MessageCircle,
   Trophy,
+  Download,
+  FileText
 } from "lucide-react";
 import { FaBookOpen, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { getAllCourses } from "../../../api/courseService";
@@ -17,6 +19,7 @@ import { getMyOrders } from "../../../api/orderService";
 import { getUserProgress, updateUserProgress } from "../../../api/userProgressService";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
 import CompletionModal from "../../../components/ui/CompletionModal";
+import ResourceItem from "../../../components/course/ResourceItem";
 
 const CourseDashboard = () => {
   const { courseSlug, lessonSlug } = useParams();
@@ -35,6 +38,8 @@ const CourseDashboard = () => {
   const [showLessons, setShowLessons] = useState(false); // mobile
   const [showAlert, setShowAlert] = useState(false);
   const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [showResources, setShowResources] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(false);
 
   // Helpers
   const allLessonIds = useMemo(
@@ -163,6 +168,7 @@ const CourseDashboard = () => {
         null;
 
       setCurrentLesson(initial);
+      setIsVideoLoading(true);
       if (!lessonSlug && initial) {
         navigate(
           `/watch/courses/${courseSlug}/lessons/${slugify(initial.title)}`,
@@ -293,9 +299,9 @@ const CourseDashboard = () => {
   // -----------------------------
   const goToLesson = (lesson) => {
     if (!lesson) return;
-    setCurrentLesson(lesson);
-    const lessonSlug = lesson.slug ? lesson.slug : slugify(lesson.title);
-    navigate(`/watch/courses/${courseSlug}/lessons/${lessonSlug}`);
+    setIsVideoLoading(true);
+    const lSlug = lesson.slug ? lesson.slug : slugify(lesson.title);
+    navigate(`/watch/courses/${courseSlug}/lessons/${lSlug}`);
   };
 
   const goPrev = () => {
@@ -369,10 +375,11 @@ const CourseDashboard = () => {
     const nextLesson =
       lessons.find((l) => slugify(l.title) === lessonSlug) || null;
 
-    if (nextLesson) {
+    if (nextLesson && nextLesson.id !== currentLesson?.id) {
+      setIsVideoLoading(true);
       setCurrentLesson(nextLesson);
     }
-  }, [lessonSlug, lessons]);
+  }, [lessonSlug, lessons, currentLesson?.id]);
 
 
   const handleClaimCertificate = () => {
@@ -413,8 +420,8 @@ const CourseDashboard = () => {
             onClick={() => navigate("/dashboard/student")}
             className="flex items-center text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 font-bold transition-colors"
           >
-            <ArrowLeft className="w-5 h-5 mr-1" />
-            <span className="text-sm">Back</span>
+            <ArrowLeft className="w-5 h-5 sm:mr-1" />
+            <span className="hidden sm:inline text-sm">Back</span>
           </button>
         </div>
 
@@ -422,7 +429,7 @@ const CourseDashboard = () => {
           <button
             onClick={handleMarkAsCompleted}
             disabled={completedLessons.includes(currentLesson?.id)}
-            className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-bold transition cursor-pointer
+            className={`flex items-center gap-2 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-bold transition cursor-pointer
               ${completedLessons.includes(currentLesson?.id)
                 ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 cursor-not-allowed"
                 : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 dark:shadow-none"
@@ -431,21 +438,57 @@ const CourseDashboard = () => {
             {completedLessons.includes(currentLesson?.id) ? (
               <>
                 <CheckCircle className="w-5 h-5" />
-                Completed
+                <span className="hidden sm:inline">Completed</span>
               </>
             ) : (
-              "Mark as Completed"
+              <>
+                <CheckCircle className="w-5 h-5 sm:hidden" />
+                <span className="hidden sm:inline">Mark as Completed</span>
+              </>
             )}
           </button>
 
           {progress === 100 && (
             <button
               onClick={() => setShowCompletionModal(true)}
-              className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 dark:shadow-none transition transform hover:-translate-y-0.5 active:scale-95 cursor-pointer"
+              className="flex items-center gap-2 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 dark:shadow-none transition transform hover:-translate-y-0.5 active:scale-95 cursor-pointer"
             >
               <Trophy className="w-5 h-5" />
-              Finish Course
+              <span className="hidden sm:inline">Finish Course</span>
             </button>
+          )}
+
+          {course?.courseResources?.length > 0 && (
+            <div className="relative">
+              <button
+                onClick={() => setShowResources(!showResources)}
+                className={`flex items-center gap-2 px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-sm sm:text-base font-bold transition transform hover:-translate-y-0.5 active:scale-95 shadow-lg dark:shadow-none cursor-pointer
+                  ${showResources
+                    ? "bg-emerald-700 text-white"
+                    : "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-200"
+                  }`}
+              >
+                <FileText className="w-5 h-5" />
+                <span className="hidden sm:inline">Resources</span>
+              </button>
+
+              {/* Resources Dropdown */}
+              {showResources && (
+                <div className="absolute right-0 mt-3 w-[280px] sm:w-[400px] bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-slate-700 p-4 sm:p-6 z-50 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="font-black text-gray-900 dark:text-white uppercase tracking-wider text-xs">Course Resources</h3>
+                    <button onClick={() => setShowResources(false)} className="text-gray-400 hover:text-gray-600">
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                    {course.courseResources.map((resource, idx) => (
+                      <ResourceItem key={idx} resource={resource} />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           <button
@@ -578,19 +621,59 @@ const CourseDashboard = () => {
         </aside>
 
         {/* MAIN CONTENT */}
-        <section className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10 flex flex-col bg-[#f8fafc] dark:bg-slate-900 transition-colors" >
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden mb-8 border border-gray-100 dark:border-slate-800 transition-colors">
+        <section
+          className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-10 flex flex-col bg-[#f8fafc] dark:bg-slate-900 transition-colors"
+        >
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl shadow-gray-200/50 dark:shadow-none overflow-hidden mb-8 border border-gray-100 dark:border-slate-800 transition-colors relative">
+            {/* Video Loading Overlay */}
+            {isVideoLoading && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-50/80 dark:bg-slate-900/80 backdrop-blur-sm transition-all duration-300">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="relative">
+                    <div className="w-16 h-16 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
+                    <PlayCircle className="absolute inset-0 m-auto text-emerald-500 w-8 h-8 animate-pulse" />
+                  </div>
+                  <p className="text-emerald-600 dark:text-emerald-400 font-black text-xs uppercase tracking-[0.2em] animate-pulse">
+                    Preparing Lesson
+                  </p>
+                </div>
+              </div>
+            )}
+
             <iframe
               className="w-full aspect-video"
               src={formatVideoUrl(currentLesson?.videoUrl)}
               title="Lesson Player"
               allowFullScreen
+              onLoad={() => setIsVideoLoading(false)}
             />
             {/* Lesson title below the video */}
             <div className="p-6 bg-white dark:bg-slate-800 transition-colors">
               <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
                 {currentLesson?.title || "Select a lesson to start learning"}
               </h2>
+
+              {/* Lesson Resources Section */}
+              {currentLesson?.lessonResources?.length > 0 && (
+                <div className="mt-8 pt-8 border-t border-gray-100 dark:border-slate-700/50">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                      <Download className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="font-black text-gray-800 dark:text-gray-200 text-sm uppercase tracking-wider">
+                        Lesson Resources
+                      </h4>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mt-0.5">Xogaha casharkaan gaarka u ah</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {currentLesson.lessonResources.map((resource, idx) => (
+                      <ResourceItem key={idx} resource={resource} />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

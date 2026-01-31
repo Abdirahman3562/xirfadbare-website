@@ -1,10 +1,17 @@
 import mongoose from 'mongoose';
 
+const resourceSchema = mongoose.Schema({
+  title: { type: String, required: true },
+  fileUrl: { type: String, required: true },
+  fileType: { type: String } // e.g., 'zip', 'pdf'
+}, { _id: false });
+
 const lessonSchema = mongoose.Schema({
   title: { type: String, required: true },
   duration: { type: String },
   videoUrl: { type: String },
   curriculumId: { type: mongoose.Schema.Types.ObjectId, ref: 'Curriculum' },
+  lessonResources: [resourceSchema]
 });
 
 const curriculumSchema = mongoose.Schema({
@@ -34,6 +41,7 @@ const courseSchema = mongoose.Schema(
     hasCertificate: { type: Boolean, default: false },
     certificateTemplate: { type: mongoose.Schema.Types.ObjectId, ref: 'CertificateTemplate' },
     curriculum: [curriculumSchema],
+    courseResources: [resourceSchema],
   },
   { timestamps: true }
 );
