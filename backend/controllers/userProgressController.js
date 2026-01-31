@@ -191,12 +191,41 @@ const saveQuizResult = async (req, res) => {
   }
 };
 
+// @desc    Verify certificate by ID (Public)
+// @route   GET /api/progress/verify/:certificateId
+// @access  Public
+const verifyCertificate = async (req, res) => {
+  try {
+    const progress = await UserProgress.findOne({
+      certificateId: req.params.certificateId,
+      progress: 100
+    }).populate('user', 'firstName lastName name').populate('course', 'title');
+
+    if (progress) {
+      res.json({
+        valid: true,
+        studentName: (progress.user.firstName && progress.user.lastName)
+          ? `${progress.user.firstName} ${progress.user.lastName}`
+          : (progress.user.name || "Student"),
+        courseName: progress.course?.title || "Unknown Course",
+        completedAt: progress.completedAt,
+        certificateId: progress.certificateId
+      });
+    } else {
+      res.status(404).json({ valid: false, message: 'Certificate not found or invalid' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 export {
   getUserProgress,
   updateUserProgress,
   getUserAllProgress,
   deleteUserProgress,
   saveQuizResult,
+  verifyCertificate,
 };
 
 

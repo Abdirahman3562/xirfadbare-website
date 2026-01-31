@@ -171,6 +171,7 @@ const CourseDashboard = () => {
       // ✅ Initial lesson
       let initial =
         lessonsWithSlugs.find((l) => slugify(l.title) === lessonSlug) ||
+        lessonsWithSlugs.find((l) => String(l.id) === String(lessonSlug)) ||
         (savedCurrentLessonId ? lessonsWithSlugs.find((l) => String(l.id) === String(savedCurrentLessonId)) : null) ||
         grouped?.[0]?.lessons?.[0] ||
         null;

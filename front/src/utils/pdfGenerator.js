@@ -1,6 +1,7 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import download from 'downloadjs';
+import QRCode from 'qrcode';
 
 /**
  * Senior-Level PDF Generation: Fixed Canvas (WYSIWYG) Approach.
@@ -89,13 +90,38 @@ export const generateCertificate = async (template, data, filename = 'certificat
             // COORDINATE MAPPING: Y-Axis Inversion ONLY
             const y = CANVAS_HEIGHT - (el.y + h);
 
-            // A. Handle Images (Logo / Stamps)
-            if (el.type === 'image' || el.field === 'systemLogo') {
+            // A. Handle Images (Logo / Stamps / QR Code)
+            if (el.type === 'image' || el.field === 'systemLogo' || el.field === 'qrCode') {
                 try {
-                    const imgSrc = el.field === 'systemLogo' ? data.systemLogo : (el.src || data[el.field]);
+                    let imgSrc;
+                    if (el.field === 'qrCode') {
+                        // Generate dynamic QR code URL based on certificate data
+                        // Points to a verification page
+                        const baseUrl = window.location.origin || 'https://xirfadbare.so';
+                        const verifyUrl = `${baseUrl}/verify/${data.certificateId || 'valid'}`;
+                        imgSrc = await QRCode.toDataURL(verifyUrl, {
+                            margin: 1,
+                            width: 256,
+                            color: {
+                                dark: '#000000',
+                                light: '#ffffff'
+                            }
+                        });
+                    } else {
+                        imgSrc = el.field === 'systemLogo' ? data.systemLogo : (el.src || data[el.field]);
+                    }
+
                     if (!imgSrc) continue;
 
-                    const imgBytes = await fetch(imgSrc).then(res => res.arrayBuffer());
+                    // Handle potential arrayBuffer or dataUrl
+                    let imgBytes;
+                    if (imgSrc.startsWith('data:image')) {
+                        const base64Data = imgSrc.split(',')[1];
+                        imgBytes = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+                    } else {
+                        imgBytes = await fetch(imgSrc).then(res => res.arrayBuffer());
+                    }
+
                     const embeddedImg = (imgSrc.toLowerCase().includes('png') || imgSrc.includes('data:image/png'))
                         ? await pdfDoc.embedPng(imgBytes)
                         : await pdfDoc.embedJpg(imgBytes);

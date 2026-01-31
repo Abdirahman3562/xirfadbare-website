@@ -103,7 +103,7 @@ export default function StudentDashboard() {
                 lessonsCount: totalLessons,
                 progress: order.status === "pending" ? 0 : progress,
                 lastAccess: order.status === "pending" ? null : lastAccess,
-                courseSlug: course.title?.toLowerCase().replace(/\s+/g, "-"),
+                courseSlug: slugify(course.title),
                 currentLesson: userProgress?.currentLesson,
               };
             } catch (error) {

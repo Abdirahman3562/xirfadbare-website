@@ -63,6 +63,7 @@ import SinglePostPage from "./pages/webpages/Blog/SinglePostPage";
 import Quizzes from "./pages/Dashboard/student/Quizzes";
 import AuthorPage from "./pages/webpages/Author/AuthorPage";
 import TopBanner from "./components/ui/TopBanner";
+import VerifyCertificate from "./pages/webpages/VerifyCertificate";
 import NotFoundPage from "./pages/webpages/NotFound/NotFoundPage";
 
 
@@ -144,6 +145,7 @@ function App() {
           <Route path="/instructors" element={<InstructorList />} />
           <Route path="/courses" element={<CourseList />} />
           <Route path="/payment/:id" element={<PaymentPage />} />
+          <Route path="/verify/:id" element={<VerifyCertificate />} />
         </Route>
 
 

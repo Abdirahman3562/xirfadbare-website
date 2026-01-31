@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Rnd } from 'react-rnd';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Save, Upload, Type, Image as ImageIcon, Layout, Move, Trash2, Eye, ShieldCheck, Origami, Globe, ArrowLeft } from 'lucide-react';
+import { Save, Upload, Type, Image as ImageIcon, Layout, Move, Trash2, Eye, ShieldCheck, Origami, Globe, ArrowLeft, QrCode } from 'lucide-react';
 import { toast } from 'react-toastify';
+import QRCode from 'qrcode';
 import { generateCertificate } from '../../../utils/pdfGenerator';
 
 const CertificateBuilder = () => {
@@ -175,8 +176,8 @@ const CertificateBuilder = () => {
             src: src,
             x: 100,
             y: 100,
-            width: type === 'image' || field === 'systemLogo' ? 100 : 200,
-            height: type === 'image' || field === 'systemLogo' ? 100 : 40,
+            width: type === 'image' || field === 'systemLogo' || field === 'qrCode' ? 100 : 200,
+            height: type === 'image' || field === 'systemLogo' || field === 'qrCode' ? 100 : 40,
             fontSize: 16,
             fontWeight: 'normal',
             fontFamily: 'Inter',
@@ -266,6 +267,21 @@ const CertificateBuilder = () => {
     };
 
     const selectedElement = elements.find(el => el.id === selectedElementId);
+
+    // Dynamic QR generation for builder preview
+    const [qrPreviewUrl, setQrPreviewUrl] = useState('');
+    useEffect(() => {
+        const generateQrPreview = async () => {
+            try {
+                const baseUrl = window.location.origin || 'https://xirfadbare.so';
+                const url = await QRCode.toDataURL(`${baseUrl}/verify/preview`);
+                setQrPreviewUrl(url);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        generateQrPreview();
+    }, []);
 
     return (
         <div className="flex flex-col h-[calc(100vh-5rem)] bg-gray-50 dark:bg-slate-900 overflow-hidden font-sans uppercase">
@@ -362,8 +378,8 @@ const CertificateBuilder = () => {
             <div className="flex flex-1 flex-col lg:flex-row overflow-hidden relative">
                 {/* Sidebar - Dynamic Fields & Settings */}
                 <div className={`bg-white dark:bg-slate-800 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 flex flex-col transition-all duration-300 ease-in-out shrink-0 z-20 ${sidebarOpen
-                        ? 'h-[40vh] lg:h-full w-full lg:w-80 opacity-100'
-                        : 'h-0 lg:w-0 opacity-0 overflow-hidden border-none'
+                    ? 'h-[40vh] lg:h-full w-full lg:w-80 opacity-100'
+                    : 'h-0 lg:w-0 opacity-0 overflow-hidden border-none'
                     }`}>
                     <div className="p-4 sm:p-6 flex flex-col gap-5 overflow-y-auto h-full scrollbar-hide no-scrollbar min-w-[256px]">
                         <div className="flex items-center justify-between shrink-0">
@@ -381,6 +397,7 @@ const CertificateBuilder = () => {
                                 { field: 'completionDate', label: 'Date', icon: Move, color: 'text-orange-500' },
                                 { field: 'instructorName', label: 'Instructor', icon: Type, color: 'text-rose-500' },
                                 { field: 'certificateId', label: 'ID', icon: Type, color: 'text-blue-500' },
+                                { field: 'qrCode', label: 'QR Code', icon: QrCode, color: 'text-gray-900' },
                             ].map(field => (
                                 <button
                                     key={field.field}
@@ -498,14 +515,20 @@ const CertificateBuilder = () => {
                                         </>
                                     )}
 
-                                    {(selectedElement.type === 'image' || selectedElement.field === 'systemLogo') && (
+                                    {(selectedElement.type === 'image' || selectedElement.field === 'systemLogo' || selectedElement.field === 'qrCode') && (
                                         <div className="bg-emerald-50/50 dark:bg-slate-900/50 p-4 sm:p-5 rounded-[1.5rem] sm:rounded-3xl border-2 border-dashed border-emerald-200 dark:border-emerald-500/20">
                                             <div className="flex items-center gap-2 mb-3">
                                                 <ImageIcon size={14} className="text-emerald-600" />
                                                 <p className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">Image Element</p>
                                             </div>
                                             <div className="bg-white dark:bg-slate-800 p-2 rounded-xl sm:rounded-2xl shadow-sm mb-3">
-                                                <img src={selectedElement.src} alt="element" className="w-full h-24 sm:h-32 object-contain rounded-lg sm:rounded-xl" />
+                                                {selectedElement.field === 'qrCode' ? (
+                                                    <div className="w-full flex items-center justify-center p-2 rounded-lg sm:rounded-xl">
+                                                        <img src={qrPreviewUrl} alt="QR Preview" className="w-24 h-24 sm:w-32 sm:h-32 object-contain" />
+                                                    </div>
+                                                ) : (
+                                                    <img src={selectedElement.src} alt="element" className="w-full h-24 sm:h-32 object-contain rounded-lg sm:rounded-xl" />
+                                                )}
                                             </div>
                                             <p className="text-[9px] text-gray-400 text-center font-bold italic">Dimensions are proportional.</p>
                                         </div>
@@ -592,12 +615,18 @@ const CertificateBuilder = () => {
                                             lineHeight: '1.2'
                                         }}
                                     >
-                                        {(el.type === 'image' || el.field === 'systemLogo') ? (
-                                            <img
-                                                src={el.field === 'systemLogo' ? getFullImageUrl(systemSettings?.logo) : el.src}
-                                                alt="layout element"
-                                                className="w-full h-full object-contain pointer-events-none drop-shadow-sm"
-                                            />
+                                        {(el.type === 'image' || el.field === 'systemLogo' || el.field === 'qrCode') ? (
+                                            el.field === 'qrCode' ? (
+                                                <div className="w-full h-full bg-white flex items-center justify-center border border-gray-100 shadow-sm rounded-lg overflow-hidden">
+                                                    <img src={qrPreviewUrl} alt="QR Code" className="w-full h-full object-contain" />
+                                                </div>
+                                            ) : (
+                                                <img
+                                                    src={el.field === 'systemLogo' ? getFullImageUrl(systemSettings?.logo) : el.src}
+                                                    alt="layout element"
+                                                    className="w-full h-full object-contain pointer-events-none drop-shadow-sm"
+                                                />
+                                            )
                                         ) : (
                                             el.content
                                         )}
