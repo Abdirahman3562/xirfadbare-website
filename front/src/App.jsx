@@ -62,6 +62,7 @@ import CourseDashboard from "./pages/Dashboard/student/CourseDashboard";
 import SinglePostPage from "./pages/webpages/Blog/SinglePostPage";
 import AuthorPage from "./pages/webpages/Author/AuthorPage";
 import TopBanner from "./components/ui/TopBanner";
+import NotFoundPage from "./pages/webpages/NotFound/NotFoundPage";
 
 
 // ScrollToTop Component
@@ -197,21 +198,8 @@ function App() {
           <Route path="live-chat" element={<LiveChat />} />
         </Route>
 
-        {/* 404 Route Wrapped in PublicLayout */}
         <Route element={<PublicLayout />}>
-          <Route path="*" element={
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
-              <h1 className="text-8xl font-black text-emerald-600 mb-4 tracking-tighter animate-bounce">404</h1>
-              <h2 className="text-4xl font-black text-gray-900 mb-4 tracking-tight uppercase">Boggan lama helin!</h2>
-              <p className="text-gray-500 mb-10 max-w-md italic font-semibold text-lg leading-relaxed">
-                Waan ka xunnahay, boggan aad raadinayso ma jiro ama waa laga guuray.
-                Fadlan dib ugu laabo bogga hore.
-              </p>
-              <Link to="/" className="bg-emerald-600 text-white px-12 py-5 rounded-[2rem] font-black text-sm uppercase tracking-widest hover:bg-emerald-700 transition shadow-2xl shadow-emerald-200 active:scale-95">
-                Ku laabo Bogga Hore
-              </Link>
-            </div>
-          } />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
