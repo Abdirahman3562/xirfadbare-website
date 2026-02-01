@@ -12,6 +12,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { X, PlayCircle as PlayIcon } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { useMyOrders } from "../../hooks/useMyOrders";
 import { slugify } from "../../utils/slugify";
@@ -30,6 +31,7 @@ export default function Curriculum({
   courseSlug
 }) {
   const [openSections, setOpenSections] = useState({});
+  const [previewLesson, setPreviewLesson] = useState(null);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { refreshOrders } = useMyOrders(user);
@@ -91,16 +93,37 @@ export default function Curriculum({
   })();
 
 
-  // 🔹 Get First Lesson Slug Helper
-  const getFirstLessonSlug = () => {
+  const getFirstLesson = () => {
     if (!curriculum || !Array.isArray(curriculum)) return null;
     for (const section of curriculum) {
       if (section.lessons && section.lessons.length > 0) {
-        const firstLesson = section.lessons[0];
-        return firstLesson.slug || slugify(firstLesson.title) || firstLesson._id || firstLesson.id;
+        return section.lessons[0];
       }
     }
     return null;
+  };
+
+  const firstLesson = getFirstLesson();
+
+  const getFirstLessonSlug = () => {
+    if (firstLesson) {
+      return firstLesson.slug || slugify(firstLesson.title) || firstLesson._id || firstLesson.id;
+    }
+    return null;
+  };
+
+  const formatVideoUrl = (url) => {
+    if (!url) return "";
+    if (url.includes("youtu.be/")) {
+      const videoId = url.split("youtu.be/")[1].split("?")[0];
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    }
+    if (url.includes("watch?v=")) {
+      const videoId = url.split("watch?v=")[1].split("&")[0];
+      return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    }
+    if (url.includes("embed/")) return `${url}${url.includes('?') ? '&' : '?'}autoplay=1`;
+    return url;
   };
 
   return (
@@ -192,26 +215,47 @@ export default function Curriculum({
               {/* Lessons */}
               {openSections[index] && (
                 <div className="px-8 pb-5 space-y-3">
-                  {section.lessons.map((lesson, i) => (
-                    <div
-                      key={i}
-                      className={`flex justify-between items-center border border-gray-200 dark:border-slate-800 rounded-lg p-3 transition duration-300 
-          hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 shadow-sm
-          ${isPaid && !isEnrolled ? "cursor-not-allowed opacity-95" : "cursor-pointer"}`}
-                    >
-                      <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
-                        {isPaid && !isEnrolled ? (
-                          <FaLock className="text-emerald-500 dark:text-emerald-400 text-xs" />
-                        ) : (
-                          <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-xs" />
-                        )}
-                        <span className="break-all whitespace-pre-wrap">{lesson.title}</span>
+                  {section.lessons.map((lesson, i) => {
+                    const isFirst = firstLesson && String(lesson._id || lesson.id) === String(firstLesson._id || firstLesson.id);
+                    const isLocked = isPaid && !isEnrolled && !isFirst;
+
+                    return (
+                      <div
+                        key={i}
+                        onClick={() => {
+                          if (isLocked) return;
+                          if (isFirst && !isEnrolled && isPaid) {
+                            setPreviewLesson(lesson);
+                          } else if (isEnrolled || !isPaid) {
+                            const lessonSlug = lesson.slug || slugify(lesson.title) || lesson._id || lesson.id;
+                            const cSlug = courseSlug || slugify(courseTitle);
+                            navigate(`/watch/courses/${cSlug}/lessons/${lessonSlug}`);
+                          }
+                        }}
+                        className={`flex justify-between items-center border border-gray-200 dark:border-slate-800 rounded-lg p-3 transition duration-300 
+                          ${isLocked ? "cursor-not-allowed opacity-95" : "cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 shadow-sm"}`}
+                      >
+                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
+                          {isLocked ? (
+                            <FaLock className="text-emerald-500 dark:text-emerald-400 text-xs" />
+                          ) : (
+                            <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-xs" />
+                          )}
+                          <div className="flex items-center gap-2">
+                            <span className="break-all whitespace-pre-wrap">{lesson.title}</span>
+                            {isFirst && isPaid && !isEnrolled && (
+                              <span className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
+                                Preview
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-gray-500 dark:text-gray-400 text-xs">
+                          {lesson.duration}
+                        </span>
                       </div>
-                      <span className="text-gray-500 dark:text-gray-400 text-xs">
-                        {lesson.duration}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -305,6 +349,7 @@ export default function Curriculum({
                     );
                   }
                 }}
+                id="buy-course-btn"
                 className="w-full bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100 dark:shadow-none"
               >
                 Buy Course To Get Full Access <FaArrowRight />
@@ -356,6 +401,74 @@ export default function Curriculum({
           )}
         </div>
       </div>
+
+      {/* ✅ Preview Video Modal */}
+      {previewLesson && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-500">
+          <div className="relative w-full max-w-3xl bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden shadow-2xl border-2 border-white dark:border-slate-800 animate-in zoom-in-95 duration-500">
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 flex items-center justify-between bg-white dark:bg-slate-900 border-b border-gray-50 dark:border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 border border-emerald-50 dark:border-emerald-500/20">
+                  <PlayIcon size={18} fill="currentColor" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                    <p className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em]">Preview</p>
+                  </div>
+                  <h3 className="text-gray-900 dark:text-white font-bold text-sm sm:text-base tracking-tight line-clamp-1">{previewLesson.title}</h3>
+                </div>
+              </div>
+              <button
+                onClick={() => setPreviewLesson(null)}
+                className="w-9 h-9 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-400 dark:text-gray-500 rounded-xl flex items-center justify-center transition-all active:scale-90"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Video Player Section */}
+            <div className="aspect-video w-full bg-slate-900">
+              {previewLesson.videoUrl ? (
+                <iframe
+                  className="w-full h-full"
+                  src={formatVideoUrl(previewLesson.videoUrl)}
+                  title="Lesson Preview"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 gap-3">
+                  <PlayIcon size={32} className="opacity-20" />
+                  <p className="font-black uppercase tracking-widest text-[10px]">Video not available</p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer / CTA */}
+            <div className="p-4 sm:p-5 bg-gray-50/30 dark:bg-slate-800/20 border-t border-gray-50 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-gray-500 dark:text-gray-400 text-[11px] sm:text-xs font-medium text-center sm:text-left leading-relaxed max-w-[280px]">
+                Enjoyed the preview? Get full access to <span className="text-emerald-600 dark:text-emerald-400 font-bold">{courseTitle}</span>.
+              </p>
+              <button
+                onClick={() => {
+                  setPreviewLesson(null);
+                  const buyBtn = document.getElementById('buy-course-btn');
+                  if (buyBtn) {
+                    buyBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    buyBtn.classList.add('animate-bounce');
+                    setTimeout(() => buyBtn.classList.remove('animate-bounce'), 2000);
+                  }
+                }}
+                className="w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                Enroll Now <FaArrowRight size={12} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
