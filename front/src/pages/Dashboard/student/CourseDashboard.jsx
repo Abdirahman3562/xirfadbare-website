@@ -322,8 +322,16 @@ const CourseDashboard = () => {
   const goToLesson = (lesson) => {
     if (!lesson) return;
     setIsVideoLoading(true);
-    const lSlug = lesson.slug ? lesson.slug : slugify(lesson.title);
-    navigate(`/watch/courses/${courseSlug}/lessons/${lSlug}`);
+
+    // Use title slug if possible, but fallback to ID if we are navigating to a different lesson with same slug
+    const titleSlug = lesson.slug ? lesson.slug : slugify(lesson.title);
+
+    // If we're already on this slug but it's a DIFFERENT lesson ID, use the ID in the URL
+    if (lessonSlug === titleSlug && String(currentLesson?.id) !== String(lesson.id)) {
+      navigate(`/watch/courses/${courseSlug}/lessons/${lesson.id}`);
+    } else {
+      navigate(`/watch/courses/${courseSlug}/lessons/${titleSlug}`);
+    }
   };
 
   const goPrev = () => {
@@ -439,8 +447,11 @@ const CourseDashboard = () => {
   useEffect(() => {
     if (!lessonSlug || !lessons.length) return;
 
+    // 🛡️ Better lookup: Try ID first, then slug
     const nextLesson =
-      lessons.find((l) => slugify(l.title) === lessonSlug) || null;
+      lessons.find((l) => String(l.id) === String(lessonSlug)) ||
+      lessons.find((l) => slugify(l.title) === lessonSlug) ||
+      null;
 
     if (nextLesson && nextLesson.id !== currentLesson?.id) {
       setIsVideoLoading(true);

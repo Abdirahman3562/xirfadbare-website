@@ -12,6 +12,8 @@ import {
 } from "react-icons/fa";
 import { getInstructorBySlug } from "../../api/instructorService";
 import { getAllCourses } from "../../api/courseService";
+import { useAuth } from "../../hooks/useAuth";
+import { useMyOrders } from "../../hooks/useMyOrders";
 
 const InstructorCourses = ({ instructorSlug }) => {
 
@@ -19,6 +21,9 @@ const InstructorCourses = ({ instructorSlug }) => {
   const [courses, setCourses] = useState([]);
   const [instructor, setInstructor] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const { user } = useAuth();
+  const { isEnrolledInCourse } = useMyOrders(user);
 
   useEffect(() => {
     const fetchInstructorCourses = async () => {
@@ -107,7 +112,7 @@ const InstructorCourses = ({ instructorSlug }) => {
         return (
           <div
             key={course._id || course.id}
-            className="group relative bg-[#edf4f5] border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+            className="group relative bg-[#edf4f5] border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
           >
             {/* ✅ Thumbnail */}
             <div className="relative h-52 w-full overflow-hidden z-0">
@@ -131,10 +136,11 @@ const InstructorCourses = ({ instructorSlug }) => {
             </div>
 
             {/* ✅ Info */}
-            <div className="relative z-20 p-6">
+            <div className="relative z-20 p-6 flex flex-col flex-1">
               <Link
                 to={`/courses/${slug}`}
-                className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition"
+                className="text-lg font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition block line-clamp-2 break-words leading-snug"
+                title={course.title}
               >
                 {course.title}
               </Link>
@@ -251,14 +257,25 @@ const InstructorCourses = ({ instructorSlug }) => {
                 </div>
               )}
 
-              <div className="border-t border-gray-100 mb-4"></div>
+              <div className="border-t border-gray-100 mb-4 mt-auto"></div>
 
-              <Link
-                to={`/courses/${slug}`}
-                className="block text-center bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-full transition duration-300 transform hover:-translate-y-0.5 relative z-30"
-              >
-                View Details →
-              </Link>
+              <div className="border-t border-gray-100 mb-4 mt-auto"></div>
+
+              {isEnrolledInCourse(course._id) ? (
+                <Link
+                  to={getWatchLink(course, slug)}
+                  className="block text-center bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-full transition duration-300 transform hover:-translate-y-0.5 relative z-30"
+                >
+                  Continue Learning →
+                </Link>
+              ) : (
+                <Link
+                  to={`/courses/${slug}`}
+                  className="block text-center bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-full transition duration-300 transform hover:-translate-y-0.5 relative z-30"
+                >
+                  View Details →
+                </Link>
+              )}
             </div>
           </div>
         );
@@ -275,6 +292,19 @@ const InstructorCourses = ({ instructorSlug }) => {
 /* ---------------------------------------------
  ✅ Helpers
 ----------------------------------------------*/
+const getWatchLink = (course, courseSlug) => {
+  if (!course.curriculum || !Array.isArray(course.curriculum)) return `/courses/${courseSlug}`; // Fallback
+
+  for (const section of course.curriculum) {
+    if (section.lessons && section.lessons.length > 0) {
+      const firstLesson = section.lessons[0];
+      const lessonSlug = firstLesson.slug || generateSlug(firstLesson.title) || firstLesson._id;
+      return `/watch/courses/${courseSlug}/lessons/${lessonSlug}`;
+    }
+  }
+  return `/courses/${courseSlug}`;
+};
+
 const generateSlug = (name) =>
   name.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
 

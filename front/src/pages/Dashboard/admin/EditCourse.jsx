@@ -438,6 +438,7 @@ const SortableLesson = ({ lesson, lIndex, sIndex, handleLessonChange, removeLess
 };
 
 const SortableSection = ({ section, sIndex, handleSectionTitleChange, removeSection, addLesson, handleLessonChange, removeLesson, onLessonDragEnd }) => {
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const {
         attributes,
         listeners,
@@ -466,7 +467,7 @@ const SortableSection = ({ section, sIndex, handleSectionTitleChange, removeSect
         <div
             ref={setNodeRef}
             style={style}
-            className="bg-gray-50/50 dark:bg-slate-800/50 rounded-[1.5rem] md:rounded-[2rem] border border-gray-100/50 dark:border-gray-700/50 p-4 md:p-8 space-y-6 relative group/section transition-colors duration-300"
+            className={`bg-gray-50/50 dark:bg-slate-800/50 rounded-[1.5rem] md:rounded-[2rem] border border-gray-100/50 dark:border-gray-700/50 p-4 md:p-8 space-y-6 relative group/section transition-all duration-300 ${isCollapsed ? 'pb-4 md:pb-6' : ''}`}
         >
             <div className="flex items-center gap-3 md:gap-4">
                 <div
@@ -483,41 +484,54 @@ const SortableSection = ({ section, sIndex, handleSectionTitleChange, removeSect
                     className="bg-transparent border-none outline-none text-base md:text-lg font-bold text-gray-900 dark:text-white flex-1 placeholder-gray-400 dark:placeholder-gray-500"
                     placeholder="Section Title..."
                 />
-                <button
-                    onClick={() => removeSection(sIndex)}
-                    className="p-2 text-gray-300 hover:text-red-500 transition-colors sm:opacity-0 sm:group-hover/section:opacity-100"
-                >
-                    <Trash2 size={18} />
-                </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => setIsCollapsed(!isCollapsed)}
+                        className="p-2 text-gray-400 hover:text-emerald-500 transition-colors flex items-center gap-1 text-[10px] font-black uppercase tracking-widest"
+                        title={isCollapsed ? "Expand Section" : "Collapse Section"}
+                    >
+                        <span className="hidden md:inline mr-1">{isCollapsed ? 'Expand' : 'Collapse'}</span>
+                        {isCollapsed ? <ChevronDown size={18} strokeWidth={3} /> : <ChevronUp size={18} strokeWidth={3} />}
+                    </button>
+                    <button
+                        onClick={() => removeSection(sIndex)}
+                        className="p-2 text-gray-300 hover:text-red-500 transition-colors sm:opacity-0 sm:group-hover/section:opacity-100"
+                        title="Remove Section"
+                    >
+                        <Trash2 size={18} />
+                    </button>
+                </div>
             </div>
 
-            <div className="space-y-4 pl-0 md:pl-10">
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={(event) => onLessonDragEnd(sIndex, event)}
-                >
-                    <SortableContext items={lessonIds} strategy={verticalListSortingStrategy}>
-                        {section.lessons.map((lesson, lIndex) => (
-                            <SortableLesson
-                                key={`lesson-${sIndex}-${lIndex}`}
-                                lesson={lesson}
-                                lIndex={lIndex}
-                                sIndex={sIndex}
-                                handleLessonChange={handleLessonChange}
-                                removeLesson={removeLesson}
-                            />
-                        ))}
-                    </SortableContext>
-                </DndContext>
-                <button
-                    onClick={() => addLesson(sIndex)}
-                    className="flex items-center gap-2 text-emerald-500 hover:text-emerald-600 font-bold text-[9px] md:text-[10px] uppercase tracking-widest pt-2 ml-2"
-                >
-                    <Plus size={14} strokeWidth={3} />
-                    Add Lesson
-                </button>
-            </div>
+            {!isCollapsed && (
+                <div className="space-y-4 pl-0 md:pl-10 animate-in slide-in-from-top-2 duration-300">
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={(event) => onLessonDragEnd(sIndex, event)}
+                    >
+                        <SortableContext items={lessonIds} strategy={verticalListSortingStrategy}>
+                            {section.lessons.map((lesson, lIndex) => (
+                                <SortableLesson
+                                    key={`lesson-${sIndex}-${lIndex}`}
+                                    lesson={lesson}
+                                    lIndex={lIndex}
+                                    sIndex={sIndex}
+                                    handleLessonChange={handleLessonChange}
+                                    removeLesson={removeLesson}
+                                />
+                            ))}
+                        </SortableContext>
+                    </DndContext>
+                    <button
+                        onClick={() => addLesson(sIndex)}
+                        className="flex items-center gap-2 text-emerald-500 hover:text-emerald-600 font-bold text-[9px] md:text-[10px] uppercase tracking-widest pt-2 ml-2"
+                    >
+                        <Plus size={14} strokeWidth={3} />
+                        Add Lesson
+                    </button>
+                </div>
+            )}
         </div>
     );
 };

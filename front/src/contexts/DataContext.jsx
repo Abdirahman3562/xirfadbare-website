@@ -5,6 +5,8 @@ import { getAllInstructors } from '../api/instructorService';
 import { getAllBlogs } from '../api/blogService';
 import { getAllAuthors } from '../api/authorService';
 import { getFAQs } from '../api/faqService';
+import { getAllBundles } from '../api/bundleService';
+import { slugify } from '../utils/slugify';
 
 // Create the context
 const DataContext = createContext();
@@ -28,6 +30,7 @@ export const DataProvider = ({ children }) => {
     authors: [],
     faqs: [],
     categories: [],
+    bundles: [],
   });
 
   const [loading, setLoading] = useState(true);
@@ -49,6 +52,7 @@ export const DataProvider = ({ children }) => {
           getAllBlogs(),
           getAllAuthors(),
           getFAQs(),
+          getAllBundles(),
         ]);
 
         const [
@@ -58,6 +62,7 @@ export const DataProvider = ({ children }) => {
           blogsRes,
           authorsRes,
           faqsRes,
+          bundlesRes,
         ] = results;
 
         // Process results and handle any failures gracefully
@@ -69,6 +74,7 @@ export const DataProvider = ({ children }) => {
           authors: authorsRes.status === 'fulfilled' ? authorsRes.value : [],
           faqs: faqsRes.status === 'fulfilled' ? faqsRes.value : [],
           categories: extractCategories(coursesRes.status === 'fulfilled' ? coursesRes.value : []),
+          bundles: bundlesRes.status === 'fulfilled' ? bundlesRes.value : [],
         };
 
         setData(newData);
@@ -160,8 +166,11 @@ export const DataProvider = ({ children }) => {
           setData(prev => ({ ...prev, authors: newData }));
           break;
         case 'faqs':
-          newData = await getFAQs();
           setData(prev => ({ ...prev, faqs: newData }));
+          break;
+        case 'bundles':
+          newData = await getAllBundles();
+          setData(prev => ({ ...prev, bundles: newData }));
           break;
         default:
           console.warn(`⚠️ Unknown data type: ${dataType}`);
@@ -183,6 +192,7 @@ export const DataProvider = ({ children }) => {
     authors: data.authors,
     faqs: data.faqs,
     categories: data.categories,
+    bundles: data.bundles,
 
     // State
     loading,
@@ -194,7 +204,8 @@ export const DataProvider = ({ children }) => {
     // Helper functions
     getCourseById: (id) => data.courses.find(course => course._id === id),
     getCourseBySlug: (slug) => data.courses.find(course =>
-      course.title?.toLowerCase().replace(/\s+/g, '-') === slug
+      course.slug === slug ||
+      slugify(course.title) === slug
     ),
     getInstructorById: (id) => data.instructors.find(instructor => instructor._id === id),
     getInstructorBySlug: (slug) => data.instructors.find(instructor =>

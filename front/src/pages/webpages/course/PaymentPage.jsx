@@ -1,5 +1,5 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { CreditCard, Camera, X } from "lucide-react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { CreditCard, Camera, X, Layers } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getImageUrl } from "../../../utils/format";
 import toast, { Toaster } from "react-hot-toast";
@@ -14,11 +14,18 @@ import {
   getFullCourseDetails,
   getFullCourseDetailsBySlug,
 } from "../../../api/courseService";
+import { getBundleById } from "../../../api/bundleService";
 import { API_BASE_URL } from "../../../config";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 function PaymentPage() {
   const { id } = useParams();
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const isBundle = queryParams.get("isBundle") === "true";
+
   const [course, setCourse] = useState(null);
+  const [bundle, setBundle] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState(null);
   const [phone, setPhone] = useState("");
@@ -30,43 +37,59 @@ function PaymentPage() {
   const [loadingMethods, setLoadingMethods] = useState(true);
   const [paymentProof, setPaymentProof] = useState("");
   const [uploadingProof, setUploadingProof] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
   const navigate = useNavigate();
 
+  // Unified item for display
+  const displayItem = isBundle ? bundle : course;
+
   // Calculate prices dynamically
-  const baseDiscount = (course?.discountCode ? 0 : (course?.discountPercentage || 0)) / 100;
+  const baseDiscount = (displayItem?.discountCode ? 0 : (displayItem?.discountPercentage || 0)) / 100;
   const totalDiscount = baseDiscount + appliedDiscount;
 
   const totalPrice = Number(
-    selectedPlan?.price || course?.price?.amount || course?.price || 0
+    selectedPlan?.price || displayItem?.price?.amount || displayItem?.price || 0
   );
   const discountAmount = (totalPrice * totalDiscount).toFixed(2);
   const finalPrice = (totalPrice - discountAmount).toFixed(2);
 
-  // ✅ Fetch course (auto detect slug or id)
+  // ✅ Fetch course or bundle (auto detect slug or id)
   useEffect(() => {
-    const fetchCourseData = async () => {
+    const fetchData = async () => {
       try {
-        const isObjectId = id.length === 24;
-
-        let courseData;
-        if (isObjectId) {
-          courseData = await getFullCourseDetails(id);
+        if (isBundle) {
+          const bundleData = await getBundleById(id);
+          if (bundleData) {
+            setBundle(bundleData);
+          } else {
+            console.error("❌ Bundle not found:", id);
+          }
         } else {
-          courseData = await getFullCourseDetailsBySlug(id);
-        }
+          const isObjectId = id.length === 24;
 
-        if (courseData) {
-          setCourse(courseData);
-        } else {
-          console.error("❌ Course not found:", id);
+          let courseData;
+          if (isObjectId) {
+            courseData = await getFullCourseDetails(id);
+          } else {
+            courseData = await getFullCourseDetailsBySlug(id);
+          }
+
+          if (courseData) {
+            setCourse(courseData);
+          } else {
+            console.error("❌ Course not found:", id);
+          }
         }
       } catch (error) {
-        console.error("❌ Error fetching course:", error);
+        console.error("❌ Error fetching data:", error);
+      } finally {
+        setLoadingData(false);
       }
     };
 
-    if (id) fetchCourseData();
-  }, [id]);
+    if (id) fetchData();
+  }, [id, isBundle]);
 
   // ✅ Fetch payment methods
   useEffect(() => {
@@ -101,9 +124,9 @@ function PaymentPage() {
       });
       const data = await res.json();
       setPaymentProof(data.url);
-      toast.success("Cadeentii waa la soo galiyay!");
+      toast.success("Proof uploaded successfully!");
     } catch (error) {
-      toast.error("Wuu fashilmay upload-ka.");
+      toast.error("Upload failed.");
     } finally {
       setUploadingProof(false);
     }
@@ -122,12 +145,12 @@ function PaymentPage() {
   // Coupon
   const handleApplyDiscount = () => {
     const coupon = discount.trim().toLowerCase();
-    const courseCode = course?.discountCode?.trim().toLowerCase();
+    const itemCode = displayItem?.discountCode?.trim().toLowerCase();
 
-    if (courseCode && coupon === courseCode) {
-      setAppliedDiscount((course.discountPercentage || 0) / 100);
+    if (itemCode && coupon === itemCode) {
+      setAppliedDiscount((displayItem.discountPercentage || 0) / 100);
       setErrorMsg("");
-      toast.success(`Code applied! You got ${course.discountPercentage}% off.`);
+      toast.success(`Code applied! You got ${displayItem.discountPercentage}% off.`);
     } else if (coupon === "") {
       setErrorMsg("Please enter a coupon code.");
       setAppliedDiscount(0);
@@ -159,6 +182,7 @@ function PaymentPage() {
 
   // save payment details
   const handlePayment = async () => {
+    setIsProcessing(true);
     const user = getLoggedInUser();
     if (!user) {
       toast.error("Please login first to complete your order.");
@@ -190,16 +214,21 @@ function PaymentPage() {
         }
       );
       const myOrders = await existingOrderRes.json();
-      const duplicate = myOrders.find(o => o.course === course._id);
+
+      const duplicate = myOrders.find(o =>
+        isBundle ? (o.bundle === bundle._id) : (o.course === course._id)
+      );
 
       if (duplicate) {
-        toast.error("You already ordered this course.");
+        toast.error(`You already ordered this ${isBundle ? "bundle" : "course"}.`);
         return;
       }
 
       const orderData = {
-        courseId: course._id,
-        courseTitle: course.title,
+        courseId: isBundle ? null : course._id,
+        bundleId: isBundle ? bundle._id : null,
+        isBundle: isBundle,
+        courseTitle: displayItem.title,
         paymentType: selectedTab === "local" ? "Local Payment" : "Online Payment",
         paymentMethod: selectedMethod,
         phoneNumber: phone,
@@ -228,47 +257,73 @@ function PaymentPage() {
     } catch (err) {
       console.error(err);
       toast.error("Server error while saving order!");
+    } finally {
+      setIsProcessing(false);
     }
   };
 
 
-  // Calculate duration per section
-  const calculateSectionDuration = (lessons) => {
-    if (!lessons) return "0m";
+  const calculateTotalDuration = (item) => {
+    if (!item) return "0m";
 
-    let totalMinutes = 0;
-    lessons.forEach((lesson) => {
-      if (!lesson.duration) return;
-      const [min, sec] = lesson.duration.split(":").map(Number);
-      totalMinutes += min + sec / 60;
-    });
+    // If it's a course with pre-calculated duration
+    if (!isBundle && item.totalDuration) return item.totalDuration;
 
-    const hours = Math.floor(totalMinutes / 60);
-    const minutes = Math.round(totalMinutes % 60);
-    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-  };
-
-  const calculateTotalDuration = (curriculum) => {
-    if (!curriculum) return "0m";
+    // Aggregate duration
     let totalSec = 0;
-    curriculum.forEach(sec => {
-      sec.lessons?.forEach(lesson => {
-        if (!lesson.duration) return;
-        const [m, s] = lesson.duration.split(':').map(Number);
-        totalSec += (m || 0) * 60 + (s || 0);
+    const courses = isBundle ? (item.courses || []) : [item];
+
+    courses.forEach(c => {
+      c.curriculum?.forEach(sec => {
+        sec.lessons?.forEach(lesson => {
+          if (!lesson.duration) return;
+          const parts = lesson.duration.split(':').map(Number);
+          if (parts.length === 2) totalSec += parts[0] * 60 + parts[1];
+          if (parts.length === 3) totalSec += parts[0] * 3600 + parts[1] * 60 + parts[2];
+        });
       });
     });
+
     const hours = Math.floor(totalSec / 3600);
     const mins = Math.floor((totalSec % 3600) / 60);
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
-  if (!course)
+  const getIncludedStats = () => {
+    if (!displayItem) return { lessons: 0, sections: 0 };
+
+    let lessons = 0;
+    let sections = 0;
+    const items = isBundle ? (displayItem.courses || []) : [displayItem];
+
+    items.forEach(item => {
+      sections += (item.curriculum?.length || 0);
+      item.curriculum?.forEach(sec => {
+        lessons += (sec.lessons?.length || 0);
+      });
+    });
+
+    return { lessons, sections };
+  };
+
+  if (loadingData) {
+    return <PremiumLoader text="Loading payment details..." />;
+  }
+
+  if (isProcessing) {
+    return <PremiumLoader text="Submitting your order..." />;
+  }
+
+  if (!displayItem) {
     return (
       <div className="min-h-screen flex justify-center items-center text-gray-500">
-        Loading course details...
+        Course/Bundle not found or error loading data.
       </div>
     );
+  }
+
+  const stats = getIncludedStats();
+  const totalDuration = calculateTotalDuration(displayItem);
 
   return (
     <div className="min-h-screen bg-[#edf4f5] dark:bg-slate-900 transition-colors duration-500">
@@ -278,35 +333,27 @@ function PaymentPage() {
         {/* ===== LEFT SIDE ===== */}
         <div className="lg:col-span-1 bg-white dark:bg-slate-900 shadow-md rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300">
           <div className="relative">
-            {course.thumbnail && (
+            {displayItem.thumbnail && (
               <img
-                src={getImageUrl(course.thumbnail)}
-                alt={course.title}
+                src={getImageUrl(displayItem.thumbnail)}
+                alt={displayItem.title}
                 className="w-full h-64 object-cover rounded-t-xl"
               />
             )}
-            {(course.discountPercentage > 0 || totalDiscount > 0) && (
+            {(displayItem.discountPercentage > 0 || totalDiscount > 0) && (
               <div className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5 animate-pulse">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
                 </span>
-                {Math.round((course.discountPercentage || totalDiscount * 100))}% Discount
-              </div>
-            )}
-
-            {course.hasCertificate && (
-              <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-400 text-white font-black px-3.5 py-1.5 rounded-lg shadow-lg border border-amber-300/30 transition-all hover:scale-105 duration-300">
-                <FaAward className="text-white text-sm animate-pulse" />
-                <span className="text-[9px] uppercase tracking-[0.1em] font-black">Certificate Included</span>
-                <div className="w-1 h-1 bg-white rounded-full animate-pulse"></div>
+                {Math.round((displayItem.discountPercentage || totalDiscount * 100))}% Discount
               </div>
             )}
           </div>
 
           <div className="p-5">
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-              {course.title}
+              {displayItem.title}
             </h2>
 
             <div className="grid grid-cols-2 gap-3 text-[13px] mt-4 mb-6">
@@ -314,73 +361,114 @@ function PaymentPage() {
               <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-all hover:border-emerald-200 dark:hover:border-emerald-500/30">
                 <FaClock className="text-emerald-500 shrink-0" />
                 <span className="text-gray-700 dark:text-gray-300 font-semibold truncate">
-                  {course.totalDuration || "N/A"}
+                  {totalDuration}
                 </span>
               </div>
 
-              {/* Sections */}
+              {/* Items Count */}
               <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-all hover:border-emerald-200 dark:hover:border-emerald-500/30">
                 <FaGraduationCap className="text-emerald-500 shrink-0" />
                 <span className="text-gray-700 dark:text-gray-300 font-semibold truncate">
-                  {course.curriculum?.length || 0} Sections
+                  {isBundle ? `${displayItem.courses?.length} Courses` : `${stats.sections} Sections`}
+                </span>
+              </div>
+
+              {/* Sections/Lessons */}
+              <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-all hover:border-emerald-200 dark:hover:border-emerald-500/30">
+                <FaCheckCircle className="text-emerald-500 shrink-0" />
+                <span className="text-gray-700 dark:text-gray-300 font-semibold truncate">
+                  {stats.lessons} Lessons
                 </span>
               </div>
 
               {/* Type */}
               <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-all hover:border-emerald-200 dark:hover:border-emerald-500/30">
-                <FaCheckCircle className="text-emerald-500 shrink-0" />
-                <span className="text-gray-700 dark:text-gray-300 font-semibold truncate">
-                  {course.type || "Course"}
-                </span>
-              </div>
-
-              {/* ✅ Students Enrolled */}
-              <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-gray-50/50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-all hover:border-emerald-200 dark:hover:border-emerald-500/30">
                 <FaUserGraduate className="text-emerald-500 shrink-0" />
                 <span className="text-gray-700 dark:text-gray-300 font-semibold truncate">
-                  {course.enrolledCount || 0} Enrolled
+                  {isBundle ? "Bundle" : (displayItem.type || "Course")}
                 </span>
               </div>
             </div>
 
-            {/* Instructor */}
-            <div className="mt-6 px-2 flex items-center gap-3 ">
-              {course?.instructor?.image ? (
-                <img
-                  src={getImageUrl(course.instructor.image)}
-                  alt={course.instructor.name}
-                  className="h-9 w-9 rounded-full object-cover border border-gray-200 dark:border-slate-800"
-                />
-              ) : (
-                <div className="h-9 w-9 rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold">
-                  {getInitials(course?.instructor?.name)}
-                </div>
-              )}
+            {/* Instructor (Only if Course) */}
+            {!isBundle && displayItem.instructor && (
+              <div className="mt-6 px-2 flex items-center gap-3 ">
+                {displayItem.instructor.image ? (
+                  <img
+                    src={getImageUrl(displayItem.instructor.image)}
+                    alt={displayItem.instructor.name}
+                    className="h-9 w-9 rounded-full object-cover border border-gray-200 dark:border-slate-800"
+                  />
+                ) : (
+                  <div className="h-9 w-9 rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-sm font-semibold">
+                    {getInitials(displayItem.instructor.name)}
+                  </div>
+                )}
 
-              <div className="leading-tight">
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
-                    {course?.instructor?.name}
-                  </span>
-                  <FaCheckCircle size={14} className="text-emerald-500" />
+                <div className="leading-tight">
+                  <div className="flex items-center gap-1">
+                    <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                      {displayItem.instructor.name}
+                    </span>
+                    <FaCheckCircle size={14} className="text-emerald-500" />
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {displayItem.instructor.instructorTitle || "Instructor"}
+                  </p>
                 </div>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {course?.instructor?.instructorTitle || "Instructor"}
-                </p>
               </div>
-            </div>
+            )}
 
-            {/* Curriculum */}
+            {/* Content List */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl mt-6 border border-gray-100 dark:border-slate-800 p-5">
-              <h3 className="text-emerald-600 dark:text-emerald-400 font-semibold text-sm mb-4 flex items-center gap-2">
-                <FaCheckCircle className="text-emerald-500" /> What You'll Get
-                Access To
+              <div className="flex flex-row flex-wrap items-center gap-2 mb-5">
+                {isBundle && (
+                  <div className="flex items-center gap-1.5 bg-emerald-600/10 text-emerald-600 font-black px-2.5 py-1.5 rounded-lg border border-emerald-600/20 whitespace-nowrap">
+                    <Layers size={13} />
+                    <span className="text-[9px] uppercase tracking-wider">Bundle Package</span>
+                  </div>
+                )}
+                {(displayItem.hasCertificate || (isBundle && displayItem.courses?.some(c => c.hasCertificate))) && (
+                  <div className="flex items-center gap-1.5 bg-slate-900 text-white font-black px-2.5 py-1.5 rounded-lg border border-emerald-500/30 whitespace-nowrap">
+                    <FaAward className="text-emerald-400" size={13} />
+                    <span className="text-[9px] uppercase tracking-wider">Certificate Included</span>
+                  </div>
+                )}
+              </div>
+
+              <h3 className="text-emerald-700 dark:text-emerald-400 font-black text-[11px] uppercase tracking-[0.1em] mb-4 flex items-center gap-2">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                {isBundle ? "Included Courses" : "What You'll Get Access To"}
               </h3>
 
-              <div className="max-h-96 overflow-y-auto pr-2 space-y-3">
-                {course.curriculum.map((section, index) => {
-                  const totalDuration = calculateSectionDuration(section.lessons);
-                  return (
+              <div className="max-h-96 overflow-y-auto overflow-x-hidden pr-2 space-y-3">
+                {isBundle ? (
+                  // List Bundle Courses
+                  displayItem.courses?.map((course, index) => (
+                    <div
+                      key={index}
+                      className="border border-emerald-100 dark:border-slate-800 rounded-xl p-3 hover:border-emerald-300 dark:hover:border-emerald-500 transition"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-12 aspect-video rounded-lg overflow-hidden bg-gray-100">
+                          <img
+                            src={getImageUrl(course.thumbnail)}
+                            alt={course.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-sm font-medium text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
+                            {course.title}
+                          </h4>
+                          <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{course.level || 'Beginner'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  // List Course Curriculum
+                  displayItem.curriculum?.map((section, index) => (
                     <div
                       key={index}
                       className="border border-emerald-100 dark:border-slate-800 rounded-xl p-3 hover:border-emerald-300 dark:hover:border-emerald-500 transition"
@@ -389,19 +477,18 @@ function PaymentPage() {
                         <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-xs font-bold">
                           {index + 1}
                         </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">
+                        <div className="min-w-0 flex-1">
+                          <h4 className="text-sm font-medium text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-words">
                             {section.title}
                           </h4>
                           <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <p>▶ {section.lessons.length} lessons</p>
-                            <p>⏱ {totalDuration} content</p>
+                            <p>▶ {section.lessons?.length || 0} lessons</p>
                           </div>
                         </div>
                       </div>
                     </div>
-                  );
-                })}
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -444,7 +531,7 @@ function PaymentPage() {
           <div className="space-y-3 mb-6 relative">
             {loadingMethods ? (
               <div className="py-4 text-center text-gray-500 text-sm animate-pulse">
-                Soo aqrinaya qababka lacag bixinta...
+                Loading payment methods...
               </div>
             ) : (
               paymentMethods
@@ -496,7 +583,7 @@ function PaymentPage() {
 
             {paymentMethods.filter(m => (m.type || 'local') === selectedTab).length === 0 && !loadingMethods && (
               <div className="p-4 bg-amber-50 dark:bg-amber-500/10 rounded-xl border border-amber-100 dark:border-amber-500/20 text-amber-600 dark:text-amber-400 text-sm font-medium text-center">
-                Hadda ma jiraan qab lacag bixin oo {selectedTab === 'local' ? 'Local' : 'Online'} ah oo diyaar ah.
+                Currently no {selectedTab === 'local' ? 'Local' : 'Online'} payment methods are available.
               </div>
             )}
           </div>
@@ -557,7 +644,7 @@ function PaymentPage() {
                   {uploadingProof ? (
                     <div className="flex flex-col items-center gap-2">
                       <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-[10px] font-bold text-gray-500">Soo galinaya...</span>
+                      <span className="text-[10px] font-bold text-gray-500">Uploading...</span>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-2 text-emerald-600">
@@ -587,15 +674,15 @@ function PaymentPage() {
                   </button>
                 </div>
                 <div className="absolute top-3 left-3 bg-emerald-600 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg">
-                  Cadeyn la helay
+                  Proof Received
                 </div>
               </div>
             )}
           </div>
 
 
-          {/* Discount Section (Only if course has a code) */}
-          {course.discountCode && (
+          {/* Discount Section (Only if item has a code) */}
+          {displayItem?.discountCode && (
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Discount Code (Optional)
@@ -618,7 +705,7 @@ function PaymentPage() {
               {errorMsg && <p className="text-red-500 text-xs mt-1">{errorMsg}</p>}
               {appliedDiscount > 0 && (
                 <p className="text-emerald-600 text-xs mt-1">
-                  🎉 Code "{course.discountCode}" applied! ({course.discountPercentage}% off)
+                  🎉 Code "{displayItem.discountCode}" applied! ({displayItem.discountPercentage}% off)
                 </p>
               )}
             </div>
@@ -653,7 +740,7 @@ function PaymentPage() {
               (selectedTab === "local" && (phone.length < 8 || phone.length > 15)) ||
               !paymentProof || uploadingProof
             }
-            className={`mt-2 w-full font-bold py-3 rounded-lg transition ${!selectedMethod ||
+            className={`mt-2 w-full font-bold py-3  cursor-pointer rounded-lg transition ${!selectedMethod ||
               (selectedTab === "local" && (phone.length < 8 || phone.length > 15)) ||
               !paymentProof || uploadingProof
               ? "bg-gray-300 dark:bg-slate-800 text-gray-500 dark:text-gray-600 cursor-not-allowed"

@@ -6,14 +6,38 @@ import { useState, useEffect } from "react";
 import Curriculum from "../../../components/course/Curriculum";
 import Testimonials from "../../../components/Home/Testimonials";
 import FAQ from "../../../components/Home/FAQ";
+import { useAuth } from "../../../hooks/useAuth";
+import { useMyOrders } from "../../../hooks/useMyOrders";
 import { useData } from "../../../contexts/DataContext";
+import { getFullCourseDetailsBySlug } from "../../../api/courseService";
 
 function CourseDetails() {
-  const { getCourseBySlug, loading } = useData();
+  const { getCourseBySlug, loading: contextLoading } = useData();
   const { slug } = useParams();
+  const { user } = useAuth();
+  const { isEnrolledInCourse } = useMyOrders(user);
 
-  // ✅ Hel course-ka si toos ah oo data preloaded ah
-  const course = getCourseBySlug(slug);
+  const [localCourse, setLocalCourse] = useState(null);
+  const [localLoading, setLocalLoading] = useState(false);
+
+  // ✅ Try context first, then local fallback
+  const contextCourse = getCourseBySlug(slug);
+  const course = contextCourse || localCourse;
+
+  // ✅ Fetch if missing in context
+  useEffect(() => {
+    if (!contextLoading && !contextCourse && slug) {
+      setLocalLoading(true);
+      getFullCourseDetailsBySlug(slug)
+        .then(data => {
+          if (data) setLocalCourse(data);
+        })
+        .catch(err => console.error("Failed to fetch course fallback:", err))
+        .finally(() => setLocalLoading(false));
+    }
+  }, [slug, contextLoading, contextCourse]);
+
+  const isEnrolled = course ? isEnrolledInCourse(course._id) : false;
 
   // ✅ Check for features
   const hasResources = course && ((course.courseResources?.length > 0) ||
@@ -33,7 +57,7 @@ function CourseDetails() {
   }, [course]);
 
   // 🔄 Loading state
-  if (loading) {
+  if (contextLoading || localLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 bg-[#edf4f5] dark:bg-slate-900 transition-colors duration-500">
         <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
@@ -97,7 +121,7 @@ function CourseDetails() {
       </div>
 
       {/* ✅ Main Content */}
-      <div className="max-w-7xl mx-auto px-6 pb-20 grid grid-cols-1 md:grid-cols-[7fr_4fr] gap-10">
+      <div className="max-w-7xl mx-auto px-6 pb-20 grid grid-cols-1 lg:grid-cols-[7fr_4fr] gap-10">
         {/* ===== LEFT ===== */}
         <main>
           {/* ✅ Course Overview */}
@@ -145,9 +169,11 @@ function CourseDetails() {
             learningOutcomes={course.learningOutcomes}
             price={course.price}
             discountPercentage={course.discountPercentage}
-            courseId={course._id || course.id}
+            courseId={course._id}
             enrolledCount={course.enrolledCount}
             courseTitle={course.title}
+            isEnrolled={isEnrolled}
+            courseSlug={slug}
           />
         </main>
 
@@ -233,7 +259,7 @@ function CourseDetails() {
 
               <div className="space-y-4">
                 {/* Resources */}
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 border border-gray-300 hover:border-emerald-400 border border-gray-300 hover:border-emerald-400 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${hasResources ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
                       <FileText size={16} />
@@ -252,7 +278,7 @@ function CourseDetails() {
                 </div>
 
                 {/* Quizzes */}
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 border border-gray-300 hover:border-emerald-400 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${hasQuizzes ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
                       <Brain size={16} />
@@ -271,7 +297,7 @@ function CourseDetails() {
                 </div>
 
                 {/* Certificate */}
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 border border-gray-300 hover:border-emerald-400 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${course.hasCertificate ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
                       <Award size={16} />

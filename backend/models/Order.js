@@ -3,13 +3,15 @@ import mongoose from 'mongoose';
 const orderSchema = mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
+    course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+    bundle: { type: mongoose.Schema.Types.ObjectId, ref: 'Bundle' },
+    isBundle: { type: Boolean, default: false },
 
     // Complete user information at time of order
     userDetails: {
-      firstName: { type: String, required: true },
-      lastName: { type: String, required: true },
-      email: { type: String, required: true },
+      firstName: { type: String },
+      lastName: { type: String },
+      email: { type: String },
       phone: { type: String },
       image: { type: String },
       role: { type: String, default: 'student' },
@@ -47,6 +49,14 @@ const orderSchema = mongoose.Schema(
         }],
       }],
     },
+
+    // For Bundles: Snapshot of included courses
+    bundleCourses: [{
+      _id: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+      title: { type: String },
+      thumbnail: { type: String },
+      level: { type: String },
+    }],
 
     // Legacy fields for backward compatibility
     userName: { type: String },

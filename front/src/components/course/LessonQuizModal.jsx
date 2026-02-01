@@ -155,7 +155,7 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
                     {!showResults && !isTimeUp ? (
                         <div className="relative z-10">
                             {/* Progress bar */}
-                            <div className="mb-6">
+                            <div className="mb-6 mt-10">
                                 <div className="flex justify-between text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">
                                     <span>Question {currentQuestionIdx + 1} of {questions.length}</span>
                                     <span>{Math.round(((currentQuestionIdx + 1) / questions.length) * 100)}%</span>

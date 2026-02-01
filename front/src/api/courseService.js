@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config';
+import { slugify } from '../utils/slugify';
 
 // ✅ Get course by ID
 export async function getFullCourseDetails(courseId) {
@@ -35,7 +36,7 @@ export async function getFullCourseDetails(courseId) {
       ...course,
       lessons: allLessons,
       totalDuration,
-      slug: course.title.toLowerCase().replace(/\s+/g, "-"),
+      slug: slugify(course.title),
     };
   } catch (error) {
     console.error("❌ Error in getFullCourseDetails:", error);
@@ -62,7 +63,10 @@ export async function getFullCourseDetailsBySlug(slug) {
     const courses = await getAllCourses();
 
     const course = courses.find(
-      (c) => c.title.toLowerCase().replace(/\s+/g, "-") === slug
+      (c) =>
+        c.slug === slug ||
+        c.title.toLowerCase().trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-") === slug ||
+        c.title.toLowerCase().replace(/\s+/g, "-") === slug
     );
     if (!course) throw new Error(`❌ Course not found for slug: ${slug}`);
 

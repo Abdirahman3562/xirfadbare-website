@@ -23,6 +23,7 @@ const TopBanner = () => {
     // Calculate target date & max discount
     const [targetDate, setTargetDate] = useState(null);
     const [maxDiscount, setMaxDiscount] = useState(0);
+    const [discountCode, setDiscountCode] = useState("");
     const [isClosing, setIsClosing] = useState(false);
 
     useEffect(() => {
@@ -46,10 +47,12 @@ const TopBanner = () => {
 
                     setTargetDate(new Date(bestDeal.discountExpiry));
                     setMaxDiscount(bestDeal.discountPercentage);
+                    setDiscountCode(bestDeal.discountCode || "");
                     setIsVisible(true);
                 } else {
                     setTargetDate(null);
                     setMaxDiscount(0);
+                    setDiscountCode("");
                     setIsVisible(false); // Hide if no active discount
                 }
             } catch (error) {
@@ -132,6 +135,11 @@ const TopBanner = () => {
                     </span>
                     <p className="text-sm font-medium text-gray-200">
                         <span className="text-white font-bold">Get {maxDiscount}% OFF</span> Invest in your future today.
+                        {discountCode && (
+                            <span className="ml-2 bg-white/10 px-2 py-0.5 rounded border border-white/20 text-emerald-300 font-bold uppercase tracking-widest text-[10px]">
+                                Use Code: {discountCode}
+                            </span>
+                        )}
                     </p>
                 </div>
 

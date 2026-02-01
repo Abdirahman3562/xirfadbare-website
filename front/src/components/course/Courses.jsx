@@ -5,7 +5,7 @@ import { useData } from "../../contexts/DataContext";
 import { Search, Filter, BookOpen, Layers, DollarSign, X, SlidersHorizontal } from "lucide-react";
 
 function Courses({ IsHome }) {
-  const { courses, loading } = useData();
+  const { courses, bundles, loading } = useData();
   const [searchParams] = useSearchParams();
   const [dbCategories, setDbCategories] = useState([]);
 
@@ -41,17 +41,24 @@ function Courses({ IsHome }) {
   }, [searchParams]);
 
   // Filter Logic
-  const filteredCourses = useMemo(() => {
-    return courses.filter((course) => {
-      const matchesSearch = course.title
+  const filteredItems = useMemo(() => {
+    const allItems = [
+      ...courses.map(c => ({ ...c, isBundle: false })),
+      ...bundles.map(b => ({ ...b, isBundle: true, type: 'Bundle' }))
+    ];
+
+    return allItems.filter((item) => {
+      const matchesSearch = item.title
         ?.toLowerCase()
         .includes(searchQuery.toLowerCase());
-      const matchesCategory =
-        selectedCategory === "All" || course.type === selectedCategory;
-      const matchesLevel =
-        selectedLevel === "All" || course.level === selectedLevel;
 
-      const isFree = !course.price || Number(course.price) === 0;
+      // If bundle, we might skip category/level matching or map them
+      const matchesCategory =
+        selectedCategory === "All" || item.type === selectedCategory;
+      const matchesLevel =
+        selectedLevel === "All" || item.level === selectedLevel || (item.isBundle && selectedLevel === "All");
+
+      const isFree = !item.price || Number(item.price) === 0;
       const matchesPrice =
         selectedPrice === "All" ||
         (selectedPrice === "Free" && isFree) ||
@@ -59,7 +66,7 @@ function Courses({ IsHome }) {
 
       return matchesSearch && matchesCategory && matchesLevel && matchesPrice;
     });
-  }, [courses, searchQuery, selectedCategory, selectedLevel, selectedPrice]);
+  }, [courses, bundles, searchQuery, selectedCategory, selectedLevel, selectedPrice]);
 
   if (IsHome) {
     return (
@@ -71,8 +78,8 @@ function Courses({ IsHome }) {
             center={false}
           />
           <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {courses.slice(0, 3).map((course) => (
-              <CourseCard course={course} key={course._id || course.id} />
+            {[...courses, ...bundles].slice(0, 3).map((item) => (
+              <CourseCard course={item} isBundle={item.courses !== undefined} key={item._id || item.id} />
             ))}
           </div>
         </div>
@@ -94,7 +101,7 @@ function Courses({ IsHome }) {
           <div className="flex-1 order-2 lg:order-1">
             <div className="flex justify-between items-center mb-6 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
               <p className="text-sm font-bold text-gray-500 dark:text-gray-400">
-                Waxaa jira <span className="text-emerald-600 dark:text-emerald-400">{filteredCourses.length}</span> koorso oo la helay
+                Waxaa jira <span className="text-emerald-600 dark:text-emerald-400">{filteredItems.length}</span> koorso/bundle oo la helay
               </p>
               <button
                 onClick={() => setIsSidebarOpen(true)}
@@ -105,9 +112,9 @@ function Courses({ IsHome }) {
             </div>
 
             <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-2">
-              {filteredCourses.length > 0 ? (
-                filteredCourses.map((course) => (
-                  <CourseCard course={course} key={course._id || course.id} />
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item) => (
+                  <CourseCard course={item} isBundle={item.isBundle} key={item._id || item.id} />
                 ))
               ) : (
                 <div className="col-span-full py-20 text-center">

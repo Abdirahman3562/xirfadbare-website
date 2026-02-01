@@ -111,7 +111,7 @@ const Quizzes = () => {
             </div>
 
             {quizzes.length === 0 ? (
-                <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-12 text-center border border-gray-100 dark:border-slate-800 shadow-xl shadow-gray-200/50 dark:shadow-none">
+                <div className="bg-white/10 border border-gray-200 dark:bg-slate-900 rounded-[2.5rem] p-12 text-center border border-gray-100 dark:border-slate-800 shadow-xl shadow-gray-200/50 dark:shadow-none">
                     <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
                         <Brain className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
                     </div>

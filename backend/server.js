@@ -26,11 +26,13 @@ import settingsRoutes from './routes/settingsRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import botResponseRoutes from './routes/botResponseRoutes.js';
 import certificateRoutes from './routes/certificateRoutes.js';
+import bundleRoutes from './routes/bundleRoutes.js';
 
 // Model Imports (for registration)
 import './models/Blog.js';
 import './models/Comment.js';
 import './models/Category.js';
+import './models/Bundle.js';
 
 dotenv.config();
 
@@ -72,6 +74,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/bot-responses', botResponseRoutes);
 app.use('/api/certificates', certificateRoutes);
+app.use('/api/bundles', bundleRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');

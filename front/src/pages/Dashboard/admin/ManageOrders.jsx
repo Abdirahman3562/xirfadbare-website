@@ -18,7 +18,8 @@ import {
     Mail,
     CreditCard,
     AlertTriangle,
-    DollarSign
+    DollarSign,
+    Package
 } from 'lucide-react';
 import PremiumLoader from '../../../components/ui/PremiumLoader';
 
@@ -120,15 +121,17 @@ const ManageOrders = () => {
         }
     };
 
-    const filteredOrders = orders.filter(order => {
-        const matchesSearch =
-            order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (order.userDetails?.firstName + ' ' + order.userDetails?.lastName).toLowerCase().includes(searchTerm.toLowerCase());
+    const filteredOrders = orders
+        .filter(order => order.paymentType !== 'Bundle Access')
+        .filter(order => {
+            const matchesSearch =
+                order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (order.userDetails?.firstName + ' ' + order.userDetails?.lastName).toLowerCase().includes(searchTerm.toLowerCase());
 
-        const matchesFilter = filterStatus === 'All' || order.status.toLowerCase() === filterStatus.toLowerCase();
+            const matchesFilter = filterStatus === 'All' || order.status.toLowerCase() === filterStatus.toLowerCase();
 
-        return matchesSearch && matchesFilter;
-    });
+            return matchesSearch && matchesFilter;
+        });
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500 overflow-x-hidden max-w-full">
@@ -226,17 +229,23 @@ const ManageOrders = () => {
                             {/* Card Body: Course Info */}
                             <div className="bg-gray-50/80 dark:bg-slate-700/30 rounded-3xl p-4 border border-gray-100 dark:border-gray-700 mb-6 flex-1">
                                 <div className="flex gap-4 items-center mb-4">
-                                    <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-white flex-shrink-0">
-                                        <img
-                                            src={getImageUrl(order.courseDetails?.thumbnail)}
-                                            alt=""
-                                            className="w-full h-full object-cover"
-                                        />
+                                    <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm border border-white flex-shrink-0 bg-emerald-100 flex items-center justify-center">
+                                        {order.isBundle ? (
+                                            <Package size={24} className="text-emerald-600" />
+                                        ) : (
+                                            <img
+                                                src={getImageUrl(order.courseDetails?.thumbnail)}
+                                                alt=""
+                                                className="w-full h-full object-cover"
+                                            />
+                                        )}
                                     </div>
                                     <div className="min-w-0">
-                                        <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block mb-0.5">Enrolled Course</span>
-                                        <h5 className="text-sm font-bold text-gray-800 dark:text-gray-200 line-clamp-1" title={order.courseDetails?.title}>
-                                            {order.courseDetails?.title}
+                                        <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block mb-0.5">
+                                            {order.isBundle ? 'Enrolled Bundle' : 'Enrolled Course'}
+                                        </span>
+                                        <h5 className="text-sm font-bold text-gray-800 dark:text-gray-200 line-clamp-1" title={order.courseTitle || (order.isBundle ? 'Package Bundle' : 'Course')}>
+                                            {order.courseTitle || (order.isBundle ? 'Package Bundle' : 'Unknown')}
                                         </h5>
                                     </div>
                                 </div>
@@ -422,6 +431,28 @@ const ManageOrders = () => {
                                 </div>
 
                             </div>
+
+                            {/* Included Courses for Bundle */}
+                            {selectedOrder.isBundle && selectedOrder.bundleCourses && selectedOrder.bundleCourses.length > 0 && (
+                                <div className="p-5 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-3xl border border-emerald-100 dark:border-emerald-500/20 space-y-4">
+                                    <h4 className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                                        <Package size={12} /> Included Courses in Bundle
+                                    </h4>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        {selectedOrder.bundleCourses.map((c, i) => (
+                                            <div key={i} className="flex items-center gap-3 bg-white dark:bg-slate-800 p-2 rounded-2xl border border-emerald-100/50 dark:border-emerald-500/10 transition-transform hover:scale-[1.02]">
+                                                <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 border border-emerald-100 dark:border-slate-700 shadow-sm">
+                                                    <img src={getImageUrl(c.thumbnail)} className="w-full h-full object-cover" alt="" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-[11px] font-bold text-gray-800 dark:text-gray-200 truncate">{c.title}</p>
+                                                    <p className="text-[9px] text-emerald-500/70 font-black uppercase tracking-widest">{c.level}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Bottom Row: Payment Proof & Order Summary Side-by-Side */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">

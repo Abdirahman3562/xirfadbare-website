@@ -20,7 +20,7 @@ import ManageUsers from "./pages/Dashboard/admin/ManageUsers";
 import ManageRoles from "./pages/Dashboard/admin/ManageRoles";
 import RolePermissionEditor from "./pages/Dashboard/admin/RolePermissionEditor";
 import ManageCoursesAdmin from "./pages/Dashboard/admin/ManageCourses";
-import CourseContent from "./pages/webpages/course/CourseContent";
+
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLayout from "./pages/Dashboard/admin/AdminLayout";
 import InstructorLayout from "./pages/Dashboard/instructor/InstructorLayout";
@@ -61,7 +61,10 @@ import Certificates from "./pages/Dashboard/student/Certificates";
 import CourseDashboard from "./pages/Dashboard/student/CourseDashboard";
 import SinglePostPage from "./pages/webpages/Blog/SinglePostPage";
 import Quizzes from "./pages/Dashboard/student/Quizzes";
+import ManageBundles from "./pages/Dashboard/admin/ManageBundles";
+import EditBundle from "./pages/Dashboard/admin/EditBundle";
 import AuthorPage from "./pages/webpages/Author/AuthorPage";
+import BundleDetails from "./pages/webpages/bundle/BundleDetails";
 import TopBanner from "./components/ui/TopBanner";
 import VerifyCertificate from "./pages/webpages/VerifyCertificate";
 import NotFoundPage from "./pages/webpages/NotFound/NotFoundPage";
@@ -140,12 +143,13 @@ function App() {
           <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
           <Route path="/auth/verify-email" element={<VerifyEmail />} />
           <Route path="/courses/:slug" element={<CourseDetails />} />
-          <Route path="/course-content/:id" element={<CourseContent />} />
+
           <Route path="/instructor/:slug" element={<InstructorDetails />} />
           <Route path="/instructors" element={<InstructorList />} />
           <Route path="/courses" element={<CourseList />} />
           <Route path="/payment/:id" element={<PaymentPage />} />
           <Route path="/verify/:id" element={<VerifyCertificate />} />
+          <Route path="/bundles/:id" element={<BundleDetails />} />
         </Route>
 
 
@@ -186,6 +190,9 @@ function App() {
           <Route path="faqs" element={<ManageFAQs />} />
           <Route path="instructors" element={<ManageInstructors />} />
           <Route path="orders" element={<ManageOrders />} />
+          <Route path="bundles" element={<ManageBundles />} />
+          <Route path="bundles/create" element={<EditBundle />} />
+          <Route path="bundles/edit/:id" element={<EditBundle />} />
           <Route path="authors" element={<ManageAuthors />} />
           <Route path="categories" element={<ManageCategories />} />
           <Route path="blogs" element={<ManageBlogs />} />

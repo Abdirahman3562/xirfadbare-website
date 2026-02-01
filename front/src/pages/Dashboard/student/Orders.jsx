@@ -5,6 +5,8 @@ import {
   Clock,
   CreditCard,
   CheckCircle,
+  Layers,
+  X
 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -12,11 +14,14 @@ import { getImageUrl } from "../../../utils/format";
 import { FaShoppingCart } from "react-icons/fa";
 import { API_BASE_URL } from "../../../config";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
+import BundleCoursesModal from "../../../components/course/BundleCoursesModal";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const navigate = useNavigate();
 
   // ✅ Fetch user logged in
@@ -41,24 +46,27 @@ export default function Orders() {
 
     const fetchAllData = async () => {
       try {
-        const resOrders = await fetch(
-          `${API_BASE_URL}/orders/myorders`,
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`,
-            },
-          }
-        );
+        const [resOrders, resCourses, resBundles] = await Promise.all([
+          fetch(`${API_BASE_URL}/orders/myorders`, {
+            headers: { Authorization: `Bearer ${user.token}` },
+          }),
+          fetch(`${API_BASE_URL}/courses`),
+          fetch(`${API_BASE_URL}/bundles`)
+        ]);
+
         const ordersData = await resOrders.json();
-
-        const resCourses = await fetch(`${API_BASE_URL}/courses`);
         const coursesData = await resCourses.json();
+        const bundlesData = await resBundles.json();
 
-        setOrders(ordersData);
-        setCourses(coursesData);
+        // 🛡️ Filter internal enrollments (Bundle Access) to avoid showing duplicates to students
+        const filteredOrders = ordersData.filter(order => order.paymentType !== 'Bundle Access');
+        setOrders(filteredOrders);
+
+        // Merge courses and bundles for slug lookup if needed
+        setCourses([...coursesData, ...bundlesData]);
       } catch (err) {
         console.error(err);
-        toast.error("Failed to load orders or courses.");
+        toast.error("Failed to load orders data.");
       } finally {
         setLoading(false);
       }
@@ -78,9 +86,14 @@ export default function Orders() {
       .replace(/(^-|-$)/g, "");
   };
 
-  // ✅ Navigate to course details
-  const handleViewCourse = (courseId) => {
-    const slug = getCourseSlug(courseId);
+  // ✅ Navigate to course/bundle details
+  const handleViewCourse = (order) => {
+    if (order.isBundle) {
+      navigate(`/bundles/${order.bundle}`);
+      return;
+    }
+
+    const slug = getCourseSlug(order.course);
     if (slug) {
       navigate(`/courses/${slug}`);
     } else {
@@ -88,12 +101,16 @@ export default function Orders() {
     }
   };
 
-  // ✅ Hel image course-ka
-  const getCourseImage = (courseId) => {
-    const course = courses.find((c) => String(c._id) === String(courseId));
-    return getImageUrl(
-      course?.thumbnail
-    ) || "https://via.placeholder.com/400x200?text=No+Image";
+  // ✅ Hel image course/bundle-ka
+  const getDisplayImage = (order) => {
+    // 1. Check cached details first (Fastest & Reliable)
+    if (order.courseDetails?.thumbnail) {
+      return getImageUrl(order.courseDetails.thumbnail);
+    }
+
+    // 2. Fallback to lookup in courses/bundles list
+    const item = courses.find((c) => String(c._id) === String(order.course || order.bundle));
+    return getImageUrl(item?.thumbnail) || "https://via.placeholder.com/400x200?text=No+Image";
   };
 
   return (
@@ -134,20 +151,26 @@ export default function Orders() {
               >
                 {/* ✅ Click image -> go to details page */}
                 <div
-                  className="w-full h-40 rounded-lg overflow-hidden mb-4 cursor-pointer"
-                  onClick={() => handleViewCourse(order.course)}
+                  className="w-full h-40 rounded-lg overflow-hidden mb-4 cursor-pointer relative group"
+                  onClick={() => handleViewCourse(order)}
                 >
                   <img
-                    src={getCourseImage(order.course)}
+                    src={getDisplayImage(order)}
                     alt={order.courseTitle || order.courseDetails?.title}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
+                  {order.isBundle && (
+                    <div className="absolute top-3 right-3 bg-emerald-600 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg shadow-lg flex items-center gap-1.5 border border-emerald-400/30">
+                      <Layers size={12} />
+                      Bundle
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex justify-between items-center mb-2">
                   <h2
-                    onClick={() => handleViewCourse(order.course)}
-                    className="text-lg font-semibold text-gray-800 dark:text-white cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400"
+                    onClick={() => handleViewCourse(order)}
+                    className="text-lg font-semibold text-gray-800 dark:text-white cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 truncate pr-2"
                   >
                     {order.courseTitle || order.courseDetails?.title}
                   </h2>
@@ -192,10 +215,30 @@ export default function Orders() {
                     </>
                   )}
                 </div>
+
+                {order.isBundle && (
+                  <button
+                    onClick={() => {
+                      setSelectedOrder(order);
+                      setShowModal(true);
+                    }}
+                    className="mt-3 w-full py-2 cursor-pointer bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-black text-[10px] uppercase tracking-widest rounded-lg border border-emerald-100 dark:border-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-colors"
+                  >
+                    View Included Courses
+                  </button>
+                )}
               </div>
             ))}
           </div>
         )}
+
+        {/* ✅ Bundle Courses Modal */}
+        <BundleCoursesModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          bundleOrder={selectedOrder}
+          allCourses={courses.filter(c => !c.courses)} // Filter out bundles if needed, or pass all
+        />
 
         {!loading && orders.length === 0 && (
           <div className="border border-gray-200 dark:border-slate-800 rounded-md bg-white/10 dark:bg-slate-800/50 py-10 flex flex-col items-center justify-center text-center">

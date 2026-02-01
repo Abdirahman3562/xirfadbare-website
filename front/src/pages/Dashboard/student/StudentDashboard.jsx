@@ -10,18 +10,24 @@ import {
   CheckCircle,
   CalendarClock,
   Search,
+  Layers,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../../utils/format";
 import { getMyOrders } from "../../../api/orderService";
 import { getAllCourses } from "../../../api/courseService";
-import { getUserProgress } from "../../../api/userProgressService";
+import { getUserProgress, getAllUserProgress } from "../../../api/userProgressService";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
+import BundleCoursesModal from "../../../components/course/BundleCoursesModal";
 
 export default function StudentDashboard() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [allCourses, setAllCourses] = useState([]);
+  const [showBundleModal, setShowBundleModal] = useState(false);
+  const [selectedBundle, setSelectedBundle] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isCoursesPage = location.pathname.includes("/courses");
 
@@ -51,75 +57,103 @@ export default function StudentDashboard() {
         }
 
         // ✅ Hel dhammaan courses-ka
-        const allCourses = await getAllCourses();
+        const coursesData = await getAllCourses();
+        setAllCourses(coursesData);
+
+        // ✅ Hel dhammaan progress records (Optimized fetch)
+        const allProgressRecords = await getAllUserProgress();
 
         // ✅ Ku dar xogta course + progress
         const enrichedCourses = await Promise.all(
-          validOrders.map(async (order) => {
-            try {
-              // Hel course info from allCourses
-              const course = allCourses.find(
-                (c) => c._id === order.course || c._id === order.courseId
-              );
+          validOrders
+            .filter(order => order.paymentType !== 'Bundle Access') // 🛡️ Filter here instead of backend
+            .map(async (order) => {
+              try {
+                if (order.isBundle) {
+                  // 📦 Handle Bundle
+                  const coursesInBundle = order.bundleCourses || [];
 
-              if (!course) {
+                  // Calculate aggregate progress
+                  let totalProgress = 0;
+                  coursesInBundle.forEach(bc => {
+                    const p = allProgressRecords.find(record =>
+                      String(record.course?._id || record.course) === String(bc._id)
+                    );
+                    totalProgress += (p?.progress || 0);
+                  });
+
+                  const avgProgress = coursesInBundle.length > 0
+                    ? Math.round(totalProgress / coursesInBundle.length)
+                    : 0;
+
+                  return {
+                    ...order,
+                    id: order._id,
+                    title: order.courseTitle,
+                    description: `Bundle containing ${coursesInBundle.length} courses.`,
+                    image: order.courseDetails?.thumbnail || "https://i.ibb.co/Yk2JmWv/default-course.jpg",
+                    lessonsCount: coursesInBundle.length, // Show course count instead of lessons
+                    progress: avgProgress,
+                    lastAccess: order.updatedAt,
+                    isBundle: true
+                  };
+                }
+
+                // 📘 Handle Single Course
+                const course = coursesData.find(
+                  (c) => c._id === order.course || c._id === order.courseId
+                );
+
+                if (!course) {
+                  return {
+                    ...order,
+                    id: order._id,
+                    title: order.courseTitle,
+                    description: "Course details unavailable.",
+                    image: "https://i.ibb.co/Yk2JmWv/default-course.jpg",
+                    lessonsCount: 0,
+                    progress: 0,
+                    lastAccess: null,
+                  };
+                }
+
+                const totalLessons = (course.curriculum || []).reduce(
+                  (sum, section) => sum + (section.lessons?.length || 0),
+                  0
+                );
+
+                const userProgress = allProgressRecords.find(p =>
+                  String(p.course?._id || p.course) === String(course._id)
+                );
+                const progress = userProgress?.progress || 0;
+                const lastAccess = userProgress?.lastAccess || null;
+
+                return {
+                  ...order,
+                  id: order._id,
+                  title: course.title || order.courseTitle,
+                  description: course.description || "No description available for this course.",
+                  image: course.thumbnail || "https://i.ibb.co/Yk2JmWv/default-course.jpg",
+                  lessonsCount: totalLessons,
+                  progress: progress,
+                  lastAccess: lastAccess,
+                  courseSlug: slugify(course.title),
+                  currentLesson: userProgress?.currentLesson,
+                };
+              } catch (error) {
+                console.error("Error processing order:", error);
                 return {
                   ...order,
                   id: order._id,
                   title: order.courseTitle,
-                  description: "Course details unavailable.",
+                  description: "Error loading course details.",
                   image: "https://i.ibb.co/Yk2JmWv/default-course.jpg",
                   lessonsCount: 0,
-                  progress: order.status === "pending" ? 0 : 0,
+                  progress: 0,
                   lastAccess: null,
                 };
               }
-
-              // ✅ Xisaabi total lessons from curriculum
-              const totalLessons = (course.curriculum || []).reduce(
-                (sum, section) => sum + (section.lessons?.length || 0),
-                0
-              );
-
-              // ✅ Hel progress ka backend API
-              let userProgress = null;
-              try {
-                const progressData = await getUserProgress(course._id);
-                userProgress = progressData;
-              } catch (err) {
-                console.warn("⚠️ Failed to fetch user progress:", err);
-              }
-
-              // ✅ Xisaabi progress
-              const progress = userProgress?.progress || 0;
-              const lastAccess = userProgress?.lastAccess || null;
-
-              return {
-                ...order,
-                id: order._id,
-                title: course.title || order.courseTitle,
-                description: course.description || "No description available for this course.",
-                image: course.thumbnail || "https://i.ibb.co/Yk2JmWv/default-course.jpg",
-                lessonsCount: totalLessons,
-                progress: order.status === "pending" ? 0 : progress,
-                lastAccess: order.status === "pending" ? null : lastAccess,
-                courseSlug: slugify(course.title),
-                currentLesson: userProgress?.currentLesson,
-              };
-            } catch (error) {
-              console.error("Error processing order:", error);
-              return {
-                ...order,
-                id: order._id,
-                title: order.courseTitle,
-                description: "Course details unavailable.",
-                image: "https://i.ibb.co/Yk2JmWv/default-course.jpg",
-                lessonsCount: 0,
-                progress: 0,
-                lastAccess: null,
-              };
-            }
-          })
+            })
         );
 
         setCourses(enrichedCourses);
@@ -355,9 +389,9 @@ export default function StudentDashboard() {
                       <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-2">
                         <span className="flex gap-2 items-center">
                           <BookOpen className="w-4 h-4 text-emerald-600 dark:text-emerald-400 mt-1" />
-                          {done} of {totalLessons} lessons
+                          {course.isBundle ? 'Included Courses' : `${done} of ${totalLessons} lessons`}
                         </span>
-                        <span>{remaining} remaining</span>
+                        <span>{course.isBundle ? 'Available' : `${remaining} remaining`}</span>
                       </div>
 
                       {/* Completion & Last Access */}
@@ -400,15 +434,18 @@ export default function StudentDashboard() {
                       </div>
                     </div>
 
-                    <Link
-                      to={`/watch/courses/${course.courseSlug || slugify(
-                        course.title
-                      )}/lessons/${slugify(
-                        course.currentLesson || course.lastAccess?.lessonTitle || "introduction"
-                      )}`}
+                    <button
+                      onClick={() => {
+                        if (course.isBundle) {
+                          setSelectedBundle(course);
+                          setShowBundleModal(true);
+                        } else {
+                          navigate(`/watch/courses/${course.courseSlug || slugify(course.title)}/lessons/${slugify(course.currentLesson || "introduction")}`);
+                        }
+                      }}
                       className={`mt-6 font-medium px-5 py-2 rounded-lg text-sm transition self-start shadow-sm flex items-center gap-2 ${course.status === "pending"
                         ? "bg-gray-300 text-gray-600 cursor-not-allowed pointer-events-none"
-                        : "bg-emerald-500 text-white hover:bg-emerald-600"
+                        : "bg-emerald-500 text-white cursor-pointer hover:bg-emerald-600"
                         }`}
                     >
                       {course.status === "pending" ? (
@@ -416,13 +453,18 @@ export default function StudentDashboard() {
                           <Clock className="w-4 h-4" />
                           Awaiting Approval
                         </>
+                      ) : course.isBundle ? (
+                        <>
+                          <Layers className="w-4 h-4" />
+                          View Courses
+                        </>
                       ) : (
                         <>
                           <PlayCircle className="w-4 h-4" />
                           Continue Learning
                         </>
                       )}
-                    </Link>
+                    </button>
                   </div>
                 </div>
               );
@@ -430,6 +472,14 @@ export default function StudentDashboard() {
           </div>
         )}
       </section>
+
+      {/* ✅ Bundle Courses Modal */}
+      <BundleCoursesModal
+        isOpen={showBundleModal}
+        onClose={() => setShowBundleModal(false)}
+        bundleOrder={selectedBundle}
+        allCourses={allCourses}
+      />
     </div>
   );
 }

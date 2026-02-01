@@ -11,6 +11,9 @@ import {
   FaUserGraduate,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { useAuth } from "../../hooks/useAuth";
+import { slugify } from "../../utils/slugify";
 
 export default function Curriculum({
   level,
@@ -20,12 +23,15 @@ export default function Curriculum({
   discountPercentage = 0,
   courseId,
   enrolledCount = 0,
-  courseTitle
+  courseTitle,
+  isEnrolled,
+  courseSlug
 }) {
   const [openSections, setOpenSections] = useState({});
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  // ✅ Loading state ma jiro - data props ka timid
+  // ✅ Loading state check
   if (!curriculum || curriculum.length === 0) {
     return (
       <div className="text-center py-10 text-emerald-600 font-semibold">
@@ -81,12 +87,25 @@ export default function Curriculum({
     return h > 0 ? `${h}h ${m}m` : `${m}m`;
   })();
 
+
+  // 🔹 Get First Lesson Slug Helper
+  const getFirstLessonSlug = () => {
+    if (!curriculum || !Array.isArray(curriculum)) return null;
+    for (const section of curriculum) {
+      if (section.lessons && section.lessons.length > 0) {
+        const firstLesson = section.lessons[0];
+        return firstLesson.slug || slugify(firstLesson.title) || firstLesson._id || firstLesson.id;
+      }
+    }
+    return null;
+  };
+
   return (
     <div className="bg-[#edf4f5] dark:bg-slate-900 mt-10 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-slate-800 transition-colors duration-500">
       {/* ✅ Summary Boxes */}
       <div className="grid sm:grid-cols-4 gap-4 mb-8 text-center">
 
-        {/* ✅ Students Enrolled (Box Afraad) */}
+        {/* ✅ Students Enrolled */}
         <div className="p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-[#edf4f5] dark:bg-slate-900 transition">
           <FaUserGraduate className="text-emerald-500 dark:text-emerald-400 text-2xl mx-auto mb-2" />
           <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">
@@ -115,7 +134,6 @@ export default function Curriculum({
           <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">{level}</p>
           <p className="text-gray-500 dark:text-gray-400 text-sm">Skill Level</p>
         </div>
-
 
       </div>
 
@@ -176,10 +194,10 @@ export default function Curriculum({
                       key={i}
                       className={`flex justify-between items-center border border-gray-200 dark:border-slate-800 rounded-lg p-3 transition duration-300 
           hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 shadow-sm
-          ${isPaid ? "cursor-not-allowed opacity-95" : "cursor-pointer"}`}
+          ${isPaid && !isEnrolled ? "cursor-not-allowed opacity-95" : "cursor-pointer"}`}
                     >
                       <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
-                        {isPaid ? (
+                        {isPaid && !isEnrolled ? (
                           <FaLock className="text-emerald-500 dark:text-emerald-400 text-xs" />
                         ) : (
                           <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-xs" />
@@ -228,7 +246,7 @@ export default function Curriculum({
           <div className="mb-4 flex items-center justify-between">
             <span className="text-gray-500 dark:text-gray-400 font-medium">Course Price:</span>
             <div className="flex flex-col items-end">
-              {discountPercentage > 0 ? (
+              {!isEnrolled && discountPercentage > 0 ? (
                 <>
                   <span className="text-sm text-gray-400 line-through font-bold">
                     ${price}
@@ -238,31 +256,74 @@ export default function Curriculum({
                   </span>
                 </>
               ) : (
-                <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">
-                  {Number(price) === 0 ? "Free" : `$${price}`}
-                </span>
+                isEnrolled ? (
+                  <span className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 px-4 py-1.5 rounded-lg text-sm font-bold uppercase tracking-wider">
+                    Enrolled
+                  </span>
+                ) : (
+                  <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400">
+                    {Number(price) === 0 ? "Free" : `$${price}`}
+                  </span>
+                )
               )}
             </div>
           </div>
-          {isPaid ? (
+
+          {/* Logic for Buttons */}
+          {isEnrolled ? (
             <button
               onClick={() => {
-                if (courseTitle) {
-                  navigate(
-                    `/payment/${courseTitle
-                      .toLowerCase()
-                      .replace(/\s+/g, "-")}`
-                  );
+                const lessonSlug = getFirstLessonSlug();
+                const cSlug = courseSlug || slugify(courseTitle);
+                if (lessonSlug && cSlug) {
+                  navigate(`/watch/courses/${cSlug}/lessons/${lessonSlug}`);
+                } else {
+                  console.warn("Could not navigate to lesson", { lessonSlug, cSlug });
                 }
               }}
-              className="w-full bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100 dark:shadow-none"
+              className="w-full bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100 dark:shadow-none"
             >
-              Buy Course To Get Full Access <FaArrowRight />
-            </button>
-          ) : (
-            <button className="w-full bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100 dark:shadow-none">
               Continue Learning <FaArrowRight />
             </button>
+          ) : (
+            isPaid ? (
+              <button
+                onClick={() => {
+                  if (!user) {
+                    toast.error("Please sign in to your account to purchase this course!");
+                    navigate("/auth/login");
+                    return;
+                  }
+                  if (courseTitle) {
+                    navigate(
+                      `/payment/${courseTitle
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}`
+                    );
+                  }
+                }}
+                className="w-full bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100 dark:shadow-none"
+              >
+                Buy Course To Get Full Access <FaArrowRight />
+              </button>
+            ) : (
+              // Free course but not enrolled? Usually should enroll, but if logic allows direct access:
+              <button
+                onClick={() => {
+                  // Logic for free course enrollment/access could go here, 
+                  // for now assuming it behaves like 'Continue Learning' if public or 'Buy' if semi-gated.
+                  // If strictly following user snippet which had 'Continue Learning' for non-paid:
+                  const lessonSlug = getFirstLessonSlug();
+                  const cSlug = courseSlug || slugify(courseTitle);
+                  if (lessonSlug && cSlug) {
+                    navigate(`/watch/courses/${cSlug}/lessons/${lessonSlug}`);
+                  }
+                }}
+                className="w-full bg-emerald-600 cursor-pointer hover:bg-emerald-700 text-white font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition shadow-lg shadow-emerald-100 dark:shadow-none"
+              >
+                Start Learning <FaArrowRight />
+              </button>
+            )
           )}
         </div>
       </div>

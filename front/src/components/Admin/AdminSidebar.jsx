@@ -19,7 +19,8 @@ import {
     Mail,
     Bot,
     CreditCard,
-    Award
+    Award,
+    Package
 } from 'lucide-react';
 
 const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], isSuperAdmin = false }) => {
@@ -76,6 +77,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
         { title: 'Orders', icon: <ShoppingCart size={20} />, path: '/admin/orders', permission: 'orders.view' },
         { title: 'Roles', icon: <ShieldCheck size={20} />, path: '/admin/roles', permission: 'roles.view' },
         { title: 'Manage Courses', icon: <BookOpen size={20} />, path: '/admin/courses', permission: 'courses.view' },
+        { title: 'Bundles', icon: <Package size={20} />, path: '/admin/bundles', permission: 'bundles.view' },
         { title: 'Manage Blogs', icon: <Newspaper size={20} />, path: '/admin/blogs', permission: 'blogs.view' },
         { title: 'Manage Contacts', icon: <Mail size={20} />, path: '/admin/contacts', permission: 'contacts.view' },
         {

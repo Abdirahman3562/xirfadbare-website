@@ -24,7 +24,8 @@ import {
     CreditCard,
     Award,
     Lock,
-    ShieldAlert
+    ShieldAlert,
+    Package
 } from 'lucide-react';
 import { usePermissions } from '../../../hooks/usePermissions';
 import {
@@ -60,6 +61,7 @@ const RolePermissionEditor = () => {
         { id: 'orders', label: 'Orders', icon: <ShoppingCart size={20} />, actions: ['view', 'edit', 'delete', 'approve'] },
         { id: 'roles', label: 'Roles & Permissions', icon: <Shield size={20} />, actions: ['view', 'create', 'edit', 'delete'] },
         { id: 'courses', label: 'Manage Courses', icon: <BookOpen size={20} />, actions: ['view', 'create', 'edit', 'delete'] },
+        { id: 'bundles', label: 'Manage Bundles', icon: <Package size={20} />, actions: ['view', 'create', 'edit', 'delete', 'status'] },
         { id: 'blogs', label: 'Manage Blogs', icon: <Newspaper size={20} />, actions: ['view', 'create', 'edit', 'delete'] },
         { id: 'contacts', label: 'Manage Contacts', icon: <Mail size={20} />, actions: ['view', 'reply', 'delete'] },
         { id: 'chat', label: 'Live Chat', icon: <MessageSquare size={20} />, actions: ['view', 'manage'] },
