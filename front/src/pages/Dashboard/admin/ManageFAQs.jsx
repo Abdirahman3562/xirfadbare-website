@@ -24,6 +24,7 @@ const ManageFAQs = () => {
     const { canAccess } = usePermissions();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('all');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [formData, setFormData] = useState({
         question: '',
@@ -126,10 +127,12 @@ const ManageFAQs = () => {
         setEditingId(null);
     };
 
-    const filteredFaqs = faqs.filter(t =>
-        t.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.answer.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredFaqs = faqs.filter(t => {
+        const matchesSearch = t.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            t.answer.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = selectedCategory === 'all' || t.category === selectedCategory;
+        return matchesSearch && matchesCategory;
+    });
 
     if (loading) {
         return <PremiumLoader text="Loading FAQs..." />;
@@ -144,14 +147,14 @@ const ManageFAQs = () => {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl font-[Inter]"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -164,7 +167,7 @@ const ManageFAQs = () => {
                         <button
                             onClick={() => canAccess('faqs', 'create') && (resetForm(), setIsModalOpen(true))}
                             disabled={!canAccess('faqs', 'create')}
-                            title={!canAccess('faqs', 'create') ? "Ma haysatid oggolaanshaha inaad darto FAQ" : ""}
+                            title={!canAccess('faqs', 'create') ? "You don't have permission to add an FAQ" : ""}
                             className={`flex items-center cursor-pointer gap-2 px-5 py-2.5 rounded-xl transition-all font-medium text-sm shadow-sm ${!canAccess('faqs', 'create') ? 'bg-gray-200 dark:bg-slate-800 text-gray-400 cursor-not-allowed opacity-60' : 'bg-emerald-600 hover:bg-emerald-700 text-white hover:shadow-emerald-200'}`}
                         >
                             {!canAccess('faqs', 'create') ? <Lock size={18} /> : <Plus size={18} />}
@@ -172,8 +175,8 @@ const ManageFAQs = () => {
                         </button>
                     </div>
 
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex items-center gap-4">
-                        <div className="relative flex-1">
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col md:flex-row items-center gap-4">
+                        <div className="relative flex-1 w-full">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                             <input
                                 type="text"
@@ -182,6 +185,19 @@ const ManageFAQs = () => {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
+                        </div>
+                        <div className="w-full md:w-48">
+                            <select
+                                className="w-full px-4 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-gray-600 rounded-xl outline-none focus:ring-1 focus:ring-emerald-500 text-sm text-gray-900 dark:text-white appearance-none cursor-pointer"
+                                value={selectedCategory}
+                                onChange={(e) => setSelectedCategory(e.target.value)}
+                            >
+                                <option value="all">All Categories</option>
+                                <option value="general">General</option>
+                                <option value="courses">Courses</option>
+                                <option value="payment">Payment</option>
+                                <option value="technical">Technical</option>
+                            </select>
                         </div>
                     </div>
 
@@ -212,7 +228,7 @@ const ManageFAQs = () => {
                                         <button
                                             onClick={() => canAccess('faqs', 'status') && handleToggleStatus(item)}
                                             disabled={!canAccess('faqs', 'status')}
-                                            title={!canAccess('faqs', 'status') ? "Ma haysatid oggolaanshaha" : (item.isActive ? "Deactivate" : "Approve")}
+                                            title={!canAccess('faqs', 'status') ? "You don't have permission" : (item.isActive ? "Deactivate" : "Approve")}
                                             className={`p-2 rounded-lg transition-colors ${!canAccess('faqs', 'status') ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60' : item.isActive ? 'text-gray-400 hover:text-amber-600 bg-gray-50 dark:bg-slate-700/50 dark:hover:bg-amber-500/10' : 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20'}`}
                                         >
                                             {!canAccess('faqs', 'status') ? <Lock size={18} /> : <ShieldCheck size={18} />}
@@ -220,7 +236,7 @@ const ManageFAQs = () => {
                                         <button
                                             onClick={() => canAccess('faqs', 'edit') && handleEdit(item)}
                                             disabled={!canAccess('faqs', 'edit')}
-                                            title={!canAccess('faqs', 'edit') ? "Ma haysatid oggolaanshaha wax beddelista" : "Edit"}
+                                            title={!canAccess('faqs', 'edit') ? "You don't have permission to edit" : "Edit"}
                                             className={`p-2 rounded-lg transition-colors ${!canAccess('faqs', 'edit') ? 'bg-gray-100 text-gray-300 cursor-not-allowed opacity-60' : 'text-gray-400 hover:text-emerald-600 bg-gray-50 dark:bg-slate-700/50'}`}
                                         >
                                             {!canAccess('faqs', 'edit') ? <Lock size={18} /> : <PenTool size={18} />}
@@ -228,7 +244,7 @@ const ManageFAQs = () => {
                                         <button
                                             onClick={() => canAccess('faqs', 'delete') && handleDelete(item)}
                                             disabled={!canAccess('faqs', 'delete')}
-                                            title={!canAccess('faqs', 'delete') ? "Ma haysatid oggolaanshaha tirtirista" : "Delete"}
+                                            title={!canAccess('faqs', 'delete') ? "You don't have permission to delete" : "Delete"}
                                             className={`p-2 rounded-lg transition-colors ${!canAccess('faqs', 'delete') ? 'bg-gray-100 text-gray-300 cursor-not-allowed opacity-60' : 'text-gray-400 hover:text-red-600 bg-gray-50 dark:bg-slate-700/50'}`}
                                         >
                                             {!canAccess('faqs', 'delete') ? <Lock size={18} /> : <Trash2 size={18} />}

@@ -51,7 +51,7 @@ const ManagePayments = () => {
                 setMethods(data);
             }
         } catch (error) {
-            toast.error('Galdinta xogta waa lagu guuldareystay');
+            toast.error('Failed to load data');
         } finally {
             setLoading(false);
         }
@@ -80,7 +80,7 @@ const ManagePayments = () => {
             });
 
             if (res.ok) {
-                toast.success(editingMethod ? 'Waa la cusboonaysiiyay!' : 'Waa la guulaystay!');
+                toast.success(editingMethod ? 'Updated successfully!' : 'Created successfully!');
                 setIsModalOpen(false);
                 setEditingMethod(null);
                 setFormData({ name: '', instruction: '', isActive: true, type: 'local', icon: 'CreditCard' });
@@ -124,7 +124,7 @@ const ManagePayments = () => {
             });
 
             if (res.ok) {
-                toast.success('Waa la tirtiray!');
+                toast.success('Deleted successfully!');
                 setShowDeleteModal(false);
                 setMethodToDelete(null);
                 fetchMethods();
@@ -147,14 +147,14 @@ const ManagePayments = () => {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl font-[Inter]"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -162,7 +162,7 @@ const ManagePayments = () => {
                     <div className="flex justify-between items-end">
                         <div>
                             <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight">Payment Methods</h1>
-                            <p className="text-gray-500 dark:text-gray-400 font-medium mt-1">Maaree qababka lacag bixinta iyo tilmaamahooda.</p>
+                            <p className="text-gray-500 dark:text-gray-400 font-medium mt-1">Manage payment methods and their instructions.</p>
                         </div>
                         <button
                             onClick={() => {
@@ -172,11 +172,11 @@ const ManagePayments = () => {
                                 setIsModalOpen(true);
                             }}
                             disabled={!canAccess('payments', 'create')}
-                            title={!canAccess('payments', 'create') ? "Ma haysatid oggolaanshaha inaad darto method lacag bixin" : ""}
+                            title={!canAccess('payments', 'create') ? "You don't have permission to add a payment method" : ""}
                             className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 cursor-pointer ${!canAccess('payments', 'create') ? 'bg-gray-200 dark:bg-slate-800 text-gray-400 cursor-not-allowed opacity-60' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-200 dark:shadow-none'}`}
                         >
                             {!canAccess('payments', 'create') ? <Lock size={16} /> : <Plus size={16} />}
-                            Method Cusub
+                            New Method
                         </button>
                     </div>
 
@@ -210,7 +210,7 @@ const ManagePayments = () => {
                                             <button
                                                 onClick={() => canAccess('payments', 'edit') && handleEdit(method)}
                                                 disabled={!canAccess('payments', 'edit')}
-                                                title={!canAccess('payments', 'edit') ? "Ma haysatid oggolaanshaha wax beddelista" : "Edit"}
+                                                title={!canAccess('payments', 'edit') ? "You don't have permission to edit" : "Edit"}
                                                 className={`p-2.5 rounded-xl transition-all ${!canAccess('payments', 'edit') ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-emerald-600 hover:bg-emerald-50'}`}
                                             >
                                                 {!canAccess('payments', 'edit') ? <Lock size={16} /> : <Edit2 size={16} />}
@@ -218,7 +218,7 @@ const ManagePayments = () => {
                                             <button
                                                 onClick={() => canAccess('payments', 'delete') && handleDeleteClick(method)}
                                                 disabled={!canAccess('payments', 'delete')}
-                                                title={!canAccess('payments', 'delete') ? "Ma haysatid oggolaanshaha tirtirista" : "Delete"}
+                                                title={!canAccess('payments', 'delete') ? "You don't have permission to delete" : "Delete"}
                                                 className={`p-2.5 rounded-xl transition-all ${!canAccess('payments', 'delete') ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-red-600 hover:bg-red-50'}`}
                                             >
                                                 {!canAccess('payments', 'delete') ? <Lock size={16} /> : <Trash2 size={16} />}
@@ -239,8 +239,8 @@ const ManagePayments = () => {
                                     <div className="w-16 h-16 bg-gray-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
                                         <CreditCard className="text-gray-300 dark:text-gray-500" size={32} />
                                     </div>
-                                    <h3 className="text-gray-900 dark:text-white font-bold">Ma jiraan methods lacag bixin</h3>
-                                    <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Ku dar method-kaaga ugu horeeya adigoo riixaya badhanka kore.</p>
+                                    <h3 className="text-gray-900 dark:text-white font-bold">No payment methods available</h3>
+                                    <p className="text-gray-400 dark:text-gray-500 text-sm mt-1">Add your first method by clicking the button above.</p>
                                 </div>
                             )}
                         </div>
@@ -254,7 +254,7 @@ const ManagePayments = () => {
                                     <div className="absolute top-0 right-0 w-48 h-26 bg-emerald-500 rounded-full -translate-y-1/2 translate-x-1/2 opacity-20"></div>
                                     <div className="relative z-10">
                                         <span className="text-emerald-100 text-[9px] font-black uppercase tracking-[0.2em] mb-1.5 block">Payment Gateway</span>
-                                        <h2 className="text-2xl font-black text-white">{editingMethod ? 'Edit Method' : 'Method Cusub'}</h2>
+                                        <h2 className="text-2xl font-black text-white">{editingMethod ? 'Edit Method' : 'New Method'}</h2>
                                     </div>
                                     <button onClick={() => setIsModalOpen(false)} className="relative z-10 w-10 h-10 bg-white/10 hover:bg-white/20 text-white rounded-full flex items-center justify-center transition-all">
                                         <X size={18} />
@@ -290,7 +290,7 @@ const ManagePayments = () => {
                                                 onChange={(e) =>
                                                     setFormData({ ...formData, instruction: e.target.value })
                                                 }
-                                                placeholder="Tilmaam sida ardaygu u soo dirayo lacagta"
+                                                placeholder="Instructions on how the student should send the money"
                                                 className="w-full rounded-2xl border border-gray-100 dark:border-gray-600 bg-gray-50 dark:bg-slate-700 px-5 py-3 text-sm font-bold outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/10 resize-none text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
                                                 required
                                             />
@@ -326,8 +326,8 @@ const ManagePayments = () => {
 
                                     <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700 rounded-2xl border border-gray-100 dark:border-gray-600">
                                         <div className="flex flex-col">
-                                            <span className="text-[11px] font-black text-gray-700 dark:text-gray-200">Status-ka Method-ka</span>
-                                            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold">Active ama Inactive ka dhig</span>
+                                            <span className="text-[11px] font-black text-gray-700 dark:text-gray-200">Method Status</span>
+                                            <span className="text-[10px] text-gray-400 dark:text-gray-500 font-bold">Set as Active or Inactive</span>
                                         </div>
                                         <button
                                             type="button"
@@ -367,9 +367,9 @@ const ManagePayments = () => {
                                     <div className="w-16 h-16 bg-red-50 dark:bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100 dark:border-red-500/30">
                                         <AlertTriangle size={32} className="text-red-500 dark:text-red-400 animate-pulse" />
                                     </div>
-                                    <h3 className="text-lg font-black text-gray-900 dark:text-white mb-2">Ma hubtaa boss?</h3>
+                                    <h3 className="text-lg font-black text-gray-900 dark:text-white mb-2">Are you sure?</h3>
                                     <p className="text-[13px] text-gray-500 dark:text-gray-400 font-medium">
-                                        Method-kan "{methodToDelete?.name}" mar haddii la tirtiro lama soo celin karo.
+                                        This method "{methodToDelete?.name}" cannot be recovered once deleted.
                                     </p>
                                 </div>
                                 <div className="p-8 bg-gray-50/50 dark:bg-slate-700/50 border-t border-gray-100 dark:border-gray-700 flex gap-3">
@@ -378,7 +378,7 @@ const ManagePayments = () => {
                                         className="flex-1 py-3.5 cursor-pointer bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-200 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-gray-200 dark:border-gray-600"
                                         disabled={isDeleting}
                                     >
-                                        Jooji
+                                        Cancel
                                     </button>
                                     <button
                                         onClick={confirmDelete}
@@ -386,7 +386,7 @@ const ManagePayments = () => {
                                         disabled={isDeleting}
                                     >
                                         {isDeleting ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> : <Trash2 size={14} />}
-                                        <span>Tirtir</span>
+                                        <span>Delete</span>
                                     </button>
                                 </div>
                             </div>

@@ -18,6 +18,7 @@ const getSavedEnrolledData = () => {
 export function useMyOrders(user) {
     const [orders, setOrders] = useState(ordersCache || []);
     const [loading, setLoading] = useState(!ordersCache);
+    const [version, setVersion] = useState(0);
 
     // Use saved data for instant availability on first load
     const savedData = getSavedEnrolledData();
@@ -36,20 +37,7 @@ export function useMyOrders(user) {
             return;
         }
 
-        // If we already have a promise in flight, just wait for it
-        if (fetchPromise) {
-            fetchPromise.then(data => {
-                if (data) updateState(data);
-            });
-            return;
-        }
-
-        // If we have cache, use it and don't fetch (unless we want to re-validate)
-        if (ordersCache) {
-            updateState(ordersCache);
-            setLoading(false);
-            return;
-        }
+        // ... logic for fetchPromise and ordersCache ...
 
         const fetchOrders = async () => {
             try {
@@ -102,16 +90,38 @@ export function useMyOrders(user) {
             }));
         };
 
+        // If we already have a promise in flight, just wait for it
+        if (fetchPromise) {
+            fetchPromise.then(data => {
+                if (data) updateState(data);
+            });
+            // We still want to let it run once if it's the first time
+        }
+
+        // If we have cache, use it and don't fetch (unless we want to re-validate)
+        if (ordersCache && version === 0) {
+            updateState(ordersCache);
+            setLoading(false);
+            return;
+        }
+
         fetchOrders();
-    }, [user?.token]); // Use token to ensure stable check
+    }, [user?.token, version]); // Added version to dependency array
 
     const isEnrolledInCourse = (courseId) => enrolledCourseIds.has(String(courseId));
     const isEnrolledInBundle = (bundleId) => enrolledBundleIds.has(String(bundleId));
+
+    const refreshOrders = () => {
+        ordersCache = null;
+        fetchPromise = null;
+        setVersion(v => v + 1);
+    };
 
     return {
         orders,
         loading,
         isEnrolledInCourse,
-        isEnrolledInBundle
+        isEnrolledInBundle,
+        refreshOrders
     };
 }

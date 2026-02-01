@@ -4,7 +4,7 @@ import { API_BASE_URL } from '../config';
 export async function getMyOrders() {
   try {
     const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
-                      JSON.parse(localStorage.getItem('user'));
+      JSON.parse(localStorage.getItem('user'));
     const token = loggedUser?.token;
     if (!token) throw new Error('No authentication token found');
 
@@ -28,7 +28,7 @@ export async function getMyOrders() {
 export async function createOrder(orderData) {
   try {
     const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
-                      JSON.parse(localStorage.getItem('user'));
+      JSON.parse(localStorage.getItem('user'));
     const token = loggedUser?.token;
     if (!token) throw new Error('No authentication token found');
 
@@ -54,7 +54,7 @@ export async function createOrder(orderData) {
 export async function getOrderById(orderId) {
   try {
     const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
-                      JSON.parse(localStorage.getItem('user'));
+      JSON.parse(localStorage.getItem('user'));
     const token = loggedUser?.token;
     if (!token) throw new Error('No authentication token found');
 
@@ -71,5 +71,34 @@ export async function getOrderById(orderId) {
   } catch (error) {
     console.error('Error fetching order:', error);
     return null;
+  }
+}
+
+// ✅ Enroll in a free course
+export async function enrollInFreeCourse(courseId) {
+  try {
+    const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
+      JSON.parse(localStorage.getItem('user'));
+    const token = loggedUser?.token;
+    if (!token) throw new Error('No authentication token found');
+
+    const response = await fetch(`${API_BASE_URL}/orders/free-enroll`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ courseId }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to enroll in free course');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error in free enrollment service:', error);
+    throw error;
   }
 }

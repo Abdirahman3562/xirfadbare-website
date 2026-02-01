@@ -710,10 +710,10 @@ const EditCourse = () => {
             }, 2000);
         } catch (error) {
             toast.update(toastId, {
-                render: errorMsg,
+                render: `${errorMsg}: ${error.message}`,
                 type: "error",
                 isLoading: false,
-                autoClose: 3000
+                autoClose: 5000
             });
             console.error(error);
         } finally {

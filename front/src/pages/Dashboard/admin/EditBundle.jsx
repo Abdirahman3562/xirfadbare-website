@@ -85,10 +85,10 @@ const EditBundle = () => {
 
             const data = await res.json();
             setFormData(prev => ({ ...prev, thumbnail: data.url || data.image || data }));
-            toast.success("Sawirka waa la upload gareeyay!");
+            toast.success("Image uploaded successfully!");
         } catch (error) {
             console.error(error);
-            toast.error("Wuu fashilmay upload-ka sawirka");
+            toast.error("Image upload failed");
         } finally {
             setUploading(false);
         }

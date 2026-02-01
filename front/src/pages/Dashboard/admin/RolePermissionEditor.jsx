@@ -87,7 +87,7 @@ const RolePermissionEditor = () => {
                         });
                     }
                 } catch (error) {
-                    toast.error("Wuu fashilmay soo aqrinta doorka");
+                    toast.error("Failed to fetch role");
                     navigate('/admin/roles');
                 } finally {
                     setLoading(false);
@@ -124,7 +124,7 @@ const RolePermissionEditor = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.name) {
-            toast.error("Fadlan magac u bixi doorka");
+            toast.error("Please provide a name for the role");
             return;
         }
 
@@ -132,21 +132,21 @@ const RolePermissionEditor = () => {
         try {
             if (mode === 'create') {
                 await createRole(formData, token);
-                toast.success("Door cusub ayaa si guul leh loo abuuray!");
+                toast.success("New role created successfully!");
             } else {
                 await updateRole(id, formData, token);
-                toast.success("Xogta doorka waa la cusbooneysiiyay!");
+                toast.success("Role data updated successfully!");
             }
             navigate('/admin/roles');
         } catch (error) {
-            toast.error(error.message || "Khalad ayaa dhacay");
+            toast.error(error.message || "An error occurred");
         } finally {
             setSubmitting(false);
         }
     };
 
     if (loading) {
-        return <PremiumLoader text="Soo aqrinaya xogta doorka..." />;
+        return <PremiumLoader text="Loading role data..." />;
     }
 
     return (
@@ -158,14 +158,14 @@ const RolePermissionEditor = () => {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -186,7 +186,7 @@ const RolePermissionEditor = () => {
                         <button
                             form="role-form"
                             disabled={submitting || !hasWritePermission}
-                            title={!hasWritePermission ? "Ma haysatid oggolaanshaha wax beddelista" : ""}
+                            title={!hasWritePermission ? "You don't have permission to save changes" : ""}
                             className={`flex items-center gap-3 px-10 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl active:scale-95 ${!hasWritePermission ? 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 dark:shadow-none'}`}
                         >
                             {submitting ? <Loader2 className="animate-spin" size={20} /> : !hasWritePermission ? <Lock size={20} /> : <Save size={20} />}

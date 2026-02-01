@@ -68,7 +68,7 @@ const ManageInstructors = () => {
             setInstructors(insData);
             setCourses(courseData);
         } catch (error) {
-            toast.error("Wuu fashilmay soo aqrinta macalimiinta");
+            toast.error("Failed to fetch instructors");
         } finally {
             setLoading(false);
         }
@@ -117,20 +117,20 @@ const ManageInstructors = () => {
             if (modalMode === 'create') {
                 const res = await createInstructor(formData);
                 if (res) {
-                    toast.success("Macalin cusub ayaa lagu daray!");
+                    toast.success("New instructor added successfully!");
                     fetchData();
                     setShowModal(false);
                 }
             } else {
                 const res = await updateInstructor(selectedInstructor._id, formData);
                 if (res) {
-                    toast.success("Xogta macalinka waa la cusbooneysiiyay!");
+                    toast.success("Instructor data updated successfully!");
                     fetchData();
                     setShowModal(false);
                 }
             }
         } catch (error) {
-            toast.error("Khalad ayaa dhacay. Fadlan isku day markale.");
+            toast.error("An error occurred. Please try again.");
         } finally {
             setSubmitting(false);
         }
@@ -141,12 +141,12 @@ const ManageInstructors = () => {
         try {
             const success = await deleteInstructor(selectedInstructor._id);
             if (success) {
-                toast.success("Macalinka waa la tirtiray!");
+                toast.success("Instructor deleted successfully!");
                 fetchData();
                 setShowDeleteModal(false);
             }
         } catch (error) {
-            toast.error("Wuu fashilmay tirtirista macalinka.");
+            toast.error("Failed to delete instructor.");
         } finally {
             setSubmitting(false);
         }
@@ -160,10 +160,10 @@ const ManageInstructors = () => {
                 setInstructors(instructors.map(ins =>
                     ins._id === instructor._id ? { ...ins, isActive: newStatus } : ins
                 ));
-                toast.success(newStatus ? "Macalinka waa la hawlgeliyay!" : "Macalinka waa la damiyay!");
+                toast.success(newStatus ? "Instructor activated!" : "Instructor deactivated!");
             }
         } catch (error) {
-            toast.error("Wuu fashilmay bedelidda heerka macalinka.");
+            toast.error("Failed to change instructor status.");
         }
     };
 
@@ -178,7 +178,7 @@ const ManageInstructors = () => {
         try {
             const imagePath = await uploadImage(uploadFormData, token);
             setFormData(prev => ({ ...prev, image: imagePath }));
-            toast.success("Sawirka waa la upload gareeyay!");
+            toast.success("Image uploaded successfully!");
         } catch (error) {
             console.error(error);
             toast.error("Wuu fashilmay upload-ka sawirka");
@@ -213,14 +213,14 @@ const ManageInstructors = () => {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -234,7 +234,7 @@ const ManageInstructors = () => {
                         <button
                             onClick={() => canAccess('instructors', 'create') && handleOpenModal('create')}
                             disabled={!canAccess('instructors', 'create')}
-                            title={!canAccess('instructors', 'create') ? "Ma haysatid oggolaanshaha" : ""}
+                            title={!canAccess('instructors', 'create') ? "You don't have permission" : ""}
                             className={`flex items-center gap-3 px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl active:scale-95 ${!canAccess('instructors', 'create') ? 'bg-gray-200 dark:bg-slate-800 text-gray-400 cursor-not-allowed shadow-none opacity-60' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 dark:shadow-none'}`}
                         >
                             {!canAccess('instructors', 'create') ? <Lock size={20} /> : <UserPlus size={20} />}
@@ -257,7 +257,7 @@ const ManageInstructors = () => {
                     </div>
 
                     {loading ? (
-                        <PremiumLoader text="Soo aqrinaya xogta..." />
+                        <PremiumLoader text="Loading data..." />
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {filteredInstructors.length > 0 ? (
@@ -289,7 +289,7 @@ const ManageInstructors = () => {
                                                 <button
                                                     onClick={() => canAccess('instructors', 'edit') && handleOpenModal('edit', ins)}
                                                     disabled={!canAccess('instructors', 'edit')}
-                                                    title={!canAccess('instructors', 'edit') ? "Ma haysatid oggolaanshaha" : "Edit"}
+                                                    title={!canAccess('instructors', 'edit') ? "You don't have permission" : "Edit"}
                                                     className={`p-3 rounded-2xl transition-all ${!canAccess('instructors', 'edit') ? 'text-gray-300 cursor-not-allowed bg-gray-100 dark:bg-slate-800' : 'text-gray-400 hover:text-emerald-600 bg-gray-50 dark:bg-slate-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'}`}
                                                 >
                                                     {!canAccess('instructors', 'edit') ? <Lock size={18} /> : <Edit3 size={18} />}
@@ -297,7 +297,7 @@ const ManageInstructors = () => {
                                                 <button
                                                     onClick={() => canAccess('instructors', 'delete') && (setSelectedInstructor(ins), setShowDeleteModal(true))}
                                                     disabled={!canAccess('instructors', 'delete')}
-                                                    title={!canAccess('instructors', 'delete') ? "Ma haysatid oggolaanshaha" : "Delete"}
+                                                    title={!canAccess('instructors', 'delete') ? "You don't have permission" : "Delete"}
                                                     className={`p-3 rounded-2xl transition-all ${!canAccess('instructors', 'delete') ? 'text-gray-300 cursor-not-allowed bg-gray-100 dark:bg-slate-800' : 'text-gray-400 hover:text-rose-600 bg-gray-50 dark:bg-slate-700/50 hover:bg-rose-50 dark:hover:bg-rose-500/10'}`}
                                                 >
                                                     {!canAccess('instructors', 'delete') ? <Lock size={18} /> : <Trash2 size={18} />}
@@ -320,7 +320,7 @@ const ManageInstructors = () => {
                                             <button
                                                 onClick={() => canAccess('instructors', 'status') && toggleStatus(ins)}
                                                 disabled={!canAccess('instructors', 'status')}
-                                                title={!canAccess('instructors', 'status') ? "Ma haysatid oggolaanshaha" : "Toggle Status"}
+                                                title={!canAccess('instructors', 'status') ? "You don't have permission" : "Toggle Status"}
                                                 className={`w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border transition-all ${!canAccess('instructors', 'status')
                                                     ? 'cursor-not-allowed opacity-60 bg-gray-50 border-gray-200 text-gray-400'
                                                     : ins.isActive !== false

@@ -149,14 +149,14 @@ export default function SystemSettings() {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (

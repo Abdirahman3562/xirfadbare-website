@@ -190,11 +190,11 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
                                                     : 'border-red-500 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400')
                                                 : 'border-gray-100 dark:border-slate-800 focus:border-emerald-500 bg-gray-50/50 dark:bg-slate-800/30'
                                                 }`}
-                                            placeholder="Gali jawaabtaada halkan..."
+                                            placeholder="Enter your answer here..."
                                         />
                                         {isSubmitted && selectedAnswer?.toString().toLowerCase().trim() !== currentQuestion.correctAnswer?.toString().toLowerCase().trim() && (
                                             <div className="p-3 bg-emerald-50/30 dark:bg-emerald-500/5 rounded-xl border border-emerald-100/50 dark:border-emerald-500/20">
-                                                <p className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1">Jawaabta Saxda ah</p>
+                                                <p className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-1">Correct Answer</p>
                                                 <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400">{currentQuestion.correctAnswer}</p>
                                             </div>
                                         )}
@@ -273,10 +273,10 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
                             </div>
 
                             <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
-                                Waqtigii waa kaa dhacay! ⏰
+                                Time's Up! ⏰
                             </h2>
                             <p className="text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-8 max-w-[250px]">
-                                Ma aadan dhammaystirin quiz-ka waqtigii loogu talagalay. Fadlan isku day markale.
+                                You didn't complete the quiz in time. Please try again.
                             </p>
 
                             <button
@@ -284,7 +284,7 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
                                 className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-slate-900 dark:bg-emerald-600 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 dark:hover:bg-emerald-700 transition-all shadow-lg active:scale-95 cursor-pointer"
                             >
                                 <RefreshCw size={14} />
-                                Isku day Markale
+                                Try Again
                             </button>
                         </div>
                     ) : (

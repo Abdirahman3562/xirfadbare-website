@@ -194,7 +194,7 @@ const AdminLayout = () => {
     // 🚀 Handle Redirect Loop & Side Effects
     useEffect(() => {
         if (!loadingPermissions && !hasAccess) {
-            toast.error("Ma haysatid ogolaansho aad boggan ku gasho.");
+            toast.error("You don't have permission to access this page.");
             navigate('/admin/dashboard', { replace: true });
         }
     }, [hasAccess, loadingPermissions, navigate]);

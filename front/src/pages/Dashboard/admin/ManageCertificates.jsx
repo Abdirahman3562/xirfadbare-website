@@ -62,14 +62,14 @@ const ManageCertificates = () => {
             });
 
             if (res.ok) {
-                toast.success('Shahaadada si guul leh ayaa loo tirtiray');
+                toast.success('Certificate template deleted successfully');
                 fetchTemplates();
                 setIsDeleteModalOpen(false);
             } else {
-                toast.error('Wuu fashilmay tirtirista shahaadada');
+                toast.error('Failed to delete certificate template');
             }
         } catch (error) {
-            toast.error('Khalad ayaa dhacay xilligii tirtirista');
+            toast.error('An error occurred during deletion');
         } finally {
             setIsDeleting(false);
             setTemplateToDelete(null);
@@ -115,14 +115,14 @@ const ManageCertificates = () => {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -140,7 +140,7 @@ const ManageCertificates = () => {
                         <button
                             onClick={() => canCreate && navigate('/admin/certificates/builder')}
                             disabled={!canCreate}
-                            title={!canCreate ? "Ma haysatid oggolaanshaha inaad abuurto template" : ""}
+                            title={!canCreate ? "You don't have permission to create templates" : ""}
                             className={`group flex dark:shadow-none cursor-pointer items-center justify-center gap-3 px-8 py-4 text-white rounded-2xl font-black text-sm transition-all active:scale-95 overflow-hidden relative ${!canCreate ? 'bg-slate-300 dark:bg-slate-800 cursor-not-allowed grayscale' : 'bg-emerald-600 hover:bg-emerald-500 shadow-xl shadow-emerald-500/20 hover:shadow-emerald-500/40'}`}
                         >
                             {!canCreate ? <Lock className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
@@ -154,7 +154,7 @@ const ManageCertificates = () => {
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-emerald-500 transition-colors" />
                             <input
                                 type="text"
-                                placeholder="Raadi Shahaadooyinka..."
+                                placeholder="Search Certificates..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 dark:text-white font-black text-sm transition-all"
@@ -166,16 +166,16 @@ const ManageCertificates = () => {
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-20 gap-4">
                             <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-                            <p className="text-slate-500 font-bold animate-pulse">Soo rarayaa...</p>
+                            <p className="text-slate-500 font-bold animate-pulse">Loading...</p>
                         </div>
                     ) : filteredTemplates.length === 0 ? (
                         <div className="bg-white dark:bg-slate-900/50 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] py-24 flex flex-col items-center justify-center text-center">
                             <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
                                 <Layout className="w-10 h-10 text-slate-400" />
                             </div>
-                            <h3 className="text-xl font-black text-slate-900 dark:text-white">Wax template ah lama helin</h3>
+                            <h3 className="text-xl font-black text-slate-900 dark:text-white">No templates found</h3>
                             <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-sm font-medium px-4">
-                                Ma jirto wax template ah oo la helay. Fadlan abuuro mid cusub si aad u bilowdo.
+                                No templates found. Please create a new one to start.
                             </p>
                         </div>
                     ) : (
@@ -188,7 +188,7 @@ const ManageCertificates = () => {
                                     {/* Preview Thumbnail */}
                                     <div className={`aspect-[1.414/1] bg-slate-100 dark:bg-slate-800 relative group-hover:scale-[1.02] transition-transform duration-700 overflow-hidden ${!canEdit ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}`}
                                         onClick={() => canEdit && navigate(`/admin/certificates/builder?id=${template._id}`)}
-                                        title={!canEdit ? "Ma haysatid oggolaanshaha inaad wax beddesho" : ""}>
+                                        title={!canEdit ? "You don't have permission to edit" : ""}>
                                         <div
                                             className="w-full h-full bg-cover bg-center transition-all duration-700"
                                             style={{ backgroundImage: `url(${getFullImageUrl(template.backgroundUrl)})` }}
@@ -214,7 +214,7 @@ const ManageCertificates = () => {
                                                     onClick={() => canStatus && toggleStatus(template._id, template.isActive)}
                                                     disabled={!canStatus}
                                                     className={`p-3 rounded-xl transition-all ${!canStatus ? 'opacity-30 cursor-not-allowed' : template.isActive ? 'text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10' : 'text-slate-400 bg-slate-50 dark:bg-slate-800'}`}
-                                                    title={!canStatus ? "Ma haysatid oggolaanshaha status-ka" : (template.isActive ? 'Deactivate' : 'Activate')}
+                                                    title={!canStatus ? "You don't have permission to change status" : (template.isActive ? 'Deactivate' : 'Activate')}
                                                 >
                                                     {!canStatus ? <Lock className="w-5 h-5" /> : (template.isActive ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />)}
                                                 </button>
@@ -222,7 +222,7 @@ const ManageCertificates = () => {
                                                     onClick={() => canDelete && handleDeleteClick(template)}
                                                     disabled={!canDelete}
                                                     className={`p-3 rounded-xl transition-all shadow-sm group/del ${!canDelete ? 'bg-slate-100 dark:bg-slate-800 text-slate-300 cursor-not-allowed opacity-50' : 'bg-rose-50 dark:bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white'}`}
-                                                    title={!canDelete ? "Ma haysatid oggolaanshaha tirtirista" : "Delete"}
+                                                    title={!canDelete ? "You don't have permission to delete" : "Delete"}
                                                 >
                                                     {!canDelete ? <Lock className="w-5 h-5" /> : <Trash2 className="w-5 h-5 group-hover/del:animate-bounce" />}
                                                 </button>
@@ -246,7 +246,7 @@ const ManageCertificates = () => {
                                                 onClick={() => canEdit && navigate(`/admin/certificates/builder?id=${template._id}`)}
                                                 disabled={!canEdit}
                                                 className={`text-xs font-black flex items-center gap-2 group/btn ${!canEdit ? 'text-slate-300 cursor-not-allowed' : 'text-emerald-600 hover:text-emerald-500'}`}
-                                                title={!canEdit ? "Ma haysatid oggolaanshaha inaad wax beddesho" : ""}
+                                                title={!canEdit ? "You don't have permission to edit" : ""}
                                             >
                                                 Full Edit
                                                 {!canEdit ? <Lock className="w-4 h-4" /> : <Plus className="w-4 h-4 group-hover/btn:rotate-90 transition-transform" />}
@@ -266,9 +266,9 @@ const ManageCertificates = () => {
                                     <div className="w-20 h-20 bg-rose-100 dark:bg-rose-500/10 rounded-full flex items-center justify-center mx-auto mb-6 relative">
                                         <AlertTriangle className="w-10 h-10 text-rose-500 animate-pulse" />
                                     </div>
-                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Ma hubtaa?</h2>
+                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Are you sure?</h2>
                                     <p className="text-slate-500 dark:text-slate-400 font-medium px-4">
-                                        Ma hubtaa inaad rabto inaad tirtirto shahaadada <span className="text-rose-500 font-black italic">"{templateToDelete?.name}"</span>? Action-kaan dib looma soo celin karo.
+                                        Are you sure you want to delete the certificate template <span className="text-rose-500 font-black italic">"{templateToDelete?.name}"</span>? This action cannot be undone.
                                     </p>
                                 </div>
 
@@ -278,7 +278,7 @@ const ManageCertificates = () => {
                                         disabled={isDeleting}
                                         className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-black text-sm rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95 disabled:opacity-50"
                                     >
-                                        Maya, Jooji
+                                        No, Cancel
                                     </button>
                                     <button
                                         onClick={confirmDelete}
@@ -290,7 +290,7 @@ const ManageCertificates = () => {
                                         ) : (
                                             <>
                                                 <Trash2 className="w-4 h-4" />
-                                                Haa, Tirtir
+                                                Yes, Delete
                                             </>
                                         )}
                                     </button>

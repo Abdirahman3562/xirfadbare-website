@@ -7,6 +7,7 @@ import {
   getMyOrders,
   getOrders,
   deleteOrder,
+  freeEnrollment,
 } from '../controllers/orderController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.route('/').post(protect, addOrderItems).get(protect, getOrders);
 router.route('/myorders').get(protect, getMyOrders);
+router.route('/free-enroll').post(protect, freeEnrollment);
 router.route('/:id').get(protect, getOrderById).delete(protect, deleteOrder);
 router.route('/:id/approve').put(protect, updateOrderToActive);
 router.route('/:id/reject').put(protect, updateOrderToRejected);

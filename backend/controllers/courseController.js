@@ -57,108 +57,124 @@ const getCourseById = async (req, res) => {
 // @route   POST /api/courses
 // @access  Private/Admin
 const createCourse = async (req, res) => {
-  const {
-    title,
-    price,
-    description,
-    technology,
-    instructor,
-    level,
-    accessType,
-    thumbnail,
-    curriculum,
-    communityLink,
-    learningOutcomes,
-    type,
-    discountCode,
-    discountPercentage,
-    discountExpiry,
-    hasCertificate,
-    certificateTemplate,
-    courseResources,
-  } = req.body;
+  try {
+    const {
+      title,
+      price,
+      description,
+      technology,
+      instructor,
+      level,
+      accessType,
+      thumbnail,
+      curriculum,
+      communityLink,
+      learningOutcomes,
+      type,
+      discountCode,
+      discountPercentage,
+      discountExpiry,
+      hasCertificate,
+      certificateTemplate,
+      courseResources,
+    } = req.body;
 
-  const course = new Course({
-    title,
-    type,
-    discountCode,
-    discountPercentage,
-    discountExpiry: discountExpiry || null,
-    price,
-    description,
-    technology,
-    instructor: instructor || null,
-    level,
-    accessType,
-    thumbnail,
-    curriculum,
-    communityLink,
-    learningOutcomes,
-    hasCertificate,
-    certificateTemplate,
-    courseResources,
-    user: req.user._id,
-  });
+    const course = new Course({
+      title,
+      type,
+      discountCode,
+      discountPercentage,
+      discountExpiry: discountExpiry || null,
+      price,
+      description,
+      technology,
+      instructor: instructor || null,
+      level,
+      accessType,
+      thumbnail,
+      curriculum,
+      communityLink,
+      learningOutcomes,
+      hasCertificate,
+      certificateTemplate,
+      courseResources,
+      user: req.user._id,
+    });
 
-  course.markModified('curriculum');
-  course.markModified('courseResources');
-  const createdCourse = await course.save();
-  res.status(201).json(createdCourse);
+    course.markModified('curriculum');
+    course.markModified('courseResources');
+    const createdCourse = await course.save();
+    res.status(201).json(createdCourse);
+  } catch (error) {
+    console.error('❌ Error in createCourse:', error);
+    res.status(500).json({
+      message: 'Failed to create course',
+      error: error.message
+    });
+  }
 };
 
 // @desc    Update a course
 // @route   PUT /api/courses/:id
 // @access  Private/Admin
 const updateCourse = async (req, res) => {
-  const {
-    title,
-    price,
-    description,
-    technology,
-    instructor,
-    level,
-    accessType,
-    thumbnail,
-    curriculum,
-    communityLink,
-    learningOutcomes,
-    type,
-    discountCode,
-    discountPercentage,
-    hasCertificate,
-    certificateTemplate,
-    courseResources,
-  } = req.body;
+  try {
+    const {
+      title,
+      price,
+      description,
+      technology,
+      instructor,
+      level,
+      accessType,
+      thumbnail,
+      curriculum,
+      communityLink,
+      learningOutcomes,
+      type,
+      discountCode,
+      discountPercentage,
+      hasCertificate,
+      certificateTemplate,
+      courseResources,
+    } = req.body;
 
-  const course = await Course.findById(req.params.id);
+    const course = await Course.findById(req.params.id);
 
-  if (course) {
-    if (title !== undefined) course.title = title;
-    if (type !== undefined) course.type = type;
-    if (price !== undefined) course.price = price;
-    if (description !== undefined) course.description = description;
-    if (technology !== undefined) course.technology = technology;
-    if (instructor !== undefined) course.instructor = instructor;
-    if (level !== undefined) course.level = level;
-    if (accessType !== undefined) course.accessType = accessType;
-    if (thumbnail !== undefined) course.thumbnail = thumbnail;
-    if (curriculum !== undefined) course.curriculum = curriculum;
-    if (communityLink !== undefined) course.communityLink = communityLink;
-    if (learningOutcomes !== undefined) course.learningOutcomes = learningOutcomes;
-    if (discountCode !== undefined) course.discountCode = discountCode;
-    if (discountPercentage !== undefined) course.discountPercentage = discountPercentage;
-    if (req.body.discountExpiry !== undefined) course.discountExpiry = req.body.discountExpiry;
-    if (hasCertificate !== undefined) course.hasCertificate = hasCertificate;
-    if (certificateTemplate !== undefined) course.certificateTemplate = certificateTemplate;
-    if (courseResources !== undefined) course.courseResources = courseResources;
+    if (course) {
+      if (title !== undefined) course.title = title;
+      if (type !== undefined) course.type = type;
+      if (price !== undefined) course.price = price;
+      if (description !== undefined) course.description = description;
+      if (technology !== undefined) course.technology = technology;
+      if (instructor !== undefined) course.instructor = instructor;
+      if (level !== undefined) course.level = level;
+      if (accessType !== undefined) course.accessType = accessType;
+      if (thumbnail !== undefined) course.thumbnail = thumbnail;
+      if (curriculum !== undefined) course.curriculum = curriculum;
+      if (communityLink !== undefined) course.communityLink = communityLink;
+      if (learningOutcomes !== undefined) course.learningOutcomes = learningOutcomes;
+      if (discountCode !== undefined) course.discountCode = discountCode;
+      if (discountPercentage !== undefined) course.discountPercentage = discountPercentage;
+      if (req.body.discountExpiry !== undefined) course.discountExpiry = req.body.discountExpiry;
+      if (hasCertificate !== undefined) course.hasCertificate = hasCertificate;
+      if (certificateTemplate !== undefined) course.certificateTemplate = certificateTemplate;
+      if (courseResources !== undefined) course.courseResources = courseResources;
 
-    course.markModified('curriculum');
-    course.markModified('courseResources');
+      course.markModified('curriculum');
+      course.markModified('courseResources');
 
-    const updatedCourse = await course.save();
-    res.json(updatedCourse);
-  } else {
-    res.status(404).json({ message: 'Course not found' });
+      const updatedCourse = await course.save();
+      res.json(updatedCourse);
+    } else {
+      res.status(404).json({ message: 'Course not found' });
+    }
+  } catch (error) {
+    console.error('❌ Error in updateCourse:', error);
+    res.status(500).json({
+      message: 'Failed to update course',
+      error: error.message
+    });
   }
 };
 

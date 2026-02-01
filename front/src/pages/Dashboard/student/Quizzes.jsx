@@ -100,7 +100,7 @@ const Quizzes = () => {
     if (loading) return <PremiumLoader />;
 
     return (
-        <div className="max-w-6xl mx-auto">
+        <div className="w-full lg:mt-20 md:mt-20 mt-36">
             <div className="mb-8">
                 <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
                     My Quizzes

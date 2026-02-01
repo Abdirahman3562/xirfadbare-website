@@ -44,7 +44,7 @@ const ManageUsers = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const user = JSON.parse(localStorage.getItem('loggedInUser') || '{}');
     const token = user?.token;
-    const [unreadCount, setUnreadCount] = useState(0);
+    const [selectedRole, setSelectedRole] = useState('all');
 
     // Modal states
     const [showModal, setShowModal] = useState(false);
@@ -99,7 +99,7 @@ const ManageUsers = () => {
                 ]);
             }
         } catch (error) {
-            toast.error("Wuu fashilmay soo aqrinta isticmaalayaasha");
+            toast.error("Failed to load users");
         } finally {
             setLoading(false);
         }
@@ -109,7 +109,7 @@ const ManageUsers = () => {
         if (token) {
             fetchData();
         } else {
-            toast.error("Fadlan soo gal marka hore");
+            toast.error("Please login first");
             setLoading(false);
         }
     }, [token]);
@@ -157,7 +157,7 @@ const ManageUsers = () => {
             if (modalMode === 'create') {
                 const res = await adminCreateUser(formData, token);
                 if (res) {
-                    toast.success("Isticmaale cusub ayaa lagu daray!");
+                    toast.success("New user added successfully!");
                     fetchData();
                     setShowModal(false);
                 }
@@ -167,13 +167,13 @@ const ManageUsers = () => {
 
                 const res = await adminUpdateUser(selectedUser._id, dataToSend, token);
                 if (res) {
-                    toast.success("Xogta isticmaalaha waa la cusbooneysiiyay!");
+                    toast.success("User data updated successfully!");
                     fetchData();
                     setShowModal(false);
                 }
             }
         } catch (error) {
-            toast.error(error.message || "Khalad ayaa dhacay. Fadlan isku day markale.");
+            toast.error(error.message || "An error occurred. Please try again.");
         } finally {
             setSubmitting(false);
         }
@@ -184,12 +184,12 @@ const ManageUsers = () => {
         try {
             const success = await deleteUser(selectedUser._id, token);
             if (success) {
-                toast.success("Isticmaalaha waa la tirtiray!");
+                toast.success("User deleted successfully!");
                 fetchData();
                 setShowDeleteModal(false);
             }
         } catch (error) {
-            toast.error("Wuu fashilmay tirtirista isticmaalaha.");
+            toast.error("Failed to delete user.");
         } finally {
             setSubmitting(false);
         }
@@ -202,10 +202,10 @@ const ManageUsers = () => {
                 setUsers(users.map(u =>
                     u._id === userToUpdate._id ? { ...u, isActive: !u.isActive } : u
                 ));
-                toast.success(!userToUpdate.isActive ? "Isticmaalaha waa la hawlgeliyay!" : "Isticmaalaha waa la damiyay!");
+                toast.success(!userToUpdate.isActive ? "User activated!" : "User deactivated!");
             }
         } catch (error) {
-            toast.error("Wuu fashilmay bedelidda heerka isticmaalaha.");
+            toast.error("Failed to change user status.");
         }
     };
 
@@ -216,10 +216,10 @@ const ManageUsers = () => {
                 setUsers(users.map(u =>
                     u._id === userId ? { ...u, role: newRole } : u
                 ));
-                toast.success(`Doorka isticmaalaha waxaa laga dhigay ${newRole}`);
+                toast.success(`User role changed to ${newRole}`);
             }
         } catch (error) {
-            toast.error("Wuu fashilmay bedelidda doorka.");
+            toast.error("Failed to change role.");
         }
     };
 
@@ -234,19 +234,21 @@ const ManageUsers = () => {
         try {
             const imageUrl = await uploadImage(uploadFormData, token);
             setFormData(prev => ({ ...prev, image: imageUrl }));
-            toast.success("Sawirka waa la upload gareeyay!");
+            toast.success("Image uploaded successfully!");
         } catch (error) {
             console.error(error);
-            toast.error("Wuu fashilmay upload-ka sawirka");
+            toast.error("Image upload failed");
         } finally {
             setUploading(false);
         }
     };
 
-    const filteredUsers = users.filter(u =>
-        (u.firstName + ' ' + u.lastName)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredUsers = users.filter(u => {
+        const matchesSearch = (u.firstName + ' ' + u.lastName)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            u.email?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesRole = selectedRole === 'all' || u.role?.toLowerCase() === selectedRole.toLowerCase();
+        return matchesSearch && matchesRole;
+    });
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700 font-[Inter] mb-20">
@@ -257,14 +259,14 @@ const ManageUsers = () => {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -278,7 +280,7 @@ const ManageUsers = () => {
                         <button
                             onClick={() => canAccess('users', 'create') && handleOpenModal('create')}
                             disabled={!canAccess('users', 'create')}
-                            title={!canAccess('users', 'create') ? "Ma haysatid oggolaanshaha" : ""}
+                            title={!canAccess('users', 'create') ? "You don't have permission" : ""}
                             className={`flex items-center gap-3 px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl active:scale-95 ${!canAccess('users', 'create') ? 'bg-gray-200 dark:bg-slate-800 text-gray-400 cursor-not-allowed shadow-none opacity-60' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 dark:shadow-none'}`}
                         >
                             {!canAccess('users', 'create') ? <Lock size={20} /> : <UserPlus size={20} />}
@@ -288,7 +290,7 @@ const ManageUsers = () => {
 
                     {/* toolbar Section */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="relative group w-full">
+                        <div className="relative group flex-1">
                             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
                             <input
                                 type="text"
@@ -298,10 +300,27 @@ const ManageUsers = () => {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
+                        <div className="w-full md:w-64">
+                            <select
+                                className="w-full px-6 py-4 bg-white dark:bg-slate-800 border border-gray-100 dark:border-gray-700 rounded-[1.5rem] outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-bold text-gray-600 dark:text-gray-200 appearance-none cursor-pointer shadow-sm uppercase tracking-wider"
+                                value={selectedRole}
+                                onChange={(e) => setSelectedRole(e.target.value)}
+                            >
+                                <option value="all">All Roles</option>
+                                <option value="student">Students</option>
+                                <option value="instructor">Instructors</option>
+                                <option value="admin">Admins</option>
+                                {roles.length > 0 && roles.map(role => (
+                                    !['student', 'instructor', 'admin'].includes(role.name.toLowerCase()) && (
+                                        <option key={role._id} value={role.name.toLowerCase()}>{role.name}</option>
+                                    )
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     {loading ? (
-                        <PremiumLoader text="Soo aqrinaya xogta..." />
+                        <PremiumLoader text="Loading data..." />
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {filteredUsers.length > 0 ? (
@@ -333,7 +352,7 @@ const ManageUsers = () => {
                                                 <button
                                                     onClick={() => canAccess('users', 'edit') && handleOpenModal('edit', userItem)}
                                                     disabled={!canAccess('users', 'edit')}
-                                                    title={!canAccess('users', 'edit') ? "Ma haysatid oggolaanshaha" : "Edit"}
+                                                    title={!canAccess('users', 'edit') ? "You don't have permission" : "Edit"}
                                                     className={`p-3 rounded-2xl transition-all ${!canAccess('users', 'edit') ? 'text-gray-300 cursor-not-allowed bg-gray-100 dark:bg-slate-800' : 'text-gray-400 hover:text-emerald-600 bg-gray-50 dark:bg-slate-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'}`}
                                                 >
                                                     {!canAccess('users', 'edit') ? <Lock size={18} /> : <Edit3 size={18} />}
@@ -341,7 +360,7 @@ const ManageUsers = () => {
                                                 <button
                                                     onClick={() => canAccess('users', 'delete') && (setSelectedUser(userItem), setShowDeleteModal(true))}
                                                     disabled={!canAccess('users', 'delete')}
-                                                    title={!canAccess('users', 'delete') ? "Ma haysatid oggolaanshaha" : "Delete"}
+                                                    title={!canAccess('users', 'delete') ? "You don't have permission" : "Delete"}
                                                     className={`p-3 rounded-2xl transition-all ${!canAccess('users', 'delete') ? 'text-gray-300 cursor-not-allowed bg-gray-100 dark:bg-slate-800' : 'text-gray-400 hover:text-rose-600 bg-gray-50 dark:bg-slate-700/50 hover:bg-rose-50 dark:hover:bg-rose-500/10'}`}
                                                 >
                                                     {!canAccess('users', 'delete') ? <Lock size={18} /> : <Trash2 size={18} />}
@@ -372,7 +391,7 @@ const ManageUsers = () => {
                                                 <button
                                                     onClick={() => canAccess('users', 'status') && toggleStatus(userItem)}
                                                     disabled={!canAccess('users', 'status')}
-                                                    title={!canAccess('users', 'status') ? "Ma haysatid oggolaanshaha" : "Toggle Status"}
+                                                    title={!canAccess('users', 'status') ? "You don't have permission" : "Toggle Status"}
                                                     className={`w-full flex items-center justify-between px-4 py-2.5 rounded-2xl border transition-all ${!canAccess('users', 'status')
                                                         ? 'cursor-not-allowed opacity-60 bg-gray-50 border-gray-200 text-gray-400'
                                                         : userItem.isActive !== false

@@ -184,14 +184,14 @@ const ManageTestimonials = () => {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl font-[Inter]"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -204,7 +204,7 @@ const ManageTestimonials = () => {
                         <button
                             onClick={() => canAccess('testimonials', 'create') && (resetForm(), setIsModalOpen(true))}
                             disabled={!canAccess('testimonials', 'create')}
-                            title={!canAccess('testimonials', 'create') ? "Ma haysatid oggolaanshaha inaad darto markhaati" : ""}
+                            title={!canAccess('testimonials', 'create') ? "You don't have permission to add a testimonial" : ""}
                             className={`flex items-center cursor-pointer gap-2 px-5 py-2.5 rounded-xl transition-all font-medium text-sm shadow-sm ${!canAccess('testimonials', 'create') ? 'bg-gray-200 dark:bg-slate-800 text-gray-400 cursor-not-allowed opacity-60 font-bold' : 'bg-emerald-600 hover:bg-emerald-700 text-white hover:shadow-emerald-200'}`}
                         >
                             {!canAccess('testimonials', 'create') ? <Lock size={18} /> : <Plus size={18} />}
@@ -279,7 +279,7 @@ const ManageTestimonials = () => {
                                         <button
                                             onClick={() => canAccess('testimonials', 'status') && handleToggleStatus(item)}
                                             disabled={!canAccess('testimonials', 'status')}
-                                            title={!canAccess('testimonials', 'status') ? "Ma haysatid oggolaanshaha" : (item.isActive ? "Deactivate" : "Approve")}
+                                            title={!canAccess('testimonials', 'status') ? "You don't have permission" : (item.isActive ? "Deactivate" : "Approve")}
                                             className={`p-2 rounded-lg transition-colors ${!canAccess('testimonials', 'status') ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-60' : item.isActive ? 'text-gray-400 hover:text-amber-600 bg-gray-50 dark:bg-slate-700/50 dark:hover:bg-amber-500/10' : 'text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 hover:bg-emerald-100 dark:hover:bg-emerald-500/20'}`}
                                         >
                                             {!canAccess('testimonials', 'status') ? <Lock size={16} /> : <ShieldCheck size={16} />}
@@ -287,7 +287,7 @@ const ManageTestimonials = () => {
                                         <button
                                             onClick={() => canAccess('testimonials', 'edit') && handleEdit(item)}
                                             disabled={!canAccess('testimonials', 'edit')}
-                                            title={!canAccess('testimonials', 'edit') ? "Ma haysatid oggolaanshaha wax beddelista" : "Edit"}
+                                            title={!canAccess('testimonials', 'edit') ? "You don't have permission to edit" : "Edit"}
                                             className={`p-2 rounded-lg transition-colors ${!canAccess('testimonials', 'edit') ? 'bg-gray-100 text-gray-300 cursor-not-allowed opacity-60' : 'text-gray-400 hover:text-emerald-600 bg-gray-50 dark:bg-slate-700/50'}`}
                                         >
                                             {!canAccess('testimonials', 'edit') ? <Lock size={16} /> : <PenTool size={16} />}
@@ -295,7 +295,7 @@ const ManageTestimonials = () => {
                                         <button
                                             onClick={() => canAccess('testimonials', 'delete') && handleDelete(item)}
                                             disabled={!canAccess('testimonials', 'delete')}
-                                            title={!canAccess('testimonials', 'delete') ? "Ma haysatid oggolaanshaha tirtirista" : "Delete"}
+                                            title={!canAccess('testimonials', 'delete') ? "You don't have permission to delete" : "Delete"}
                                             className={`p-2 rounded-lg transition-colors ${!canAccess('testimonials', 'delete') ? 'bg-gray-100 text-gray-300 cursor-not-allowed opacity-60' : 'text-gray-400 hover:text-red-600 bg-gray-50 dark:bg-slate-700/50'}`}
                                         >
                                             {!canAccess('testimonials', 'delete') ? <Lock size={16} /> : <Trash2 size={16} />}

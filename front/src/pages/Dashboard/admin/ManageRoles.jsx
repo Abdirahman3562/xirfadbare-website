@@ -40,7 +40,7 @@ const ManageRoles = () => {
             const data = await getRoles(token);
             setRoles(data);
         } catch (error) {
-            toast.error("Wuu fashilmay soo aqrinta doorka");
+            toast.error("Failed to fetch roles");
         } finally {
             setLoading(false);
         }
@@ -50,7 +50,7 @@ const ManageRoles = () => {
         if (token) {
             fetchData();
         } else {
-            toast.error("Fadlan soo gal marka hore");
+            toast.error("Please login first");
             setLoading(false);
         }
     }, [token]);
@@ -60,12 +60,12 @@ const ManageRoles = () => {
         try {
             const success = await deleteRole(selectedRole._id, token);
             if (success) {
-                toast.success("Doorka waa la tirtiray!");
+                toast.success("Role deleted successfully!");
                 fetchData();
                 setShowDeleteModal(false);
             }
         } catch (error) {
-            toast.error("Wuu fashilmay tirtirista doorka.");
+            toast.error("Failed to delete role.");
         } finally {
             setSubmitting(false);
         }
@@ -85,14 +85,14 @@ const ManageRoles = () => {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -106,7 +106,7 @@ const ManageRoles = () => {
                         <button
                             onClick={() => canAccess('roles', 'create') && navigate('/admin/roles/create')}
                             disabled={!canAccess('roles', 'create')}
-                            title={!canAccess('roles', 'create') ? "Ma haysatid oggolaanshaha inaad abuurto door" : ""}
+                            title={!canAccess('roles', 'create') ? "You don't have permission to create a role" : ""}
                             className={`flex items-center gap-3 px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl active:scale-95 ${!canAccess('roles', 'create') ? 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed opacity-60' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 dark:shadow-none'}`}
                         >
                             {!canAccess('roles', 'create') ? <Lock size={20} /> : <Plus size={20} />}
@@ -129,7 +129,7 @@ const ManageRoles = () => {
                     </div>
 
                     {loading ? (
-                        <PremiumLoader text="Soo aqrinaya xogta..." />
+                        <PremiumLoader text="Loading data..." />
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {filteredRoles.length > 0 ? (
@@ -144,7 +144,7 @@ const ManageRoles = () => {
                                                     onClick={() => canAccess('roles', 'edit') && navigate(`/admin/roles/edit/${roleItem._id}`)}
                                                     disabled={!canAccess('roles', 'edit')}
                                                     className={`p-3 rounded-2xl transition-all ${!canAccess('roles', 'edit') ? 'text-gray-300 bg-gray-50 dark:bg-slate-700/50 cursor-not-allowed opacity-60' : 'text-gray-400 hover:text-emerald-600 bg-gray-50 dark:bg-slate-700/50 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'}`}
-                                                    title={!canAccess('roles', 'edit') ? "Ma haysatid oggolaanshaha wax beddelista" : "Edit"}
+                                                    title={!canAccess('roles', 'edit') ? "You don't have permission to edit" : "Edit"}
                                                 >
                                                     {!canAccess('roles', 'edit') ? <Lock size={18} /> : <Edit3 size={18} />}
                                                 </button>
@@ -152,7 +152,7 @@ const ManageRoles = () => {
                                                     onClick={() => { if (canAccess('roles', 'delete')) { setSelectedRole(roleItem); setShowDeleteModal(true); } }}
                                                     disabled={!canAccess('roles', 'delete')}
                                                     className={`p-3 rounded-2xl transition-all ${!canAccess('roles', 'delete') ? 'text-gray-300 bg-gray-50 dark:bg-slate-700/50 cursor-not-allowed opacity-60' : 'text-gray-400 hover:text-rose-600 bg-gray-50 dark:bg-slate-700/50 hover:bg-rose-50 dark:hover:bg-rose-500/10'}`}
-                                                    title={!canAccess('roles', 'delete') ? "Ma haysatid oggolaanshaha tirtirista" : "Delete"}
+                                                    title={!canAccess('roles', 'delete') ? "You don't have permission to delete" : "Delete"}
                                                 >
                                                     {!canAccess('roles', 'delete') ? <Lock size={18} /> : <Trash2 size={18} />}
                                                 </button>

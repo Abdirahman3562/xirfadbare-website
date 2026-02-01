@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
     User,
     Mail,
@@ -57,7 +58,7 @@ const Profile = () => {
                 confirmPassword: ''
             });
         } catch (error) {
-            toast.error("Wuu fashilmay soo aqrinta xogta profile-ka");
+            toast.error("Failed to load profile data");
             console.error(error);
         } finally {
             setLoading(false);
@@ -76,14 +77,14 @@ const Profile = () => {
             const res = await updateUserProfile({ is2FAEnabled: newValue }, token);
             if (res) {
                 setProfileData(prev => ({ ...prev, is2FAEnabled: newValue }));
-                toast.success(`Two-Step Verification waa la ${newValue ? 'shiday' : 'damiyay'}!`);
+                toast.success(`Two-Step Verification has been ${newValue ? 'enabled' : 'disabled'}!`);
                 // Update local storage if necessary
                 const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
                 localStorage.setItem('loggedInUser', JSON.stringify({ ...loggedInUser, is2FAEnabled: newValue }));
                 window.dispatchEvent(new Event('userLogin'));
             }
         } catch (error) {
-            toast.error("Wuu fashilmay badalaadda 2FA status");
+            toast.error("Failed to update 2FA status");
         } finally {
             setUpdating(false);
         }
@@ -104,14 +105,14 @@ const Profile = () => {
             const res = await updateUserProfile({ image: imagePath }, token);
             if (res) {
                 setProfileData(prev => ({ ...prev, image: imagePath }));
-                toast.success("Profile image-ka waa la bedelay!");
+                toast.success("Profile image updated successfully!");
                 // Update local storage
                 const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
                 localStorage.setItem('loggedInUser', JSON.stringify({ ...loggedInUser, image: imagePath }));
                 window.dispatchEvent(new Event('userLogin'));
             }
         } catch (error) {
-            toast.error("Wuu fashilmay upload-ka sawirka");
+            toast.error("Image upload failed");
         } finally {
             setUploading(false);
         }
@@ -121,7 +122,7 @@ const Profile = () => {
         e.preventDefault();
 
         if (profileData.password && profileData.password !== profileData.confirmPassword) {
-            return toast.error("Passwords-ka uma dhigmaan!");
+            return toast.error("Passwords do not match!");
         }
 
         try {
@@ -139,7 +140,7 @@ const Profile = () => {
 
             const res = await updateUserProfile(dataToUpdate, token);
             if (res) {
-                toast.success("Xogta profile-ka waa la cusbooneysiiyay!");
+                toast.success("Profile settings updated successfully!");
                 setProfileData(prev => ({ ...prev, password: '', confirmPassword: '' }));
 
                 // Update local storage
@@ -153,38 +154,31 @@ const Profile = () => {
                 window.dispatchEvent(new Event('userLogin'));
             }
         } catch (error) {
-            toast.error(error.message || "Wuu fashilmay update-ka");
+            toast.error(error.message || "Failed to update profile");
         } finally {
             setUpdating(false);
         }
     };
+
+    const location = useLocation();
+    const isAdminPath = location.pathname.startsWith('/admin');
 
     if (loading) {
         return <PremiumLoader text={null} />;
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-700 font-[Inter]">
+        <div className={`space-y-8 ${isAdminPath ? '' : 'lg:mt-20 md:mt-20 mt-36'} animate-in fade-in duration-700 font-[Inter]`}>
             {/* Breadcrumb */}
-            <div className="flex gap-1 items-center">
-                <Home className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                <ChevronRight className="w-5 h-5 text-emerald-600" />
-                <span className="text-lg font-semibold mb-1 text-gray-700 dark:text-gray-300 underline decoration-emerald-200 dark:decoration-emerald-500/30 underline-offset-4 tracking-tight">
-                    Settings
-                </span>
-                <ChevronRight className="w-5 h-5 text-emerald-600" />
-                <span className="text-lg font-semibold mb-1 text-gray-700 dark:text-gray-300 tracking-tight">
-                    My Profile
-                </span>
-            </div>
+
 
             <div className="mb-2">
                 <h1 className="text-3xl font-black text-gray-900 dark:text-white tracking-tighter transition-colors">My Settings</h1>
-                <p className="text-gray-500 dark:text-gray-400 font-semibold italic mt-1 text-sm">Halkan ka maamul macluumaadkaaga gaarka ah iyo amniga account-kaaga.</p>
+                <p className="text-gray-500 dark:text-gray-400 font-semibold italic mt-1 text-sm">Manage your personal information and account security settings.</p>
             </div>
 
             {/* Header Section */}
-            <div className="bg-white/10 dark:bg-slate-800/50 p-5 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-gray-100 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden transition-all duration-500">
+            <div className="bg-white/10 border border-gray-200 dark:bg-slate-900 p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] border border-gray-100 dark:border-slate-800 shadow-2xl shadow-emerald-500/5 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden transition-all duration-500 backdrop-blur-xl">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
                 <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 relative z-10 text-center sm:text-left">
                     <div className="relative group">
@@ -354,7 +348,7 @@ const Profile = () => {
                                 className="w-full sm:w-auto flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl transition-all font-black text-[10px] uppercase tracking-widest shadow-xl dark:shadow-none cursor-pointer shadow-emerald-200 disabled:opacity-50 active:scale-95"
                             >
                                 {updating ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                                <span>{updating ? 'Cusbooneysiinaya...' : 'Save Profile Changes'}</span>
+                                <span>{updating ? 'Updating...' : 'Save Profile Changes'}</span>
                             </button>
                         </div>
                     </form>
@@ -382,7 +376,7 @@ const Profile = () => {
                             <div>
                                 <h4 className="text-sm font-bold text-gray-900 dark:text-white transition-colors">Two-Step Verification</h4>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-relaxed transition-colors">
-                                    Markii aad soo galayso, waxaa laguu soo dirayaa code si xogtaada loo dhawro.
+                                    A verification code will be sent to your email when you log in to ensure your account security.
                                 </p>
                             </div>
 
@@ -404,7 +398,7 @@ const Profile = () => {
                             <div className="bg-blue-50/50 dark:bg-blue-500/5 p-4 rounded-2xl border border-blue-100 dark:border-blue-500/20 transition-colors">
                                 <p className="text-[10px] text-blue-700 dark:text-blue-400 font-bold leading-relaxed flex items-start gap-2">
                                     <Shield size={14} className="shrink-0 mt-0.5" />
-                                    <span>Laba talaabo o xaqiijin ah waxay dhowreysaa koontadaada si aan qof kale u geli karin.</span>
+                                    <span>Two-step verification adds an extra layer of security to protects your account from unauthorized access.</span>
                                 </p>
                             </div>
                         </div>

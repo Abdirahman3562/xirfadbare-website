@@ -72,7 +72,7 @@ const ManageAuthors = () => {
             const data = await getAllAuthors();
             setAuthors(data);
         } catch (error) {
-            toast.error("Wuu fashilmay soo aqrinta qorayaasha");
+            toast.error("Failed to fetch authors");
         } finally {
             setLoading(false);
         }
@@ -141,20 +141,20 @@ const ManageAuthors = () => {
             if (modalMode === 'create') {
                 const res = await createAuthor(formData);
                 if (res) {
-                    toast.success("Qoraa cusub ayaa lagu daray!");
+                    toast.success("New author registered successfully!");
                     fetchData();
                     setShowModal(false);
                 }
             } else {
                 const res = await updateAuthor(selectedAuthor._id, formData);
                 if (res) {
-                    toast.success("Xogta qoraaga waa la cusbooneysiiyay!");
+                    toast.success("Author data updated successfully!");
                     fetchData();
                     setShowModal(false);
                 }
             }
         } catch (error) {
-            toast.error("Khalad ayaa dhacay. Fadlan isku day markale.");
+            toast.error("An error occurred. Please try again.");
         } finally {
             setSubmitting(false);
         }
@@ -165,12 +165,12 @@ const ManageAuthors = () => {
         try {
             const success = await deleteAuthor(selectedAuthor._id);
             if (success) {
-                toast.success("Qoraaga waa la tirtiray!");
+                toast.success("Author deleted successfully!");
                 fetchData();
                 setShowDeleteModal(false);
             }
         } catch (error) {
-            toast.error("Wuu fashilmay tirtirista qoraaga.");
+            toast.error("Failed to delete author.");
         } finally {
             setSubmitting(false);
         }
@@ -184,10 +184,10 @@ const ManageAuthors = () => {
                 setAuthors(authors.map(a =>
                     a._id === author._id ? { ...a, status: newStatus } : a
                 ));
-                toast.success(newStatus === 'active' ? "Qoraaga waa la hawlgeliyay!" : "Qoraaga waa la damiyay!");
+                toast.success(newStatus === 'active' ? "Author activated!" : "Author deactivated!");
             }
         } catch (error) {
-            toast.error("Wuu fashilmay bedelidda heerka qoraaga.");
+            toast.error("Failed to change author status.");
         }
     };
 
@@ -202,10 +202,10 @@ const ManageAuthors = () => {
         try {
             const imagePath = await uploadImage(uploadFormData, token);
             setFormData(prev => ({ ...prev, avatar: imagePath }));
-            toast.success("Avatar-ka waa la upload gareeyay!");
+            toast.success("Avatar uploaded successfully!");
         } catch (error) {
             console.error(error);
-            toast.error("Wuu fashilmay upload-ka sawirka");
+            toast.error("Image upload failed");
         } finally {
             setUploading(false);
         }
@@ -249,7 +249,7 @@ const ManageAuthors = () => {
             </div>
 
             {loading ? (
-                <PremiumLoader text="Soo aqrinaya xogta qorayaasha..." />
+                <PremiumLoader text="Loading authors data..." />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredAuthors.length > 0 ? (

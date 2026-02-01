@@ -105,7 +105,7 @@ const ManageCourses = () => {
     const levels = ['Beginner', 'Intermediate', 'Advanced'];
 
     if (loading) {
-        return <PremiumLoader text="Soo aqrinaya koorsooyinka..." />;
+        return <PremiumLoader text="Loading courses..." />;
     }
 
     const handleDelete = (id) => {
@@ -118,12 +118,12 @@ const ManageCourses = () => {
         try {
             setIsDeleting(true);
             await deleteCourse(courseToDelete);
-            toast.success("Koorsada waa la tirtiray si guul leh!");
+            toast.success("Course deleted successfully!");
             setShowDeleteModal(false);
             setCourseToDelete(null);
             fetchCourses(); // Refresh list
         } catch (error) {
-            toast.error("Wuu fashilmay tirtirista koorsada");
+            toast.error("Failed to delete course");
         } finally {
             setIsDeleting(false);
         }
@@ -138,14 +138,14 @@ const ManageCourses = () => {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -159,7 +159,7 @@ const ManageCourses = () => {
                         <button
                             onClick={() => canAccess('courses', 'create') && navigate('/admin/courses/create/new')}
                             disabled={!canAccess('courses', 'create')}
-                            title={!canAccess('courses', 'create') ? "Ma haysatid oggolaanshaha inaad abuurto koorso" : ""}
+                            title={!canAccess('courses', 'create') ? "You don't have permission to create a course" : ""}
                             className={`flex items-center gap-3 px-8 py-4 rounded-2xl transition-all font-bold text-sm shadow-xl active:scale-95 ${!canAccess('courses', 'create') ? 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed opacity-60' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-200 dark:shadow-none'}`}
                         >
                             {!canAccess('courses', 'create') ? <Lock size={20} className="w-5 h-5" /> : <Plus size={20} strokeWidth={3} />}
@@ -323,7 +323,7 @@ const ManageCourses = () => {
                                                 }}
                                                 disabled={!canAccess('courses', 'edit')}
                                                 className={`p-3 backdrop-blur-md rounded-2xl shadow-xl transition-all hover:scale-110 ${!canAccess('courses', 'edit') ? 'bg-white/50 text-slate-400 cursor-not-allowed' : 'bg-white/90 text-gray-700 hover:bg-emerald-600 hover:text-white'}`}
-                                                title={!canAccess('courses', 'edit') ? "Ma haysatid oggolaanshaha wax beddelista" : "Edit"}
+                                                title={!canAccess('courses', 'edit') ? "You don't have permission to edit" : "Edit"}
                                             >
                                                 {!canAccess('courses', 'edit') ? <Lock size={18} /> : <Edit size={18} />}
                                             </button>
@@ -334,7 +334,7 @@ const ManageCourses = () => {
                                                 }}
                                                 disabled={!canAccess('courses', 'delete')}
                                                 className={`p-3 backdrop-blur-md rounded-2xl shadow-xl transition-all hover:scale-110 ${!canAccess('courses', 'delete') ? 'bg-white/50 text-slate-400 cursor-not-allowed' : 'bg-white/90 text-red-500 hover:bg-red-600 hover:text-white'}`}
-                                                title={!canAccess('courses', 'delete') ? "Ma haysatid oggolaanshaha tirtirista" : "Delete"}
+                                                title={!canAccess('courses', 'delete') ? "You don't have permission to delete" : "Delete"}
                                             >
                                                 {!canAccess('courses', 'delete') ? <Lock size={18} /> : <Trash2 size={18} />}
                                             </button>
@@ -457,9 +457,9 @@ const ManageCourses = () => {
                                     <div className="w-20 h-20 bg-red-50 dark:bg-red-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6 transform -rotate-6 border border-red-100 dark:border-red-500/20">
                                         <Trash2 size={40} className="text-red-500" />
                                     </div>
-                                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">Ma hubtaa boss?</h3>
+                                    <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2">Are you sure?</h3>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
-                                        Koorsadan mar haddii la tirtiro lama soo celin karo. Dhamaan xogta ardayda iyo casharada way lumayaan.
+                                        Once this course is deleted, it cannot be recovered. All student data and lessons will be lost.
                                     </p>
                                 </div>
                                 <div className="p-8 bg-gray-50/80 dark:bg-slate-800/80 border-t border-gray-100 dark:border-gray-700 flex gap-4">
@@ -468,7 +468,7 @@ const ManageCourses = () => {
                                         className="flex-1 py-4 bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-gray-200 dark:border-slate-600 transition-all active:scale-95"
                                         disabled={isDeleting}
                                     >
-                                        Jooji
+                                        Cancel
                                     </button>
                                     <button
                                         onClick={confirmDelete}
@@ -480,7 +480,7 @@ const ManageCourses = () => {
                                         ) : (
                                             <Trash2 size={14} />
                                         )}
-                                        <span>{isDeleting ? 'Tirtiraya...' : 'Haa, Tirtir'}</span>
+                                        <span>{isDeleting ? 'Deleting...' : 'Yes, Delete'}</span>
                                     </button>
                                 </div>
                             </div>

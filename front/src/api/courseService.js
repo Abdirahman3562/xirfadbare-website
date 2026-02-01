@@ -89,7 +89,13 @@ export async function updateCourse(courseId, courseData) {
       },
       body: JSON.stringify(courseData),
     });
-    if (!res.ok) throw new Error(`Failed to ${isNew ? 'create' : 'update'} course`);
+
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      const errorMessage = errorData.error || errorData.message || `Failed to ${isNew ? 'create' : 'update'} course`;
+      throw new Error(errorMessage);
+    }
+
     return await res.json();
   } catch (error) {
     console.error(`❌ Error in ${courseId === 'new' ? 'createCourse' : 'updateCourse'}:`, error);

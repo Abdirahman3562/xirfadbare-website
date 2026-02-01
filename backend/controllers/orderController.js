@@ -245,6 +245,93 @@ const updateOrderToActive = async (req, res) => {
   }
 };
 
+// @desc    Free Course Enrollment
+// @route   POST /api/orders/free-enroll
+// @access  Private
+const freeEnrollment = async (req, res) => {
+  const { courseId } = req.body;
+
+  try {
+    const course = await Course.findById(courseId).populate('instructor');
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    // Check if the course is really free
+    if (course.price !== 0) {
+      return res.status(400).json({ message: 'This course is not free' });
+    }
+
+    // Check if already enrolled (active order)
+    const existingOrder = await Order.findOne({
+      user: req.user._id,
+      course: courseId,
+      status: 'active'
+    });
+
+    if (existingOrder) {
+      return res.status(200).json(existingOrder); // Already enrolled
+    }
+
+    const user = await User.findById(req.user._id);
+
+    const order = new Order({
+      user: req.user._id,
+      course: courseId,
+      status: 'active', // Free courses are immediately active
+      userDetails: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        image: user.image,
+        role: user.role,
+      },
+      courseDetails: {
+        title: course.title,
+        type: course.type,
+        description: course.description,
+        technology: course.technology,
+        price: course.price,
+        accessType: course.accessType,
+        thumbnail: course.thumbnail,
+        level: course.level,
+        enrolledCount: course.enrolledCount,
+        instructor: course.instructor ? {
+          name: course.instructor.name,
+          instructorTitle: course.instructor.instructorTitle,
+          image: course.instructor.image,
+          description: course.instructor.description,
+          contactEmail: course.instructor.contactEmail,
+          contactPhone: course.instructor.contactPhone,
+        } : null,
+        learningOutcomes: course.learningOutcomes,
+        curriculum: course.curriculum.map(curr => ({
+          title: curr.title,
+          lessons: curr.lessons.map(lesson => ({
+            title: lesson.title,
+            duration: lesson.duration,
+            videoUrl: lesson.videoUrl,
+          })),
+        })),
+      },
+      userName: `${user.firstName} ${user.lastName}`,
+      userEmail: user.email,
+      courseTitle: course.title,
+      paymentType: 'Free Enrollment',
+      paymentMethod: 'None',
+      totalToPay: 0,
+      finalPrice: 0,
+    });
+
+    const createdOrder = await order.save();
+    res.status(201).json(createdOrder);
+  } catch (error) {
+    console.error('Error in free enrollment:', error);
+    res.status(500).json({ message: 'Server error during free enrollment' });
+  }
+};
+
 // @desc    Update order to rejected
 // @route   PUT /api/orders/:id/reject
 // @access  Private/Admin
@@ -325,6 +412,7 @@ export {
   deleteOrder,
   getMyOrders,
   getOrders,
+  freeEnrollment,
 };
 
 

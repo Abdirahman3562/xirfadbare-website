@@ -62,7 +62,7 @@ const ManageOrders = () => {
 
     const handleStatusUpdate = async (id, status) => {
         const action = status === 'active' ? 'approve' : 'reject';
-        const actionText = status === 'active' ? 'lagu daray!' : 'laga saaray!';
+        const actionText = status === 'active' ? 'Approved!' : 'Rejected!';
 
         try {
             const user = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -74,7 +74,7 @@ const ManageOrders = () => {
             });
 
             if (res.ok) {
-                toast.success(`Dalabka waa ${actionText}`);
+                toast.success(`Order ${actionText}`);
                 fetchOrders(); // Refresh list
                 window.dispatchEvent(new Event('refreshNotifications'));
             } else {
@@ -105,7 +105,7 @@ const ManageOrders = () => {
             });
 
             if (res.ok) {
-                toast.success('Dalabka waa la tirtiray!');
+                toast.success('Order deleted successfully!');
                 setShowDeleteModal(false);
                 setOrderToDelete(null);
                 fetchOrders();
@@ -169,14 +169,14 @@ const ManageOrders = () => {
             </div>
 
             {loading ? (
-                <PremiumLoader text="Dalabka waa la soo akhrinayaa..." />
+                <PremiumLoader text="Loading orders..." />
             ) : filteredOrders.length === 0 ? (
                 <div className="bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-gray-100 dark:border-gray-700 py-20 text-center">
                     <div className="w-16 h-16 bg-gray-50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Search className="text-gray-300 dark:text-gray-500" size={32} />
                     </div>
-                    <h3 className="text-gray-900 dark:text-white font-bold">Wax dalab ah lama helin</h3>
-                    <p className="text-gray-400 text-sm mt-1">Isku day inaad wax kale raadiso ama bedesho filter-ka.</p>
+                    <h3 className="text-gray-900 dark:text-white font-bold">No orders found</h3>
+                    <p className="text-gray-400 text-sm mt-1">Try a different search term or filter.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6">
@@ -542,9 +542,9 @@ const ManageOrders = () => {
                             <div className="w-20 h-20 bg-red-50 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-red-100 dark:border-red-500/20 shadow-inner">
                                 <AlertTriangle size={40} className="text-red-500 animate-pulse" />
                             </div>
-                            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 font-[Inter]">Ma hubtaa boss?</h3>
+                            <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 font-[Inter]">Are you sure?</h3>
                             <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
-                                Dalabkan mar haddii la tirtiro dib looma soo celin karo. Ma huba inaad tirtirto dalabkan?
+                                This order cannot be recovered once deleted. Are you sure you want to delete this order?
                             </p>
                         </div>
                         <div className="p-8 bg-gray-50/50 dark:bg-slate-800/50 border-t border-gray-100 dark:border-gray-700 flex gap-3">
@@ -556,7 +556,7 @@ const ManageOrders = () => {
                                 className="flex-1 py-4 bg-white dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-gray-200 dark:border-slate-600 active:scale-95"
                                 disabled={isDeleting}
                             >
-                                Iska daa
+                                Cancel
                             </button>
                             <button
                                 onClick={confirmDelete}
@@ -566,12 +566,12 @@ const ManageOrders = () => {
                                 {isDeleting ? (
                                     <>
                                         <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                        <span>Waa la tirtirayaa...</span>
+                                        <span>Deleting...</span>
                                     </>
                                 ) : (
                                     <>
                                         <Trash2 size={14} />
-                                        <span>Hubaal tirtir</span>
+                                        <span>Confirm Delete</span>
                                     </>
                                 )}
                             </button>

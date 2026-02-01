@@ -11,7 +11,12 @@ export default function ManageCategories() {
     const [editingId, setEditingId] = useState(null);
     const [showAddForm, setShowAddForm] = useState(false);
     const [formData, setFormData] = useState({ name: "", description: "" });
+    const [searchTerm, setSearchTerm] = useState("");
     const [deleteModal, setDeleteModal] = useState({ show: false, categoryId: null, categoryName: "" });
+    const filteredCategories = categories.filter(cat =>
+        cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        cat.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
     const { canAccess } = usePermissions();
     const navigate = useNavigate();
 
@@ -138,14 +143,14 @@ export default function ManageCategories() {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl font-[Inter]"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -159,12 +164,29 @@ export default function ManageCategories() {
                         <button
                             onClick={() => canAccess('categories', 'create') && setShowAddForm(!showAddForm)}
                             disabled={!canAccess('categories', 'create')}
-                            title={!canAccess('categories', 'create') ? "Ma haysatid oggolaanshaha inaad darto category" : ""}
+                            title={!canAccess('categories', 'create') ? "You don't have permission to add a category" : ""}
                             className={`flex items-center cursor-pointer gap-2 px-4 py-2 rounded-lg transition ${!canAccess('categories', 'create') ? 'bg-gray-200 dark:bg-slate-800 text-gray-400 cursor-not-allowed opacity-60' : 'bg-emerald-600 text-white hover:bg-emerald-700'}`}
                         >
                             {!canAccess('categories', 'create') ? <Lock size={20} /> : showAddForm ? <X size={20} /> : <Plus size={20} />}
                             {showAddForm ? "Cancel" : "Add Category"}
                         </button>
+                    </div>
+
+                    {/* toolbar Section */}
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div className="relative flex-1 w-full">
+                            <Plus className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 rotate-45" size={18} />
+                            <input
+                                type="text"
+                                placeholder="Search categories by name or description..."
+                                className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-gray-600 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm transition-all text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg border border-emerald-100 dark:border-emerald-500/20 text-xs font-bold uppercase tracking-widest whitespace-nowrap">
+                            {filteredCategories.length} Categories Found
+                        </div>
                     </div>
 
                     {/* Add Form */}
@@ -238,14 +260,14 @@ export default function ManageCategories() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                                    {categories.length === 0 ? (
+                                    {filteredCategories.length === 0 ? (
                                         <tr>
                                             <td colSpan={4} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                                                No categories found. Create your first category!
+                                                No categories found. {searchTerm ? "Try adjusting your search." : "Create your first category!"}
                                             </td>
                                         </tr>
                                     ) : (
-                                        categories.map((category) => (
+                                        filteredCategories.map((category) => (
                                             <tr key={category._id} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition">
                                                 <td className="px-6 py-4">
                                                     {editingId === category._id ? (
@@ -300,7 +322,7 @@ export default function ManageCategories() {
                                                                     onClick={() => canAccess('categories', 'edit') && handleUpdate(category._id)}
                                                                     disabled={!canAccess('categories', 'edit')}
                                                                     className={`p-2 rounded-lg transition ${!canAccess('categories', 'edit') ? 'text-gray-300 cursor-not-allowed' : 'text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'}`}
-                                                                    title={!canAccess('categories', 'edit') ? "Ma haysatid oggolaanshaha" : "Save"}
+                                                                    title={!canAccess('categories', 'edit') ? "You don't have permission" : "Save"}
                                                                 >
                                                                     <Save size={18} />
                                                                 </button>
@@ -318,7 +340,7 @@ export default function ManageCategories() {
                                                                     onClick={() => canAccess('categories', 'edit') && setEditingId(category._id)}
                                                                     disabled={!canAccess('categories', 'edit')}
                                                                     className={`p-2 rounded-lg transition ${!canAccess('categories', 'edit') ? 'text-gray-300 cursor-not-allowed' : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10'}`}
-                                                                    title={!canAccess('categories', 'edit') ? "Ma haysatid oggolaanshaha wax beddelista" : "Edit"}
+                                                                    title={!canAccess('categories', 'edit') ? "You don't have permission to edit" : "Edit"}
                                                                 >
                                                                     {!canAccess('categories', 'edit') ? <Lock size={18} /> : <Edit2 size={18} />}
                                                                 </button>
@@ -326,7 +348,7 @@ export default function ManageCategories() {
                                                                     onClick={() => canAccess('categories', 'delete') && handleDelete(category._id, category.name)}
                                                                     disabled={!canAccess('categories', 'delete')}
                                                                     className={`p-2 rounded-lg transition ${!canAccess('categories', 'delete') ? 'text-gray-300 cursor-not-allowed' : 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10'}`}
-                                                                    title={!canAccess('categories', 'delete') ? "Ma haysatid oggolaanshaha tirtirista" : "Delete"}
+                                                                    title={!canAccess('categories', 'delete') ? "You don't have permission to delete" : "Delete"}
                                                                 >
                                                                     {!canAccess('categories', 'delete') ? <Lock size={18} /> : <Trash2 size={18} />}
                                                                 </button>
@@ -387,7 +409,7 @@ export default function ManageCategories() {
                                 {/* Modal Body */}
                                 <div className="p-6 bg-white dark:bg-slate-800">
                                     <p className="text-gray-700 dark:text-gray-300">
-                                        Ma hubtaa inaad tirtireyso category-gan:{" "}
+                                        Are you sure you want to delete this category:{" "}
                                         <span className="font-semibold text-gray-900 dark:text-white">"{deleteModal.categoryName}"</span>?
                                     </p>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">

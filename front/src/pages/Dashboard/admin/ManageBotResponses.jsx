@@ -142,14 +142,14 @@ export default function ManageBotResponses() {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Waan ka xunnahay, ma haysatid oggolaanshaha aad ku aragto boggan.
-                        Fadlan la xiriir maamulka sare si laguu siiyo oggolaansho.
+                        Sorry, you don't have permission to view this page.
+                        Please contact the administrator for access.
                     </p>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
                         className="mt-10 px-12 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-800 transition-all active:scale-95 shadow-xl font-[Inter]"
                     >
-                        Ku laabo Dashboard
+                        Back to Dashboard
                     </button>
                 </div>
             ) : (
@@ -166,7 +166,7 @@ export default function ManageBotResponses() {
                         <button
                             onClick={() => canAccess('bot', 'create') && openModal()}
                             disabled={!canAccess('bot', 'create')}
-                            title={!canAccess('bot', 'create') ? "Ma haysatid oggolaanshaha" : ""}
+                            title={!canAccess('bot', 'create') ? "You don't have permission" : ""}
                             className={`flex items-center gap-2 dark:shadow-none cursor-pointer px-6 py-3 rounded-xl transition font-bold text-sm active:scale-95 ${!canAccess('bot', 'create') ? 'bg-gray-200 dark:bg-slate-800 text-gray-400 cursor-not-allowed opacity-60' : 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-200'}`}
                         >
                             {!canAccess('bot', 'create') ? <Lock size={18} /> : <Plus size={18} />} Add New Answer
@@ -201,7 +201,7 @@ export default function ManageBotResponses() {
                                         <button
                                             onClick={() => canAccess('bot', 'edit') && openModal(item)}
                                             disabled={!canAccess('bot', 'edit')}
-                                            title={!canAccess('bot', 'edit') ? "Ma haysatid oggolaanshaha" : "Edit"}
+                                            title={!canAccess('bot', 'edit') ? "You don't have permission" : "Edit"}
                                             className={`p-2 rounded-lg ${!canAccess('bot', 'edit') ? 'text-gray-300 cursor-not-allowed' : 'text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10'}`}
                                         >
                                             {!canAccess('bot', 'edit') ? <Lock size={16} /> : <Edit2 size={16} />}
@@ -209,7 +209,7 @@ export default function ManageBotResponses() {
                                         <button
                                             onClick={() => canAccess('bot', 'delete') && handleDelete(item._id)}
                                             disabled={!canAccess('bot', 'delete')}
-                                            title={!canAccess('bot', 'delete') ? "Ma haysatid oggolaanshaha" : "Delete"}
+                                            title={!canAccess('bot', 'delete') ? "You don't have permission" : "Delete"}
                                             className={`p-2 rounded-lg ${!canAccess('bot', 'delete') ? 'text-gray-300 cursor-not-allowed' : 'text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10'}`}
                                         >
                                             {!canAccess('bot', 'delete') ? <Lock size={16} /> : <Trash2 size={16} />}

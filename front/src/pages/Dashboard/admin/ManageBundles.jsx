@@ -42,7 +42,7 @@ const ManageBundles = () => {
             const data = await getAllBundles();
             setBundles(data);
         } catch (error) {
-            toast.error("Wuu fashilmay soo aqrinta bundles-ka");
+            toast.error("Failed to load bundles");
             console.error(error);
         } finally {
             setLoading(false);
@@ -59,12 +59,12 @@ const ManageBundles = () => {
         try {
             setIsDeleting(true);
             await deleteBundle(bundleToDelete);
-            toast.success("Bundle-ka waa la tirtiray!");
+            toast.success("Bundle deleted successfully!");
             setShowDeleteModal(false);
             setBundleToDelete(null);
             fetchBundles();
         } catch (error) {
-            toast.error("Wuu fashilmay tirtirista bundle-ka");
+            toast.error("Failed to delete bundle");
         } finally {
             setIsDeleting(false);
         }
@@ -76,7 +76,7 @@ const ManageBundles = () => {
     );
 
     if (loading) {
-        return <PremiumLoader text="Soo aqrinaya bundles..." />;
+        return <PremiumLoader text="Loading bundles..." />;
     }
 
     return (
@@ -88,7 +88,7 @@ const ManageBundles = () => {
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tight">Access Denied</h2>
                     <p className="text-slate-500 dark:text-slate-400 max-w-md font-medium text-lg leading-relaxed italic">
-                        Ma haysatid oggolaanshaha aad ku aragto boggan.
+                        You don't have permission to view this page.
                     </p>
                 </div>
             ) : (

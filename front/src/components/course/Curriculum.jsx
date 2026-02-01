@@ -13,7 +13,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../hooks/useAuth";
+import { useMyOrders } from "../../hooks/useMyOrders";
 import { slugify } from "../../utils/slugify";
+import { enrollInFreeCourse } from "../../api/orderService";
 
 export default function Curriculum({
   level,
@@ -30,6 +32,7 @@ export default function Curriculum({
   const [openSections, setOpenSections] = useState({});
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { refreshOrders } = useMyOrders(user);
 
   // ✅ Loading state check
   if (!curriculum || curriculum.length === 0) {
@@ -309,10 +312,36 @@ export default function Curriculum({
             ) : (
               // Free course but not enrolled? Usually should enroll, but if logic allows direct access:
               <button
-                onClick={() => {
-                  // Logic for free course enrollment/access could go here, 
-                  // for now assuming it behaves like 'Continue Learning' if public or 'Buy' if semi-gated.
-                  // If strictly following user snippet which had 'Continue Learning' for non-paid:
+                onClick={async () => {
+                  if (!user) {
+                    toast.error("Please sign in to your account to start learning this course!");
+                    navigate("/auth/login");
+                    return;
+                  }
+
+                  // If not enrolled, enroll first
+                  if (!isEnrolled) {
+                    const toastId = toast.loading("Enrolling you in this free course...");
+                    try {
+                      await enrollInFreeCourse(courseId);
+                      refreshOrders();
+                      toast.update(toastId, {
+                        render: "Successfully enrolled! Enjoy your course.",
+                        type: "success",
+                        isLoading: false,
+                        autoClose: 3000
+                      });
+                    } catch (error) {
+                      toast.update(toastId, {
+                        render: error.message || "Failed to enroll",
+                        type: "error",
+                        isLoading: false,
+                        autoClose: 3000
+                      });
+                      return;
+                    }
+                  }
+
                   const lessonSlug = getFirstLessonSlug();
                   const cSlug = courseSlug || slugify(courseTitle);
                   if (lessonSlug && cSlug) {
