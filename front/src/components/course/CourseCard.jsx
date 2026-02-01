@@ -5,6 +5,8 @@ import {
   FaInfinity,
   FaCalendarAlt,
   FaAward,
+  FaStar,
+  FaStarHalfAlt,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useMemo } from "react";
@@ -111,6 +113,31 @@ function CourseCard({ course, isBundle = false }) {
   // ✅ Instructor helpers
   const instructor = course.instructor || {};
   const instructorTitle = instructor.name || "Instructor";
+
+  // ✅ Course Rating Logic
+  const courseReviews = instructor?.reviews?.filter(r => String(r.courseId) === String(course._id)) || [];
+  const avgRating = parseFloat(courseReviews.length > 0
+    ? (courseReviews.reduce((acc, r) => acc + (r.rating || 0), 0) / courseReviews.length).toFixed(1)
+    : 0);
+  const reviewCount = courseReviews.length;
+
+  const renderStars = (rating) => {
+    return (
+      <div className="flex items-center gap-0.5" aria-label={`Rating: ${rating} out of 5`}>
+        {[1, 2, 3, 4, 5].map((star) => {
+          const isFull = star <= Math.floor(rating);
+          const isHalf = !isFull && star <= Math.ceil(rating) && rating % 1 !== 0;
+          return isFull ? (
+            <FaStar key={star} size={11} className="text-amber-400 shadow-sm" />
+          ) : isHalf ? (
+            <FaStarHalfAlt key={star} size={11} className="text-amber-400 shadow-sm" />
+          ) : (
+            <FaStar key={star} size={11} className="text-gray-200 dark:text-slate-700" />
+          );
+        })}
+      </div>
+    );
+  };
   const initials = useMemo(() => {
     const parts = instructorTitle.trim().split(" ").filter(Boolean);
     return parts
@@ -318,16 +345,26 @@ function CourseCard({ course, isBundle = false }) {
           </div>
         </div>
 
-        {hasCertificate && (
-          <div className="group/cert relative flex items-center gap-2 bg-gradient-to-r from-amber-100/50 to-orange-50/50 dark:from-amber-500/10 dark:to-orange-500/5 text-amber-700 dark:text-amber-400 font-black px-3.5 py-1.5 rounded-xl shadow-sm border border-amber-200/50 dark:border-amber-500/20 w-fit mb-4 transition-all hover:shadow-md hover:shadow-amber-200/40 dark:hover:shadow-none group-hover:scale-[1.02] duration-300">
-            <div className="relative">
-              <FaAward className="text-amber-500 text-sm animate-pulse" />
-              <div className="absolute inset-0 bg-amber-400 blur-md opacity-20 group-hover/cert:opacity-40 animate-pulse"></div>
+        <div className="flex flex-wrap items-center gap-2 mb-4">
+          {hasCertificate && (
+            <div className="group/cert relative flex items-center gap-2 bg-gradient-to-r from-amber-100/50 to-orange-50/50 dark:from-amber-500/10 dark:to-orange-500/5 text-amber-700 dark:text-amber-400 font-black px-3.5 py-1.5 rounded-xl shadow-sm border border-amber-200/50 dark:border-amber-500/20 w-fit transition-all hover:shadow-md hover:shadow-amber-200/40 dark:hover:shadow-none group-hover:scale-[1.02] duration-300">
+              <div className="relative">
+                <FaAward className="text-amber-500 text-sm animate-pulse" />
+                <div className="absolute inset-0 bg-amber-400 blur-md opacity-20 group-hover/cert:opacity-40 animate-pulse"></div>
+              </div>
+              <span className="text-[9px] uppercase tracking-[0.05em] relative z-10">Certificate</span>
+              <div className="ml-0.5 w-1 h-1 bg-amber-500 rounded-full animate-[pulse_2s_infinite]"></div>
             </div>
-            <span className="text-[9px] uppercase tracking-[0.05em] relative z-10">Certificate</span>
-            <div className="ml-0.5 w-1 h-1 bg-amber-500 rounded-full animate-[pulse_2s_infinite]"></div>
-          </div>
-        )}
+          )}
+
+          {reviewCount > 0 && (
+            <div className="flex items-center gap-1.5 bg-white/40 dark:bg-slate-800/40 backdrop-blur-sm px-2.5 py-1.5 rounded-xl border border-gray-100/50 dark:border-slate-800/50 shadow-sm transition-all hover:shadow-md hover:border-amber-200/50">
+              {renderStars(avgRating)}
+              <span className="text-[10px] font-black text-gray-700 dark:text-gray-200">{avgRating}</span>
+              <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-tighter">({reviewCount})</span>
+            </div>
+          )}
+        </div>
 
         <div className="border-t border-gray-100 dark:border-gray-800 mb-3.5 transition-colors"></div>
 

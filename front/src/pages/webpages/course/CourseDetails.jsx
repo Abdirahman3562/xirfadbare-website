@@ -1,4 +1,5 @@
 import { FaCode, FaArrowLeft } from "react-icons/fa6";
+import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import { FileText, Brain, Award, CheckCircle2, XCircle, Info } from 'lucide-react';
 import { Link, useParams } from "react-router-dom";
 import { getImageUrl } from "../../../utils/format";
@@ -38,6 +39,14 @@ function CourseDetails() {
   }, [slug, contextLoading, contextCourse]);
 
   const isEnrolled = course ? isEnrolledInCourse(course._id) : false;
+
+  // ✅ Course Rating Logic
+  const instructor = course?.instructor || {};
+  const courseReviews = instructor?.reviews?.filter(r => String(r.courseId) === String(course?._id)) || [];
+  const avgRating = parseFloat(courseReviews.length > 0
+    ? (courseReviews.reduce((acc, r) => acc + (r.rating || 0), 0) / courseReviews.length).toFixed(1)
+    : 0);
+  const reviewCount = courseReviews.length;
 
   // ✅ Check for features
   const hasResources = course && ((course.courseResources?.length > 0) ||
@@ -314,6 +323,36 @@ function CourseDetails() {
                     </span>
                   )}
                 </div>
+
+                {/* Course Rating */}
+                {reviewCount > 0 && (
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 border border-gray-300 hover:border-emerald-400 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center bg-amber-50 dark:bg-amber-500/10 text-amber-500">
+                        <FaStar size={14} />
+                      </div>
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300 break-all">Rating</span>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const isFull = star <= Math.floor(avgRating);
+                          const isHalf = !isFull && star <= Math.ceil(avgRating) && avgRating % 1 !== 0;
+                          return isFull ? (
+                            <FaStar key={star} size={12} className="text-amber-400" />
+                          ) : isHalf ? (
+                            <FaStarHalfAlt key={star} size={12} className="text-amber-400" />
+                          ) : (
+                            <FaStar key={star} size={12} className="text-gray-200 dark:text-slate-700" />
+                          );
+                        })}
+                      </div>
+                      <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                        {avgRating} ({reviewCount} reviews)
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
 
 
