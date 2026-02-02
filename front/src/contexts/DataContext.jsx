@@ -32,7 +32,7 @@ export const DataProvider = ({ children }) => {
         console.log('📦 Data hydrated from cache');
         return {
           ...parsed,
-          loading: false, // Don't show global loader if we have cache
+          loading: true, // Show global loader for premium feel even with cache
           hydrated: true
         };
       } catch (e) {
@@ -77,12 +77,14 @@ export const DataProvider = ({ children }) => {
     const preloadAllData = async () => {
       let loadingTimer = null;
       try {
-        if (!initialState.hydrated) {
-          setLoading(true);
-        }
+        // Always set loading to true initially for premium feel
+        setLoading(true);
 
-        // Safety timeout to ensure loading doesn't hang more than 2s if no cache
-        loadingTimer = !initialState.hydrated ? setTimeout(() => setLoading(false), 2000) : null;
+        // Add a small artificial delay to show the "premium" loader (min 1.2s)
+        const minLoadingPromise = new Promise(resolve => setTimeout(resolve, 1200));
+
+        // Safety timeout to ensure loading doesn't hang more than 3s
+        loadingTimer = setTimeout(() => setLoading(false), 3000);
 
         console.log('🚀 Starting background data sync...');
         setError(null);
@@ -133,6 +135,8 @@ export const DataProvider = ({ children }) => {
         localStorage.setItem('samafale_data_cache', JSON.stringify(newData));
         console.log('✅ Background sync complete and cached');
 
+        // Wait for both data and our minimum loading time
+        await minLoadingPromise;
       } catch (err) {
         console.error('❌ Error preloading data:', err);
         setError(err.message);
