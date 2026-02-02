@@ -97,6 +97,8 @@ const faqs = [
   },
 ];
 
+const BASE_URL = process.env.API_URL || 'https://xirfadbare-backend.onrender.com';
+
 async function populateCollections() {
   console.log('🚀 Starting to populate testimonials and FAQs collections...\n');
 
@@ -104,7 +106,7 @@ async function populateCollections() {
   console.log('📝 Adding testimonials...');
   for (let i = 0; i < testimonials.length; i++) {
     try {
-      const response = await fetch('http://localhost:5000/api/testimonials', {
+      const response = await fetch(`${BASE_URL}/api/testimonials`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(testimonials[i]),
@@ -126,7 +128,7 @@ async function populateCollections() {
   // Populate FAQs
   for (let i = 0; i < faqs.length; i++) {
     try {
-      const response = await fetch('http://localhost:5000/api/faqs', {
+      const response = await fetch(`${BASE_URL}/api/faqs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(faqs[i]),

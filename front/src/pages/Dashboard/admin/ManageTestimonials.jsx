@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial } from '../../../api/adminService';
 import { toast } from 'react-toastify';
 import PremiumLoader from '../../../components/ui/PremiumLoader';
+import { API_BASE_URL, SERVER_URL } from '../../../config';
 
 const ManageTestimonials = () => {
     const [testimonials, setTestimonials] = useState([]);
@@ -111,7 +112,7 @@ const ManageTestimonials = () => {
 
         try {
             const user = JSON.parse(localStorage.getItem('loggedInUser'));
-            const res = await fetch('http://localhost:5000/api/upload', {
+            const res = await fetch(`${API_BASE_URL}/upload`, {
                 method: 'POST',
                 body: formDataPayload,
                 headers: {
@@ -163,7 +164,7 @@ const ManageTestimonials = () => {
 
     const getImageUrl = (image) => {
         if (!image) return null;
-        return image.startsWith('/') ? `http://localhost:5000${image}` : image;
+        return image.startsWith('/') ? `${SERVER_URL}${image}` : image;
     };
 
     const filteredTestimonials = testimonials.filter(t =>

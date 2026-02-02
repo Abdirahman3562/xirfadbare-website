@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { MessageSquare, Send, X, ChevronLeft, Phone, User } from "lucide-react";
 import axios from "axios";
 import { getImageUrl } from "../utils/format";
+import { API_BASE_URL } from "../config";
 
 export default function SupportWidget() {
     const [isOpen, setIsOpen] = useState(false);
@@ -26,7 +27,7 @@ export default function SupportWidget() {
         // 2. Fetch Settings
         const fetchSettings = async () => {
             try {
-                const { data } = await axios.get("http://localhost:5000/api/settings");
+                const { data } = await axios.get(`${API_BASE_URL}/settings`);
                 setSettings(data);
             } catch (error) {
                 console.error("Error fetching settings:", error);
@@ -41,7 +42,7 @@ export default function SupportWidget() {
         if (view === 'chat' && user?.token) {
             const fetchHistory = async () => {
                 try {
-                    const { data } = await axios.get("http://localhost:5000/api/chat", {
+                    const { data } = await axios.get(`${API_BASE_URL}/chat`, {
                         headers: { Authorization: `Bearer ${user.token}` }
                     });
                     const formattedMessages = data.map(msg => ({
@@ -93,7 +94,7 @@ export default function SupportWidget() {
 
     const fetchBotResponses = async () => {
         try {
-            const { data } = await axios.get("http://localhost:5000/api/bot-responses");
+            const { data } = await axios.get(`${API_BASE_URL}/bot-responses`);
             setBotResponses(data);
         } catch (error) {
             console.error("Failed to load bot responses", error);
@@ -167,7 +168,7 @@ export default function SupportWidget() {
         try {
             // Send to Backend if User Logged In
             if (user?.token) {
-                await axios.post("http://localhost:5000/api/chat", {
+                await axios.post(`${API_BASE_URL}/chat`, {
                     message: text,
                     sender: 'user'
                 }, {
@@ -184,7 +185,7 @@ export default function SupportWidget() {
             // Check if admin has taken over
             if (user?.token) {
                 try {
-                    const { data: userData } = await axios.get("http://localhost:5000/api/users/profile", {
+                    const { data: userData } = await axios.get(`${API_BASE_URL}/users/profile`, {
                         headers: { Authorization: `Bearer ${user.token}` }
                     });
                     if (userData.isChatPausedByAdmin) {
@@ -207,7 +208,7 @@ export default function SupportWidget() {
             // Save Bot Message to Backend
             if (user?.token) {
                 try {
-                    await axios.post("http://localhost:5000/api/chat/bot", {
+                    await axios.post(`${API_BASE_URL}/chat/bot`, {
                         message: botText
                     }, {
                         headers: { Authorization: `Bearer ${user.token}` }

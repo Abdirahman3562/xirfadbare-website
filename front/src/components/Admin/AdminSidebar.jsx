@@ -22,6 +22,7 @@ import {
     Award,
     Package
 } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], isSuperAdmin = false }) => {
     const [settings, setSettings] = useState({
@@ -38,7 +39,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/settings");
+                const response = await fetch(`${API_BASE_URL}/settings`);
                 const data = await response.json();
                 setSettings({
                     logo: data.logo || "",
@@ -52,7 +53,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
         const fetchUnreadCount = async () => {
             if (!token) return;
             try {
-                const response = await fetch("http://localhost:5000/api/chat/unread-count", {
+                const response = await fetch(`${API_BASE_URL}/chat/unread-count`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();

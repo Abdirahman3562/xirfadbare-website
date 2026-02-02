@@ -1,5 +1,7 @@
 import fetch from 'node-fetch';
 
+const BASE_URL = process.env.API_URL || 'https://xirfadbare-backend.onrender.com';
+
 const testimonials = [
   {
     name: "Ayaan Cabdi",
@@ -46,7 +48,7 @@ async function addTestimonials() {
     try {
       console.log(`📝 Adding: ${testimonial.name}`);
 
-      const response = await fetch('http://localhost:5000/api/testimonials', {
+      const response = await fetch(`${BASE_URL}/api/testimonials`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Link as LinkIcon, Download, ExternalLink, Loader2 } from 'lucide-react';
+import { SERVER_URL } from '../../config';
 
 const ResourceItem = ({ resource }) => {
     const [isDownloading, setIsDownloading] = useState(false);
@@ -10,7 +11,7 @@ const ResourceItem = ({ resource }) => {
     const getFullUrl = (url) => {
         if (!url) return '';
         if (url.startsWith('http')) return url;
-        return `http://localhost:5000${url.startsWith('/') ? '' : '/'}${url}`;
+        return `${SERVER_URL}${url.startsWith('/') ? '' : '/'}${url}`;
     };
 
     const handleDownload = async (e) => {

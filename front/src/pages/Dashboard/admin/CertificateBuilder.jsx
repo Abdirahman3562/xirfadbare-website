@@ -5,6 +5,7 @@ import { Save, Upload, Type, Image as ImageIcon, Layout, Move, Trash2, Eye, Shie
 import { toast } from 'react-toastify';
 import QRCode from 'qrcode';
 import { generateCertificate } from '../../../utils/pdfGenerator';
+import { API_BASE_URL, SERVER_URL } from '../../../config';
 
 const CertificateBuilder = () => {
     const [templateId, setTemplateId] = useState(null);
@@ -70,7 +71,7 @@ const CertificateBuilder = () => {
 
     const fetchSystemSettings = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/settings');
+            const res = await fetch(`${API_BASE_URL}/settings`);
             const data = await res.json();
             setSystemSettings(data);
         } catch (error) {
@@ -83,8 +84,8 @@ const CertificateBuilder = () => {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
             // If urlId exists, fetch specific, otherwise fetch active
             const endpoint = urlId
-                ? `http://localhost:5000/api/certificates/template/${urlId}`
-                : 'http://localhost:5000/api/certificates/template';
+                ? `${API_BASE_URL}/certificates/template/${urlId}`
+                : `${API_BASE_URL}/certificates/template`;
 
             const res = await fetch(endpoint, {
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -110,7 +111,7 @@ const CertificateBuilder = () => {
 
     const getFullImageUrl = (path) => {
         if (!path) return '';
-        return path.startsWith('http') ? path : `http://localhost:5000${path}`;
+        return path.startsWith('http') ? path : `${SERVER_URL}${path}`;
     };
 
     const handleBackgroundUpload = async (e) => {
@@ -123,7 +124,7 @@ const CertificateBuilder = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const res = await fetch('http://localhost:5000/api/upload', {
+            const res = await fetch(`${API_BASE_URL}/upload`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -149,7 +150,7 @@ const CertificateBuilder = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const res = await fetch('http://localhost:5000/api/upload', {
+            const res = await fetch(`${API_BASE_URL}/upload`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: formData
@@ -215,7 +216,7 @@ const CertificateBuilder = () => {
                 layout: elements
             };
 
-            const res = await fetch('http://localhost:5000/api/certificates/template', {
+            const res = await fetch(`${API_BASE_URL}/certificates/template`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

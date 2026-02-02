@@ -1,6 +1,6 @@
 // Simple script to check if backend is running
 const checkBackend = async () => {
-  const baseUrl = 'http://localhost:5000';
+  const baseUrl = process.env.API_URL || 'https://xirfadbare-backend.onrender.com';
 
   console.log('🔍 Checking Backend Connectivity...\n');
 

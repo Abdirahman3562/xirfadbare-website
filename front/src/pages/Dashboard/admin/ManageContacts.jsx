@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { getImageUrl } from "../../../utils/format";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
+import { API_BASE_URL } from "../../../config";
 
 // Helper to format date
 const formatDate = (dateString) => {
@@ -59,7 +60,7 @@ const ManageContacts = () => {
             const user = JSON.parse(localStorage.getItem("loggedInUser"));
             const token = user?.token;
 
-            const { data } = await axios.get("http://localhost:5000/api/contacts", {
+            const { data } = await axios.get(`${API_BASE_URL}/contacts`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setContacts(data);
@@ -84,7 +85,7 @@ const ManageContacts = () => {
             const user = JSON.parse(localStorage.getItem("loggedInUser"));
             const token = user?.token;
 
-            await axios.delete(`http://localhost:5000/api/contacts/${contactToDelete._id}`, {
+            await axios.delete(`${API_BASE_URL}/contacts/${contactToDelete._id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -123,7 +124,7 @@ const ManageContacts = () => {
             // Use the generic update endpoint if it exists or we might need to create one.
             // Based on previous tool usage, contactRoutes has .put(protect, updateContact) which takes req.body
 
-            await axios.put(`http://localhost:5000/api/contacts/${contact._id}`,
+            await axios.put(`${API_BASE_URL}/contacts/${contact._id}`,
                 { status: newStatus },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -170,7 +171,7 @@ const ManageContacts = () => {
             const user = JSON.parse(localStorage.getItem("loggedInUser"));
             const token = user?.token;
 
-            await axios.post(`http://localhost:5000/api/contacts/${selectedContact._id}/reply`,
+            await axios.post(`${API_BASE_URL}/contacts/${selectedContact._id}/reply`,
                 {
                     subject: replySubject,
                     replyMessage: replyMessage

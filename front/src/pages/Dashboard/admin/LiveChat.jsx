@@ -4,6 +4,7 @@ import { Search, Send, User, MessageSquare, ShieldAlert, ShieldCheck, Loader, Ar
 import PremiumLoader from '../../../components/ui/PremiumLoader';
 import { getImageUrl } from '../../../utils/format';
 import { toast } from 'react-toastify';
+import { API_BASE_URL } from '../../../config';
 
 export default function LiveChat() {
     const [conversations, setConversations] = useState([]);
@@ -27,7 +28,7 @@ export default function LiveChat() {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const { data } = await axios.get("http://localhost:5000/api/settings");
+                const { data } = await axios.get(`${API_BASE_URL}/settings`);
                 setSettings(data);
             } catch (error) { console.error("Settings fetch failed"); }
         };
@@ -41,7 +42,7 @@ export default function LiveChat() {
     const fetchUserProfile = async () => {
         if (!token) return;
         try {
-            const response = await fetch("http://localhost:5000/api/users/profile", {
+            const response = await fetch(`${API_BASE_URL}/users/profile`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -77,7 +78,7 @@ export default function LiveChat() {
 
     const fetchConversations = async () => {
         try {
-            const { data } = await axios.get("http://localhost:5000/api/chat/conversations", {
+            const { data } = await axios.get(`${API_BASE_URL}/chat/conversations`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setConversations(data);
@@ -90,7 +91,7 @@ export default function LiveChat() {
     const fetchMessages = async (userId, silent = false) => {
         if (!silent) setMsgLoading(true);
         try {
-            const { data } = await axios.get(`http://localhost:5000/api/chat/admin/${userId}`, {
+            const { data } = await axios.get(`${API_BASE_URL}/chat/admin/${userId}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMessages(data);
@@ -128,7 +129,7 @@ export default function LiveChat() {
         setInput("");
 
         try {
-            await axios.post("http://localhost:5000/api/chat/admin", {
+            await axios.post(`${API_BASE_URL}/chat/admin`, {
                 userId: selectedUser._id,
                 message: text
             }, {
@@ -152,7 +153,7 @@ export default function LiveChat() {
         const newStatus = !selectedUser.isChatPausedByAdmin;
 
         try {
-            await axios.put(`http://localhost:5000/api/chat/take-over/${selectedUser._id}`, {
+            await axios.put(`${API_BASE_URL}/chat/take-over/${selectedUser._id}`, {
                 pause: newStatus
             }, {
                 headers: { Authorization: `Bearer ${token}` }

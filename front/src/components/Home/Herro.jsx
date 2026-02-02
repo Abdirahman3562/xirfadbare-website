@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import herro from "../../assets/herro1.jpeg";
 import { Star } from "lucide-react";
+import { API_BASE_URL } from "../../config";
 
 export default function Herro({
   title: propTitle,
@@ -15,7 +16,7 @@ export default function Herro({
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/stats");
+        const response = await fetch(`${API_BASE_URL}/stats`);
         const data = await response.json();
         setStats(data);
       } catch (error) {

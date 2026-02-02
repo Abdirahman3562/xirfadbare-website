@@ -1,6 +1,7 @@
 import React from "react";
 import { FaQuoteRight, FaStar } from "react-icons/fa";
 import { useData } from "../../contexts/DataContext";
+import { SERVER_URL } from "../../config";
 
 export default function Testimonials() {
   const { testimonials } = useData();
@@ -52,7 +53,7 @@ export default function Testimonials() {
                   <img
                     src={
                       t.image?.startsWith('/')
-                        ? `${"http://localhost:5000"}${t.image}`
+                        ? `${SERVER_URL}${t.image}`
                         : (t.image || "https://randomuser.me/api/portraits/lego/1.jpg")
                     }
                     alt={t.name}

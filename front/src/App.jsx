@@ -4,6 +4,7 @@ import { useLayoutEffect, useEffect, useState } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTheme } from "./contexts/ThemeContext";
+import { API_BASE_URL, SERVER_URL } from "./config";
 // ---------------------------
 // Existing Imports (Assuming these valid)
 // ---------------------------
@@ -87,7 +88,7 @@ function App() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/settings");
+        const response = await fetch(`${API_BASE_URL}/settings`);
         const data = await response.json();
 
         // Update Title
@@ -98,7 +99,7 @@ function App() {
         // Update Favicon
         if (data.logo) {
           const faviconUrl = data.logo.startsWith("/")
-            ? `http://localhost:5000${data.logo}`
+            ? `${SERVER_URL}${data.logo}`
             : data.logo;
 
           let link = document.querySelector("link[rel~='icon']");

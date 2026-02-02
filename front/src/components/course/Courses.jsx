@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import CourseCard from "./CourseCard";
 import { useData } from "../../contexts/DataContext";
 import { Search, Filter, BookOpen, Layers, DollarSign, X, SlidersHorizontal } from "lucide-react";
+import { API_BASE_URL } from "../../config";
 
 function Courses({ IsHome }) {
   const { courses, bundles, loading } = useData();
@@ -20,7 +21,7 @@ function Courses({ IsHome }) {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/categories");
+        const response = await fetch(`${API_BASE_URL}/categories`);
         const data = await response.json();
         setDbCategories(data.map(cat => cat.name));
       } catch (error) {
