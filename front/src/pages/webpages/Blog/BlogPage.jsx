@@ -5,6 +5,7 @@ import { FiBook, FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { getAllBlogs } from "../../../api/blogService";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
+import { API_BASE_URL } from "../../../config";
 
 function BlogPage() {
   const [search, setSearch] = useState("");
@@ -31,7 +32,7 @@ function BlogPage() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await fetch("https://xirfadbare-backend.onrender.com/api/blogs");
+        const response = await fetch(`${API_BASE_URL}/blogs`);
         const data = await response.json();
 
         // Filter only active blogs

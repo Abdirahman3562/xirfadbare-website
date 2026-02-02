@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { FiCheckCircle, FiAlertCircle, FiLoader } from "react-icons/fi";
+import { API_BASE_URL } from "../../config";
 
 const VerifyEmail = () => {
     const [searchParams] = useSearchParams();
@@ -19,7 +20,7 @@ const VerifyEmail = () => {
         // API call to verify email
         const verifyToken = async () => {
             try {
-                const response = await fetch('https://xirfadbare-backend.onrender.com/api/users/verify-email', {
+                const response = await fetch(`${API_BASE_URL}/users/verify-email`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token })

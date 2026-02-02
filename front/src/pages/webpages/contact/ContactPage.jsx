@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Mail, MessageSquare, Monitor, ArrowRight, Send, Phone, MapPin, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { API_BASE_URL } from "../../../config";
 
 
 export default function ContactPage() {
@@ -15,7 +16,7 @@ export default function ContactPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch("https://xirfadbare-backend.onrender.com/api/settings");
+        const response = await fetch(`${API_BASE_URL}/settings`);
         const data = await response.json();
         setSettings({
           contactEmail: data.contactEmail || "info@xirfadbare.com",
@@ -73,7 +74,7 @@ export default function ContactPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('https://xirfadbare-backend.onrender.com/api/contacts', {
+      const response = await fetch(`${API_BASE_URL}/contacts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { usePermissions } from "../../../hooks/usePermissions";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
+import { API_BASE_URL, SERVER_URL } from "../../../config";
 
 export default function SystemSettings() {
     const { canAccess } = usePermissions();
@@ -33,7 +34,7 @@ export default function SystemSettings() {
 
     const fetchSettings = async () => {
         try {
-            const response = await fetch("https://xirfadbare-backend.onrender.com/api/settings");
+            const response = await fetch(`${API_BASE_URL}/settings`);
             const data = await response.json();
             setSettings(data);
         } catch (error) {
@@ -75,7 +76,7 @@ export default function SystemSettings() {
             formData.append('image', file);
 
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch("https://xirfadbare-backend.onrender.com/api/upload", {
+            const response = await fetch(`${API_BASE_URL}/upload`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -87,7 +88,7 @@ export default function SystemSettings() {
 
             if (response.ok) {
                 // Add backend URL to the path
-                const fullUrl = `https://xirfadbare-backend.onrender.com${data.url}`;
+                const fullUrl = `${SERVER_URL}${data.url}`;
                 setSettings(prev => ({
                     ...prev,
                     logo: fullUrl
@@ -110,7 +111,7 @@ export default function SystemSettings() {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch("https://xirfadbare-backend.onrender.com/api/settings", {
+            const response = await fetch(`${API_BASE_URL}/settings`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

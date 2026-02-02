@@ -1,3 +1,5 @@
+import { SERVER_URL } from '../config';
+
 export const getImageUrl = (img) => {
     if (!img) return '';
     if (typeof img !== "string") return img;
@@ -6,7 +8,7 @@ export const getImageUrl = (img) => {
     // Remove leading slash if present to avoid double slashes
     const cleanPath = img.startsWith("/") ? img.substring(1) : img;
 
-    return `https://xirfadbare-backend.onrender.com/${cleanPath}`;
+    return `${SERVER_URL}/${cleanPath}`;
 };
 
 export const formatDate = (dateString, includeTime = false) => {

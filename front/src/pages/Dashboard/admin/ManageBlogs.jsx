@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
 import { toast } from "react-toastify";
+import { API_BASE_URL, SERVER_URL } from "../../../config";
 
 const CommentItem = ({ comment, depth = 0, ...props }) => {
     const {
@@ -283,7 +284,7 @@ const ManageBlogs = () => {
     const fetchUserProfile = async () => {
         if (!token) return;
         try {
-            const response = await fetch("https://xirfadbare-backend.onrender.com/api/users/profile", {
+            const response = await fetch(`${API_BASE_URL}/users/profile`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -299,7 +300,7 @@ const ManageBlogs = () => {
 
     const fetchBlogs = async () => {
         try {
-            const response = await fetch("https://xirfadbare-backend.onrender.com/api/blogs");
+            const response = await fetch(`${API_BASE_URL}/blogs`);
             const data = await response.json();
             setBlogs(data.blogs || []);
         } catch (error) {
@@ -319,7 +320,7 @@ const ManageBlogs = () => {
         // We can optimize by checking if blog has pending comments first, or just hit endpoint safely.
         // Hitting endpoint is safer.
         if (token) {
-            fetch(`https://xirfadbare-backend.onrender.com/api/comments/mark-read/${blog._id}`, {
+            fetch(`${API_BASE_URL}/comments/mark-read/${blog._id}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             }).then(res => {
@@ -331,7 +332,7 @@ const ManageBlogs = () => {
         }
 
         try {
-            const response = await fetch(`https://xirfadbare-backend.onrender.com/api/comments/${blog._id}`);
+            const response = await fetch(`${API_BASE_URL}/comments/${blog._id}`);
             if (response.ok) {
                 const data = await response.json();
                 setComments(data);
@@ -376,7 +377,7 @@ const ManageBlogs = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch('https://xirfadbare-backend.onrender.com/api/comments', {
+            const response = await fetch(`${API_BASE_URL}/comments`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -410,7 +411,7 @@ const ManageBlogs = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch(`https://xirfadbare-backend.onrender.com/api/comments/${commentId}`, {
+            const response = await fetch(`${API_BASE_URL}/comments/${commentId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -454,7 +455,7 @@ const ManageBlogs = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch(`https://xirfadbare-backend.onrender.com/api/comments/${commentToDelete}`, {
+            const response = await fetch(`${API_BASE_URL}/comments/${commentToDelete}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -481,7 +482,7 @@ const ManageBlogs = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch(`https://xirfadbare-backend.onrender.com/api/blogs/${blogToDelete._id}`, {
+            const response = await fetch(`${API_BASE_URL}/blogs/${blogToDelete._id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -536,7 +537,7 @@ const ManageBlogs = () => {
 
     const getImageUrl = (img) => {
         if (!img) return null;
-        return img.startsWith("/") ? `https://xirfadbare-backend.onrender.com${img}` : img;
+        return img.startsWith("/") ? `${SERVER_URL}${img}` : img;
     };
 
     if (loading) {

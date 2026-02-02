@@ -5,6 +5,7 @@ import { getAllCourses } from "../../../api/courseService";
 import { getTemplateById } from "../../../api/certificateService";
 import { generateCertificate } from "../../../utils/pdfGenerator";
 import { toast } from "react-toastify";
+import { API_BASE_URL, SERVER_URL } from "../../../config";
 
 export default function Certificates() {
     const [completedCourses, setCompletedCourses] = useState([]);
@@ -24,7 +25,7 @@ export default function Certificates() {
 
     const fetchSystemSettings = async () => {
         try {
-            const res = await fetch('https://xirfadbare-backend.onrender.com/api/settings');
+            const res = await fetch(`${API_BASE_URL}/settings`);
             const data = await res.json();
             setSystemSettings(data);
         } catch (error) {
@@ -117,7 +118,7 @@ export default function Certificates() {
                 }),
                 instructorName: course.instructor?.name || "Xirfadbare Academy",
                 certificateId: certId,
-                systemLogo: systemSettings?.logo ? (systemSettings.logo.startsWith('http') ? systemSettings.logo : `https://xirfadbare-backend.onrender.com${systemSettings.logo}`) : null
+                systemLogo: systemSettings?.logo ? (systemSettings.logo.startsWith('http') ? systemSettings.logo : `${SERVER_URL}${systemSettings.logo}`) : null
             };
 
             await generateCertificate(template, data, `${course.title}_Certificate.pdf`);
