@@ -4,13 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { usePermissions } from "../../../hooks/usePermissions";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
+import { useData } from "../../../contexts/DataContext";
+import { getImageUrl } from "../../../utils/format";
 import { API_BASE_URL, SERVER_URL } from "../../../config";
 
 export default function SystemSettings() {
     const { canAccess } = usePermissions();
+    const { refreshData } = useData();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
+    const [tempPreview, setTempPreview] = useState(null);
     const [settings, setSettings] = useState({
         websiteTitle: "",
         websiteDescription: "",
@@ -53,6 +57,26 @@ export default function SystemSettings() {
         }));
     };
 
+    // Local getImageUrl with logging
+    const getImageUrl = (img) => {
+        if (!img) {
+            console.log('🖼️ getImageUrl received empty image path.');
+            return '';
+        }
+        if (img.startsWith("http") || img.startsWith("data:image") || img.startsWith("blob:")) {
+            console.log('🖼️ getImageUrl returning direct match:', img);
+            return img;
+        }
+
+        // Remove leading slash from path and trailing slash from SERVER_URL
+        const cleanPath = img.startsWith("/") ? img.substring(1) : img;
+        const cleanBase = SERVER_URL.endsWith("/") ? SERVER_URL.slice(0, -1) : SERVER_URL;
+
+        const result = `${cleanBase}/${cleanPath}`;
+        console.log('🖼️ getImageUrl constructed:', result);
+        return result;
+    };
+
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -68,6 +92,10 @@ export default function SystemSettings() {
             toast.error('Image size should be less than 5MB');
             return;
         }
+
+        // Create instant local preview
+        const objectUrl = URL.createObjectURL(file);
+        setTempPreview(objectUrl);
 
         setUploading(true);
 
@@ -87,18 +115,19 @@ export default function SystemSettings() {
             const data = await response.json();
 
             if (response.ok) {
-                // Add backend URL to the path
-                const fullUrl = `${SERVER_URL}${data.url}`;
+                // Store only the relative path in the settings state
                 setSettings(prev => ({
                     ...prev,
-                    logo: fullUrl
+                    logo: data.url // data.url is /uploads/...
                 }));
+                console.log('✅ Logo uploaded successfully. New settings.logo:', data.url);
                 toast.success("Logo uploaded successfully!");
             } else {
+                console.error('❌ Logo upload failed:', data.message || "Unknown error");
                 toast.error(data.message || "Failed to upload logo");
             }
         } catch (error) {
-            console.error("Error uploading logo:", error);
+            console.error("❌ Error uploading logo:", error);
             toast.error("Failed to upload logo");
         } finally {
             setUploading(false);
@@ -124,6 +153,8 @@ export default function SystemSettings() {
 
             if (response.ok) {
                 toast.success("Settings updated successfully!");
+                // Update global data context
+                if (refreshData) refreshData('settings');
                 // Update document title
                 document.title = settings.websiteTitle;
             } else {
@@ -137,10 +168,7 @@ export default function SystemSettings() {
         }
     };
 
-    const getImageUrl = (path) => {
-        if (!path) return "";
-        return path.startsWith("/") ? `${SERVER_URL}${path}` : path;
-    };
+    // Unified getImageUrl from utils/format is now used
 
     if (loading) {
         return <PremiumLoader text="Loading System Settings..." />;
@@ -427,16 +455,20 @@ export default function SystemSettings() {
                             </div>
 
                             {/* Current Logo Preview */}
-                            {settings.logo && (
+                            {(settings.logo || tempPreview) && (
                                 <div className="mb-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-xl border border-gray-200 dark:border-gray-600">
                                     <p className="text-xs text-gray-500 dark:text-gray-300 mb-2">Current Logo:</p>
                                     <img
-                                        src={getImageUrl(settings.logo)}
+                                        src={tempPreview || getImageUrl(settings.logo)}
                                         alt="Current logo"
                                         className="h-20 object-contain rounded-lg"
+                                        onLoad={() => console.log('✅ Logo image loaded successfully')}
                                         onError={(e) => {
-                                            e.target.style.display = 'none';
-                                            e.target.nextSibling.style.display = 'block';
+                                            console.error('❌ Logo image failed to load. Source:', e.target.src);
+                                            if (!tempPreview) {
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'block';
+                                            }
                                         }}
                                     />
                                     <p className="text-xs text-red-500 mt-2 hidden">Failed to load image</p>

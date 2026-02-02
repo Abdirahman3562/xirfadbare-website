@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, ShieldCheck, ArrowLeft, Loader2 } from "lucide-react";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { API_BASE_URL } from "../../config";
 
 const Login = () => {
@@ -177,209 +176,217 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen py-20 flex flex-col md:flex-row items-center justify-center bg-white font-[Inter]">
-
-      {/* ✅ Left section */}
-      <div className="hidden md:flex flex-col items-start justify-center w-1/2 px-16 space-y-6">
-        <blockquote className="text-gray-600 text-lg italic leading-relaxed">
-          "Xirfadbare has transformed how we deliver education, making it more
-          accessible and engaging than ever before."
-        </blockquote>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold">AM</div>
-          <div>
-            <p className="text-gray-900 font-bold text-sm">Abdirahman Mohamed</p>
-            <p className="text-gray-500 text-xs">CEO of Xirfadbare</p>
-          </div>
-        </div>
+    <div className="min-h-screen py-20 flex flex-col md:flex-row items-center justify-center bg-gray-50/50 font-[Inter]">
+      {/* Decorative Background Blobs */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
       </div>
 
-      {/* ✅ Right section */}
-      <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-10 md:p-12">
-        <div className="w-full max-w-md">
-          <Link
-            to="/"
-            className="text-xs font-bold text-gray-400 hover:text-emerald-600 mb-8 inline-block flex items-center gap-2 uppercase tracking-widest transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <ArrowLeft size={14} />
-              <span className="text-emerald-600"> Back to home</span>
+      <div className="container mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-center relative z-10">
+
+        {/* ✅ Left section */}
+        <div className="hidden md:flex flex-col items-start justify-center w-1/2 px-16 space-y-6">
+          <blockquote className="text-gray-600 text-lg italic leading-relaxed">
+            "Xirfadbare has transformed how we deliver education, making it more
+            accessible and engaging than ever before."
+          </blockquote>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold">AM</div>
+            <div>
+              <p className="text-gray-900 font-bold text-sm">Abdirahman Mohamed</p>
+              <p className="text-gray-500 text-xs">CEO of Xirfadbare</p>
             </div>
+          </div>
+        </div>
 
-          </Link>
+        {/* ✅ Right section */}
+        <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 md:p-12">
+          <div className="w-full max-w-md bg-white/10 border border-gray-300 dark:bg-slate-900/50 backdrop-blur-xl p-8 md:p-10 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
+            <Link
+              to="/"
+              className="text-xs font-bold text-gray-400 hover:text-emerald-600 mb-8 inline-block flex items-center gap-2 uppercase tracking-widest transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <ArrowLeft size={14} />
+                <span className="text-emerald-600"> Back to home</span>
+              </div>
 
-          <h2 className="text-4xl font-black text-gray-900 mb-3 tracking-tight">
-            {require2FA ? "Security Shield" : "Welcome back"}
-          </h2>
-          <p className="text-gray-500 mb-10 text-sm leading-relaxed">
-            {require2FA
-              ? `We sent a 6-digit verification code to ${loginEmail}. Please enter it below to continue.`
-              : "Enter your credentials to sign in to your account"}
-          </p>
+            </Link>
 
-          {require2FA ? (
-            /* ✅ 2FA Form - Professional 6-Digit Layout */
-            <form className="space-y-8" onSubmit={handleVerify2FA}>
-              <div className="space-y-4">
-                <div className="flex justify-between gap-3">
-                  {otp.map((data, index) => (
-                    <input
-                      key={index}
-                      type="text"
-                      name="otp"
-                      maxLength="1"
-                      value={data}
-                      onFocus={(e) => e.target.select()}
-                      onPaste={handlePaste}
-                      onChange={(e) => handleOtpChange(e.target, index)}
-                      onKeyDown={(e) => handleKeyDown(e, index)}
-                      className="w-14 h-16 text-center text-2xl font-black bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all text-gray-900"
-                    />
-                  ))}
-                </div>
-                <p className="text-center text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                  Enter 6-digit verification code
-                </p>
-                <div className="flex items-center justify-center gap-2 py-2">
-                  <div className={`text-xs font-black px-3 py-1.5 rounded-full ${timer > 60 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600 animate-pulse'}`}>
-                    Expires in {formatTime(timer)}
+            <h2 className="text-4xl font-black text-gray-900 mb-3 tracking-tight">
+              {require2FA ? "Security Shield" : "Welcome back"}
+            </h2>
+            <p className="text-gray-500 mb-10 text-sm leading-relaxed">
+              {require2FA
+                ? `We sent a 6-digit verification code to ${loginEmail}. Please enter it below to continue.`
+                : "Enter your credentials to sign in to your account"}
+            </p>
+
+            {require2FA ? (
+              /* ✅ 2FA Form - Professional 6-Digit Layout */
+              <form className="space-y-8" onSubmit={handleVerify2FA}>
+                <div className="space-y-4">
+                  <div className="flex justify-between gap-3">
+                    {otp.map((data, index) => (
+                      <input
+                        key={index}
+                        type="text"
+                        name="otp"
+                        maxLength="1"
+                        value={data}
+                        onFocus={(e) => e.target.select()}
+                        onPaste={handlePaste}
+                        onChange={(e) => handleOtpChange(e.target, index)}
+                        onKeyDown={(e) => handleKeyDown(e, index)}
+                        className="w-14 h-16 text-center text-2xl font-black bg-gray-50 border-2 border-gray-100 rounded-2xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all text-gray-900"
+                      />
+                    ))}
+                  </div>
+                  <p className="text-center text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                    Enter 6-digit verification code
+                  </p>
+                  <div className="flex items-center justify-center gap-2 py-2">
+                    <div className={`text-xs font-black px-3 py-1.5 rounded-full ${timer > 60 ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600 animate-pulse'}`}>
+                      Expires in {formatTime(timer)}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <button
-                type="submit"
-                disabled={loading || timer === 0}
-                className="w-full bg-emerald-600 text-white py-5 rounded-[2rem] font-bold hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-3 group disabled:opacity-70 active:scale-[0.98]"
-              >
-                {loading ? <Loader2 className="animate-spin" size={20} /> : <ShieldCheck size={20} className="group-hover:scale-110 transition-transform" />}
-                <span className="uppercase tracking-widest text-xs">Verify & Continue</span>
-              </button>
-
-              <div className="text-center space-y-4">
-                {timer === 0 ? (
-                  <button
-                    type="button"
-                    onClick={handleSubmit}
-                    className="text-[11px] font-black text-emerald-600 hover:text-emerald-700 transition uppercase tracking-[0.2em] bg-emerald-50 px-6 py-2 rounded-full"
-                  >
-                    Resend Code
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setRequire2FA(false);
-                      setTimer(0);
-                    }}
-                    className="text-[11px] font-black text-gray-400 hover:text-gray-600 transition uppercase tracking-[0.2em]"
-                  >
-                    Return to login
-                  </button>
-                )}
-              </div>
-            </form>
-          ) : (
-            /* ✅ Login Form */
-            <form className="space-y-5" onSubmit={handleSubmit}>
-              {/* Email */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-bold text-gray-700 uppercase tracking-wider ml-1"
+                <button
+                  type="submit"
+                  disabled={loading || timer === 0}
+                  className="w-full bg-emerald-600 text-white py-5 rounded-[2rem] font-bold hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-100 flex items-center justify-center gap-3 group disabled:opacity-70 active:scale-[0.98]"
                 >
-                  Email address
-                </label>
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 transition-colors" size={18} />
-                  <input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50/50 transition-all text-gray-900 placeholder-gray-500"
-                  />
+                  {loading ? <Loader2 className="animate-spin" size={20} /> : <ShieldCheck size={20} className="group-hover:scale-110 transition-transform" />}
+                  <span className="uppercase tracking-widest text-xs">Verify & Continue</span>
+                </button>
+
+                <div className="text-center space-y-4">
+                  {timer === 0 ? (
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      className="text-[11px] font-black text-emerald-600 hover:text-emerald-700 transition uppercase tracking-[0.2em] bg-emerald-50 px-6 py-2 rounded-full"
+                    >
+                      Resend Code
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRequire2FA(false);
+                        setTimer(0);
+                      }}
+                      className="text-[11px] font-black text-gray-400 hover:text-gray-600 transition uppercase tracking-[0.2em]"
+                    >
+                      Return to login
+                    </button>
+                  )}
                 </div>
-              </div>
-
-              {/* Password */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-bold text-gray-700 uppercase tracking-wider ml-1"
-                >
-                  Password
-                </label>
-                <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 transition-colors" size={18} />
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50/50 transition-all text-gray-900 placeholder-gray-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              </form>
+            ) : (
+              /* ✅ Login Form */
+              <form className="space-y-5" onSubmit={handleSubmit}>
+                {/* Email */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-bold text-gray-700 uppercase tracking-wider ml-1"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
+                    Email address
+                  </label>
+                  <div className="relative group">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 transition-colors" size={18} />
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50/50 transition-all text-gray-900 placeholder-gray-500"
+                    />
+                  </div>
                 </div>
 
-                <div className="flex justify-end mt-2">
-                  <Link
-                    to="/auth/forgot-password"
-                    className="text-xs font-bold text-emerald-600 hover:underline"
+                {/* Password */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-bold text-gray-700 uppercase tracking-wider ml-1"
                   >
-                    Forgot password?
+                    Password
+                  </label>
+                  <div className="relative group">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 transition-colors" size={18} />
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                      className="w-full pl-12 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:bg-white focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50/50 transition-all text-gray-900 placeholder-gray-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+
+                  <div className="flex justify-end mt-2">
+                    <Link
+                      to="/auth/forgot-password"
+                      className="text-xs font-bold text-emerald-600 hover:underline"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Remember me */}
+                <div className="flex items-center px-1">
+                  <input
+                    id="remember"
+                    type="checkbox"
+                    className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
+                  />
+                  <label
+                    htmlFor="remember"
+                    className="ml-2 block text-sm text-gray-500 font-medium cursor-pointer"
+                  >
+                    Stay signed in
+                  </label>
+                </div>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-emerald-500 text-white py-4 rounded-xl font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-100 flex items-center justify-center gap-2 group disabled:opacity-70"
+                >
+                  {loading ? <Loader2 className="animate-spin" size={20} /> : <span>Sign in now</span>}
+                  {!loading && <span className="group-hover:translate-x-1 transition-transform">→</span>}
+                </button>
+              </form>
+            )}
+
+            {/* Footer */}
+            {!require2FA && (
+              <div className="text-center mt-8">
+                <p className="text-sm text-gray-500 font-medium">
+                  New to Xirfadbare?{" "}
+                  <Link to="/auth/signup" className="text-emerald-600 font-bold hover:underline">
+                    Create account
                   </Link>
-                </div>
+                </p>
               </div>
-
-              {/* Remember me */}
-              <div className="flex items-center px-1">
-                <input
-                  id="remember"
-                  type="checkbox"
-                  className="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded cursor-pointer"
-                />
-                <label
-                  htmlFor="remember"
-                  className="ml-2 block text-sm text-gray-500 font-medium cursor-pointer"
-                >
-                  Stay signed in
-                </label>
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-emerald-500 text-white py-4 rounded-xl font-bold hover:bg-emerald-600 transition shadow-lg shadow-emerald-100 flex items-center justify-center gap-2 group disabled:opacity-70"
-              >
-                {loading ? <Loader2 className="animate-spin" size={20} /> : <span>Sign in now</span>}
-                {!loading && <span className="group-hover:translate-x-1 transition-transform">→</span>}
-              </button>
-            </form>
-          )}
-
-          {/* Footer */}
-          {!require2FA && (
-            <div className="text-center mt-8">
-              <p className="text-sm text-gray-500 font-medium">
-                New to Xirfadbare?{" "}
-                <Link to="/auth/signup" className="text-emerald-600 font-bold hover:underline">
-                  Create account
-                </Link>
-              </p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

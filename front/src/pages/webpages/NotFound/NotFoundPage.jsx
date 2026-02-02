@@ -21,7 +21,7 @@ const NotFoundPage = () => {
                         <div className="w-24 h-24 bg-gradient-to-tr from-emerald-400 to-emerald-600 rounded-3xl rotate-12 flex items-center justify-center shadow-2xl shadow-emerald-500/30 animate-in zoom-in duration-700">
                             <MapPinOff size={48} className="text-white" />
                         </div>
-                        <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md px-8 py-3 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-xl animate-in slide-in-from-bottom-5 duration-700 delay-150">
+                        <div className="bg-white/10 border border-gray-300 dark:bg-slate-800/50 backdrop-blur-md px-8 py-3 rounded-2xl shadow-xl animate-in slide-in-from-bottom-5 duration-700 delay-150">
                             <span className="text-xl sm:text-2xl font-black uppercase tracking-widest text-gray-900 dark:text-white">
                                 Boggan Lama Helin!
                             </span>
@@ -39,7 +39,7 @@ const NotFoundPage = () => {
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                         <button
                             onClick={() => navigate(-1)}
-                            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 font-bold text-sm uppercase tracking-wider hover:bg-gray-50 dark:hover:bg-slate-700 border border-gray-200 dark:border-slate-700 transition-all active:scale-95 flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
+                            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white/10 border border-gray-300 dark:bg-slate-800/50 backdrop-blur-md text-gray-700 dark:text-gray-300 font-bold text-sm uppercase tracking-wider hover:bg-white/20 transition-all active:scale-95 flex items-center justify-center gap-3 shadow-sm hover:shadow-md"
                         >
                             <ArrowLeft size={18} />
                             Dib u noqo

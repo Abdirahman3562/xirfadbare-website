@@ -14,6 +14,7 @@ import InstructorTabs from "../../../components/instructor/InstructorTabs";
 import { toast } from "react-toastify";
 import { getInstructorBySlug, updateInstructor } from "../../../api/instructorService";
 import { getAllCourses } from "../../../api/courseService";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 export default function InstructorDetails() {
   const { slug } = useParams();
@@ -139,12 +140,7 @@ export default function InstructorDetails() {
     }
   };
 
-  if (loading)
-    return (
-      <div className="min-h-screen flex justify-center items-center text-emerald-600 font-semibold">
-        Loading instructor details...
-      </div>
-    );
+  if (loading) return <PremiumLoader text="Loading instructor details..." />;
 
   if (!instructor)
     return (
@@ -252,7 +248,7 @@ export default function InstructorDetails() {
                 </button>
 
                 {showDropdown && (
-                  <div className="absolute right-0 mt-12 w-40 bg-white border border-gray-200 rounded-xl shadow-lg animate-fadeIn">
+                  <div className="absolute right-0 mt-12 w-48 bg-white/10 border border-gray-300 backdrop-blur-md rounded-xl shadow-lg animate-fadeIn z-[110]">
                     <button
                       onClick={async () => {
                         await handleFollow(); // samee unfollow API logic
@@ -284,7 +280,7 @@ export default function InstructorDetails() {
         </div>
 
         {/* ✅ Stats Section */}
-        <div className="grid grid-cols-3 sm:grid-cols-3 gap-4 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
           {dynamicStats.map((stat, i) => (
             <div
               key={i}

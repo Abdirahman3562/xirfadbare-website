@@ -9,6 +9,8 @@ const TopBanner = () => {
 
     // Hide on Dashboard/Admin/Instructor pages
     const isDashboard = location.pathname.startsWith("/admin") ||
+        location.pathname.startsWith("/dashboard") ||
+        location.pathname.startsWith("/settings") ||
         ["/instructor/dashboard", "/instructor/create-course", "/instructor/manage-courses", "/instructor/edit-course", "/instructor/profile"].some(path => location.pathname.startsWith(path)) ||
         location.pathname.startsWith("/auth") ||
         location.pathname.startsWith("/watch");

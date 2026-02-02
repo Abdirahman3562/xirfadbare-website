@@ -153,11 +153,11 @@ function SinglePostPage() {
             className="w-full h-80 object-cover rounded-xl"
             onError={(e) => (e.target.src = "/images/placeholder.jpg")}
           />
-          <div className="absolute top-4 right-4 px-4 py-1 bg-white/90 dark:bg-slate-900/90 text-sm rounded-full text-gray-700 dark:text-gray-300 shadow-md backdrop-blur-sm">
+          <div className="absolute top-4 right-4 px-4 py-1 bg-white/10 border border-gray-300 dark:bg-slate-900/90 text-sm rounded-full text-gray-700 dark:text-gray-300 shadow-md backdrop-blur-sm">
             <FaCalendarAlt className="inline text-emerald-500 mr-1" />
             {formatDate(article.date)}
           </div>
-          <div className="absolute top-4 left-2 px-4 py-1 bg-white/90 dark:bg-slate-900/90 text-emerald-900 dark:text-emerald-400 text-sm font-semibold rounded-full shadow-md backdrop-blur-sm">
+          <div className="absolute top-4 left-2 px-4 py-1 bg-white/10 border border-gray-300 dark:bg-slate-900/90 text-emerald-900 dark:text-emerald-400 text-sm font-semibold rounded-full shadow-md backdrop-blur-sm">
             {article.category}
           </div>
         </div>
@@ -287,7 +287,7 @@ function SinglePostPage() {
               </div>
 
               {/* ✅ Dynamic Post Count */}
-              <div className="mt-6 mr-2   mb-2 md:mt-0 md:ml-6 text-gray-900 dark:text-gray-200 text-sm font-semibold border border-emerald-400 dark:border-emerald-500/30 rounded-full px-4 py-2 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm transition-all duration-300">
+              <div className="mt-6 mr-2 mb-2 md:mt-0 md:ml-6 text-gray-900 dark:text-gray-200 text-sm font-semibold border border-gray-300 dark:border-emerald-500/30 rounded-full px-4 py-2 bg-white/10 dark:bg-slate-800/50 backdrop-blur-sm transition-all duration-300">
                 Posts{" "}
                 <span className="ml-1  text-emerald-600 dark:text-emerald-400">
                   ({authorPosts.length})

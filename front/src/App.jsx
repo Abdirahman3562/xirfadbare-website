@@ -1,9 +1,10 @@
 import React from "react";
 import { BrowserRouter, Route, Routes, useLocation, Link, Navigate } from "react-router-dom";
 import { useLayoutEffect, useEffect, useState } from "react";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTheme } from "./contexts/ThemeContext";
+import { useData } from "./contexts/DataContext";
 import { API_BASE_URL, SERVER_URL } from "./config";
 // ---------------------------
 // Existing Imports (Assuming these valid)
@@ -83,40 +84,32 @@ const ScrollToTop = () => {
 // Main App Component
 function App() {
   const { theme } = useTheme();
+  const { settings } = useData();
 
-  // 🌍 Fetch & Apply System Settings (Title & Favicon)
+  // 🌍 Apply System Settings (Title & Favicon)
   useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/settings`);
-        const data = await response.json();
+    if (!settings) return;
 
-        // Update Title
-        if (data.websiteTitle) {
-          document.title = data.websiteTitle;
-        }
+    // Update Title
+    if (settings.websiteTitle) {
+      document.title = settings.websiteTitle;
+    }
 
-        // Update Favicon
-        if (data.logo) {
-          const faviconUrl = data.logo.startsWith("/")
-            ? `${SERVER_URL}${data.logo}`
-            : data.logo;
+    // Update Favicon
+    if (settings.logo) {
+      const faviconUrl = settings.logo.startsWith("/")
+        ? `${SERVER_URL}${settings.logo}`
+        : settings.logo;
 
-          let link = document.querySelector("link[rel~='icon']");
-          if (!link) {
-            link = document.createElement("link");
-            link.rel = "icon";
-            document.getElementsByTagName("head")[0].appendChild(link);
-          }
-          link.href = faviconUrl;
-        }
-      } catch (error) {
-        console.error("Error fetching system settings:", error);
+      let link = document.querySelector("link[rel~='icon']");
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = "icon";
+        document.getElementsByTagName("head")[0].appendChild(link);
       }
-    };
-
-    fetchSettings();
-  }, []);
+      link.href = faviconUrl;
+    }
+  }, [settings]);
 
   return (
     <BrowserRouter>

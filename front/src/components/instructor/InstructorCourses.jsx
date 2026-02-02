@@ -14,6 +14,7 @@ import { getInstructorBySlug } from "../../api/instructorService";
 import { getAllCourses } from "../../api/courseService";
 import { useAuth } from "../../hooks/useAuth";
 import { useMyOrders } from "../../hooks/useMyOrders";
+import PremiumLoader from "../ui/PremiumLoader";
 
 const InstructorCourses = ({ instructorSlug }) => {
 
@@ -77,12 +78,7 @@ const InstructorCourses = ({ instructorSlug }) => {
     fetchInstructorCourses();
   }, [instructorSlug]);
 
-  if (loading)
-    return (
-      <p className="text-center py-10 text-emerald-600 font-semibold">
-        Loading courses...
-      </p>
-    );
+  if (loading) return <PremiumLoader text="Loading courses..." fullScreen={false} />;
 
   if (!instructor)
     return (
@@ -92,7 +88,7 @@ const InstructorCourses = ({ instructorSlug }) => {
     );
 
   return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {courses.map((course) => {
         const totalDuration = formatSeconds(course.totalDuration);
         const isFree = !course.price || Number(course.price) === 0;
@@ -112,7 +108,7 @@ const InstructorCourses = ({ instructorSlug }) => {
         return (
           <div
             key={course._id || course.id}
-            className="group relative bg-[#edf4f5] border border-gray-200 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
+            className="group relative bg-white/10 border border-gray-300 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col h-full"
           >
             {/* ✅ Thumbnail */}
             <div className="relative h-52 w-full overflow-hidden z-0">
@@ -181,7 +177,7 @@ const InstructorCourses = ({ instructorSlug }) => {
               </div>
 
               {/* ✅ Lessons + Duration */}
-              <div className="flex justify-between text-sm text-gray-700 mb-4">
+              <div className="flex lg:flex-row  md:flex-row flex-wrap justify-start gap-2 text-sm text-gray-700 mb-4">
                 <div className="flex items-center gap-2">
                   <FaUserGraduate className="text-emerald-500 text-[14px]" />
                   <span>{course.enrolledCount || 0} Students</span>

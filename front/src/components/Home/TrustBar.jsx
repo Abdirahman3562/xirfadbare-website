@@ -17,23 +17,7 @@ function Stat({ label, value }) {
 }
 
 function TrustBar() {
-  const { courses } = useData();
-  const [stats, setStats] = useState({ students: 0, instructors: 0 });
-
-  // Fetch platform statistics
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/stats`);
-        const data = await response.json();
-        setStats(data);
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-      }
-    };
-
-    fetchStats();
-  }, []);
+  const { courses, stats } = useData();
 
   // Calculate total courses
   const totalCourses = courses.length;
