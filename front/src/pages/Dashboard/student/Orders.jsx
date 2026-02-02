@@ -8,7 +8,7 @@ import {
   Layers,
   X
 } from "lucide-react";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../../utils/format";
 import { FaShoppingCart } from "react-icons/fa";
@@ -115,8 +115,6 @@ export default function Orders() {
 
   return (
     <div className="space-y-8">
-      <Toaster position="top-right" reverseOrder={false} />
-
       <div className="flex gap-1 items-center">
         <Home className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
         <ChevronRight className="w-5 h-5 text-emerald-600" />
@@ -143,7 +141,7 @@ export default function Orders() {
         )}
 
         {!loading && orders.length > 0 && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {orders.map((order) => (
               <div
                 key={order._id || order.id}

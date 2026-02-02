@@ -1,29 +1,31 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL } from '../config';
 
-// 🚀 Singleton cache to share between all cards/instances
-let ordersCache = null;
-let fetchPromise = null;
-
 // Helper to get initial data from localStorage if available
-const getSavedEnrolledData = () => {
+const getSavedStore = () => {
     try {
         const saved = localStorage.getItem('enrolled_data');
-        return saved ? JSON.parse(saved) : { courses: [], bundles: [] };
+        const orders = localStorage.getItem('orders_cache');
+        return {
+            ids: saved ? JSON.parse(saved) : { courses: [], bundles: [] },
+            orders: orders ? JSON.parse(orders) : null
+        };
     } catch (e) {
-        return { courses: [], bundles: [] };
+        return { ids: { courses: [], bundles: [] }, orders: null };
     }
 };
+
+const initialStore = getSavedStore();
+let ordersCache = initialStore.orders;
+let fetchPromise = null;
 
 export function useMyOrders(user) {
     const [orders, setOrders] = useState(ordersCache || []);
     const [loading, setLoading] = useState(!ordersCache);
     const [version, setVersion] = useState(0);
 
-    // Use saved data for instant availability on first load
-    const savedData = getSavedEnrolledData();
-    const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set(savedData.courses));
-    const [enrolledBundleIds, setEnrolledBundleIds] = useState(new Set(savedData.bundles));
+    const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set(initialStore.ids.courses));
+    const [enrolledBundleIds, setEnrolledBundleIds] = useState(new Set(initialStore.ids.bundles));
 
     useEffect(() => {
         if (!user) {
@@ -34,10 +36,9 @@ export function useMyOrders(user) {
             ordersCache = null;
             fetchPromise = null;
             localStorage.removeItem('enrolled_data');
+            localStorage.removeItem('orders_cache');
             return;
         }
-
-        // ... logic for fetchPromise and ordersCache ...
 
         const fetchOrders = async () => {
             try {
@@ -88,6 +89,7 @@ export function useMyOrders(user) {
                 courses: Array.from(courses),
                 bundles: Array.from(bundles)
             }));
+            localStorage.setItem('orders_cache', JSON.stringify(data));
         };
 
         // If we already have a promise in flight, just wait for it
@@ -95,10 +97,9 @@ export function useMyOrders(user) {
             fetchPromise.then(data => {
                 if (data) updateState(data);
             });
-            // We still want to let it run once if it's the first time
         }
 
-        // If we have cache, use it and don't fetch (unless we want to re-validate)
+        // If we have cache, use it and only re-validate if version changes
         if (ordersCache && version === 0) {
             updateState(ordersCache);
             setLoading(false);
@@ -106,7 +107,7 @@ export function useMyOrders(user) {
         }
 
         fetchOrders();
-    }, [user?.token, version]); // Added version to dependency array
+    }, [user?.token, version]);
 
     const isEnrolledInCourse = (courseId) => enrolledCourseIds.has(String(courseId));
     const isEnrolledInBundle = (bundleId) => enrolledBundleIds.has(String(bundleId));

@@ -7,6 +7,7 @@ import { getAllAuthors } from '../api/authorService';
 import { getFAQs } from '../api/faqService';
 import { getAllBundles } from '../api/bundleService';
 import { slugify } from '../utils/slugify';
+import { API_BASE_URL } from '../config';
 
 // Create the context
 const DataContext = createContext();
@@ -22,29 +23,73 @@ export const useData = () => {
 
 // Data Provider Component
 export const DataProvider = ({ children }) => {
+  // Initialize state from localStorage if available
+  const getInitialState = () => {
+    const cached = localStorage.getItem('samafale_data_cache');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        console.log('📦 Data hydrated from cache');
+        return {
+          ...parsed,
+          loading: true, // Show global loader for premium feel even with cache
+          hydrated: true
+        };
+      } catch (e) {
+        console.error('❌ Failed to parse cache:', e);
+      }
+    }
+    return {
+      courses: [],
+      testimonials: [],
+      instructors: [],
+      blogs: [],
+      authors: [],
+      faqs: [],
+      categories: [],
+      bundles: [],
+      stats: { students: 0, instructors: 0 },
+      settings: null,
+      loading: true,
+      hydrated: false
+    };
+  };
+
+  const initialState = getInitialState();
   const [data, setData] = useState({
-    courses: [],
-    testimonials: [],
-    instructors: [],
-    blogs: [],
-    authors: [],
-    faqs: [],
-    categories: [],
-    bundles: [],
+    courses: initialState.courses,
+    testimonials: initialState.testimonials,
+    instructors: initialState.instructors,
+    blogs: initialState.blogs,
+    authors: initialState.authors,
+    faqs: initialState.faqs,
+    categories: initialState.categories,
+    bundles: initialState.bundles,
+    stats: initialState.stats,
+    settings: initialState.settings
   });
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialState.loading);
   const [error, setError] = useState(null);
 
   // Preload all data when app starts
   useEffect(() => {
     const preloadAllData = async () => {
+      let loadingTimer = null;
       try {
-        console.log('🚀 Starting data preload...');
+        // Always set loading to true initially for premium feel
         setLoading(true);
+
+        // Add a small artificial delay to show the "premium" loader (min 1.2s)
+        const minLoadingPromise = new Promise(resolve => setTimeout(resolve, 1200));
+
+        // Safety timeout to ensure loading doesn't hang more than 3s
+        loadingTimer = setTimeout(() => setLoading(false), 3000);
+
+        console.log('🚀 Starting background data sync...');
         setError(null);
 
-        // Fetch all data in parallel for better performance
+        // Fetch all data in parallel
         const results = await Promise.allSettled([
           loadCourses(),
           getTestimonials(),
@@ -53,6 +98,8 @@ export const DataProvider = ({ children }) => {
           getAllAuthors(),
           getFAQs(),
           getAllBundles(),
+          fetch(`${API_BASE_URL}/stats`).then(res => res.json()),
+          fetch(`${API_BASE_URL}/settings`).then(res => res.json()),
         ]);
 
         const [
@@ -63,36 +110,39 @@ export const DataProvider = ({ children }) => {
           authorsRes,
           faqsRes,
           bundlesRes,
+          statsRes,
+          settingsRes,
         ] = results;
 
-        // Process results and handle any failures gracefully
         const newData = {
-          courses: coursesRes.status === 'fulfilled' ? coursesRes.value : [],
-          testimonials: testimonialsRes.status === 'fulfilled' ? testimonialsRes.value : [],
-          instructors: instructorsRes.status === 'fulfilled' ? instructorsRes.value : [],
-          blogs: blogsRes.status === 'fulfilled' ? blogsRes.value : [],
-          authors: authorsRes.status === 'fulfilled' ? authorsRes.value : [],
-          faqs: faqsRes.status === 'fulfilled' ? faqsRes.value : [],
-          categories: extractCategories(coursesRes.status === 'fulfilled' ? coursesRes.value : []),
-          bundles: bundlesRes.status === 'fulfilled' ? bundlesRes.value : [],
+          courses: coursesRes.status === 'fulfilled' ? coursesRes.value : data.courses,
+          testimonials: testimonialsRes.status === 'fulfilled' ? testimonialsRes.value : data.testimonials,
+          instructors: instructorsRes.status === 'fulfilled' ? instructorsRes.value : data.instructors,
+          blogs: blogsRes.status === 'fulfilled' ? blogsRes.value : data.blogs,
+          authors: authorsRes.status === 'fulfilled' ? authorsRes.value : data.authors,
+          faqs: faqsRes.status === 'fulfilled' ? faqsRes.value : data.faqs,
+          bundles: bundlesRes.status === 'fulfilled' ? bundlesRes.value : data.bundles,
+          stats: statsRes.status === 'fulfilled' ? statsRes.value : data.stats,
+          settings: settingsRes.status === 'fulfilled' ? settingsRes.value : data.settings,
         };
 
-        setData(newData);
-        console.log('✅ All data preloaded successfully:', {
-          courses: newData.courses.length,
-          testimonials: newData.testimonials.length,
-          instructors: newData.instructors.length,
-          blogs: newData.blogs.length,
-          authors: newData.authors.length,
-          faqs: newData.faqs.length,
-          categories: newData.categories.length,
-        });
+        // Add categories
+        newData.categories = extractCategories(newData.courses);
 
+        setData(newData);
+
+        // Save to cache
+        localStorage.setItem('samafale_data_cache', JSON.stringify(newData));
+        console.log('✅ Background sync complete and cached');
+
+        // Wait for both data and our minimum loading time
+        await minLoadingPromise;
       } catch (err) {
         console.error('❌ Error preloading data:', err);
         setError(err.message);
       } finally {
         setLoading(false);
+        if (loadingTimer) clearTimeout(loadingTimer);
       }
     };
 
@@ -111,8 +161,7 @@ export const DataProvider = ({ children }) => {
             const details = await getFullCourseDetails(course._id);
             return details ? { ...course, ...details } : course;
           } catch (error) {
-            console.warn(`⚠️ Failed to load details for course ${course._id}:`, error);
-            return course; // Return basic course data if details fail
+            return course;
           }
         })
       );
@@ -124,7 +173,7 @@ export const DataProvider = ({ children }) => {
     }
   };
 
-  // Extract unique categories from courses
+  // Extract unique categories
   const extractCategories = (courses) => {
     const categorySet = new Set();
     courses.forEach(course => {
@@ -138,81 +187,88 @@ export const DataProvider = ({ children }) => {
   // Function to refresh specific data type
   const refreshData = async (dataType) => {
     try {
-      let newData;
+      let newDataValue;
 
       switch (dataType) {
         case 'courses':
-          newData = await loadCourses();
-          setData(prev => ({
-            ...prev,
-            courses: newData,
-            categories: extractCategories(newData)
-          }));
+          newDataValue = await loadCourses();
+          setData(prev => {
+            const up = { ...prev, courses: newDataValue, categories: extractCategories(newDataValue) };
+            localStorage.setItem('samafale_data_cache', JSON.stringify(up));
+            return up;
+          });
           break;
         case 'testimonials':
-          newData = await getTestimonials();
-          setData(prev => ({ ...prev, testimonials: newData }));
+          newDataValue = await getTestimonials();
+          setData(prev => {
+            const up = { ...prev, testimonials: newDataValue };
+            localStorage.setItem('samafale_data_cache', JSON.stringify(up));
+            return up;
+          });
           break;
         case 'instructors':
-          newData = await getAllInstructors();
-          setData(prev => ({ ...prev, instructors: newData }));
+          newDataValue = await getAllInstructors();
+          setData(prev => {
+            const up = { ...prev, instructors: newDataValue };
+            localStorage.setItem('samafale_data_cache', JSON.stringify(up));
+            return up;
+          });
           break;
         case 'blogs':
-          newData = await getAllBlogs();
-          setData(prev => ({ ...prev, blogs: newData }));
+          newDataValue = await getAllBlogs();
+          setData(prev => {
+            const up = { ...prev, blogs: newDataValue };
+            localStorage.setItem('samafale_data_cache', JSON.stringify(up));
+            return up;
+          });
           break;
         case 'authors':
-          newData = await getAllAuthors();
-          setData(prev => ({ ...prev, authors: newData }));
+          newDataValue = await getAllAuthors();
+          setData(prev => {
+            const up = { ...prev, authors: newDataValue };
+            localStorage.setItem('samafale_data_cache', JSON.stringify(up));
+            return up;
+          });
           break;
-        case 'faqs':
-          setData(prev => ({ ...prev, faqs: newData }));
+        case 'stats':
+          newDataValue = await fetch(`${API_BASE_URL}/stats`).then(res => res.json());
+          setData(prev => {
+            const up = { ...prev, stats: newDataValue };
+            localStorage.setItem('samafale_data_cache', JSON.stringify(up));
+            return up;
+          });
           break;
-        case 'bundles':
-          newData = await getAllBundles();
-          setData(prev => ({ ...prev, bundles: newData }));
+        case 'settings':
+          newDataValue = await fetch(`${API_BASE_URL}/settings`).then(res => res.json());
+          setData(prev => {
+            const up = { ...prev, settings: newDataValue };
+            localStorage.setItem('samafale_data_cache', JSON.stringify(up));
+            return up;
+          });
           break;
         default:
           console.warn(`⚠️ Unknown data type: ${dataType}`);
       }
-
-      console.log(`✅ Refreshed ${dataType} data`);
     } catch (error) {
       console.error(`❌ Error refreshing ${dataType}:`, error);
     }
   };
 
-  // Context value
   const value = {
-    // Data
-    courses: data.courses,
-    testimonials: data.testimonials,
-    instructors: data.instructors,
-    blogs: data.blogs,
-    authors: data.authors,
-    faqs: data.faqs,
-    categories: data.categories,
-    bundles: data.bundles,
-
-    // State
+    ...data,
     loading,
     error,
-
-    // Actions
     refreshData,
-
-    // Helper functions
     getCourseById: (id) => data.courses.find(course => course._id === id),
     getCourseBySlug: (slug) => data.courses.find(course =>
-      course.slug === slug ||
-      slugify(course.title) === slug
+      course.slug === slug || slugify(course.title) === slug
     ),
     getInstructorById: (id) => data.instructors.find(instructor => instructor._id === id),
     getInstructorBySlug: (slug) => data.instructors.find(instructor =>
-      instructor.name?.toLowerCase().replace(/\s+/g, '-') === slug
+      instructor.slug === slug || slugify(instructor.name || '') === slug
     ),
     getBlogByTitle: (title) => data.blogs.find(blog =>
-      blog.title?.toLowerCase().replace(/\s+/g, '-') === title
+      slugify(blog.title || '') === title
     ),
     getAuthorByUsername: (username) => data.authors.find(author =>
       author.username === username

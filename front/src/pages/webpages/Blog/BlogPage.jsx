@@ -109,7 +109,7 @@ function BlogPage() {
               placeholder="Search articles..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white dark:bg-slate-900 border border-emerald-400 dark:border-emerald-500/30 rounded-lg py-2.5 pl-10 pr-3 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:focus:ring-emerald-500/20 transition"
+              className="w-full bg-white/10 border border-gray-300 dark:bg-slate-900/50 backdrop-blur-md rounded-lg py-2.5 pl-10 pr-3 text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:focus:ring-emerald-500/20 transition"
             />
           </div>
         </div>
@@ -121,7 +121,7 @@ function BlogPage() {
               {pageArticles.map((article) => (
                 <div
                   key={article.id}
-                  className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2"
+                  className="bg-white/10 border border-gray-300 dark:bg-slate-900/50 backdrop-blur-md rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 group"
                 >
                   <Link
                     to={`/blog/${encodeURIComponent(

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { getImageUrl } from "../../utils/format";
 import { FaCalendarAlt, FaUserEdit } from "react-icons/fa";
 import { getAllBlogs } from "../../api/blogService";
+import PremiumLoader from "../ui/PremiumLoader";
 
 const InstructorArticles = ({ instructorName }) => {
     const [articles, setArticles] = useState([]);
@@ -30,11 +31,11 @@ const InstructorArticles = ({ instructorName }) => {
         }
     }, [instructorName]);
 
-    if (loading) return <p className="text-gray-500 italic">Loading articles...</p>;
+    if (loading) return <PremiumLoader text="Loading articles..." fullScreen={false} />;
 
     if (articles.length === 0) {
         return (
-            <div className="text-center py-10 bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div className="text-center py-10 bg-white/10 border border-gray-300 rounded-xl shadow-sm">
                 <FaUserEdit className="text-gray-300 text-4xl mx-auto mb-3" />
                 <p className="text-gray-600">No articles available for this instructor yet.</p>
             </div>
@@ -47,7 +48,7 @@ const InstructorArticles = ({ instructorName }) => {
                 <Link
                     key={article._id}
                     to={`/blog/${article._id}`}
-                    className="flex flex-col md:flex-row gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition group"
+                    className="flex flex-col md:flex-row gap-4 p-4 bg-white/10 border border-gray-300 rounded-xl shadow-sm hover:shadow-md transition group"
                 >
                     <div className="w-full md:w-48 h-32 flex-shrink-0">
                         <img

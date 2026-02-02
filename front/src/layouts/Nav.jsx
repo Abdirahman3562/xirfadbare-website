@@ -1,50 +1,29 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import {
-  Menu, X, Sun, Moon, LogIn, Rocket, Bell, User as UserIcon, LayoutDashboard, LogOut, Loader2, BookOpen, FileText, User, Settings, Phone, Info, Home, Monitor
+  Menu, X, Sun, Moon, LogIn, Rocket, Bell, User as UserIcon, LayoutDashboard, LogOut, Loader2, BookOpen, FileText, User, Settings, Phone, Info, Home, Monitor, Award, Layers
 } from "lucide-react";
 import defaultLogo from "../assets/logo.png";
 import { useData } from "../contexts/DataContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { getImageUrl } from "../utils/format";
 import { API_BASE_URL, SERVER_URL } from "../config";
 
 
 function Nav() {
   const { theme, setTheme } = useTheme();
-  const [settings, setSettings] = useState({
-    logo: "",
-    websiteTitle: "Samafale Academy"
-  });
+  const { settings } = useData();
   const [open, setOpen] = useState(false);
-  // const [theme, setTheme] = useState(localStorage.getItem("theme") || "light"); // Removed local state
   const [openTheme, setOpenTheme] = useState(false);
   const [user, setUser] = useState(null);
   const [openProfile, setOpenProfile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingUser, setLoadingUser] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const dropdownRef = useRef(null);
   const themeRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
-
-  // 🎨 Fetch settings from API
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/settings`);
-        const data = await response.json();
-        setSettings({
-          logo: data.logo || "",
-          websiteTitle: data.websiteTitle || "Samafale Academy"
-        });
-      } catch (error) {
-        console.error("Error fetching settings:", error);
-      }
-    };
-
-    fetchSettings();
-  }, []);
 
   // 🎨 Scroll animation
   useEffect(() => {
@@ -55,16 +34,13 @@ function Nav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // 🌓 Theme handling (Removed - handled by Context)
-
   // 🔐 Load user
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const u = localStorage.getItem("loggedInUser");
-      setUser(u ? JSON.parse(u) : null);
-      setLoadingUser(false);
-    }, 500);
-    return () => clearTimeout(timer);
+    const u = localStorage.getItem("loggedInUser");
+    if (u) {
+      setUser(JSON.parse(u));
+    }
+    setLoadingUser(false);
   }, []);
 
   // 🚫 Redirect if already logged in
@@ -118,6 +94,10 @@ function Nav() {
   const handleLogout = () => {
     // alert("Clicked logout ✅"); // test confirmation
     localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("samafale_data_cache");
+    localStorage.removeItem("user_profile_cache");
+    localStorage.removeItem("enrolled_data");
+
     window.dispatchEvent(new Event("userLogout"));
     setUser(null);
     setOpenProfile(false);
@@ -129,12 +109,10 @@ function Nav() {
 
   const initials = (user?.firstName?.[0] || "") + (user?.lastName?.[0] || "");
 
-  const getImageUrl = (img) => {
-    if (!img) return null;
-    return img.startsWith("/") ? `${SERVER_URL}${img}` : img;
-  };
-
-  const logoSrc = getImageUrl(settings.logo) || defaultLogo;
+  // ✅ Optimized Logo Source: Use context, fallback to direct cache, then default
+  const logoSrc = getImageUrl(settings?.logo) ||
+    getImageUrl(JSON.parse(localStorage.getItem('samafale_data_cache') || '{}')?.settings?.logo) ||
+    defaultLogo;
 
   const avatar = getImageUrl(user?.image || localStorage.getItem("profileImage"));
 
@@ -201,24 +179,24 @@ function Nav() {
               </button>
 
               {openTheme && (
-                <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-2xl shadow-2xl p-2 z-[60] animate-in fade-in zoom-in slide-in-from-top-2 duration-300">
+                <div className="absolute right-0 mt-2 w-40 bg-white/10 border border-gray-300 dark:bg-slate-900/50 backdrop-blur-xl rounded-2xl shadow-2xl p-2 z-[60] animate-in fade-in zoom-in slide-in-from-top-2 duration-300">
                   <button
                     onClick={() => { setTheme("light"); setOpenTheme(false); }}
-                    className={`w-full flex items-center cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "light" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                    className={`w-full flex items-center cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "light" ? "bg-emerald-50/50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-gray-800"}`}
                   >
                     <Sun size={18} />
                     Light
                   </button>
                   <button
                     onClick={() => { setTheme("dark"); setOpenTheme(false); }}
-                    className={`w-full flex items-center cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "dark" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                    className={`w-full flex items-center cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "dark" ? "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-gray-800"}`}
                   >
                     <Moon size={18} />
                     Dark
                   </button>
                   <button
                     onClick={() => { setTheme("system"); setOpenTheme(false); }}
-                    className={`w-full flex items-center cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "system" ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                    className={`w-full flex items-center cursor-pointer gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${theme === "system" ? "bg-emerald-50/50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400" : "text-gray-600 dark:text-gray-400 hover:bg-white/10 dark:hover:bg-gray-800"}`}
                   >
                     <Monitor size={18} />
                     System
@@ -404,6 +382,19 @@ function Nav() {
             About
           </NavLink>
           <NavLink
+            to="/blog"
+            onClick={() => setOpen(false)}
+            className={({ isActive }) =>
+              `w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${isActive
+                ? "bg-[#e5f9f3] dark:bg-slate-800 text-emerald-500 dark:text-emerald-400"
+                : "text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
+              }`
+            }
+          >
+            <Layers size={18} />
+            Blog
+          </NavLink>
+          <NavLink
             to="/contact"
             onClick={() => setOpen(false)}
             className={({ isActive }) =>
@@ -484,6 +475,32 @@ function Nav() {
                 >
                   <BookOpen size={20} />
                   My Courses
+                </NavLink>
+                <NavLink
+                  to="/dashboard/quizzes"
+                  onClick={() => setSidebarOpen(false)}
+                  className={({ isActive }) =>
+                    `w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${isActive
+                      ? "bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-100 dark:border-slate-800"
+                      : "text-gray-600 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
+                    }`
+                  }
+                >
+                  <Layers size={20} />
+                  Quizzes
+                </NavLink>
+                <NavLink
+                  to="/dashboard/certificates"
+                  onClick={() => setSidebarOpen(false)}
+                  className={({ isActive }) =>
+                    `w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold transition-all duration-200 ${isActive
+                      ? "bg-emerald-50 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-100 dark:border-slate-800"
+                      : "text-gray-600 dark:text-white hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400"
+                    }`
+                  }
+                >
+                  <Award size={20} />
+                  Certificates
                 </NavLink>
               </div>
 

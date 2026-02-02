@@ -1,10 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { API_BASE_URL, SERVER_URL } from "../config";
+import { useData } from "../contexts/DataContext";
+import { getImageUrl } from "../utils/format";
 
 export default function Footer() {
-  const [settings, setSettings] = useState({
+  const { settings: globalSettings } = useData();
+
+  const defaultSettings = {
     websiteTitle: "Xirfadbare Academy",
     websiteDescription: "Xirfadbare waa madal waxbarasho casri ah oo kaa caawisa inaad barato xirfadaha Technology-ga sida Web Development, Design, iyo AI — si aad u noqoto xirfadle diyaar u ah suuqa shaqada maanta.",
     contactEmail: "info@xirfadbare.com",
@@ -17,40 +21,9 @@ export default function Footer() {
     instagramLink: "",
     tiktokLink: "",
     youtubeLink: ""
-  });
-
-  // Fetch settings from API
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/settings`);
-        const data = await response.json();
-        setSettings({
-          websiteTitle: data.websiteTitle || "Xirfadbare Academy",
-          websiteDescription: data.websiteDescription || "Xirfadbare waa madal waxbarasho casri ah oo kaa caawisa inaad barato xirfadaha Technology-ga sida Web Development, Design, iyo AI — si aad u noqoto xirfadle diyaar u ah suuqa shaqada maanta.",
-          contactEmail: data.contactEmail || "info@xirfadbare.com",
-          phoneNumber: data.phoneNumber || "+252 61 234 5678",
-          location: data.location || "Mogadishu, Somalia",
-          logo: data.logo || "",
-          facebookLink: data.facebookLink || "",
-          twitterLink: data.twitterLink || "",
-          linkedinLink: data.linkedinLink || "",
-          instagramLink: data.instagramLink || "",
-          tiktokLink: data.tiktokLink || "",
-          youtubeLink: data.youtubeLink || ""
-        });
-      } catch (error) {
-        console.error("Error fetching settings:", error);
-      }
-    };
-
-    fetchSettings();
-  }, []);
-
-  const getImageUrl = (path) => {
-    if (!path) return "";
-    return path.startsWith("/") ? `${SERVER_URL}${path}` : path;
   };
+
+  const settings = globalSettings || defaultSettings;
 
   return (
     <footer className="relative overflow-hidden pt-16 pb-8 bg-[#edf4f5] dark:bg-slate-900 text-gray-800 dark:text-gray-300 transition-colors duration-500">

@@ -45,18 +45,32 @@ const Profile = () => {
     const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
 
     useEffect(() => {
+        // ✅ Try to hydrate from cache for instant display
+        const savedProfile = localStorage.getItem('user_profile_cache');
+        if (savedProfile) {
+            try {
+                setProfileData(prev => ({ ...prev, ...JSON.parse(savedProfile) }));
+                setLoading(false); // Hide loader if we have cached data
+            } catch (e) { }
+        }
         fetchProfile();
     }, []);
 
     const fetchProfile = async () => {
         try {
-            setLoading(true);
+            // Only show loading if we don't have cached data
+            if (!localStorage.getItem('user_profile_cache')) {
+                setLoading(true);
+            }
             const data = await getUserProfile(token);
-            setProfileData({
+            const freshData = {
                 ...data,
                 password: '',
                 confirmPassword: ''
-            });
+            };
+            setProfileData(freshData);
+            // ✅ Update cache
+            localStorage.setItem('user_profile_cache', JSON.stringify(data));
         } catch (error) {
             toast.error("Failed to load profile data");
             console.error(error);
@@ -168,7 +182,7 @@ const Profile = () => {
     }
 
     return (
-        <div className={`space-y-8 ${isAdminPath ? '' : 'lg:mt-20 md:mt-20 mt-36'} animate-in fade-in duration-700 font-[Inter]`}>
+        <div className={`space-y-8 ${isAdminPath ? '' : 'lg:mt-20 md:mt-20 mt-24'} animate-in fade-in duration-700 font-[Inter]`}>
             {/* Breadcrumb */}
 
 
@@ -380,7 +394,7 @@ const Profile = () => {
                                 </p>
                             </div>
 
-                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-900/50 rounded-2xl border border-gray-100 dark:border-slate-800 transition-all hover:border-emerald-200 dark:hover:border-emerald-500/30">
+                            <div className="flex items-center justify-between p-4 bg-white/10 border border-gray-300 dark:bg-slate-900/50 rounded-2xl border border-gray-100 dark:border-slate-800 transition-all hover:border-emerald-200 dark:hover:border-emerald-500/30">
                                 <span className={`text-[10px] font-black uppercase tracking-widest ${profileData.is2FAEnabled ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400 dark:text-gray-600'}`}>
                                     {profileData.is2FAEnabled ? 'Active' : 'Disabled'}
                                 </span>

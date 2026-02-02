@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { FiCheckCircle, FiAlertCircle, FiLoader } from "react-icons/fi";
+import { FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 import { API_BASE_URL } from "../../config";
+import PremiumLoader from "../../components/ui/PremiumLoader";
 
 const VerifyEmail = () => {
     const [searchParams] = useSearchParams();
@@ -46,13 +47,9 @@ const VerifyEmail = () => {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-            <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
+            <div className="bg-white/10 border border-gray-300 dark:bg-slate-900/50 backdrop-blur-md p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
                 {status === "verifying" && (
-                    <div className="flex flex-col items-center">
-                        <FiLoader className="w-16 h-16 text-emerald-500 animate-spin mb-4" />
-                        <h1 className="text-2xl font-bold text-gray-800 mb-2">Verifying...</h1>
-                        <p className="text-gray-600">{message}</p>
-                    </div>
+                    <PremiumLoader text="Email verification in progress..." fullScreen={false} />
                 )}
 
                 {status === "success" && (

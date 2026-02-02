@@ -6,9 +6,8 @@ import { Search, Filter, BookOpen, Layers, DollarSign, X, SlidersHorizontal } fr
 import { API_BASE_URL } from "../../config";
 
 function Courses({ IsHome }) {
-  const { courses, bundles, loading } = useData();
+  const { courses, bundles, categories: dbCategories, loading } = useData();
   const [searchParams] = useSearchParams();
-  const [dbCategories, setDbCategories] = useState([]);
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,22 +15,6 @@ function Courses({ IsHome }) {
   const [selectedLevel, setSelectedLevel] = useState("All");
   const [selectedPrice, setSelectedPrice] = useState("All");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // Fetch categories from database
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/categories`);
-        const data = await response.json();
-        setDbCategories(data.map(cat => cat.name));
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-        setDbCategories([]);
-      }
-    };
-
-    fetchCategories();
-  }, []);
 
   // Auto-select category from URL parameter
   useEffect(() => {

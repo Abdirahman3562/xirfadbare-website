@@ -9,6 +9,8 @@ const TopBanner = () => {
 
     // Hide on Dashboard/Admin/Instructor pages
     const isDashboard = location.pathname.startsWith("/admin") ||
+        location.pathname.startsWith("/dashboard") ||
+        location.pathname.startsWith("/settings") ||
         ["/instructor/dashboard", "/instructor/create-course", "/instructor/manage-courses", "/instructor/edit-course", "/instructor/profile"].some(path => location.pathname.startsWith(path)) ||
         location.pathname.startsWith("/auth") ||
         location.pathname.startsWith("/watch");
@@ -32,20 +34,24 @@ const TopBanner = () => {
                 const res = await fetch(`${API_BASE_URL}/courses`);
                 const data = await res.json();
 
-                // Find all courses with future discount expiry AND active discount > 0
-                const activeDiscounts = data.filter(c =>
-                    c.discountExpiry &&
-                    new Date(c.discountExpiry) > new Date() &&
-                    c.discountPercentage > 0
-                );
+                // Find all courses with active discount > 0
+                const activeDiscounts = data.filter(c => c.discountPercentage > 0);
 
                 if (activeDiscounts.length > 0) {
                     // Find the one with the highest discount percentage
-                    const bestDeal = activeDiscounts.reduce((prev, current) =>
-                        (prev.discountPercentage > current.discountPercentage) ? prev : current
-                    );
+                    // Prioritize those with an expiry if possible for the timer
+                    const withExpiry = activeDiscounts.filter(c => c.discountExpiry && new Date(c.discountExpiry) > new Date());
 
-                    setTargetDate(new Date(bestDeal.discountExpiry));
+                    const bestDeal = withExpiry.length > 0
+                        ? withExpiry.reduce((prev, current) => (prev.discountPercentage > current.discountPercentage) ? prev : current)
+                        : activeDiscounts.reduce((prev, current) => (prev.discountPercentage > current.discountPercentage) ? prev : current);
+
+                    if (bestDeal.discountExpiry && new Date(bestDeal.discountExpiry) > new Date()) {
+                        setTargetDate(new Date(bestDeal.discountExpiry));
+                    } else {
+                        setTargetDate(null);
+                    }
+
                     setMaxDiscount(bestDeal.discountPercentage);
                     setDiscountCode(bestDeal.discountCode || "");
                     setIsVisible(true);
@@ -146,27 +152,29 @@ const TopBanner = () => {
                 {/* Right Side: Timer & Action */}
                 <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto justify-center sm:justify-end">
 
-                    {/* Countdown Timer */}
-                    <div className="flex items-center gap-3 text-xs sm:text-sm font-mono font-bold tracking-widest text-emerald-400 bg-emerald-950/30 px-3 py-1.5 rounded-lg border border-emerald-500/20">
-                        <Clock size={16} className="text-emerald-500" />
-                        <div className="flex gap-2">
-                            <div className="text-white">
-                                {String(timeLeft.days).padStart(2, '0')}
-                                <span className="text-emerald-600 mx-0.5">:</span>
-                            </div>
-                            <div className="text-white">
-                                {String(timeLeft.hours).padStart(2, '0')}
-                                <span className="text-emerald-600 mx-0.5">:</span>
-                            </div>
-                            <div className="text-white">
-                                {String(timeLeft.minutes).padStart(2, '0')}
-                                <span className="text-emerald-600 mx-0.5">:</span>
-                            </div>
-                            <div className="text-white w-5 text-center">
-                                {String(timeLeft.seconds).padStart(2, '0')}
+                    {/* Countdown Timer (Optional) */}
+                    {targetDate && (
+                        <div className="flex items-center gap-3 text-xs sm:text-sm font-mono font-bold tracking-widest text-emerald-400 bg-emerald-950/30 px-3 py-1.5 rounded-lg border border-emerald-500/20">
+                            <Clock size={16} className="text-emerald-500" />
+                            <div className="flex gap-2">
+                                <div className="text-white">
+                                    {String(timeLeft.days).padStart(2, '0')}
+                                    <span className="text-emerald-600 mx-0.5">:</span>
+                                </div>
+                                <div className="text-white">
+                                    {String(timeLeft.hours).padStart(2, '0')}
+                                    <span className="text-emerald-600 mx-0.5">:</span>
+                                </div>
+                                <div className="text-white">
+                                    {String(timeLeft.minutes).padStart(2, '0')}
+                                    <span className="text-emerald-600 mx-0.5">:</span>
+                                </div>
+                                <div className="text-white w-5 text-center">
+                                    {String(timeLeft.seconds).padStart(2, '0')}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* CTA Button */}
                     <Link

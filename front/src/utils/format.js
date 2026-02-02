@@ -3,12 +3,13 @@ import { SERVER_URL } from '../config';
 export const getImageUrl = (img) => {
     if (!img) return '';
     if (typeof img !== "string") return img;
-    if (img.startsWith("http") || img.startsWith("data:image")) return img;
+    if (img.startsWith("http") || img.startsWith("data:image") || img.startsWith("blob:")) return img;
 
-    // Remove leading slash if present to avoid double slashes
+    // Remove leading slash from path and trailing slash from SERVER_URL
     const cleanPath = img.startsWith("/") ? img.substring(1) : img;
+    const cleanBase = SERVER_URL.endsWith("/") ? SERVER_URL.slice(0, -1) : SERVER_URL;
 
-    return `${SERVER_URL}/${cleanPath}`;
+    return `${cleanBase}/${cleanPath}`;
 };
 
 export const formatDate = (dateString, includeTime = false) => {

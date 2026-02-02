@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import UserAvatar from "../UserAvatar";
 import { getInstructorBySlug, updateInstructor } from "../../api/instructorService";
 import { getAllCourses } from "../../api/courseService";
+import PremiumLoader from "../ui/PremiumLoader";
 
 /* ----------------------------------------------------------------
    ✅ Helper Function
@@ -31,12 +32,12 @@ function DeleteConfirmationModal({ isOpen, onClose, onConfirm, review }) {
 
   return (
     <div className="fixed inset-0 z-[1000000] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl transform transition-all animate-scaleUp">
+      <div className="bg-white/10 border border-gray-300 rounded-2xl p-6 w-full max-w-sm shadow-2xl transform transition-all animate-scaleUp backdrop-blur-md text-white">
         <div className="text-center">
-          <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-red-100/20 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaTrash size={28} />
           </div>
-          <h3 className="text-xl font-bold text-gray-800 mb-2">Ma hubtaa?</h3>
+          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Ma hubtaa?</h3>
           <p className="text-gray-500 text-sm mb-6">
             Review-gan dib looma soo celin karo marka la tirtiro.
           </p>
@@ -44,7 +45,7 @@ function DeleteConfirmationModal({ isOpen, onClose, onConfirm, review }) {
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition cursor-pointer font-medium"
+            className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-white/5 transition cursor-pointer font-medium"
           >
             Iska dhaaf
           </button>
@@ -64,9 +65,7 @@ function DeleteConfirmationModal({ isOpen, onClose, onConfirm, review }) {
 }
 
 /* ----------------------------------------------------------------
-   ✅ Review Comment Component (Read More / Show Less)
------------------------------------------------------------------- */
-/* ✅ Review Comment Component (Smart Read More / Show Less) */
+   ✅ Review Comment Component (Smart Read More / Show Less) Native Styled Info Box */
 function ReviewComment({ text }) {
   const [expanded, setExpanded] = useState(false);
   const limit = 150; // xarfo ugu badan
@@ -81,7 +80,7 @@ function ReviewComment({ text }) {
   return (
     <div className="relative mt-2">
       <p
-        className={`text-gray-600 ml-13 leading-relaxed transition-all duration-300 ease-in-out ${expanded ? "max-h-full" : "max-h-[4.5rem] overflow-hidden"
+        className={`text-gray-600 dark:text-gray-300 ml-13 leading-relaxed transition-all duration-300 ease-in-out ${expanded ? "max-h-full" : "max-h-[4.5rem] overflow-hidden"
           }`}
         style={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}
       >
@@ -281,12 +280,7 @@ export default function Reviews() {
       ).toFixed(1)
       : 0;
 
-  if (loading)
-    return (
-      <p className="text-center py-10 text-emerald-600 font-semibold">
-        Loading reviews...
-      </p>
-    );
+  if (loading) return <PremiumLoader text="Loading reviews..." fullScreen={false} />;
 
   if (!instructor)
     return (
@@ -297,7 +291,7 @@ export default function Reviews() {
 
   /* ✅ MAIN UI */
   return (
-    <div className="max-w-3xl mx-auto bg-[#edf4f5] p-6 rounded-2xl shadow-lg border border-gray-100 transition hover:shadow-xl mt-10">
+    <div className="max-w-3xl mx-auto bg-white/10 border border-gray-300 p-6 rounded-2xl shadow-lg transition hover:shadow-xl mt-10 backdrop-blur-sm">
       {/* ✅ Delete Confirmation Modal */}
       <DeleteConfirmationModal
         isOpen={isModalOpen}
@@ -307,8 +301,8 @@ export default function Reviews() {
       />
 
       {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-1">
+      <div className="text-center mb-2">
+        <h2 className="text-[15px] font-bold text-gray-800 dark:text-white">
           Reviews for {instructor.name}
         </h2>
       </div>
@@ -321,7 +315,7 @@ export default function Reviews() {
             return (
               <div
                 key={i}
-                className="border border-gray-100 hover:border-emerald-400 rounded-xl p-4 bg-[#edf4f5] shadow-sm hover:shadow-md transition relative group"
+                className="border border-gray-100 dark:border-slate-800 hover:border-emerald-400 rounded-xl p-4 bg-white/5 dark:bg-slate-900/50 shadow-sm hover:shadow-md transition relative group"
               >
                 {isOwner && (
                   <button
@@ -341,7 +335,7 @@ export default function Reviews() {
                     name={rev.student}
                   />
                   <div>
-                    <p className="font-semibold text-gray-700 mt-2">
+                    <p className="font-semibold text-gray-700 dark:text-gray-200 mt-2">
                       {rev.student}
                     </p>
                     <p className="text-emerald-500 text-sm flex items-center gap-1">
@@ -365,10 +359,10 @@ export default function Reviews() {
                 {/* ✅ Comment with Read More / Less */}
                 <ReviewComment text={rev.comment} />
 
-                <p className="text-xs text-gray-500 italic mt-1 ml-12 flex items-center gap-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 italic mt-1 ml-12 flex items-center gap-1">
                   <FaBook className="text-emerald-500 text-[11px]" />
                   Course:{" "}
-                  <span className="text-emerald-600 font-medium">
+                  <span className="text-emerald-600 dark:text-emerald-400 font-medium">
                     {getCourseTitle(rev.courseId) || "Unknown Course"}
                   </span>
                 </p>
@@ -383,14 +377,14 @@ export default function Reviews() {
       )}
 
       {/* Add Review Form */}
-      <div className="mt-10 border-t border-gray-200 pt-8">
+      <div className="mt-10 border-t border-gray-200 dark:border-slate-800 pt-8">
         <h3 className="text-xl font-semibold text-emerald-500 mb-4 text-center">
           <FaPenFancy className="inline text-emerald-500 mr-2" />
           Share Your Experience with Instructor
         </h3>
 
         {!user ? (
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 bg-[#edf4f5] p-4 rounded-2xl text-red-500 text-center font-medium shadow-sm">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 bg-white/5 p-4 rounded-2xl text-red-500 text-center font-medium shadow-sm">
             <FaLock className="text-lg" />
             <span>Please sign in to leave a review.</span>
           </div>
@@ -399,26 +393,26 @@ export default function Reviews() {
             ref={formRef}
             key={selectedCourse}
             onSubmit={handleReviewSubmit}
-            className="max-w-xl mx-auto bg-[#edf4f5] rounded-2xl shadow-md p-6 space-y-5 transition hover:shadow-lg"
+            className="max-w-xl mx-auto bg-white/5 dark:bg-slate-900/40 rounded-2xl shadow-md p-6 space-y-5 transition hover:shadow-lg border border-white/10"
           >
             {/* Select Course */}
             <div>
-              <label className="text-sm font-semibold text-gray-700 mb-1 block">
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 block">
                 Select Course
               </label>
               <select
                 name="courseId"
                 value={selectedCourse}
                 onChange={(e) => setSelectedCourse(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg pl-5 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                className="w-full bg-white/5 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg pl-5 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                 required
               >
-                <option value="">Choose a course</option>
+                <option value="" className="text-gray-900">Choose a course</option>
                 {(Array.isArray(instructor.courses)
                   ? instructor.courses
                   : []
                 ).map((c) => (
-                  <option key={c._id || c.id} value={c._id || c.id}>
+                  <option key={c._id || c.id} value={c._id || c.id} className="text-gray-900">
                     {c.title}
                   </option>
                 ))}
@@ -427,18 +421,18 @@ export default function Reviews() {
 
             {/* Rating */}
             <div>
-              <label className="text-sm font-semibold text-gray-700 mb-1 block">
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 block">
                 Rating
               </label>
               <select
                 name="rating"
                 defaultValue={currentExistingReview?.rating || ""}
-                className="w-full border border-gray-300 rounded-lg pl-5 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                className="w-full bg-white/5 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg pl-5 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                 required
               >
-                <option value="">Select rating</option>
+                <option value="" className="text-gray-900">Select rating</option>
                 {[1, 2, 3, 4, 5].map((r) => (
-                  <option key={r} value={r}>
+                  <option key={r} value={r} className="text-gray-900">
                     {r} Star{r > 1 && "s"}
                   </option>
                 ))}
@@ -447,14 +441,14 @@ export default function Reviews() {
 
             {/* Comment */}
             <div>
-              <label className="text-sm font-semibold text-gray-700 mb-1 block">
+              <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1 block">
                 Comment
               </label>
               <textarea
                 name="comment"
                 defaultValue={currentExistingReview?.comment || ""}
                 placeholder={`Write your review about ${instructor.name}...`}
-                className="w-full border border-gray-300 rounded-lg pl-5 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                className="w-full bg-white/5 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-gray-900 dark:text-white rounded-lg pl-5 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
                 rows="4"
                 required
               />

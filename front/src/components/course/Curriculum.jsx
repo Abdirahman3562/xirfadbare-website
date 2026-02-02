@@ -13,6 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { X, PlayCircle as PlayIcon } from "lucide-react";
+import PremiumLoader from "../ui/PremiumLoader";
 import { useAuth } from "../../hooks/useAuth";
 import { useMyOrders } from "../../hooks/useMyOrders";
 import { slugify } from "../../utils/slugify";
@@ -38,11 +39,7 @@ export default function Curriculum({
 
   // ✅ Loading state check
   if (!curriculum || curriculum.length === 0) {
-    return (
-      <div className="text-center py-10 text-emerald-600 font-semibold">
-        Loading curriculum...
-      </div>
-    );
+    return <PremiumLoader text="Loading curriculum..." fullScreen={false} />;
   }
   const isPaid = Number(price) > 0;
 
@@ -129,38 +126,36 @@ export default function Curriculum({
   return (
     <div className="bg-[#edf4f5] dark:bg-slate-900 mt-10 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-slate-800 transition-colors duration-500">
       {/* ✅ Summary Boxes */}
-      <div className="grid sm:grid-cols-4 gap-4 mb-8 text-center">
-
-        {/* ✅ Students Enrolled */}
-        <div className="p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-[#edf4f5] dark:bg-slate-900 transition">
-          <FaUserGraduate className="text-emerald-500 dark:text-emerald-400 text-2xl mx-auto mb-2" />
-          <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
+        {/* Students Enrolled */}
+        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/50 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
+          <FaUserGraduate className="text-emerald-500 dark:text-emerald-400 text-xl sm:text-2xl mb-2" />
+          <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-gray-100">
             {enrolledCount || 0}
           </p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Students Enrolled</p>
+          <p className="text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest font-bold">Students</p>
         </div>
 
-        {/* Total Duration */}
-        <div className="p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-[#edf4f5] dark:bg-slate-900 transition">
-          <FaClock className="text-emerald-500 dark:text-emerald-400 text-2xl mx-auto mb-2" />
-          <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">{totalDuration}</p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Total Duration</p>
+        {/* Duration */}
+        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/50 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
+          <FaClock className="text-emerald-500 dark:text-emerald-400 text-xl sm:text-2xl mb-2" />
+          <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-gray-100">{totalDuration}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest font-bold">Hours</p>
         </div>
 
         {/* Video Lessons */}
-        <div className="p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-[#edf4f5] dark:bg-slate-900 transition">
-          <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-2xl mx-auto mb-2" />
-          <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">{totalLessons}</p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Video Lessons</p>
+        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/50 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
+          <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-xl sm:text-2xl mb-2" />
+          <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-gray-100">{totalLessons}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest font-bold">Lessons</p>
         </div>
 
         {/* Skill Level */}
-        <div className="p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-[#edf4f5] dark:bg-slate-900 transition">
-          <FaSignal className="text-emerald-500 dark:text-emerald-400 text-2xl mx-auto mb-2" />
-          <p className="text-xl font-semibold text-gray-800 dark:text-gray-200">{level}</p>
-          <p className="text-gray-500 dark:text-gray-400 text-sm">Skill Level</p>
+        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/50 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
+          <FaSignal className="text-emerald-500 dark:text-emerald-400 text-xl sm:text-2xl mb-2" />
+          <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-gray-100">{level}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest font-bold">Level</p>
         </div>
-
       </div>
 
       {/* ✅ Curriculum Header */}

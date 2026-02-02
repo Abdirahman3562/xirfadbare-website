@@ -52,7 +52,7 @@ const InstructorList = () => {
                     {instructors.map((instructor) => (
                         <div
                             key={instructor._id}
-                            className="bg-white rounded-xl shadow-sm hover:shadow-md transition border border-gray-100 overflow-hidden"
+                            className="bg-white/10 border border-gray-300 dark:bg-slate-900/50 backdrop-blur-md rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group"
                         >
                             <div className="relative h-48 bg-gray-100">
                                 <img

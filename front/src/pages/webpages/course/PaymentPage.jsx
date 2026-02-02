@@ -2,7 +2,7 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { CreditCard, Camera, X, Layers } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getImageUrl } from "../../../utils/format";
-import toast, { Toaster } from "react-hot-toast";
+import { toast } from "react-toastify";
 import {
   FaCheckCircle,
   FaClock,
@@ -328,10 +328,8 @@ function PaymentPage() {
   return (
     <div className="min-h-screen bg-[#edf4f5] dark:bg-slate-900 transition-colors duration-500">
       <div className="max-w-7xl  mx-auto px-4 lg:px-8 py-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <Toaster position="top-right" reverseOrder={false} />
-
         {/* ===== LEFT SIDE ===== */}
-        <div className="lg:col-span-1 bg-white dark:bg-slate-900 shadow-md rounded-2xl border border-gray-100 dark:border-slate-800 overflow-hidden transition-all duration-300">
+        <div className="lg:col-span-1 bg-white/10 border border-gray-300 dark:bg-slate-900/50 backdrop-blur-md shadow-md rounded-2xl overflow-hidden transition-all duration-300">
           <div className="relative">
             {displayItem.thumbnail && (
               <img
@@ -495,7 +493,7 @@ function PaymentPage() {
         </div>
 
         {/* ===== RIGHT SIDE ===== */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 shadow-sm rounded-xl border border-gray-100 dark:border-slate-800 p-6 transition-all duration-300">
+        <div className="lg:col-span-2 bg-white/10 border border-gray-300 dark:bg-slate-900/50 backdrop-blur-md shadow-sm rounded-xl p-6 transition-all duration-300">
           <h2 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-200">
             Complete Your Enrollment
           </h2>

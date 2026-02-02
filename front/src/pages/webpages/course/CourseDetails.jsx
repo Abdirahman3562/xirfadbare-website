@@ -11,6 +11,7 @@ import { useAuth } from "../../../hooks/useAuth";
 import { useMyOrders } from "../../../hooks/useMyOrders";
 import { useData } from "../../../contexts/DataContext";
 import { getFullCourseDetailsBySlug } from "../../../api/courseService";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 function CourseDetails() {
   const { getCourseBySlug, loading: contextLoading } = useData();
@@ -67,12 +68,7 @@ function CourseDetails() {
 
   // 🔄 Loading state
   if (contextLoading || localLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4 bg-[#edf4f5] dark:bg-slate-900 transition-colors duration-500">
-        <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-emerald-600 dark:text-emerald-400 font-bold italic animate-pulse tracking-widest text-sm uppercase">Soo aqrinaya koorsada...</p>
-      </div>
-    );
+    return <PremiumLoader text="Soo aqrinaya koorsada..." />;
   }
 
   // ❌ Error or not found
@@ -252,7 +248,7 @@ function CourseDetails() {
           </div>
 
           {/* ✅ Course Features Card */}
-          <div className="bg-white/10 dark:bg-slate-900/50 backdrop-blur-sm border border-gray-200 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-xl shadow-emerald-500/5 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-500 group overflow-hidden relative">
+          <div className="bg-white/10 dark:bg-slate-900/50 backdrop-blur-sm border border-gray-300 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-xl shadow-emerald-500/5 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-500 group overflow-hidden relative">
             {/* Decoration */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-bl-[5rem] -mr-10 -mt-10 group-hover:scale-110 transition-transform duration-700" />
 
@@ -266,72 +262,72 @@ function CourseDetails() {
                 </h3>
               </div>
 
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
                 {/* Resources */}
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 border border-gray-300 hover:border-emerald-400 border border-gray-300 hover:border-emerald-400 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-300 group/item">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${hasResources ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
-                      <FileText size={16} />
+                    <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center transition-colors ${hasResources ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
+                      <FileText size={18} />
                     </div>
-                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300 break-all">Resources</span>
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">Resources</span>
                   </div>
                   {hasResources ? (
-                    <span className="flex items-center gap-1.5 text-[11px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 w-fit">
-                      <CheckCircle2 size={14} /> Yes
+                    <span className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-100 dark:border-emerald-500/20">
+                      <CheckCircle2 size={12} /> Yes
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1.5 text-[11px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-gray-100 dark:border-slate-800 w-fit">
-                      <XCircle size={14} /> No
+                    <span className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-gray-100 dark:border-slate-800">
+                      <XCircle size={12} /> No
                     </span>
                   )}
                 </div>
 
                 {/* Quizzes */}
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 border border-gray-300 hover:border-emerald-400 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-300 group/item">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${hasQuizzes ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
-                      <Brain size={16} />
+                    <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center transition-colors ${hasQuizzes ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
+                      <Brain size={18} />
                     </div>
-                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300 break-all">Quizzes</span>
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">Quizzes</span>
                   </div>
                   {hasQuizzes ? (
-                    <span className="flex items-center gap-1.5 text-[11px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 w-fit">
-                      <CheckCircle2 size={14} /> Yes
+                    <span className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-100 dark:border-emerald-500/20">
+                      <CheckCircle2 size={12} /> Yes
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1.5 text-[11px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-gray-100 dark:border-slate-800 w-fit">
-                      <XCircle size={14} /> No
+                    <span className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-gray-100 dark:border-slate-800">
+                      <XCircle size={12} /> No
                     </span>
                   )}
                 </div>
 
                 {/* Certificate */}
-                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 border border-gray-300 hover:border-emerald-400 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-300 group/item">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${course.hasCertificate ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
-                      <Award size={16} />
+                    <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center transition-colors ${course.hasCertificate ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600' : 'bg-gray-100 dark:bg-slate-800 text-gray-400'}`}>
+                      <Award size={18} />
                     </div>
-                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300 break-all">Certificate</span>
+                    <span className="text-sm font-bold text-gray-700 dark:text-gray-300">Certificate</span>
                   </div>
                   {course.hasCertificate ? (
-                    <span className="flex items-center gap-1.5 text-[11px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-100 dark:border-emerald-500/20 w-fit">
-                      <CheckCircle2 size={14} /> Yes
+                    <span className="flex items-center gap-1.5 text-[10px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-100 dark:border-emerald-500/20">
+                      <CheckCircle2 size={12} /> Yes
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1.5 text-[11px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 px-2.5 py-1 rounded-full border border-gray-100 dark:border-slate-800 w-fit">
-                      <XCircle size={14} /> No
+                    <span className="flex items-center gap-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 dark:bg-slate-800 px-3 py-1.5 rounded-full border border-gray-100 dark:border-slate-800">
+                      <XCircle size={12} /> No
                     </span>
                   )}
                 </div>
 
                 {/* Course Rating */}
                 {reviewCount > 0 && (
-                  <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 border border-gray-300 hover:border-emerald-400 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 transition-colors gap-3">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-white/10 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 transition-all duration-300 group/item">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center bg-amber-50 dark:bg-amber-500/10 text-amber-500">
-                        <FaStar size={14} />
+                      <div className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center bg-amber-50 dark:bg-amber-500/10 text-amber-500">
+                        <FaStar size={16} />
                       </div>
-                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300 break-all">Rating</span>
+                      <span className="text-sm font-bold text-gray-700 dark:text-gray-300">Rating</span>
                     </div>
                     <div className="flex flex-col items-end gap-1">
                       <div className="flex items-center gap-0.5">
@@ -339,16 +335,16 @@ function CourseDetails() {
                           const isFull = star <= Math.floor(avgRating);
                           const isHalf = !isFull && star <= Math.ceil(avgRating) && avgRating % 1 !== 0;
                           return isFull ? (
-                            <FaStar key={star} size={12} className="text-amber-400" />
+                            <FaStar key={star} size={10} className="text-amber-400" />
                           ) : isHalf ? (
-                            <FaStarHalfAlt key={star} size={12} className="text-amber-400" />
+                            <FaStarHalfAlt key={star} size={10} className="text-amber-400" />
                           ) : (
-                            <FaStar key={star} size={12} className="text-gray-200 dark:text-slate-700" />
+                            <FaStar key={star} size={10} className="text-gray-200 dark:text-slate-700" />
                           );
                         })}
                       </div>
-                      <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                        {avgRating} ({reviewCount} reviews)
+                      <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                        {avgRating} ({reviewCount})
                       </span>
                     </div>
                   </div>

@@ -14,16 +14,20 @@ import {
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getImageUrl } from "../../../utils/format";
-import { getMyOrders } from "../../../api/orderService";
-import { getAllCourses } from "../../../api/courseService";
-import { getUserProgress, getAllUserProgress } from "../../../api/userProgressService";
+import { getAllUserProgress } from "../../../api/userProgressService";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
 import BundleCoursesModal from "../../../components/course/BundleCoursesModal";
+import { useData } from "../../../contexts/DataContext";
+import { useAuth } from "../../../hooks/useAuth";
+import { useMyOrders } from "../../../hooks/useMyOrders";
 
 export default function StudentDashboard() {
+  const { courses: allCoursesInContext, loading: dataLoading } = useData();
+  const { user } = useAuth();
+  const { orders: userOrders, loading: ordersLoading } = useMyOrders(user);
+
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [allCourses, setAllCourses] = useState([]);
   const [showBundleModal, setShowBundleModal] = useState(false);
   const [selectedBundle, setSelectedBundle] = useState(null);
   const location = useLocation();
@@ -36,11 +40,13 @@ export default function StudentDashboard() {
     text?.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^\w-]+/g, "");
 
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        // ✅ Hel orders ee user-kan (backend API)
-        const userOrders = await getMyOrders();
+    const processDashboardData = async () => {
+      // If we are still waiting for critical data and don't have enough to show
+      if ((dataLoading || ordersLoading) && userOrders.length === 0) {
+        return;
+      }
 
+      try {
         if (userOrders.length === 0) {
           setCourses([]);
           setLoading(false);
@@ -56,116 +62,101 @@ export default function StudentDashboard() {
           return;
         }
 
-        // ✅ Hel dhammaan courses-ka
-        const coursesData = await getAllCourses();
-        setAllCourses(coursesData);
-
         // ✅ Hel dhammaan progress records (Optimized fetch)
         const allProgressRecords = await getAllUserProgress();
 
         // ✅ Ku dar xogta course + progress
-        const enrichedCourses = await Promise.all(
-          validOrders
-            .filter(order => order.paymentType !== 'Bundle Access') // 🛡️ Filter here instead of backend
-            .map(async (order) => {
-              try {
-                if (order.isBundle) {
-                  // 📦 Handle Bundle
-                  const coursesInBundle = order.bundleCourses || [];
+        const enrichedCourses = validOrders
+          .filter(order => order.paymentType !== 'Bundle Access')
+          .map((order) => {
+            try {
+              if (order.isBundle) {
+                const coursesInBundle = order.bundleCourses || [];
+                let totalProgress = 0;
+                coursesInBundle.forEach(bc => {
+                  const p = allProgressRecords.find(record =>
+                    String(record.course?._id || record.course) === String(bc._id)
+                  );
+                  totalProgress += (p?.progress || 0);
+                });
 
-                  // Calculate aggregate progress
-                  let totalProgress = 0;
-                  coursesInBundle.forEach(bc => {
-                    const p = allProgressRecords.find(record =>
-                      String(record.course?._id || record.course) === String(bc._id)
-                    );
-                    totalProgress += (p?.progress || 0);
-                  });
+                const avgProgress = coursesInBundle.length > 0
+                  ? Math.round(totalProgress / coursesInBundle.length)
+                  : 0;
 
-                  const avgProgress = coursesInBundle.length > 0
-                    ? Math.round(totalProgress / coursesInBundle.length)
-                    : 0;
-
-                  return {
-                    ...order,
-                    id: order._id,
-                    title: order.courseTitle,
-                    description: `Bundle containing ${coursesInBundle.length} courses.`,
-                    image: order.courseDetails?.thumbnail || "https://i.ibb.co/Yk2JmWv/default-course.jpg",
-                    lessonsCount: coursesInBundle.length, // Show course count instead of lessons
-                    progress: avgProgress,
-                    lastAccess: order.updatedAt,
-                    isBundle: true
-                  };
-                }
-
-                // 📘 Handle Single Course
-                const course = coursesData.find(
-                  (c) => c._id === order.course || c._id === order.courseId
-                );
-
-                if (!course) {
-                  return {
-                    ...order,
-                    id: order._id,
-                    title: order.courseTitle,
-                    description: "Course details unavailable.",
-                    image: "https://i.ibb.co/Yk2JmWv/default-course.jpg",
-                    lessonsCount: 0,
-                    progress: 0,
-                    lastAccess: null,
-                  };
-                }
-
-                const totalLessons = (course.curriculum || []).reduce(
-                  (sum, section) => sum + (section.lessons?.length || 0),
-                  0
-                );
-
-                const userProgress = allProgressRecords.find(p =>
-                  String(p.course?._id || p.course) === String(course._id)
-                );
-                const progress = userProgress?.progress || 0;
-                const lastAccess = userProgress?.lastAccess || null;
-
-                return {
-                  ...order,
-                  id: order._id,
-                  title: course.title || order.courseTitle,
-                  description: course.description || "No description available for this course.",
-                  image: course.thumbnail || "https://i.ibb.co/Yk2JmWv/default-course.jpg",
-                  lessonsCount: totalLessons,
-                  progress: progress,
-                  lastAccess: lastAccess,
-                  courseSlug: slugify(course.title),
-                  currentLesson: userProgress?.currentLesson,
-                };
-              } catch (error) {
-                console.error("Error processing order:", error);
                 return {
                   ...order,
                   id: order._id,
                   title: order.courseTitle,
-                  description: "Error loading course details.",
+                  image: order.courseDetails?.thumbnail || "https://i.ibb.co/Yk2JmWv/default-course.jpg",
+                  lessonsCount: coursesInBundle.length,
+                  progress: avgProgress,
+                  lastAccess: order.updatedAt,
+                  isBundle: true
+                };
+              }
+
+              const course = allCoursesInContext.find(
+                (c) => c._id === order.course || c._id === order.courseId
+              );
+
+              if (!course) {
+                return {
+                  ...order,
+                  id: order._id,
+                  title: order.courseTitle,
+                  description: "Course details unavailable.",
                   image: "https://i.ibb.co/Yk2JmWv/default-course.jpg",
                   lessonsCount: 0,
                   progress: 0,
                   lastAccess: null,
                 };
               }
-            })
-        );
+
+              const totalLessons = (course.curriculum || []).reduce(
+                (sum, section) => sum + (section.lessons?.length || 0),
+                0
+              );
+
+              const userProgress = allProgressRecords.find(p =>
+                String(p.course?._id || p.course) === String(course._id)
+              );
+
+              return {
+                ...order,
+                id: order._id,
+                title: course.title || order.courseTitle,
+                description: course.description || "No description available.",
+                image: course.thumbnail || "https://i.ibb.co/Yk2JmWv/default-course.jpg",
+                lessonsCount: totalLessons,
+                progress: userProgress?.progress || 0,
+                lastAccess: userProgress?.lastAccess || null,
+                courseSlug: slugify(course.title),
+                currentLesson: userProgress?.currentLesson,
+              };
+            } catch (error) {
+              return { ...order, id: order._id, progress: 0 };
+            }
+          });
 
         setCourses(enrichedCourses);
+        setLoading(false);
       } catch (err) {
-        console.error("❌ Error loading courses:", err);
-      } finally {
+        console.error("❌ Error loading dashboard:", err);
         setLoading(false);
       }
     };
 
-    fetchCourses();
-  }, []);
+    processDashboardData();
+  }, [allCoursesInContext, userOrders, dataLoading, ordersLoading]);
+
+  // ✅ Limit loading spinner to max 1s for "Premium" feel if already hydrated
+  useEffect(() => {
+    if (loading && !dataLoading && !ordersLoading && courses.length > 0) {
+      const timer = setTimeout(() => setLoading(false), 500); // Super fast if data ready
+      return () => clearTimeout(timer);
+    }
+  }, [loading, dataLoading, ordersLoading, courses]);
 
   // 📊 Stats
   const pendingCourses = courses.filter((c) => c.status === "pending").length;
@@ -301,7 +292,7 @@ export default function StudentDashboard() {
             <PremiumLoader text={null} fullScreen={false} />
           </div>
         ) : courses.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 bg-white/10 dark:bg-slate-800/50 border border-dashed border-gray-300 dark:border-slate-700 rounded-xl text-center transition-colors duration-500">
+          <div className="flex flex-col items-center justify-center p-12 bg-white/10 dark:bg-slate-800/50 backdrop-blur-md border border-dashed border-gray-300 dark:border-slate-700 rounded-xl text-center transition-colors duration-500">
             <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-full mb-4">
               <BookOpen className="w-10 h-10 text-emerald-500" />
             </div>
@@ -328,7 +319,7 @@ export default function StudentDashboard() {
               return (
                 <div
                   key={course._id || course.id}
-                  className="group relative bg-white/10 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col md:flex-row"
+                  className="group relative bg-white/10 dark:bg-slate-800/50 backdrop-blur-md border border-gray-300 dark:border-slate-800 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 flex flex-col md:flex-row"
                 >
                   {/* Thumbnail */}
                   <div className="md:w-64 w-full h-44 md:h-auto relative">
@@ -478,7 +469,7 @@ export default function StudentDashboard() {
         isOpen={showBundleModal}
         onClose={() => setShowBundleModal(false)}
         bundleOrder={selectedBundle}
-        allCourses={allCourses}
+        allCourses={allCoursesInContext}
       />
     </div>
   );

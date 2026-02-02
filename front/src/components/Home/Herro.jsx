@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import herro from "../../assets/herro1.jpeg";
 import { Star } from "lucide-react";
 import { API_BASE_URL } from "../../config";
+import { useData } from "../../contexts/DataContext";
 
 export default function Herro({
   title: propTitle,
@@ -10,22 +11,7 @@ export default function Herro({
   primaryCta = { label: "Browse Courses", to: "/courses" },
   secondaryCta = { label: "Daawo Koorsooyinka", to: "/courses" },
 }) {
-  const [stats, setStats] = useState({ students: 0, instructors: 0 });
-
-  // Fetch platform statistics
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/stats`);
-        const data = await response.json();
-        setStats(data);
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-      }
-    };
-
-    fetchStats();
-  }, []);
+  const { stats } = useData();
 
   const title = propTitle || (
     <>

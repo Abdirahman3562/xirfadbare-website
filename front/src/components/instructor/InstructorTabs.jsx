@@ -20,12 +20,12 @@ export default function InstructorTabs({ instructor }) {
   return (
     <div className="border-t border-gray-100">
       {/* Tabs Header */}
-      <div className="flex flex-wrap  border-b border-gray-300 justify-center gap-6 py-4 text-gray-600 font-medium text-sm">
+      <div className="flex border-b border-gray-300 overflow-x-auto scrollbar-hide snap-x px-4 gap-6 py-4 text-gray-600 font-medium text-sm">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`pb-1 transition-all cursor-pointer ${activeTab === tab.id
+            className={`pb-1 transition-all cursor-pointer whitespace-nowrap snap-start flex-shrink-0 ${activeTab === tab.id
               ? "text-emerald-600 border-b-2 border-emerald-500"
               : "hover:text-emerald-600"
               }`}

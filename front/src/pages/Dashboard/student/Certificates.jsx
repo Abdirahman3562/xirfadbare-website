@@ -6,6 +6,7 @@ import { getTemplateById } from "../../../api/certificateService";
 import { generateCertificate } from "../../../utils/pdfGenerator";
 import { toast } from "react-toastify";
 import { API_BASE_URL, SERVER_URL } from "../../../config";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 export default function Certificates() {
     const [completedCourses, setCompletedCourses] = useState([]);
@@ -132,18 +133,13 @@ export default function Certificates() {
     };
 
     if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh]">
-                <Loader2 className="w-12 h-12 text-emerald-500 animate-spin mb-4" />
-                <p className="text-gray-500 font-bold animate-pulse">Loading your certificates...</p>
-            </div>
-        );
+        return <PremiumLoader text="Loading your certificates..." />;
     }
 
     return (
         <div className="w-full">
             {/* Header Section */}
-            <div className="mb-10 lg:mt-20 md:mt-20 mt-25 text-center sm:text-left relative overflow-hidden bg-white/10 border border-gray-300 dark:bg-slate-900 rounded-[2.5rem] p-8 sm:p-12 border border-gray-100 dark:border-slate-800 shadow-xl shadow-emerald-500/5 transition-colors">
+            <div className="mb-10 lg:mt-4 md:mt-4 mt-10 text-center sm:text-left relative overflow-hidden bg-white/10 border border-gray-300 dark:bg-slate-900 rounded-[2.5rem] p-8 sm:p-12 shadow-xl shadow-emerald-500/5 transition-colors backdrop-blur-md">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
 
@@ -165,7 +161,7 @@ export default function Certificates() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Selector Section */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white/10 border border-gray-300 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-lg shadow-gray-200/50 dark:shadow-none transition-colors lg:sticky lg:top-24">
+                    <div className="bg-white/10 border border-gray-300 dark:bg-slate-900 border-gray-300 dark:border-slate-800 rounded-[2rem] p-6 sm:p-8 shadow-lg shadow-gray-200/50 dark:shadow-none transition-colors lg:sticky lg:top-24 backdrop-blur-md">
                         <div className="flex items-center gap-3 mb-8">
                             <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400">
                                 <Search className="w-5 h-5" />
@@ -181,7 +177,7 @@ export default function Certificates() {
                                 <select
                                     value={selectedCourse}
                                     onChange={(e) => setSelectedCourse(e.target.value)}
-                                    className="w-full bg-white/10 border border-gray-300 dark:bg-slate-800 border-2 border-gray-300 focus:border-emerald-500/20 rounded-2xl px-5 py-4 text-gray-700 dark:text-gray-300 font-bold focus:outline-none transition-all appearance-none cursor-pointer"
+                                    className="w-full bg-white/10 border border-gray-300 dark:bg-slate-800 border-2 border-gray-300 focus:border-emerald-500/20 rounded-2xl px-5 py-4 text-gray-700 dark:text-gray-300 font-bold focus:outline-none transition-all appearance-none cursor-pointer backdrop-blur-sm"
                                 >
                                     <option value="">-- Select Course --</option>
                                     {completedCourses.map((course) => (
@@ -222,7 +218,7 @@ export default function Certificates() {
                 {/* Display/Placeholder Section */}
                 <div className="lg:col-span-2">
                     {selectedCourse ? (
-                        <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[2.5rem] p-10 shadow-lg shadow-gray-200/50 dark:shadow-none flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500 transition-colors">
+                        <div className="bg-white/10 border border-gray-300 dark:bg-slate-900 dark:border-slate-800 rounded-[2.5rem] p-10 shadow-lg shadow-gray-200/50 dark:shadow-none flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-4 duration-500 transition-colors backdrop-blur-md">
                             <div className="relative mb-10 group">
                                 <div className="absolute inset-0 bg-emerald-500/20 rounded-full blur-3xl group-hover:scale-110 transition-transform" />
                                 <div className="relative w-32 h-32 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-emerald-200 dark:shadow-none rotate-3">
@@ -240,7 +236,7 @@ export default function Certificates() {
                             </p>
 
                             <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-[1.5rem] border border-gray-100 dark:border-slate-800 transition-colors">
+                                <div className="bg-white/10 border border-gray-300 dark:bg-slate-800/50 p-6 rounded-[1.5rem] dark:border-slate-800 transition-colors">
                                     <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Student</p>
                                     <p className="text-gray-900 dark:text-white font-bold">
                                         {(() => {
@@ -251,7 +247,7 @@ export default function Certificates() {
                                         })()}
                                     </p>
                                 </div>
-                                <div className="bg-gray-50 dark:bg-slate-800/50 p-6 rounded-[1.5rem] border border-gray-100 dark:border-slate-800 transition-colors">
+                                <div className="bg-white/10 border border-gray-300 dark:bg-slate-800/50 p-6 rounded-[1.5rem] dark:border-slate-800 transition-colors">
                                     <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Cert ID</p>
                                     <p className="text-emerald-600 dark:text-emerald-400 font-bold">
                                         {completedCourses.find(c => c._id === selectedCourse)?.certId || "N/A"}
@@ -278,7 +274,7 @@ export default function Certificates() {
                             <h4 className="font-black text-xl mb-2">Learn & Succeed</h4>
                             <p className="text-emerald-50 text-sm font-medium leading-relaxed opacity-90">Expand your knowledge to become a competitor in the modern skills market.</p>
                         </div>
-                        <div className="bg-white/10 border border-gray-300 dark:bg-slate-900 border border-gray-100 dark:border-slate-800 p-8 rounded-[2rem] shadow-lg shadow-gray-200/50 dark:shadow-none hover:-translate-y-1 transition-all group transition-colors">
+                        <div className="bg-white/10 border border-gray-300 dark:bg-slate-900 border-gray-300 dark:border-slate-800 p-8 rounded-[2rem] shadow-lg shadow-gray-200/50 dark:shadow-none hover:-translate-y-1 transition-all group backdrop-blur-md">
                             <Medal className="w-10 h-10 text-emerald-500 mb-6 group-hover:scale-110 transition-transform" />
                             <h4 className="font-black text-xl text-gray-900 dark:text-white mb-2">Bright Future</h4>
                             <p className="text-gray-500 dark:text-gray-400 text-sm font-medium leading-relaxed opacity-90">Every skill you learn opens a new door to success.</p>

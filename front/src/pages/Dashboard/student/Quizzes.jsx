@@ -100,7 +100,7 @@ const Quizzes = () => {
     if (loading) return <PremiumLoader />;
 
     return (
-        <div className="w-full lg:mt-20 md:mt-20 mt-36">
+        <div className="w-full lg:mt-4 md:mt-4 mt-10">
             <div className="mb-8">
                 <h1 className="text-2xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
                     My Quizzes
@@ -129,7 +129,7 @@ const Quizzes = () => {
                         return (
                             <div
                                 key={idx}
-                                className="group bg-white dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 p-6 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 relative overflow-hidden"
+                                className="group bg-white/10 border border-gray-300 dark:bg-slate-900 rounded-[2rem] border border-gray-100 dark:border-slate-800 p-6 hover:border-emerald-500/50 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 relative overflow-hidden"
                             >
                                 {/* Header Decoration */}
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/5 to-transparent rounded-bl-[4rem]" />
