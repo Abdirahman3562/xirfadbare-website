@@ -283,7 +283,7 @@ const ManageBlogs = () => {
     const fetchUserProfile = async () => {
         if (!token) return;
         try {
-            const response = await fetch("http://localhost:5000/api/users/profile", {
+            const response = await fetch("https://xirfadbare-backend.onrender.com/api/users/profile", {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -299,7 +299,7 @@ const ManageBlogs = () => {
 
     const fetchBlogs = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/blogs");
+            const response = await fetch("https://xirfadbare-backend.onrender.com/api/blogs");
             const data = await response.json();
             setBlogs(data.blogs || []);
         } catch (error) {
@@ -319,7 +319,7 @@ const ManageBlogs = () => {
         // We can optimize by checking if blog has pending comments first, or just hit endpoint safely.
         // Hitting endpoint is safer.
         if (token) {
-            fetch(`http://localhost:5000/api/comments/mark-read/${blog._id}`, {
+            fetch(`https://xirfadbare-backend.onrender.com/api/comments/mark-read/${blog._id}`, {
                 method: 'PUT',
                 headers: { 'Authorization': `Bearer ${token}` }
             }).then(res => {
@@ -331,7 +331,7 @@ const ManageBlogs = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/api/comments/${blog._id}`);
+            const response = await fetch(`https://xirfadbare-backend.onrender.com/api/comments/${blog._id}`);
             if (response.ok) {
                 const data = await response.json();
                 setComments(data);
@@ -376,7 +376,7 @@ const ManageBlogs = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch('http://localhost:5000/api/comments', {
+            const response = await fetch('https://xirfadbare-backend.onrender.com/api/comments', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -410,7 +410,7 @@ const ManageBlogs = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch(`http://localhost:5000/api/comments/${commentId}`, {
+            const response = await fetch(`https://xirfadbare-backend.onrender.com/api/comments/${commentId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -454,7 +454,7 @@ const ManageBlogs = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch(`http://localhost:5000/api/comments/${commentToDelete}`, {
+            const response = await fetch(`https://xirfadbare-backend.onrender.com/api/comments/${commentToDelete}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -481,7 +481,7 @@ const ManageBlogs = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch(`http://localhost:5000/api/blogs/${blogToDelete._id}`, {
+            const response = await fetch(`https://xirfadbare-backend.onrender.com/api/blogs/${blogToDelete._id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -536,7 +536,7 @@ const ManageBlogs = () => {
 
     const getImageUrl = (img) => {
         if (!img) return null;
-        return img.startsWith("/") ? `http://localhost:5000${img}` : img;
+        return img.startsWith("/") ? `https://xirfadbare-backend.onrender.com${img}` : img;
     };
 
     if (loading) {

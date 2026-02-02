@@ -19,7 +19,7 @@ const VerifyEmail = () => {
         // API call to verify email
         const verifyToken = async () => {
             try {
-                const response = await fetch('http://localhost:5000/api/users/verify-email', {
+                const response = await fetch('https://xirfadbare-backend.onrender.com/api/users/verify-email', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token })

@@ -24,7 +24,7 @@ export default function Certificates() {
 
     const fetchSystemSettings = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/settings');
+            const res = await fetch('https://xirfadbare-backend.onrender.com/api/settings');
             const data = await res.json();
             setSystemSettings(data);
         } catch (error) {
@@ -117,7 +117,7 @@ export default function Certificates() {
                 }),
                 instructorName: course.instructor?.name || "Xirfadbare Academy",
                 certificateId: certId,
-                systemLogo: systemSettings?.logo ? (systemSettings.logo.startsWith('http') ? systemSettings.logo : `http://localhost:5000${systemSettings.logo}`) : null
+                systemLogo: systemSettings?.logo ? (systemSettings.logo.startsWith('http') ? systemSettings.logo : `https://xirfadbare-backend.onrender.com${systemSettings.logo}`) : null
             };
 
             await generateCertificate(template, data, `${course.title}_Certificate.pdf`);

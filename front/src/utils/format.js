@@ -6,7 +6,7 @@ export const getImageUrl = (img) => {
     // Remove leading slash if present to avoid double slashes
     const cleanPath = img.startsWith("/") ? img.substring(1) : img;
 
-    return `http://localhost:5000/${cleanPath}`;
+    return `https://xirfadbare-backend.onrender.com/${cleanPath}`;
 };
 
 export const formatDate = (dateString, includeTime = false) => {

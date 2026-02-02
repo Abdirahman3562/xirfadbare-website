@@ -33,7 +33,7 @@ export default function SystemSettings() {
 
     const fetchSettings = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/settings");
+            const response = await fetch("https://xirfadbare-backend.onrender.com/api/settings");
             const data = await response.json();
             setSettings(data);
         } catch (error) {
@@ -75,7 +75,7 @@ export default function SystemSettings() {
             formData.append('image', file);
 
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch("http://localhost:5000/api/upload", {
+            const response = await fetch("https://xirfadbare-backend.onrender.com/api/upload", {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -87,7 +87,7 @@ export default function SystemSettings() {
 
             if (response.ok) {
                 // Add backend URL to the path
-                const fullUrl = `http://localhost:5000${data.url}`;
+                const fullUrl = `https://xirfadbare-backend.onrender.com${data.url}`;
                 setSettings(prev => ({
                     ...prev,
                     logo: fullUrl
@@ -110,7 +110,7 @@ export default function SystemSettings() {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch("http://localhost:5000/api/settings", {
+            const response = await fetch("https://xirfadbare-backend.onrender.com/api/settings", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

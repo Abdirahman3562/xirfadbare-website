@@ -574,8 +574,8 @@ const EditCourse = () => {
                 const [course, allInstructors, allCategories, templatesRes] = await Promise.all([
                     id === 'new' ? Promise.resolve(null) : getFullCourseDetails(id),
                     getAllInstructors(),
-                    fetch('http://localhost:5000/api/categories').then(res => res.json()),
-                    fetch('http://localhost:5000/api/certificates/templates', {
+                    fetch('https://xirfadbare-backend.onrender.com/api/categories').then(res => res.json()),
+                    fetch('https://xirfadbare-backend.onrender.com/api/certificates/templates', {
                         headers: { 'Authorization': `Bearer ${JSON.parse(localStorage.getItem('loggedInUser'))?.token}` }
                     }).then(res => res.json())
                 ]);

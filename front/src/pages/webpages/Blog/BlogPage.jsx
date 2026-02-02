@@ -31,7 +31,7 @@ function BlogPage() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/blogs");
+        const response = await fetch("https://xirfadbare-backend.onrender.com/api/blogs");
         const data = await response.json();
 
         // Filter only active blogs
