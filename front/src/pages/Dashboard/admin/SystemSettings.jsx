@@ -137,6 +137,11 @@ export default function SystemSettings() {
         }
     };
 
+    const getImageUrl = (path) => {
+        if (!path) return "";
+        return path.startsWith("/") ? `${SERVER_URL}${path}` : path;
+    };
+
     if (loading) {
         return <PremiumLoader text="Loading System Settings..." />;
     }
@@ -426,7 +431,7 @@ export default function SystemSettings() {
                                 <div className="mb-4 p-4 bg-gray-50 dark:bg-slate-700 rounded-xl border border-gray-200 dark:border-gray-600">
                                     <p className="text-xs text-gray-500 dark:text-gray-300 mb-2">Current Logo:</p>
                                     <img
-                                        src={settings.logo}
+                                        src={getImageUrl(settings.logo)}
                                         alt="Current logo"
                                         className="h-20 object-contain rounded-lg"
                                         onError={(e) => {

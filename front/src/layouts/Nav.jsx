@@ -134,7 +134,7 @@ function Nav() {
     return img.startsWith("/") ? `${SERVER_URL}${img}` : img;
   };
 
-  const logoSrc = settings.logo || defaultLogo;
+  const logoSrc = getImageUrl(settings.logo) || defaultLogo;
 
   const avatar = getImageUrl(user?.image || localStorage.getItem("profileImage"));
 
