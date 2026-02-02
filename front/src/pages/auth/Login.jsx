@@ -176,7 +176,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen py-20 flex flex-col md:flex-row items-center justify-center bg-gray-50/50 font-[Inter]">
+    <div className="min-h-screen  flex flex-col md:flex-row items-center justify-center bg-gray-50/50 font-[Inter] relative overflow-hidden">
       {/* Decorative Background Blobs */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
@@ -214,9 +214,7 @@ const Login = () => {
 
             </Link>
 
-            <h2 className="text-4xl font-black text-gray-900 mb-3 tracking-tight">
-              {require2FA ? "Security Shield" : "Welcome back"}
-            </h2>
+
             <p className="text-gray-500 mb-10 text-sm leading-relaxed">
               {require2FA
                 ? `We sent a 6-digit verification code to ${loginEmail}. Please enter it below to continue.`
