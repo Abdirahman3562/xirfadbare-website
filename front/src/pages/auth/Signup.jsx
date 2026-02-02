@@ -95,7 +95,7 @@ const Signup = () => {
   }
 
   return (
-    <div className="min-h-screen py-10 flex flex-col md:flex-row items-center justify-center bg-gray-50/50 dark:bg-slate-950 font-[Inter] relative overflow-hidden">
+    <div className="min-h-screen  flex flex-col md:flex-row items-center justify-center bg-gray-50/50 dark:bg-slate-950 font-[Inter] relative overflow-hidden">
       {/* Decorative Background Blobs */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
@@ -130,15 +130,13 @@ const Signup = () => {
               ← Back to home
             </Link>
 
-            <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
-              Create an account
-            </h2>
+
             <p className="text-gray-500 dark:text-gray-400 mb-8 text-sm leading-relaxed">
               Enter your details below to create your account
             </p>
 
             {/* Signup Form */}
-            <form className="space-y-5" onSubmit={handleSubmit}>
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
@@ -175,91 +173,91 @@ const Signup = () => {
                     />
                   </div>
                 </div>
-              </div>
 
-              <div className="space-y-1">
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                  Email address
-                </label>
-                <div className="relative group">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={16} />
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="m@example.com"
-                    required
-                    className="w-full pl-9 pr-3 py-2.5 bg-white/10 border border-gray-200 dark:border-slate-800 rounded-xl outline-none focus:border-emerald-500 transition-all text-gray-900 dark:text-white placeholder-gray-400"
-                  />
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                    Email address
+                  </label>
+                  <div className="relative group">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={16} />
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="m@example.com"
+                      required
+                      className="w-full pl-9 pr-3 py-2.5 bg-white/10 border border-gray-200 dark:border-slate-800 rounded-xl outline-none focus:border-emerald-500 transition-all text-gray-900 dark:text-white placeholder-gray-400"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-1">
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                  Phone number
-                </label>
-                <div className="relative group">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={16} />
-                  <input
-                    type="tel"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="+252 61 234 5678"
-                    required
-                    className="w-full pl-9 pr-3 py-2.5 bg-white/10 border border-gray-200 dark:border-slate-800 rounded-xl outline-none focus:border-emerald-500 transition-all text-gray-900 dark:text-white placeholder-gray-400"
-                  />
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                    Phone number
+                  </label>
+                  <div className="relative group">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={16} />
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      placeholder="+252 6..."
+                      required
+                      className="w-full pl-9 pr-3 py-2.5 bg-white/10 border border-gray-200 dark:border-slate-800 rounded-xl outline-none focus:border-emerald-500 transition-all text-gray-900 dark:text-white placeholder-gray-400"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-1">
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                  Password
-                </label>
-                <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={16} />
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    required
-                    className="w-full pl-9 pr-10 py-2.5 bg-white/10 border border-gray-200 dark:border-slate-800 rounded-xl outline-none focus:border-emerald-500 transition-all text-gray-900 dark:text-white placeholder-gray-400"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                    Password
+                  </label>
+                  <div className="relative group">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={16} />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="••••••••"
+                      required
+                      className="w-full pl-9 pr-10 py-2.5 bg-white/10 border border-gray-200 dark:border-slate-800 rounded-xl outline-none focus:border-emerald-500 transition-all text-gray-900 dark:text-white placeholder-gray-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-1">
-                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
-                  Confirm password
-                </label>
-                <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={16} />
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder="••••••••"
-                    required
-                    className="w-full pl-9 pr-10 py-2.5 bg-white/10 border border-gray-200 dark:border-slate-800 rounded-xl outline-none focus:border-emerald-500 transition-all text-gray-900 dark:text-white placeholder-gray-400"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                    Confirm password
+                  </label>
+                  <div className="relative group">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600" size={16} />
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      placeholder="••••••••"
+                      required
+                      className="w-full pl-9 pr-10 py-2.5 bg-white/10 border border-gray-200 dark:border-slate-800 rounded-xl outline-none focus:border-emerald-500 transition-all text-gray-900 dark:text-white placeholder-gray-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
                 </div>
               </div>
 
