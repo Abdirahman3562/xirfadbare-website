@@ -22,7 +22,7 @@ import {
     Award,
     Package
 } from 'lucide-react';
-import { API_BASE_URL } from '../../config';
+import { API_BASE_URL, SERVER_URL } from '../../config';
 
 const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], isSuperAdmin = false }) => {
     const [settings, setSettings] = useState({
@@ -70,6 +70,11 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
         return () => clearInterval(interval);
     }, [token]);
 
+    const getImageUrl = (path) => {
+        if (!path) return "";
+        return path.startsWith("/") ? `${SERVER_URL}${path}` : path;
+    };
+
     const menuItems = [
         { title: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard', permission: 'dashboard.view' },
         { title: 'Manage Users', icon: <Users size={20} />, path: '/admin/users', permission: 'users.view' },
@@ -114,7 +119,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
             <div className="p-6 flex items-center justify-center border-b border-gray-50 dark:border-gray-800 h-[80px]">
                 {settings.logo ? (
                     <img
-                        src={settings.logo}
+                        src={getImageUrl(settings.logo)}
                         alt={settings.websiteTitle}
                         className="h-[80px] mt-5 ml-[-80px] object-contain hover:scale-105 transition-transform duration-300"
                     />

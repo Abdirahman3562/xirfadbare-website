@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { API_BASE_URL } from "../config";
+import { API_BASE_URL, SERVER_URL } from "../config";
 
 export default function Footer() {
   const [settings, setSettings] = useState({
@@ -47,6 +47,11 @@ export default function Footer() {
     fetchSettings();
   }, []);
 
+  const getImageUrl = (path) => {
+    if (!path) return "";
+    return path.startsWith("/") ? `${SERVER_URL}${path}` : path;
+  };
+
   return (
     <footer className="relative overflow-hidden pt-16 pb-8 bg-[#edf4f5] dark:bg-slate-900 text-gray-800 dark:text-gray-300 transition-colors duration-500">
       {/* 🎨 Background blobs — sida FAQ & Hero */}
@@ -60,7 +65,7 @@ export default function Footer() {
           {/* Logo or Brand Name */}
           {settings.logo ? (
             <Link to="/" className="block">
-              <img src={settings.logo} alt="Logo" className="h-20 mt-[-20px] mb-[-10px] object-contain" />
+              <img src={getImageUrl(settings.logo)} alt="Logo" className="h-20 mt-[-20px] mb-[-10px] object-contain" />
             </Link>
           ) : (
             <Link to="/" className="text-2xl font-extrabold text-emerald-600">
