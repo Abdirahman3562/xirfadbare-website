@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Edit2, Trash2, Eye, Layout, CheckCircle, XCircle, Search, MoreVertical, AlertTriangle, ShieldAlert, Lock } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { usePermissions } from '../../../hooks/usePermissions';
+import { API_BASE_URL, SERVER_URL } from '../../../config';
 
 const ManageCertificates = () => {
     const [templates, setTemplates] = useState([]);
@@ -21,7 +22,7 @@ const ManageCertificates = () => {
 
     const getFullImageUrl = (path) => {
         if (!path) return 'https://placehold.co/842x595/png?text=No+Background';
-        return path.startsWith('http') ? path : `http://localhost:5000${path}`;
+        return path.startsWith('http') ? path : `${SERVER_URL}${path}`;
     };
 
     useEffect(() => {
@@ -31,7 +32,7 @@ const ManageCertificates = () => {
     const fetchTemplates = async () => {
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const res = await fetch('http://localhost:5000/api/certificates/templates', {
+            const res = await fetch(`${API_BASE_URL}/certificates/templates`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await res.json();
@@ -56,7 +57,7 @@ const ManageCertificates = () => {
 
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const res = await fetch(`http://localhost:5000/api/certificates/template/${templateToDelete._id}`, {
+            const res = await fetch(`${API_BASE_URL}/certificates/template/${templateToDelete._id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -84,7 +85,7 @@ const ManageCertificates = () => {
     const toggleStatus = async (id, currentStatus) => {
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const res = await fetch(`http://localhost:5000/api/certificates/template/${id}/status`, {
+            const res = await fetch(`${API_BASE_URL}/certificates/template/${id}/status`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

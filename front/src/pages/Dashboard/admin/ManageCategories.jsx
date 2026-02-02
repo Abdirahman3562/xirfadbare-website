@@ -4,6 +4,7 @@ import { usePermissions } from "../../../hooks/usePermissions";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
+import { API_BASE_URL } from "../../../config";
 
 export default function ManageCategories() {
     const [categories, setCategories] = useState([]);
@@ -30,7 +31,7 @@ export default function ManageCategories() {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/categories");
+            const response = await fetch(`${API_BASE_URL}/categories`);
             const data = await response.json();
             setCategories(data);
             setLoading(false);
@@ -45,7 +46,7 @@ export default function ManageCategories() {
     const handleCreate = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch("http://localhost:5000/api/categories", {
+            const response = await fetch(`${API_BASE_URL}/categories`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -72,7 +73,7 @@ export default function ManageCategories() {
     const handleUpdate = async (id) => {
         const category = categories.find((c) => c._id === id);
         try {
-            const response = await fetch(`http://localhost:5000/api/categories/${id}`, {
+            const response = await fetch(`${API_BASE_URL}/categories/${id}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -101,7 +102,7 @@ export default function ManageCategories() {
 
     const confirmDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/categories/${deleteModal.categoryId}`, {
+            const response = await fetch(`${API_BASE_URL}/categories/${deleteModal.categoryId}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${user?.token}`

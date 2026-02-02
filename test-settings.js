@@ -1,6 +1,7 @@
 
 // ESM syntax
-const API_URL = 'http://localhost:5000/api/settings';
+const BASE_URL = process.env.API_URL || 'https://xirfadbare-backend.onrender.com';
+const API_URL = `${BASE_URL}/api/settings`;
 
 console.log(`Testing ${API_URL}...`);
 

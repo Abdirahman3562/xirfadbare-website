@@ -13,6 +13,7 @@ import { toast } from "react-toastify";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import { API_BASE_URL, SERVER_URL } from "../../../config";
 
 const quillDarkTheme = `
     .dark .ql-snow .ql-stroke {
@@ -94,7 +95,7 @@ const CreateBlog = () => {
 
                 try {
                     const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-                    const result = await fetch("http://localhost:5000/api/upload", {
+                    const result = await fetch(`${API_BASE_URL}/upload`, {
                         method: "POST",
                         headers: {
                             Authorization: `Bearer ${token}`
@@ -107,7 +108,7 @@ const CreateBlog = () => {
                     if (result.ok && data.url) {
                         const quill = quillRef.current.getEditor();
                         const range = quill.getSelection(true);
-                        const imageUrl = `http://localhost:5000${data.url}`;
+                        const imageUrl = `${SERVER_URL}${data.url}`;
                         quill.insertEmbed(range.index, 'image', imageUrl);
                     } else {
                         toast.error('Image upload failed');
@@ -143,7 +144,7 @@ const CreateBlog = () => {
 
     const fetchBlog = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/blogs/${id}`);
+            const response = await fetch(`${API_BASE_URL}/blogs/${id}`);
             const data = await response.json();
             if (response.ok) {
                 setFormData({
@@ -154,7 +155,7 @@ const CreateBlog = () => {
                     thumbnail: data.thumbnail || ""
                 });
                 if (data.thumbnail) {
-                    setPreviewUrl(`http://localhost:5000${data.thumbnail}`);
+                    setPreviewUrl(`${SERVER_URL}${data.thumbnail}`);
                 }
             } else {
                 toast.error("Failed to fetch blog details");
@@ -197,7 +198,7 @@ const CreateBlog = () => {
         setUploading(true);
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
-            const response = await fetch("http://localhost:5000/api/upload", {
+            const response = await fetch(`${API_BASE_URL}/upload`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -211,7 +212,7 @@ const CreateBlog = () => {
                 // data.url likely comes back as '/uploads/filename.ext'
                 // We want to store the relative path in the DB
                 setFormData(prev => ({ ...prev, thumbnail: data.url }));
-                setPreviewUrl(`http://localhost:5000${data.url}`);
+                setPreviewUrl(`${SERVER_URL}${data.url}`);
                 toast.success("Image uploaded successfully");
             } else {
                 toast.error(data.message || "Failed to upload image");
@@ -236,8 +237,8 @@ const CreateBlog = () => {
         try {
             const token = JSON.parse(localStorage.getItem('loggedInUser'))?.token;
             const url = isEditing
-                ? `http://localhost:5000/api/blogs/${id}`
-                : "http://localhost:5000/api/blogs";
+                ? `${API_BASE_URL}/blogs/${id}`
+                : `${API_BASE_URL}/blogs`;
 
             const method = isEditing ? "PUT" : "POST";
 

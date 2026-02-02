@@ -1,4 +1,6 @@
 // Script to add FAQs via API calls
+const BASE_URL = process.env.API_URL || 'https://xirfadbare-backend.onrender.com';
+
 const faqs = [
   {
     question: "Sideen uga diiwaan gali karaa koorsooyinka Xirfadbare?",
@@ -65,7 +67,7 @@ async function addFAQs() {
     try {
       console.log(`📝 Adding: ${faq.question.substring(0, 50)}...`);
 
-      const response = await fetch('http://localhost:5000/api/faqs', {
+      const response = await fetch(`${BASE_URL}/api/faqs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

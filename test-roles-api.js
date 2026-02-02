@@ -1,8 +1,10 @@
 import fetch from 'node-fetch';
 
+const BASE_URL = process.env.API_URL || 'https://xirfadbare-backend.onrender.com';
+
 const testApi = async () => {
     try {
-        const response = await fetch('http://localhost:5000/api/roles');
+        const response = await fetch(`${BASE_URL}/api/roles`);
         const text = await response.text();
         console.log('Status:', response.status);
         console.log('Content-Type:', response.headers.get('content-type'));

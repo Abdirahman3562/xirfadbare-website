@@ -1,5 +1,6 @@
 // Quick test script for testimonials API
-fetch('http://localhost:5000/api/testimonials')
+const BASE_URL = process.env.API_URL || 'https://xirfadbare-backend.onrender.com';
+fetch(`${BASE_URL}/api/testimonials`)
   .then(res => {
     if (res.ok) {
       return res.json();

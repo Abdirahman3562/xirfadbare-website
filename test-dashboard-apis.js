@@ -1,6 +1,6 @@
 // Test script to check dashboard API endpoints
 const testAPIs = async () => {
-  const baseUrl = 'http://localhost:5000/api';
+  const baseUrl = (process.env.API_URL || 'https://xirfadbare-backend.onrender.com') + '/api';
 
   console.log('🔍 TESTING DASHBOARD API ENDPOINTS\n');
 

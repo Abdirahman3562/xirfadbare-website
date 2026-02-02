@@ -5,6 +5,7 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { Bell, Search, User, LogOut, Settings, ChevronDown, ShoppingCart, Clock, Menu, Sun, Moon, Monitor, MessageSquare } from 'lucide-react';
 import { toast } from 'react-toastify';
 import PremiumLoader from '../../../components/ui/PremiumLoader';
+import { API_BASE_URL, SERVER_URL } from '../../../config';
 
 
 const AdminLayout = () => {
@@ -70,7 +71,7 @@ const AdminLayout = () => {
         const token = user?.token;
         if (!token) return;
         try {
-            const response = await fetch("http://localhost:5000/api/chat/unread-count", {
+            const response = await fetch(`${API_BASE_URL}/chat/unread-count`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -86,7 +87,7 @@ const AdminLayout = () => {
         if (!token) return;
         try {
             // Assuming this endpoint exists or will be created to match the pattern
-            const response = await fetch("http://localhost:5000/api/comments/unread-count", {
+            const response = await fetch(`${API_BASE_URL}/comments/unread-count`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
@@ -109,7 +110,7 @@ const AdminLayout = () => {
         }
         try {
             setLoadingPermissions(true);
-            const response = await fetch("http://localhost:5000/api/users/profile", {
+            const response = await fetch(`${API_BASE_URL}/users/profile`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
@@ -212,8 +213,9 @@ const AdminLayout = () => {
 
     const getImageUrl = (image) => {
         if (!image) return null;
+        if (typeof image !== 'string') return null;
         if (image.startsWith('http')) return image;
-        return `http://localhost:5000${image.startsWith('/') ? '' : '/'}${image}`;
+        return `${SERVER_URL}${image.startsWith('/') ? '' : '/'}${image}`;
     };
 
     const pendingOrdersCount = stats?.pendingOrders || 0;

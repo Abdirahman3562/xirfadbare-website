@@ -6,6 +6,7 @@ import {
 import defaultLogo from "../assets/logo.png";
 import { useData } from "../contexts/DataContext";
 import { useTheme } from "../contexts/ThemeContext";
+import { API_BASE_URL, SERVER_URL } from "../config";
 
 
 function Nav() {
@@ -31,7 +32,7 @@ function Nav() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/settings");
+        const response = await fetch(`${API_BASE_URL}/settings`);
         const data = await response.json();
         setSettings({
           logo: data.logo || "",
@@ -130,7 +131,7 @@ function Nav() {
 
   const getImageUrl = (img) => {
     if (!img) return null;
-    return img.startsWith("/") ? `http://localhost:5000${img}` : img;
+    return img.startsWith("/") ? `${SERVER_URL}${img}` : img;
   };
 
   const logoSrc = settings.logo || defaultLogo;

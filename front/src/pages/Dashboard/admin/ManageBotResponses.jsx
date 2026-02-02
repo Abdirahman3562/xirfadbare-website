@@ -5,6 +5,7 @@ import { Plus, Search, Edit2, Trash2, Save, X, MessageSquare, Bot, Lock, ShieldA
 import { usePermissions } from "../../../hooks/usePermissions";
 import { useNavigate } from "react-router-dom";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
+import { API_BASE_URL } from "../../../config";
 
 export default function ManageBotResponses() {
     const [responses, setResponses] = useState([]);
@@ -35,7 +36,7 @@ export default function ManageBotResponses() {
 
     const fetchResponses = async () => {
         try {
-            const { data } = await axios.get("http://localhost:5000/api/bot-responses");
+            const { data } = await axios.get(`${API_BASE_URL}/bot-responses`);
             setResponses(data);
         } catch (error) {
             console.error("Failed to fetch bot responses", error);
@@ -52,7 +53,7 @@ export default function ManageBotResponses() {
             if (isEditing) {
                 // Update
                 const { data } = await axios.put(
-                    `http://localhost:5000/api/bot-responses/${currentItem.id}`,
+                    `${API_BASE_URL}/bot-responses/${currentItem.id}`,
                     {
                         trigger: currentItem.trigger,
                         response: currentItem.response,
@@ -65,7 +66,7 @@ export default function ManageBotResponses() {
             } else {
                 // Create
                 const { data } = await axios.post(
-                    "http://localhost:5000/api/bot-responses",
+                    `${API_BASE_URL}/bot-responses`,
                     {
                         trigger: currentItem.trigger,
                         response: currentItem.response,
@@ -90,7 +91,7 @@ export default function ManageBotResponses() {
     const confirmDelete = async () => {
         if (!itemToDelete) return;
         try {
-            await axios.delete(`http://localhost:5000/api/bot-responses/${itemToDelete}`, {
+            await axios.delete(`${API_BASE_URL}/bot-responses/${itemToDelete}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setResponses(responses.filter((item) => item._id !== itemToDelete));

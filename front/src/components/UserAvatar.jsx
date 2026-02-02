@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SERVER_URL } from "../config";
 
 /**
  * ✅ Reusable User Avatar Component
@@ -22,7 +23,7 @@ const UserAvatar = ({ image, name, size = "w-10 h-10", className = "" }) => {
         if (!img) return null;
         if (typeof img !== "string") return img;
         if (img.startsWith("http") || img.startsWith("data:image")) return img;
-        if (img.startsWith("/")) return `http://localhost:5000${img}`;
+        if (img.startsWith("/")) return `${SERVER_URL}${img}`;
         return img;
     };
 

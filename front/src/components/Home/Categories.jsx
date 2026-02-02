@@ -1,6 +1,7 @@
 // src/components/Categories.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../../config";
 
 export default function Categories({
   title = "Browse by Category",
@@ -14,7 +15,7 @@ export default function Categories({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/categories");
+        const response = await fetch(`${API_BASE_URL}/categories`);
         const data = await response.json();
         // Extract category names from the response
         setCategories(data.map(cat => cat.name));

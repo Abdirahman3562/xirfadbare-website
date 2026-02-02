@@ -18,7 +18,7 @@ const createAdminUser = async () => {
     console.log('Email: admin@xirfadbare.com');
     console.log('Password: admin123');
 
-    const response = await fetch('http://localhost:5000/api/users/register', {
+    const response = await fetch(`${BASE_URL}/api/users/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

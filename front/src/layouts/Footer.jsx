@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram, FaTiktok, FaYoutube } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../config";
 
 export default function Footer() {
   const [settings, setSettings] = useState({
@@ -22,7 +23,7 @@ export default function Footer() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/settings");
+        const response = await fetch(`${API_BASE_URL}/settings`);
         const data = await response.json();
         setSettings({
           websiteTitle: data.websiteTitle || "Xirfadbare Academy",

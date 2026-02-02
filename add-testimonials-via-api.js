@@ -38,6 +38,8 @@ const testimonials = [
   },
 ];
 
+const BASE_URL = process.env.API_URL || 'https://xirfadbare-backend.onrender.com';
+
 async function addTestimonials() {
   console.log('🚀 Starting to add testimonials via API...');
 
@@ -47,7 +49,7 @@ async function addTestimonials() {
     try {
       console.log(`📝 Adding testimonial ${i + 1}: ${testimonial.name}`);
 
-      const response = await fetch('http://localhost:5000/api/testimonials', {
+      const response = await fetch(`${BASE_URL}/api/testimonials`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
