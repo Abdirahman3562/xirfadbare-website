@@ -4,6 +4,7 @@ import { getImageUrl } from "../../../utils/format";
 import { FiBook, FiSearch } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { getAllBlogs } from "../../../api/blogService";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 function BlogPage() {
   const [search, setSearch] = useState("");
@@ -80,11 +81,7 @@ function BlogPage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex justify-center items-center text-gray-500">
-        Loading blog articles...
-      </div>
-    );
+    return <PremiumLoader />;
   }
 
   return (

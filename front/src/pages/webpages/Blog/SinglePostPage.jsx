@@ -14,6 +14,7 @@ import { CommentSection } from "../../../components/Comment";
 import { getAllBlogs, getBlogById } from "../../../api/blogService";
 import UserAvatar from "../../../components/UserAvatar";
 import { useAuth } from "../../../hooks/useAuth";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 function SinglePostPage() {
   const { title } = useParams();
@@ -128,11 +129,7 @@ function SinglePostPage() {
 
   // Loading & not found states
   if (loading) {
-    return (
-      <div className="min-h-screen flex justify-center items-center text-gray-500">
-        Loading article...
-      </div>
-    );
+    return <PremiumLoader />;
   }
 
   if (!article) {

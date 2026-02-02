@@ -15,6 +15,7 @@ import {
   FaCheckCircle,
   FaMapMarkerAlt
 } from "react-icons/fa";
+import PremiumLoader from "../../../components/ui/PremiumLoader";
 
 function AuthorPage() {
   const { username } = useParams();
@@ -88,11 +89,7 @@ function AuthorPage() {
 
   // 🕓 Loading state
   if (loading) {
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center text-gray-500">
-        Loading author…
-      </div>
-    );
+    return <PremiumLoader />;
   }
 
   // ❌ Author not found
@@ -109,7 +106,7 @@ function AuthorPage() {
   return (
     <div className="max-w-6xl mx-auto px-6 py-12 space-y-10 mt-6">
       {/* ✅ Author Profile Section */}
-      <div className="flex flex-col md:flex-row items-center md:items-start bg-white p-6 rounded-xl shadow-md">
+      <div className="flex flex-col md:flex-row items-center md:items-start bg-white/10 p-6 rounded-xl shadow-md">
         <img
           src={getImageUrl(author.image) || "/images/authors/default.jpg"}
           alt={author.name}
@@ -242,7 +239,7 @@ function AuthorPage() {
             <Link
               to={`/blog/${toSlug(post.title)}`}
               key={post.id}
-              className="relative bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden group"
+              className="relative bg-white/10  rounded-xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 overflow-hidden group"
             >
               <img
                 src={getImageUrl(post.thumbnail) || "/images/placeholders/article-thumb.jpg"}
