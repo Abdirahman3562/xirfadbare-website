@@ -22,12 +22,51 @@ import { useAuth } from "../../../hooks/useAuth";
 import { useMyOrders } from "../../../hooks/useMyOrders";
 
 export default function StudentDashboard() {
-  const { courses: allCoursesInContext, loading: dataLoading } = useData();
+  const { courses: allCoursesInContext, loading: dataLoading, syncing: dataSyncing } = useData();
   const { user } = useAuth();
-  const { orders: userOrders, loading: ordersLoading } = useMyOrders(user);
+  const { orders: userOrders, loading: ordersLoading, refreshing: ordersRefreshing } = useMyOrders(user);
 
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState(() => {
+    // 🚀 Instant Hydration: Try to load from cache immediately to have it ready
+    const cachedOrders = JSON.parse(localStorage.getItem('orders_cache'));
+    const cachedProgress = JSON.parse(localStorage.getItem('user_progress_cache'));
+
+    if (cachedOrders && cachedOrders.length > 0) {
+      const activeOrders = cachedOrders.filter(o => o.status === 'active');
+      return activeOrders
+        .filter(order => order.paymentType !== 'Bundle Access')
+        .map(order => {
+          const progress = cachedProgress?.find(p =>
+            String(p.course?._id || p.course) === String(order.course || order.courseId)
+          );
+
+          // Reconstruct as much as possible from order + progress cache
+          return {
+            ...order,
+            id: order._id,
+            title: order.courseTitle || order.course?.title,
+            description: order.courseDetails?.description || "Loading course details...",
+            image: order.courseDetails?.thumbnail || "https://i.ibb.co/Yk2JmWv/default-course.jpg",
+            lessonsCount: order.bundleCourses?.length || order.courseDetails?.curriculum?.reduce((s, sec) => s + (sec.lessons?.length || 0), 0) || 0,
+            progress: progress?.progress || 0,
+            lastAccess: progress?.lastAccess || order.updatedAt,
+            isHydrated: true
+          };
+        });
+    }
+    return [];
+  });
+
+  // ✅ Start with loading false if we have hydrated data to show it immediately
+  const [loading, setLoading] = useState(() => {
+    const cachedOrders = JSON.parse(localStorage.getItem('orders_cache'));
+    return !(cachedOrders && cachedOrders.length > 0);
+  });
+
+  // ✅ Use more granular syncing status
+  const isSyncing = dataLoading || ordersLoading || dataSyncing || ordersRefreshing;
+
+
   const [showBundleModal, setShowBundleModal] = useState(false);
   const [selectedBundle, setSelectedBundle] = useState(null);
   const location = useLocation();
@@ -42,7 +81,8 @@ export default function StudentDashboard() {
   useEffect(() => {
     const processDashboardData = async () => {
       // If we are still waiting for critical data and don't have enough to show
-      if ((dataLoading || ordersLoading) && userOrders.length === 0) {
+      // But only if we don't already have hydrated courses
+      if ((dataLoading || ordersLoading) && userOrders.length === 0 && courses.length === 0) {
         return;
       }
 
@@ -150,13 +190,16 @@ export default function StudentDashboard() {
     processDashboardData();
   }, [allCoursesInContext, userOrders, dataLoading, ordersLoading]);
 
-  // ✅ Limit loading spinner to max 1s for "Premium" feel if already hydrated
+  // ✅ Handle transition and syncing status
   useEffect(() => {
-    if (loading && !dataLoading && !ordersLoading && courses.length > 0) {
-      const timer = setTimeout(() => setLoading(false), 500); // Super fast if data ready
+    if (!dataLoading && !ordersLoading) {
+      // Add a small 600ms delay so the "loading yar" is actually visible if it was very fast
+      const timer = setTimeout(() => {
+        setLoading(false);
+      }, 600);
       return () => clearTimeout(timer);
     }
-  }, [loading, dataLoading, ordersLoading, courses]);
+  }, [dataLoading, ordersLoading]);
 
   // 📊 Stats
   const pendingCourses = courses.filter((c) => c.status === "pending").length;
@@ -224,8 +267,8 @@ export default function StudentDashboard() {
         </p>
       </div>
 
-      {/* Stats Section - ONLY SHOW ON DASHBOARD */}
-      {!isCoursesPage && (
+      {/* Stats Section - ONLY SHOW ON DASHBOARD AND WHEN DATA IS READY */}
+      {!isCoursesPage && (courses.length > 0 || (!loading && !isSyncing)) && (
         <section>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* User Level */}
@@ -287,7 +330,7 @@ export default function StudentDashboard() {
           </div>
         )}
 
-        {loading ? (
+        {(loading || (isSyncing && courses.length === 0)) ? (
           <div className="flex justify-center py-12">
             <PremiumLoader text={null} fullScreen={false} />
           </div>
@@ -310,6 +353,7 @@ export default function StudentDashboard() {
           </div>
         ) : (
           <div className="flex flex-col space-y-6">
+
             {courses.map((course) => {
               const progressValue = Math.min(Number(course.progress) || 0, 100);
               const totalLessons = Number(course.lessonsCount) || 0;
@@ -352,7 +396,7 @@ export default function StudentDashboard() {
                   <div className="flex-1 p-6 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 text-gray-900 dark:text-white text-lg transition-colors">
+                        <h3 className="font-black group-hover:text-emerald-600 dark:group-hover:text-emerald-400 text-gray-900 dark:text-white text-lg transition-colors line-clamp-2 leading-tight mb-2 break-all">
                           {course.title}
                         </h3>
                         <span className="text-emerald-600 dark:text-emerald-400 font-semibold text-sm">
@@ -360,7 +404,7 @@ export default function StudentDashboard() {
                         </span>
                       </div>
 
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 leading-relaxed">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-3 leading-relaxed line-clamp-2 break-words">
                         {course.description}
                       </p>
 

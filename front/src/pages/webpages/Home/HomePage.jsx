@@ -14,8 +14,8 @@ import FAQ from "../../../components/Home/FAQ";
 function HomePage() {
   return (
     <div className="bg-[#edf4f5] relative dark:bg-slate-900">
-      <div className="absolute -top-24 -left-24 w-72 h-72 bg-indigo-200/40 blur-3xl rounded-full" />
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-200/40 blur-3xl rounded-full" />
+      <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-500/5 dark:bg-indigo-500/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 dark:bg-emerald-500/10 blur-[150px] rounded-full pointer-events-none" />
 
 
       {/* 1️⃣ Hero Section */}

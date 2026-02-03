@@ -106,7 +106,7 @@ function CourseDetails() {
               Special Offer: {course.discountPercentage}% Off
             </div>
           )}
-          <h1 className="text-2xl md:text-4xl font-extrabold mb-3 max-w-4xl break-words">
+          <h1 className="text-2xl md:text-4xl font-extrabold mb-3 max-w-4xl break-all">
             {course.title}
           </h1>
           <p className="mt-2 text-sm font-semibold text-emerald-400 uppercase tracking-wide bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm">

@@ -191,7 +191,7 @@ export default function Curriculum({
 
                   {/* Titles & duration */}
                   <div className="flex-1 min-w-0 flex flex-col">
-                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-emerald-400 whitespace-pre-wrap">
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-emerald-400 break-all">
                       {section.title}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -219,7 +219,7 @@ export default function Curriculum({
                         key={i}
                         onClick={() => {
                           if (isLocked) return;
-                          if (isFirst && !isEnrolled && isPaid) {
+                          if (isFirst && !isEnrolled) {
                             setPreviewLesson(lesson);
                           } else if (isEnrolled || !isPaid) {
                             const lessonSlug = lesson.slug || slugify(lesson.title) || lesson._id || lesson.id;
@@ -231,7 +231,7 @@ export default function Curriculum({
                           ${isLocked ? "cursor-not-allowed opacity-95" : "cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 shadow-sm"}`}
                       >
                         {/* ✅ Absolute Positioned Preview Badge */}
-                        {isFirst && isPaid && !isEnrolled && (
+                        {isFirst && !isEnrolled && (
                           <span className="absolute top-2 right-2 sm:static sm:mr-4 bg-emerald-500 text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm shadow-emerald-200 dark:shadow-none animate-pulse">
                             Preview
                           </span>
@@ -245,14 +245,14 @@ export default function Curriculum({
                               <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-xs flex-shrink-0" />
                             )}
                           </div>
-                          <div className={`flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-2 ${isFirst && isPaid && !isEnrolled ? "pr-14 sm:pr-0" : ""}`}>
-                            <span className="font-medium leading-relaxed sm:leading-normal whitespace-pre-wrap">{lesson.title}</span>
+                          <div className={`flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-2 ${isFirst && !isEnrolled ? "pr-14 sm:pr-0" : ""}`}>
+                            <span className="font-medium leading-relaxed sm:leading-normal break-all">{lesson.title}</span>
                           </div>
                         </div>
                         <div className="flex items-center justify-between sm:justify-end gap-2 border-t border-gray-100 dark:border-slate-800 sm:border-0 pt-2 sm:pt-0">
                           <span className="sm:hidden text-[10px] text-gray-400 uppercase font-bold tracking-widest">Duration</span>
                           <span className="text-gray-500 dark:text-gray-400 text-xs font-semibold flex-shrink-0 flex items-center gap-1.5">
-                            <FaClock className="sm:hidden text-emerald-500/50" size={10} />
+                            <FaClock className="text-emerald-500" size={12} />
                             {lesson.duration}
                           </span>
                         </div>

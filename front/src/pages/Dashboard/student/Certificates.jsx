@@ -80,9 +80,6 @@ export default function Certificates() {
 
         try {
             setGenerating(true);
-            const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3");
-            audio.volume = 0.5;
-            audio.play().catch(err => console.log("Download sound blocked:", err));
 
             const template = await getTemplateById(course.certificateTemplate);
 
@@ -94,6 +91,10 @@ export default function Certificates() {
                 toast.info("The certificate is not available yet. Please contact administration.");
                 return;
             }
+
+            const audio = new Audio("https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3");
+            audio.volume = 0.5;
+            audio.play().catch(err => console.log("Download sound blocked:", err));
 
             // Get full name from firstName and lastName and format it nicely
             const rawName = (userData?.firstName && userData?.lastName)

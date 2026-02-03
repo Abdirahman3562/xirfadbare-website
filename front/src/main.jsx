@@ -10,8 +10,12 @@ import GlobalLoader from './components/GlobalLoader'
 // App wrapper that handles loading state
 const AppWithData = () => {
   const { loading } = useData();
+  const isDashboard = window.location.pathname.startsWith('/dashboard') ||
+    window.location.pathname.startsWith('/watch');
 
-  if (loading) {
+  // Only show global loader if we're not on a dashboard/playback page 
+  // and data is still loading for the first time
+  if (loading && !isDashboard) {
     return <GlobalLoader />;
   }
 

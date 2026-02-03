@@ -22,6 +22,7 @@ let fetchPromise = null;
 export function useMyOrders(user) {
     const [orders, setOrders] = useState(ordersCache || []);
     const [loading, setLoading] = useState(!ordersCache);
+    const [refreshing, setRefreshing] = useState(false);
     const [version, setVersion] = useState(0);
 
     const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set(initialStore.ids.courses));
@@ -41,6 +42,7 @@ export function useMyOrders(user) {
         }
 
         const fetchOrders = async () => {
+            setRefreshing(true);
             try {
                 fetchPromise = (async () => {
                     const response = await fetch(`${API_BASE_URL}/orders/myorders`, {
@@ -62,6 +64,7 @@ export function useMyOrders(user) {
                 console.error("Failed to fetch orders:", error);
             } finally {
                 setLoading(false);
+                setRefreshing(false);
             }
         };
 
@@ -121,6 +124,7 @@ export function useMyOrders(user) {
     return {
         orders,
         loading,
+        refreshing,
         isEnrolledInCourse,
         isEnrolledInBundle,
         refreshOrders

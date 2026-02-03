@@ -586,7 +586,7 @@ const CourseDashboard = () => {
         >
           {/* Progress card */}
           <div className="bg-gray-50 dark:bg-slate-800/50 mt-2 shadow-sm rounded-xl p-6 mb-6 border border-gray-100 dark:border-slate-800 transition-colors" >
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 break-all">
               {course.title}
             </h1>
             <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-3">
@@ -629,7 +629,7 @@ const CourseDashboard = () => {
                           {index + 1}
                         </span>
                         <div>
-                          <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                          <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors break-all">
                             {section.title}
                           </h3>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -680,7 +680,7 @@ const CourseDashboard = () => {
                                         : "font-medium"}
                                   `}
                                 >
-                                  <span className={isCompleted ? "line-through" : ""}>{lesson.title}</span>
+                                  <span className={(isCompleted ? "line-through " : "") + "break-all"}>{lesson.title}</span>
                                   {(() => {
                                     const result = quizResults.find(r => String(r.lessonId) === String(lesson.id));
                                     return result && (
@@ -735,7 +735,7 @@ const CourseDashboard = () => {
             />
             {/* Lesson title below the video */}
             <div className="p-6 bg-white dark:bg-slate-800 transition-colors">
-              <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight break-all">
                 {currentLesson?.title || "Select a lesson to start learning"}
               </h2>
 
@@ -825,7 +825,7 @@ const CourseDashboard = () => {
               </div>
 
               <div className="bg-gray-50 dark:bg-slate-800/50 mt-2 shadow-sm rounded-2xl p-6 mb-6 border border-gray-100 dark:border-slate-800 transition-colors">
-                <h1 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                <h1 className="text-lg font-bold text-gray-900 dark:text-white mb-2 break-all">
                   {course.title}
                 </h1>
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-3">
@@ -867,7 +867,7 @@ const CourseDashboard = () => {
                             {index + 1}
                           </span>
                           <div>
-                            <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                            <h3 className="font-bold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors break-all">
                               {section.title}
                             </h3>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -928,7 +928,7 @@ const CourseDashboard = () => {
                                           : "font-medium"}
                                     `}
                                   >
-                                    <span className={isCompleted ? "line-through" : ""}>{lesson.title}</span>
+                                    <span className={(isCompleted ? "line-through " : "") + "break-all"}>{lesson.title}</span>
                                     {(() => {
                                       const result = quizResults.find(r => String(r.lessonId) === String(lesson.id));
                                       return result && (

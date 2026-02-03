@@ -45,7 +45,7 @@ const getDashboardStats = async (req, res) => {
         const totalCourses = await Course.countDocuments({});
 
         // 4. Total Orders
-        const totalOrders = await Order.countDocuments({});
+        const totalOrders = await Order.countDocuments({ paymentType: { $ne: 'Bundle Access' } });
 
         // 5. Pending Orders
         const pendingOrders = await Order.countDocuments({ status: 'pending' });

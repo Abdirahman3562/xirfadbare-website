@@ -50,8 +50,19 @@ export async function updateUserProgress(courseId, progressData) {
   }
 }
 
-// ✅ Get all user progress records
+// ✅ Get all user progress records with caching
 export async function getAllUserProgress() {
+  // Try to return cached data immediately if we're not wanting to wait
+  const cached = localStorage.getItem('user_progress_cache');
+  let cachedData = null;
+  if (cached) {
+    try {
+      cachedData = JSON.parse(cached);
+    } catch (e) {
+      console.error('❌ Failed to parse progress cache:', e);
+    }
+  }
+
   try {
     const loggedUser = JSON.parse(localStorage.getItem('loggedInUser')) ||
       JSON.parse(localStorage.getItem('user'));
@@ -67,10 +78,15 @@ export async function getAllUserProgress() {
 
     if (!response.ok) throw new Error('Failed to fetch user progress');
     const progressRecords = await response.json();
+
+    // Save to cache for next time
+    localStorage.setItem('user_progress_cache', JSON.stringify(progressRecords));
+
     return progressRecords;
   } catch (error) {
     console.error('Error fetching all user progress:', error);
-    return [];
+    // Return cached data as fallback if server fails
+    return cachedData || [];
   }
 }
 

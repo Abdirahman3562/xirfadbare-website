@@ -27,7 +27,7 @@ export default function FAQ() {
   }, []);
 
   return (
-    <section className="py-24 bg-[#edf4f5] dark:bg-slate-900 transition-colors duration-500">
+    <section className="py-24 bg-white/10 dark:bg-slate-900 transition-colors duration-500">
       <div className="max-w-4xl mx-auto px-6">
         {/* ✅ Header */}
         <div className="text-center mb-16">
@@ -48,7 +48,7 @@ export default function FAQ() {
           if (!xirfadbareFaq) return null;
 
           return (
-            <div className="border border-emerald-100 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 mb-12 shadow-xl shadow-emerald-50/50 dark:shadow-none transition-all duration-500 group hover:border-emerald-500 dark:hover:border-emerald-500/50">
+            <div className="border border-white/20 dark:border-slate-800 bg-white/10 backdrop-blur-md dark:bg-slate-900 rounded-[2.5rem] p-10 mb-12 shadow-xl shadow-emerald-50/50 dark:shadow-none transition-all duration-500 group hover:border-emerald-500 dark:hover:border-emerald-500/50">
               <h3 className="font-black text-2xl text-emerald-600 dark:text-emerald-400 mb-4 uppercase tracking-tighter">
                 {xirfadbareFaq.question}
               </h3>
@@ -65,7 +65,7 @@ export default function FAQ() {
 
         {/* ✅ FAQ List */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 bg-white dark:bg-slate-900 rounded-[3rem] border border-gray-50 dark:border-slate-800 shadow-sm">
+          <div className="flex flex-col items-center justify-center py-20 bg-white/10 backdrop-blur-md rounded-[3rem] border border-white/20 dark:border-slate-800 shadow-sm">
             <Loader2 className="animate-spin text-emerald-500 mb-4" size={48} />
             <p className="text-gray-500 dark:text-gray-400 font-bold italic">Soo aqrinaya xogta dhabta ah...</p>
           </div>
@@ -74,9 +74,9 @@ export default function FAQ() {
             {faqs.map((item, i) => (
               <div
                 key={item._id || i}
-                className={`border-2 transition-all duration-500 rounded-[2rem] overflow-hidden ${openIndex === i
-                  ? 'border-emerald-500 bg-white dark:bg-slate-900 shadow-xl shadow-emerald-100 dark:shadow-emerald-900/10'
-                  : 'border-white dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-900 hover:border-emerald-100 dark:hover:border-emerald-900/20 shadow-sm'
+                className={`border transition-all duration-500 rounded-[2rem] overflow-hidden ${openIndex === i
+                  ? 'border-emerald-500 bg-white/10 dark:bg-slate-900 shadow-xl shadow-emerald-100 dark:shadow-emerald-900/10'
+                  : 'border-white/20 dark:border-slate-800 bg-white/10 dark:bg-slate-900/60 hover:border-emerald-500/50 shadow-sm'
                   }`}
               >
                 <button
@@ -97,7 +97,7 @@ export default function FAQ() {
                   className={`px-8 transition-all duration-500 ease-in-out overflow-hidden ${openIndex === i ? "max-h-[800px] pb-10 opacity-100" : "max-h-0 opacity-0"
                     }`}
                 >
-                  <div className="pt-6 border-t border-gray-50 dark:border-gray-800 text-gray-600 dark:text-gray-400 text-lg leading-relaxed font-normal">
+                  <div className="pt-6 border-t border-white/10 dark:border-emerald-500/30 text-gray-600 dark:text-gray-400 text-lg leading-relaxed font-normal">
                     {item.answer}
                   </div>
                 </div>

@@ -223,11 +223,10 @@ function CourseCard({ course, isBundle = false }) {
         )}
         <Link
           to={detailsLink}
-          className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition"
+          className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition line-clamp-2 min-h-[56px] leading-tight break-all"
         >
           {course.title}
         </Link>
-
         <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-2.5 line-clamp-2">
           {course.description}
         </p>
