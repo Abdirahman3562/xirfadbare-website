@@ -11,7 +11,7 @@ export default function TopInstructors() {
   const createSlug = (name) => name.toLowerCase().replace(/\s+/g, "-");
 
   return (
-    <section className="relative py-20 bg-[#edf4f5] dark:bg-slate-900 transition-colors duration-500">
+    <section className="relative py-20 bg-white/10 dark:bg-slate-900 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-14">
           <h2 className="text-[28px] md:text-4xl font-extrabold text-emerald-600 dark:text-emerald-400 drop-shadow-sm">
@@ -23,13 +23,13 @@ export default function TopInstructors() {
           </p>
         </div>
 
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid  gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {instructors.filter(ins => ins.isActive !== false).map((instructor, i) => (
             <motion.div
               key={i}
               whileHover={{ y: -8, scale: 1.04 }}
               transition={{ type: "spring", stiffness: 200, damping: 15 }}
-              className="relative rounded-3xl bg-white/70 dark:bg-slate-900/80 backdrop-blur-xl border border-white/50 dark:border-slate-800 shadow-xl overflow-hidden group hover:shadow-2xl hover:border-emerald-300 dark:hover:border-emerald-500/30 transition-all duration-500"
+              className="relative rounded-3xl bg-white/10 dark:bg-slate-900/80 backdrop-blur-xl border border-white/50 dark:border-slate-800 shadow-xl overflow-hidden group hover:shadow-2xl hover:border-emerald-300 dark:hover:border-emerald-500/30 transition-all duration-500"
             >
               <div className="relative overflow-hidden">
                 <img

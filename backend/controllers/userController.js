@@ -318,6 +318,7 @@ const getUserProfile = async (req, res) => {
       permissions,
       isSuperAdmin: user.role === 'admin',
       image: user.image,
+      bio: user.bio,
       is2FAEnabled: user.is2FAEnabled,
       isChatPausedByAdmin: user.isChatPausedByAdmin,
       createdAt: user.createdAt,
@@ -375,6 +376,7 @@ const updateUserProfile = async (req, res) => {
     user.email = req.body.email || user.email;
     user.phone = req.body.phone || user.phone;
     user.image = req.body.image || user.image;
+    user.bio = req.body.bio !== undefined ? req.body.bio : user.bio;
 
     // Toggle 2FA
     if (req.body.is2FAEnabled !== undefined) {
@@ -408,6 +410,7 @@ const updateUserProfile = async (req, res) => {
         phone: updatedUser.phone,
         role: updatedUser.role,
         image: updatedUser.image,
+        bio: updatedUser.bio,
         is2FAEnabled: updatedUser.is2FAEnabled,
         createdAt: updatedUser.createdAt,
         lastLogin: updatedUser.lastLogin,
@@ -489,7 +492,7 @@ const updateUserRole = async (req, res) => {
 // @route   POST /api/users/admin-create
 // @access  Private/Admin
 const createUserByAdmin = async (req, res) => {
-  const { firstName, lastName, email, phone, password, role, image, isActive } = req.body;
+  const { firstName, lastName, email, phone, password, role, image, isActive, bio } = req.body;
 
   const userExists = await User.findOne({ email });
 
@@ -506,7 +509,8 @@ const createUserByAdmin = async (req, res) => {
     password,
     role: role || 'student',
     image,
-    isActive: isActive !== undefined ? isActive : true // Default to true if not provided
+    isActive: isActive !== undefined ? isActive : true, // Default to true if not provided
+    bio
   });
 
   if (user) {
@@ -517,6 +521,7 @@ const createUserByAdmin = async (req, res) => {
       email: user.email,
       role: user.role,
       isActive: user.isActive,
+      bio: user.bio,
     });
   } else {
     res.status(400).json({ message: 'Invalid user data' });
@@ -578,6 +583,10 @@ const updateUserByAdmin = async (req, res) => {
         user.password = req.body.password;
       }
 
+      if (req.body.bio !== undefined) {
+        user.bio = req.body.bio;
+      }
+
       const updatedUser = await user.save();
 
       res.json({
@@ -588,6 +597,7 @@ const updateUserByAdmin = async (req, res) => {
         role: updatedUser.role,
         image: updatedUser.image,
         isActive: updatedUser.isActive,
+        bio: updatedUser.bio,
       });
     } else {
       res.status(404).json({ message: 'User not found' });

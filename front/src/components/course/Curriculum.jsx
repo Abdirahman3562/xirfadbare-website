@@ -128,7 +128,7 @@ export default function Curriculum({
       {/* ✅ Summary Boxes */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-center">
         {/* Students Enrolled */}
-        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/50 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
+        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/10 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
           <FaUserGraduate className="text-emerald-500 dark:text-emerald-400 text-xl sm:text-2xl mb-2" />
           <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-gray-100">
             {enrolledCount || 0}
@@ -137,21 +137,21 @@ export default function Curriculum({
         </div>
 
         {/* Duration */}
-        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/50 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
+        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/10 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
           <FaClock className="text-emerald-500 dark:text-emerald-400 text-xl sm:text-2xl mb-2" />
           <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-gray-100">{totalDuration}</p>
           <p className="text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest font-bold">Hours</p>
         </div>
 
         {/* Video Lessons */}
-        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/50 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
+        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/10 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
           <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-xl sm:text-2xl mb-2" />
           <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-gray-100">{totalLessons}</p>
           <p className="text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest font-bold">Lessons</p>
         </div>
 
         {/* Skill Level */}
-        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/50 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
+        <div className="p-4 sm:p-5 rounded-xl border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 bg-white/10 dark:bg-slate-900/50 transition flex flex-col items-center justify-center">
           <FaSignal className="text-emerald-500 dark:text-emerald-400 text-xl sm:text-2xl mb-2" />
           <p className="text-lg sm:text-xl font-black text-gray-900 dark:text-gray-100">{level}</p>
           <p className="text-gray-500 dark:text-gray-400 text-[10px] sm:text-xs uppercase tracking-widest font-bold">Level</p>
@@ -185,13 +185,13 @@ export default function Curriculum({
                 className="w-full flex justify-between items-center p-5"
               >
                 <div className="flex items-center gap-3 text-left">
-                  <span className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold w-8 h-8 flex items-center justify-center rounded-full">
+                  <span className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-semibold w-8 h-8 flex flex-shrink-0 items-center justify-center rounded-full">
                     {index + 1}
                   </span>
 
                   {/* Titles & duration */}
-                  <div className="flex flex-col">
-                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-emerald-400 break-all whitespace-pre-wrap">
+                  <div className="flex-1 min-w-0 flex flex-col">
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-200 group-hover:text-emerald-400 whitespace-pre-wrap">
                       {section.title}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -201,9 +201,9 @@ export default function Curriculum({
                 </div>
 
                 {openSections[index] ? (
-                  <FaChevronUp className="text-emerald-500" />
+                  <FaChevronUp className="text-emerald-500 flex-shrink-0" />
                 ) : (
-                  <FaChevronDown className="text-gray-400 group-hover:text-emerald-400" />
+                  <FaChevronDown className="text-gray-400 group-hover:text-emerald-400 flex-shrink-0" />
                 )}
               </button>
 
@@ -227,27 +227,35 @@ export default function Curriculum({
                             navigate(`/watch/courses/${cSlug}/lessons/${lessonSlug}`);
                           }
                         }}
-                        className={`flex justify-between items-center border border-gray-200 dark:border-slate-800 rounded-lg p-3 transition duration-300 
+                        className={`relative flex flex-col sm:flex-row sm:items-center justify-between border border-gray-200 dark:border-slate-800 rounded-xl p-4 sm:p-3 transition duration-300 gap-3
                           ${isLocked ? "cursor-not-allowed opacity-95" : "cursor-pointer hover:border-emerald-400 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10 shadow-sm"}`}
                       >
-                        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 text-sm">
-                          {isLocked ? (
-                            <FaLock className="text-emerald-500 dark:text-emerald-400 text-xs" />
-                          ) : (
-                            <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-xs" />
-                          )}
-                          <div className="flex items-center gap-2">
-                            <span className="break-all whitespace-pre-wrap">{lesson.title}</span>
-                            {isFirst && isPaid && !isEnrolled && (
-                              <span className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
-                                Preview
-                              </span>
+                        {/* ✅ Absolute Positioned Preview Badge */}
+                        {isFirst && isPaid && !isEnrolled && (
+                          <span className="absolute top-2 right-2 sm:static sm:mr-4 bg-emerald-500 text-white text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm shadow-emerald-200 dark:shadow-none animate-pulse">
+                            Preview
+                          </span>
+                        )}
+
+                        <div className="flex-1 min-w-0 flex items-start sm:items-center gap-3 text-gray-700 dark:text-gray-300 text-sm">
+                          <div className="mt-1 sm:mt-0">
+                            {isLocked ? (
+                              <FaLock className="text-emerald-500 dark:text-emerald-400 text-xs flex-shrink-0" />
+                            ) : (
+                              <FaPlayCircle className="text-emerald-500 dark:text-emerald-400 text-xs flex-shrink-0" />
                             )}
                           </div>
+                          <div className={`flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-2 ${isFirst && isPaid && !isEnrolled ? "pr-14 sm:pr-0" : ""}`}>
+                            <span className="font-medium leading-relaxed sm:leading-normal whitespace-pre-wrap">{lesson.title}</span>
+                          </div>
                         </div>
-                        <span className="text-gray-500 dark:text-gray-400 text-xs">
-                          {lesson.duration}
-                        </span>
+                        <div className="flex items-center justify-between sm:justify-end gap-2 border-t border-gray-100 dark:border-slate-800 sm:border-0 pt-2 sm:pt-0">
+                          <span className="sm:hidden text-[10px] text-gray-400 uppercase font-bold tracking-widest">Duration</span>
+                          <span className="text-gray-500 dark:text-gray-400 text-xs font-semibold flex-shrink-0 flex items-center gap-1.5">
+                            <FaClock className="sm:hidden text-emerald-500/50" size={10} />
+                            {lesson.duration}
+                          </span>
+                        </div>
                       </div>
                     );
                   })}
@@ -278,7 +286,7 @@ export default function Curriculum({
             {learningOutcomes.map((point, idx) => (
               <li key={idx} className="flex items-start gap-2">
                 <FaCheckCircle className="text-emerald-500 dark:text-emerald-400 text-lg mt-0.5 flex-shrink-0" />
-                <span className="break-all whitespace-pre-wrap">{point}</span>
+                <span className="whitespace-pre-wrap">{point}</span>
               </li>
             ))}
           </ul>

@@ -83,15 +83,15 @@ function Courses({ IsHome }) {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Courses Main Area */}
           <div className="flex-1 order-2 lg:order-1">
-            <div className="flex justify-between items-center mb-6 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
+            <div className="flex justify-between items-center mb-6 bg-white/10 dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800">
               <p className="text-sm font-bold text-gray-500 dark:text-gray-400">
-                Waxaa jira <span className="text-emerald-600 dark:text-emerald-400">{filteredItems.length}</span> koorso/bundle oo la helay
+                Found <span className="text-emerald-600 dark:text-emerald-400">{filteredItems.length}</span> courses/bundles
               </p>
               <button
                 onClick={() => setIsSidebarOpen(true)}
                 className="lg:hidden flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm"
               >
-                <Filter size={18} /> Shaandhey
+                <Filter size={18} /> Filter
               </button>
             </div>
 
@@ -105,8 +105,8 @@ function Courses({ IsHome }) {
                   <div className="w-20 h-20 bg-gray-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto text-gray-400 dark:text-gray-600 mb-4 transition-colors">
                     <Search size={32} />
                   </div>
-                  <h3 className="text-lg font-bold text-gray-800 dark:text-white transition-colors">Koorso looma helin</h3>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 transition-colors">Fadlan isku day inaad raadis kale sameyso.</p>
+                  <h3 className="text-lg font-bold text-gray-800 dark:text-white transition-colors">No courses found</h3>
+                  <p className="text-sm text-gray-400 dark:text-gray-500 transition-colors">Please try another search.</p>
                 </div>
               )}
             </div>
@@ -115,14 +115,14 @@ function Courses({ IsHome }) {
           {/* Right Sidebar Filter */}
           <aside className={`
             order-1 lg:order-2
-            fixed lg:static inset-y-0 right-0 w-[300px] lg:w-80 bg-white dark:bg-slate-900 lg:bg-transparent z-[1000] lg:z-auto
+            fixed lg:static inset-y-0 right-0 w-[300px] lg:w-80 bg-white/10 dark:bg-slate-900 lg:bg-transparent z-[1000] lg:z-auto
             p-6 lg:p-0 transition-transform duration-300 transform
             ${isSidebarOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}
             lg:block
           `}>
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl lg:shadow-sm p-6 space-y-8 lg:sticky lg:top-28 transition-colors">
+            <div className="bg-white/10 dark:bg-slate-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl lg:shadow-sm p-6 space-y-8 lg:sticky lg:top-28 transition-colors">
               <div className="flex lg:hidden justify-between items-center mb-4">
-                <h3 className="font-black text-gray-900 dark:text-white">Shaandhaynta</h3>
+                <h3 className="font-black text-gray-900 dark:text-white">Filters</h3>
                 <button onClick={() => setIsSidebarOpen(false)} className="p-2 bg-gray-50 dark:bg-slate-800 rounded-lg text-gray-400">
                   <X size={20} />
                 </button>
@@ -138,7 +138,7 @@ function Courses({ IsHome }) {
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Raadi magaca..."
+                    placeholder="Search by name..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-gray-50 dark:bg-slate-900 border border-transparent dark:border-gray-800 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500/20 transition-all placeholder:text-gray-400"

@@ -57,25 +57,7 @@ export default function SystemSettings() {
         }));
     };
 
-    // Local getImageUrl with logging
-    const getImageUrl = (img) => {
-        if (!img) {
-            console.log('🖼️ getImageUrl received empty image path.');
-            return '';
-        }
-        if (img.startsWith("http") || img.startsWith("data:image") || img.startsWith("blob:")) {
-            console.log('🖼️ getImageUrl returning direct match:', img);
-            return img;
-        }
 
-        // Remove leading slash from path and trailing slash from SERVER_URL
-        const cleanPath = img.startsWith("/") ? img.substring(1) : img;
-        const cleanBase = SERVER_URL.endsWith("/") ? SERVER_URL.slice(0, -1) : SERVER_URL;
-
-        const result = `${cleanBase}/${cleanPath}`;
-        console.log('🖼️ getImageUrl constructed:', result);
-        return result;
-    };
 
     const handleImageUpload = async (e) => {
         const file = e.target.files[0];
@@ -462,11 +444,17 @@ export default function SystemSettings() {
                                         src={tempPreview || getImageUrl(settings.logo)}
                                         alt="Current logo"
                                         className="h-20 object-contain rounded-lg"
-                                        onLoad={() => console.log('✅ Logo image loaded successfully')}
+                                        onLoad={(e) => {
+                                            console.log('✅ Logo image loaded successfully');
+                                            e.target.style.display = 'block';
+                                            if (e.target.nextSibling) {
+                                                e.target.nextSibling.style.display = 'none';
+                                            }
+                                        }}
                                         onError={(e) => {
                                             console.error('❌ Logo image failed to load. Source:', e.target.src);
-                                            if (!tempPreview) {
-                                                e.target.style.display = 'none';
+                                            e.target.style.display = 'none';
+                                            if (e.target.nextSibling) {
                                                 e.target.nextSibling.style.display = 'block';
                                             }
                                         }}

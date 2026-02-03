@@ -10,7 +10,7 @@ export default function AboutHero() {
   };
 
   return (
-    <section className="relative pt-28  sm:pt-28 bg-white dark:bg-slate-900 overflow-hidden transition-colors duration-500">
+    <section className="relative pt-28  sm:pt-28 bg-white/10 dark:bg-slate-900 overflow-hidden transition-colors duration-500">
       <div className="max-w-5xl mx-auto px-6 text-center ">
         {/* Badge */}
         <div className="inline-block mb-5 px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold text-sm border border-emerald-100 dark:border-emerald-500/20">

@@ -37,9 +37,9 @@ function DeleteConfirmationModal({ isOpen, onClose, onConfirm, review }) {
           <div className="w-16 h-16 bg-red-100/20 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <FaTrash size={28} />
           </div>
-          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Ma hubtaa?</h3>
+          <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Are you sure?</h3>
           <p className="text-gray-500 text-sm mb-6">
-            Review-gan dib looma soo celin karo marka la tirtiro.
+            This review cannot be recovered once deleted.
           </p>
         </div>
         <div className="flex gap-3">
@@ -47,7 +47,7 @@ function DeleteConfirmationModal({ isOpen, onClose, onConfirm, review }) {
             onClick={onClose}
             className="flex-1 px-4 py-2 border border-gray-200 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-white/5 transition cursor-pointer font-medium"
           >
-            Iska dhaaf
+            Cancel
           </button>
           <button
             onClick={() => {
@@ -56,7 +56,7 @@ function DeleteConfirmationModal({ isOpen, onClose, onConfirm, review }) {
             }}
             className="flex-1 px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition cursor-pointer font-medium shadow-md shadow-red-200"
           >
-            Haa, tirtir
+            Yes, delete
           </button>
         </div>
       </div>
@@ -80,7 +80,7 @@ function ReviewComment({ text }) {
   return (
     <div className="relative mt-2">
       <p
-        className={`text-gray-600 dark:text-gray-300 ml-13 leading-relaxed transition-all duration-300 ease-in-out ${expanded ? "max-h-full" : "max-h-[4.5rem] overflow-hidden"
+        className={`text-gray-600 dark:text-gray-300 sm:ml-13 ml-0 leading-relaxed transition-all duration-300 ease-in-out ${expanded ? "max-h-full" : "max-h-[4.5rem] overflow-hidden"
           }`}
         style={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}
       >
@@ -89,7 +89,7 @@ function ReviewComment({ text }) {
 
       {/* Read More / Less Button */}
       {isLong && (
-        <div className="mt-1 ml-13 ">
+        <div className="mt-1 sm:ml-13 ml-0">
           <button
             onClick={() => setExpanded(!expanded)}
             className="text-emerald-600 text-sm  cursor-pointer font-medium"
@@ -224,7 +224,7 @@ export default function Reviews() {
       formRef.current.reset();
       setSelectedCourse("");
 
-      toast.success(`Waxaad review ka bixisay macallin ${instructor.name}!`);
+      toast.success(`You have successfully reviewed ${instructor.name}!`);
 
       // ✅ Auto-refresh page after submission to update stats
       setTimeout(() => {
@@ -254,14 +254,14 @@ export default function Reviews() {
       // ✅ Minimal update: only send reviews array
       await updateInstructor(instructor._id, { reviews: updatedReviews });
 
-      toast.success("Review-ga waa la tirtiray!");
+      toast.success("The review has been deleted!");
 
       setTimeout(() => {
         window.location.reload();
       }, 1000);
     } catch (err) {
       console.error("❌ Error deleting review:", err);
-      toast.error("Wuu ku fashilmay tirtirista review-ga!");
+      toast.error("Failed to delete the review!");
     }
   };
 
@@ -291,7 +291,7 @@ export default function Reviews() {
 
   /* ✅ MAIN UI */
   return (
-    <div className="max-w-3xl mx-auto bg-white/10 border border-gray-300 p-6 rounded-2xl shadow-lg transition hover:shadow-xl mt-10 backdrop-blur-sm">
+    <div className="max-w-3xl mx-auto bg-white/10 border border-gray-300 p-4 sm:p-6 rounded-2xl shadow-lg transition hover:shadow-xl mt-10 backdrop-blur-sm">
       {/* ✅ Delete Confirmation Modal */}
       <DeleteConfirmationModal
         isOpen={isModalOpen}
@@ -359,7 +359,7 @@ export default function Reviews() {
                 {/* ✅ Comment with Read More / Less */}
                 <ReviewComment text={rev.comment} />
 
-                <p className="text-xs text-gray-500 dark:text-gray-400 italic mt-1 ml-12 flex items-center gap-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 italic mt-2 sm:ml-12 ml-0 flex items-center gap-1">
                   <FaBook className="text-emerald-500 text-[11px]" />
                   Course:{" "}
                   <span className="text-emerald-600 dark:text-emerald-400 font-medium">
@@ -393,7 +393,7 @@ export default function Reviews() {
             ref={formRef}
             key={selectedCourse}
             onSubmit={handleReviewSubmit}
-            className="max-w-xl mx-auto bg-white/5 dark:bg-slate-900/40 rounded-2xl shadow-md p-6 space-y-5 transition hover:shadow-lg border border-white/10"
+            className="max-w-xl mx-auto bg-white/5 dark:bg-slate-900/40 rounded-2xl shadow-md p-4 sm:p-6 space-y-5 transition hover:shadow-lg border border-white/10"
           >
             {/* Select Course */}
             <div>

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Mail, MessageSquare, Monitor, ArrowRight, Send, Phone, MapPin, Loader2 } from "lucide-react";
+import { Mail, MessageSquare, Monitor, ArrowRight, Send, Phone, MapPin, Loader2, Lock, User as UserIcon } from "lucide-react";
 import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../../../config";
+import { useAuth } from "../../../hooks/useAuth";
 
 
 export default function ContactPage() {
@@ -32,6 +34,7 @@ export default function ContactPage() {
     fetchSettings();
   }, []);
 
+  const { user } = useAuth();
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -39,6 +42,18 @@ export default function ContactPage() {
     about: "",
     message: "",
   });
+
+  // Pre-fill form if user is logged in
+  useEffect(() => {
+    if (user) {
+      setForm(prev => ({
+        ...prev,
+        name: user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : prev.name,
+        email: user.email || prev.email,
+        phone: user.phone || prev.phone
+      }));
+    }
+  }, [user]);
 
   const [loading, setLoading] = useState(false);
 
@@ -115,7 +130,30 @@ export default function ContactPage() {
       {/* Content */}
       <section className="max-w-7xl mx-auto px-6 pb-24 grid gap-10 lg:grid-cols-2">
         {/* Left: Form */}
-        <div className="bg-[#f4faf7] dark:bg-slate-900 backdrop-blur rounded-2xl border border-emerald-100 dark:border-slate-800 shadow-sm hover:shadow-md transition p-6 md:p-8">
+        <div className="relative bg-[#f4faf7]  dark:bg-slate-900 backdrop-blur rounded-2xl border border-emerald-100 dark:border-slate-800 shadow-sm hover:shadow-md transition p-6 md:p-8 overflow-hidden">
+          {!user && (
+            <div className="absolute inset-0 z-10 flex items-center justify-center p-6 text-center backdrop-blur-sm bg-white/10 dark:bg-slate-900/40">
+              <div className="bg-white/10 dark:bg-slate-800 p-8 rounded-3xl shadow-2xl border border-emerald-50 dark:border-slate-700 max-w-sm animate-in fade-in zoom-in duration-300">
+                <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4 text-emerald-600 dark:text-emerald-400">
+                  <Lock className="w-8 h-8" />
+                </div>
+                <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Sign in Required</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                  Please log in to your account to send us a message. It helps us provide better support.
+                </p>
+                <Link
+                  to="/auth/login"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-emerald-500/20"
+                >
+                  <UserIcon className="w-4 h-4" />
+                  Sign In Now
+                </Link>
+                <p className="mt-4 text-xs text-slate-400">
+                  Don't have an account? <Link to="/auth/signup" className="text-emerald-500 hover:underline">Register here</Link>
+                </p>
+              </div>
+            </div>
+          )}
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
             Send Us a Message
           </h3>

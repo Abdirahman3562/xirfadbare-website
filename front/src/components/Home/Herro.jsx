@@ -27,7 +27,7 @@ export default function Herro({
         {/* LEFT CONTENT */}
         <div className="relative z-10 text-center lg:text-left">
           {/* Subtitle Badge */}
-          <div className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold text-xs sm:text-sm border border-emerald-100 dark:border-emerald-500/20 mb-4 sm:mb-0">
+          <div className="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold text-xs sm:text-sm border border-emerald-100 dark:border-emerald-500/20 mb-4 sm:mb-0 animate-pulse">
             {subtitle}
           </div>
 

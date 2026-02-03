@@ -164,7 +164,7 @@ function SinglePostPage() {
 
         {/* Title + Author Info */}
         <div className="max-w-4xl px-2">
-          <h1 className="w-full lg:text-3xl  md:text-3xl text-2xl font-extrabold text-gray-900 dark:text-white mb-6">
+          <h1 className="w-full lg:text-3xl  md:text-3xl text-[18px] font-extrabold text-gray-900 dark:text-white mb-6">
             {article.title}
           </h1>
 
@@ -206,96 +206,106 @@ function SinglePostPage() {
         />
 
         {/* Author Profile Section */}
-        <div className="mt-10  max-w-4xl mx-auto ">
+        <div className="mt-16 max-w-4xl mx-auto">
           {authorLoading ? (
-            <div className="text-gray-500">Loading author...</div>
-          ) : author ? (
-            <div className="flex flex-col md:flex-row  items-center md:items-start   rounded-xl shadow-md">
-              {/* Author Avatar */}
-              <UserAvatar
-                image={getImageUrl(author.avatar)}
-                name={author.name}
-                size="w-56 h-56"
-                className="rounded-xl"
-              />
-
-              {/* Author Info */}
-              <div className="flex-1  md:ml-6 mt-4 md:mt-0 px-20 lg:px-0 md:px-0">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-1">
-                    {author.name}
-                    {author.verified && (
-                      <FaCheckCircle
-                        className="text-emerald-600 dark:text-emerald-400 text-lg "
-                        title="Verified Author"
-                      />
-                    )}
-                  </h2>
-                </div>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">@{author.username}</p>
-                <p className="text-gray-700 dark:text-gray-300 mt-4 max-w-xl italic">
-                  "{author.bio || "No bio available yet."}"
-                </p>
-
-                {/* Social Links */}
-                <div className="flex flex-wrap gap-2 mt-6">
-                  {social.github && (
-                    <a
-                      href={social.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-2 px-4 py-2 border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
-                    >
-                      <FaGithub className="text-gray-800 dark:text-gray-200 text-lg" />
-                      <span>GitHub</span>
-                    </a>
-                  )}
-                  {social.linkedin && (
-                    <a
-                      href={social.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-2 px-4 py-2 border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
-                    >
-                      <FaLinkedin className="text-blue-700 dark:text-blue-400 text-lg" />
-                      <span>LinkedIn</span>
-                    </a>
-                  )}
-                  {social.twitter && (
-                    <a
-                      href={social.twitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-2 px-4 py-2 border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
-                    >
-                      <FaTwitter className="text-blue-400 dark:text-blue-300 text-lg" />
-                      <span>Twitter</span>
-                    </a>
-                  )}
-                  {social.website && (
-                    <a
-                      href={social.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center space-x-2 px-4 py-2 border border-gray-200 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition"
-                    >
-                      <FaGlobe className="text-gray-500 dark:text-gray-400 text-lg" />
-                      <span>Website</span>
-                    </a>
-                  )}
-                </div>
+            <div className="flex justify-center p-8 bg-white/10 dark:bg-slate-800/40 backdrop-blur-md rounded-3xl border border-white/20 dark:border-slate-700/50">
+              <div className="flex items-center gap-3 text-emerald-600 dark:text-emerald-400 font-medium">
+                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                Loading author info...
               </div>
+            </div>
+          ) : author ? (
+            <div className="relative group bg-white/10 border dark:bg-slate-800/60 backdrop-blur-xl rounded-[2rem] p-6 md:p-10 border border-white/40 dark:border-slate-700/40 shadow-xl shadow-emerald-500/5 transition-all duration-500 hover:shadow-emerald-500/10 hover:bg-white/80 dark:hover:bg-slate-800/80 overflow-hidden">
+              {/* Background Glow */}
+              <div className="absolute -top-24 -right-24 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/15 transition-colors duration-700"></div>
 
-              {/* ✅ Dynamic Post Count */}
-              <div className="mt-6 mr-2 mb-2 md:mt-0 md:ml-6 text-gray-900 dark:text-gray-200 text-sm font-semibold border border-gray-300 dark:border-emerald-500/30 rounded-full px-4 py-2 bg-white/10 dark:bg-slate-800/50 backdrop-blur-sm transition-all duration-300">
-                Posts{" "}
-                <span className="ml-1  text-emerald-600 dark:text-emerald-400">
-                  ({authorPosts.length})
-                </span>
+              <div className="relative flex flex-col md:flex-row items-center md:items-start gap-8">
+                {/* Author Avatar with Premium Border */}
+                <div className="relative flex-shrink-0">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-3xl blur-md opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                  <UserAvatar
+                    image={getImageUrl(author.avatar)}
+                    name={author.name}
+                    size="w-40 h-40 md:w-48 md:h-48"
+                    className="relative rounded-3xl shadow-lg border-4 border-white dark:border-slate-700 object-cover"
+                  />
+                  {author.verified && (
+                    <div className="absolute -bottom-3 -right-3 bg-white dark:bg-slate-800 p-1.5 rounded-2xl shadow-xl border border-emerald-100 dark:border-slate-700">
+                      <FaCheckCircle className="text-2xl text-emerald-500" title="Verified Expert" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Author Info */}
+                <div className="flex-1 text-center md:text-left">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <div>
+                      <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight leading-tight">
+                        {author.name}
+                      </h2>
+                      <div className="flex items-center justify-center md:justify-start gap-2 mt-1">
+                        <span className="text-emerald-600 dark:text-emerald-400 font-bold text-sm">@{author.username}</span>
+                        <span className="w-1 h-1 bg-gray-300 dark:bg-slate-600 rounded-full"></span>
+                        <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-sm font-medium">
+                          <span className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-100 dark:border-emerald-500/20">
+                            {authorPosts.length} Posts
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quick Social Icons */}
+                    <div className="flex items-center justify-center gap-3">
+                      {social.website && (
+                        <a href={social.website} target="_blank" rel="noopener noreferrer" className="p-2.5 bg-white dark:bg-slate-700 rounded-xl border border-gray-100 dark:border-slate-600 text-gray-600 dark:text-gray-300 hover:text-emerald-500 dark:hover:text-emerald-400 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:-translate-y-1 transition-all duration-300 shadow-sm">
+                          <FaGlobe className="text-xl" />
+                        </a>
+                      )}
+                      {social.twitter && (
+                        <a href={social.twitter} target="_blank" rel="noopener noreferrer" className="p-2.5 bg-white dark:bg-slate-700 rounded-xl border border-gray-100 dark:border-slate-600 text-gray-600 dark:text-gray-300 hover:text-sky-500 dark:hover:text-sky-400 hover:border-sky-200 dark:hover:border-sky-500/30 hover:-translate-y-1 transition-all duration-300 shadow-sm">
+                          <FaTwitter className="text-xl" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <div className="absolute -left-4 top-0 w-1 h-full bg-emerald-500/20 rounded-full"></div>
+                    <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed  font-medium">
+                      "{author.bio || "Crafting knowledge and inspiring future developers through quality education and hands-on experience."}"
+                    </p>
+                  </div>
+
+                  {/* Feature Tags/Skills fallback or more social links */}
+                  <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-8">
+                    {social.github && (
+                      <a
+                        href={social.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-2xl font-bold text-sm hover:scale-105 transition-all duration-300 shadow-lg shadow-gray-900/10 dark:shadow-white/10"
+                      >
+                        <FaGithub className="text-lg" />
+                        <span>GitHub Profile</span>
+                      </a>
+                    )}
+                    {social.linkedin && (
+                      <a
+                        href={social.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#0077b5] text-white rounded-2xl font-bold text-sm hover:scale-105 transition-all duration-300 shadow-lg shadow-blue-500/20"
+                      >
+                        <FaLinkedin className="text-lg" />
+                        <span>LinkedIn</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           ) : (
-            <div className="text-gray-500">
+            <div className="p-8 text-center bg-gray-50 dark:bg-slate-800/50 rounded-3xl border border-dashed border-gray-200 dark:border-slate-700 text-gray-500 italic">
               Author details not found for this post.
             </div>
           )}

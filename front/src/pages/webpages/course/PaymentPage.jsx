@@ -418,7 +418,7 @@ function PaymentPage() {
             )}
 
             {/* Content List */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl mt-6 border border-gray-100 dark:border-slate-800 p-5">
+            <div className="bg-white/10 border border-gray-300 dark:bg-slate-900 rounded-2xl mt-6 border border-gray-100 dark:border-slate-800 p-5">
               <div className="flex flex-row flex-wrap items-center gap-2 mb-5">
                 {isBundle && (
                   <div className="flex items-center gap-1.5 bg-emerald-600/10 text-emerald-600 font-black px-2.5 py-1.5 rounded-lg border border-emerald-600/20 whitespace-nowrap">
