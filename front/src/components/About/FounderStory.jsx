@@ -27,7 +27,7 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
   const hasMore = paragraphs.length > 2;
 
   return (
-    <section className="py-20 bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 relative overflow-hidden transition-colors duration-500">
+    <section className="py-20 bg-white/10 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 relative overflow-hidden transition-colors duration-500">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-20 w-96 h-96 bg-emerald-200/20 rounded-full blur-3xl animate-pulse"></div>
@@ -72,7 +72,7 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.3 }}
-          className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl shadow-emerald-900/5 overflow-hidden border border-gray-100 dark:border-slate-800"
+          className="bg-white/10 dark:bg-slate-900 rounded-3xl shadow-2xl shadow-emerald-900/5 overflow-hidden border border-gray-100 dark:border-slate-800"
         >
           <div className="grid lg:grid-cols-5 gap-0">
             {/* Left: Image Section */}
@@ -99,7 +99,7 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
                 </div>
 
                 {/* Name & Role Card */}
-                <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/10">
+                <div className="bg-white/10 dark:bg-slate-800/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/10">
                   <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-1">{founder.name}</h3>
                   <p className="text-emerald-600 dark:text-emerald-400 font-bold text-sm uppercase tracking-wider mb-3">{founder.role}</p>
                   <div className="w-16 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"></div>
@@ -108,9 +108,9 @@ Our mission is simple: to open clear pathways to knowledge, confidence, and real
             </div>
 
             {/* Right: Content Section */}
-            <div className="lg:col-span-3 p-8 lg:p-12">
+            <div className="lg:col-span-3 p-8 lg:p-12 ">
               {/* Quote */}
-              <div className="relative mb-8 p-6 bg-emerald-50/50 dark:bg-emerald-500/5 rounded-2xl border-l-4 border-emerald-500">
+              <div className="relative mb-8 p-6 bg-white/10 dark:bg-emerald-500/5 rounded-2xl border-l-4 border-emerald-500">
                 <Quote className="absolute top-4 right-4 w-8 h-8 text-emerald-200 dark:text-emerald-900/20" fill="currentColor" />
                 <p className="text-lg text-gray-700 dark:text-gray-300 italic font-medium leading-relaxed relative z-10">
                   "{founder.bio}"

@@ -106,11 +106,11 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4 sm:px-6">
             {/* Backdrop - Click to close disabled */}
             <div
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300"
+                className="absolute inset-0 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-300"
             />
 
             {/* Modal Content */}
-            <div className="relative bg-white dark:bg-slate-900 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-2xl border border-gray-100 dark:border-slate-800 animate-in zoom-in-95 duration-300 custom-scrollbar">
+            <div className="relative bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[2.5rem] shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_70px_-10px_rgba(0,0,0,0.5)] border border-white/40 dark:border-white/5 animate-in zoom-in-95 duration-300 custom-scrollbar">
 
                 {/* Header Decoration */}
                 <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-br from-emerald-500/10 to-transparent pointer-events-none" />
@@ -144,7 +144,7 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
                             {closable && (
                                 <button
                                     onClick={onClose}
-                                    className="p-2 rounded-xl bg-gray-50 dark:bg-slate-800 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors cursor-pointer border border-gray-100 dark:border-slate-800"
+                                    className="p-2 rounded-xl bg-white/10 dark:bg-white/5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors cursor-pointer border border-white/20 dark:border-white/5"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>
@@ -160,7 +160,7 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
                                     <span>Question {currentQuestionIdx + 1} of {questions.length}</span>
                                     <span>{Math.round(((currentQuestionIdx + 1) / questions.length) * 100)}%</span>
                                 </div>
-                                <div className="w-full h-1.5 bg-gray-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div className="w-full h-1.5 bg-gray-200/50 dark:bg-white/5 rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-emerald-500 transition-all duration-500"
                                         style={{ width: `${((currentQuestionIdx + 1) / questions.length) * 100}%` }}
@@ -186,9 +186,9 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
                                             disabled={isSubmitted}
                                             className={`w-full p-4 rounded-xl border-2 transition-all outline-none font-bold text-sm ${isSubmitted
                                                 ? (selectedAnswer?.toString().toLowerCase().trim() === currentQuestion.correctAnswer?.toString().toLowerCase().trim()
-                                                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
-                                                    : 'border-red-500 bg-red-50 dark:bg-red-500/10 text-red-700 dark:text-red-400')
-                                                : 'border-gray-100 dark:border-slate-800 focus:border-emerald-500 bg-gray-50/50 dark:bg-slate-800/30'
+                                                    ? 'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                                                    : 'border-red-500 bg-red-500/10 text-red-700 dark:text-red-400')
+                                                : 'border-gray-200/50 dark:border-white/5 focus:border-emerald-500 bg-white/50 dark:bg-white/5'
                                                 }`}
                                             placeholder="Enter your answer here..."
                                         />
@@ -205,13 +205,13 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
                                             const isCorrect = idx == currentQuestion.correctAnswer;
                                             const isSelected = selectedAnswer == idx;
 
-                                            let variantClasses = "bg-gray-50 dark:bg-slate-800/50 border-gray-100 dark:border-slate-800 hover:border-emerald-500/50 cursor-pointer";
+                                            let variantClasses = "bg-white/50 dark:bg-white/5 border-gray-200/50 dark:border-white/5 hover:border-emerald-500/50 cursor-pointer";
                                             if (isSubmitted) {
-                                                if (isCorrect) variantClasses = "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400";
-                                                else if (isSelected) variantClasses = "bg-red-50 dark:bg-red-500/10 border-red-500 text-red-700 dark:text-red-400";
-                                                else variantClasses = "bg-gray-50 dark:bg-slate-800/50 border-gray-100 dark:border-slate-800 opacity-50";
+                                                if (isCorrect) variantClasses = "bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400";
+                                                else if (isSelected) variantClasses = "bg-red-500/10 border-red-500 text-red-700 dark:text-red-400";
+                                                else variantClasses = "bg-gray-200/20 dark:bg-white/5 border-transparent opacity-50";
                                             } else if (isSelected) {
-                                                variantClasses = "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400";
+                                                variantClasses = "bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 shadow-lg shadow-emerald-500/5";
                                             }
 
                                             return (
@@ -256,7 +256,7 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
                                     <button
                                         onClick={handleSubmitAnswer}
                                         disabled={selectedAnswer === null}
-                                        className="w-full py-3.5 rounded-xl bg-slate-900 dark:bg-emerald-600 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 dark:hover:bg-emerald-700 disabled:opacity-50 transition-all shadow-lg active:scale-95 cursor-pointer"
+                                        className="w-full py-3.5 rounded-xl bg-emerald-600 dark:bg-emerald-600 text-white font-black text-[11px] uppercase tracking-widest hover:bg-emerald-700 dark:hover:bg-emerald-700 disabled:opacity-50 transition-all shadow-lg active:scale-95 cursor-pointer"
                                     >
                                         Check Answer
                                     </button>
@@ -281,7 +281,7 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
 
                             <button
                                 onClick={handleReset}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-slate-900 dark:bg-emerald-600 text-white font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 dark:hover:bg-emerald-700 transition-all shadow-lg active:scale-95 cursor-pointer"
+                                className="w-full flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-emerald-600 dark:bg-emerald-600 text-white font-black text-[11px] uppercase tracking-widest hover:bg-emerald-700 dark:hover:bg-emerald-700 transition-all shadow-lg active:scale-95 cursor-pointer"
                             >
                                 <RefreshCw size={14} />
                                 Try Again
@@ -303,24 +303,24 @@ const LessonQuizModal = ({ isOpen, onClose, lesson, onComplete, closable = false
                                 You scored {score} out of {questions.length}
                             </p>
 
-                            <div className="p-5 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 w-full mb-6">
+                            <div className="p-6 bg-white/50 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-gray-200/50 dark:border-white/5 w-full mb-8">
                                 <div className="flex items-center justify-around">
                                     <div className="text-center">
-                                        <p className="text-xl font-black text-emerald-600 dark:text-emerald-400">{Math.round((score / questions.length) * 100)}%</p>
-                                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Accuracy</p>
+                                        <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{Math.round((score / questions.length) * 100)}%</p>
+                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Accuracy</p>
                                     </div>
-                                    <div className="w-px h-8 bg-gray-200 dark:bg-slate-700" />
+                                    <div className="w-px h-10 bg-gray-200 dark:bg-white/10" />
                                     <div className="text-center">
-                                        <p className="text-xl font-black text-gray-900 dark:text-white">{score}</p>
-                                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Correct</p>
+                                        <p className="text-2xl font-black text-gray-900 dark:text-white">{score}</p>
+                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Correct</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3 w-full">
+                            <div className="grid grid-cols-2 gap-4 w-full">
                                 <button
                                     onClick={handleReset}
-                                    className="flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-800 text-gray-600 dark:text-gray-300 font-black text-[11px] uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-slate-700 transition-all cursor-pointer"
+                                    className="flex items-center justify-center gap-2 px-4 py-4 rounded-xl bg-white dark:bg-white/10 border border-gray-200 dark:border-white/5 text-gray-600 dark:text-gray-300 font-black text-[11px] uppercase tracking-widest hover:bg-gray-50 dark:hover:bg-white/20 transition-all cursor-pointer"
                                 >
                                     <RefreshCw size={14} />
                                     Retake

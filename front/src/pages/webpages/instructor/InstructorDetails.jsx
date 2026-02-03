@@ -9,7 +9,10 @@ import {
   FaStar,
   FaRegStar,
   FaCalendarAlt,
+  FaUserAltSlash,
+  FaArrowLeft,
 } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import InstructorTabs from "../../../components/instructor/InstructorTabs";
 import { toast } from "react-toastify";
 import { getInstructorBySlug, updateInstructor } from "../../../api/instructorService";
@@ -144,8 +147,28 @@ export default function InstructorDetails() {
 
   if (!instructor)
     return (
-      <div className="min-h-screen flex justify-center items-center text-red-500">
-        Instructor not found 😕
+      <div className="min-h-screen flex flex-col justify-center items-center bg-white/10 px-4">
+        <div className="bg-white/10 p-10 rounded-3xl shadow-xl border border-gray-100 max-w-md w-full text-center transform transition-all hover:scale-[1.02]">
+          <div className="relative mb-6">
+            <div className="absolute inset-0 bg-red-100 rounded-full blur-2xl opacity-50 animate-pulse"></div>
+            <div className="relative bg-red-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto border-4 border-white shadow-sm">
+              <FaUserAltSlash className="text-red-500 text-4xl" />
+            </div>
+          </div>
+
+          <h2 className="text-3xl font-extrabold text-emerald-600 mb-2">
+            404 - Instructor Not Found
+          </h2>
+
+
+          <Link
+            to="/instructors"
+            className="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg shadow-emerald-200 transition-all duration-300 group w-full"
+          >
+            <FaArrowLeft className="group-hover:-translate-x-1 transition-transform" />
+            Back to Instructors
+          </Link>
+        </div>
       </div>
     );
 

@@ -48,12 +48,12 @@ const CompletionModal = ({ isOpen, onClose, courseTitle, onClaimCertificate, has
                     </div>
 
                     <h2 className="text-3xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">
-                        Hambalyo! 🎉
+                        Congratulations! 🎉
                     </h2>
 
                     <p className="text-gray-500 dark:text-gray-400 text-lg mb-8 leading-relaxed">
-                        Waxaad si guul leh u dhammaysay koorsada <br />
-                        <span className="font-black text-emerald-600 dark:text-emerald-400">"{courseTitle}"</span>
+                        You have successfully completed the course <br />
+                        <span className="font-black text-emerald-600 dark:text-emerald-400 break-all">"{courseTitle}"</span>
                     </p>
 
                     <div className="space-y-4 w-full">

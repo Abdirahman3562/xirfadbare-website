@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2, Eye, Layout, CheckCircle, XCircle, Search, MoreVer
 import { toast } from 'react-toastify';
 import { usePermissions } from '../../../hooks/usePermissions';
 import { API_BASE_URL, SERVER_URL } from '../../../config';
+import PremiumLoader from '../../../components/ui/PremiumLoader';
 
 const ManageCertificates = () => {
     const [templates, setTemplates] = useState([]);
@@ -165,10 +166,7 @@ const ManageCertificates = () => {
 
                     {/* Grid View */}
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-20 gap-4">
-                            <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-                            <p className="text-slate-500 font-bold animate-pulse">Loading...</p>
-                        </div>
+                        <PremiumLoader text="Loading Certificates..." fullScreen={false} />
                     ) : filteredTemplates.length === 0 ? (
                         <div className="bg-white dark:bg-slate-900/50 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] py-24 flex flex-col items-center justify-center text-center">
                             <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">

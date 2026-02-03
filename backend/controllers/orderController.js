@@ -394,13 +394,33 @@ const getOrders = async (req, res) => {
 // @route   DELETE /api/orders/:id
 // @access  Private/Admin
 const deleteOrder = async (req, res) => {
-  const order = await Order.findById(req.params.id);
+  try {
+    const order = await Order.findById(req.params.id);
 
-  if (order) {
-    await order.deleteOne();
-    res.json({ message: 'Order removed' });
-  } else {
-    res.status(404).json({ message: 'Order not found' });
+    if (order) {
+      // 🗑️ Cascading Delete for Bundles
+      if (order.isBundle && order.bundleCourses && order.bundleCourses.length > 0) {
+        console.log(`Deleting bundle child orders for Order ID: ${order._id}`);
+
+        const courseIds = order.bundleCourses.map(c => c._id);
+
+        await Order.deleteMany({
+          user: order.user,
+          course: { $in: courseIds },
+          paymentType: 'Bundle Access'
+        });
+
+        console.log(`Successfully deleted child orders containing courses: ${courseIds}`);
+      }
+
+      await order.deleteOne();
+      res.json({ message: 'Order removed' });
+    } else {
+      res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting order:', error);
+    res.status(500).json({ message: 'Server error while deleting order' });
   }
 };
 

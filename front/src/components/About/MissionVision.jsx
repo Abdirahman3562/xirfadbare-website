@@ -54,7 +54,7 @@ export default function MissionVision() {
   ];
 
   return (
-    <section className="py-16 bg-white dark:bg-slate-900 transition-colors duration-500">
+    <section className="py-16 bg-white/10 dark:bg-slate-900 transition-colors duration-500">
       <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-8">
         {data.map((item, i) => {
           const Icon = item.icon;
@@ -62,7 +62,7 @@ export default function MissionVision() {
             <div
               key={i}
               className={[
-                "rounded-2xl p-6 border border-emerald-100 dark:border-slate-800 bg-white/70 dark:bg-slate-900 transition-all duration-300 shadow-sm group hover:bg-emerald-50/80 dark:hover:bg-emerald-500/10 hover:-translate-y-1 hover:shadow-md",
+                "rounded-2xl p-6 border border-emerald-100 dark:border-slate-800 bg-white/10 dark:bg-slate-900 transition-all duration-300 shadow-sm group hover:bg-emerald-50/80 dark:hover:bg-emerald-500/10 hover:-translate-y-1 hover:shadow-md",
               ].join(" ")}
             >
               {/* Icon + Title */}

@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import PremiumLoader from "../../../components/ui/PremiumLoader";
 import { toast } from "react-toastify";
+import { getImageUrl } from "../../../utils/format";
 import { API_BASE_URL, SERVER_URL } from "../../../config";
 
 const CommentItem = ({ comment, depth = 0, ...props }) => {
@@ -535,10 +536,7 @@ const ManageBlogs = () => {
         return matchesSearch && matchesStatus;
     });
 
-    const getImageUrl = (img) => {
-        if (!img) return null;
-        return img.startsWith("/") ? `${SERVER_URL}${img}` : img;
-    };
+
 
     if (loading) {
         return <PremiumLoader text="Loading blogs..." />;

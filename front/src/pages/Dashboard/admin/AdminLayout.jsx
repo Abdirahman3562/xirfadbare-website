@@ -5,6 +5,7 @@ import { useTheme } from '../../../contexts/ThemeContext';
 import { Bell, Search, User, LogOut, Settings, ChevronDown, ShoppingCart, Clock, Menu, Sun, Moon, Monitor, MessageSquare } from 'lucide-react';
 import { toast } from 'react-toastify';
 import PremiumLoader from '../../../components/ui/PremiumLoader';
+import { getImageUrl } from '../../../utils/format';
 import { API_BASE_URL, SERVER_URL } from '../../../config';
 
 
@@ -211,12 +212,7 @@ const AdminLayout = () => {
         navigate('/auth/login');
     };
 
-    const getImageUrl = (image) => {
-        if (!image) return null;
-        if (typeof image !== 'string') return null;
-        if (image.startsWith('http')) return image;
-        return `${SERVER_URL}${image.startsWith('/') ? '' : '/'}${image}`;
-    };
+
 
     const pendingOrdersCount = stats?.pendingOrders || 0;
     const pendingCount = pendingOrdersCount + unreadChatCount;

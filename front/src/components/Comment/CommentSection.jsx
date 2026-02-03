@@ -98,7 +98,7 @@ const CommentSection = ({ article }) => {
   }
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 transition-colors duration-300 border border-gray-100 dark:border-slate-700">
+    <div className="bg-white/10 dark:bg-slate-800 rounded-lg shadow-md p-6 transition-colors duration-300 border border-gray-100 dark:border-slate-700">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Comments ({comments.length})

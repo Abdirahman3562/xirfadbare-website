@@ -22,6 +22,7 @@ import {
     Award,
     Package
 } from 'lucide-react';
+import { getImageUrl } from '../../utils/format';
 import { API_BASE_URL, SERVER_URL } from '../../config';
 
 const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], isSuperAdmin = false }) => {
@@ -70,10 +71,7 @@ const AdminSidebar = ({ isMobileOpen, closeMobileSidebar, userPermissions = [], 
         return () => clearInterval(interval);
     }, [token]);
 
-    const getImageUrl = (path) => {
-        if (!path) return "";
-        return path.startsWith("/") ? `${SERVER_URL}${path}` : path;
-    };
+
 
     const menuItems = [
         { title: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/admin/dashboard', permission: 'dashboard.view' },

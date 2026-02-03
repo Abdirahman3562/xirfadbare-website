@@ -17,7 +17,7 @@ export default function RelatedArticles({
   const toSlug = (str) => str?.toLowerCase().trim().replace(/\s+/g, "-") ?? "";
 
   return (
-    <div className="mt-12 rounded-xl bg-white dark:bg-slate-800 p-6 border border-gray-200 dark:border-slate-700 max-w-4xl mx-auto shadow-sm transition-colors duration-300">
+    <div className="mt-12 rounded-xl bg-white/10 dark:bg-slate-800 p-6 border border-gray-200 dark:border-slate-700 max-w-4xl mx-auto shadow-sm transition-colors duration-300">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white flex items-center">
         Related Articles
       </h2>

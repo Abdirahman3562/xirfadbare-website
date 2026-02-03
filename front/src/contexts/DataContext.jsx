@@ -32,7 +32,7 @@ export const DataProvider = ({ children }) => {
         console.log('📦 Data hydrated from cache');
         return {
           ...parsed,
-          loading: true, // Show global loader for premium feel even with cache
+          loading: false, // Don't block UI if we have cache
           hydrated: true
         };
       } catch (e) {
@@ -70,6 +70,7 @@ export const DataProvider = ({ children }) => {
   });
 
   const [loading, setLoading] = useState(initialState.loading);
+  const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState(null);
 
   // Preload all data when app starts
@@ -77,11 +78,15 @@ export const DataProvider = ({ children }) => {
     const preloadAllData = async () => {
       let loadingTimer = null;
       try {
-        // Always set loading to true initially for premium feel
-        setLoading(true);
+        // Only set loading to true if we don't have hydrated data
+        const isHydrated = initialState.hydrated;
+        if (!isHydrated) setLoading(true);
+        setSyncing(true); // Always set syncing to true during refresh
 
-        // Add a small artificial delay to show the "premium" loader (min 1.2s)
-        const minLoadingPromise = new Promise(resolve => setTimeout(resolve, 1200));
+        // Add a small artificial delay ONLY if not hydrated (min 1.2s)
+        const minLoadingPromise = isHydrated
+          ? Promise.resolve()
+          : new Promise(resolve => setTimeout(resolve, 1200));
 
         // Safety timeout to ensure loading doesn't hang more than 3s
         loadingTimer = setTimeout(() => setLoading(false), 3000);
@@ -142,6 +147,7 @@ export const DataProvider = ({ children }) => {
         setError(err.message);
       } finally {
         setLoading(false);
+        setSyncing(false); // Done syncing
         if (loadingTimer) clearTimeout(loadingTimer);
       }
     };
@@ -257,6 +263,7 @@ export const DataProvider = ({ children }) => {
   const value = {
     ...data,
     loading,
+    syncing,
     error,
     refreshData,
     getCourseById: (id) => data.courses.find(course => course._id === id),

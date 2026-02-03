@@ -44,10 +44,10 @@ export default function BundleCoursesModal({ isOpen, onClose, bundleOrder, allCo
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-[2.5rem] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-300 border border-gray-100 dark:border-gray-800 flex flex-col max-h-[90vh]">
+            <div className="bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-2xl w-full max-w-2xl rounded-[2.5rem] overflow-hidden shadow-[0_20px_70px_-10px_rgba(0,0,0,0.3)] dark:shadow-[0_20px_70px_-10px_rgba(0,0,0,0.5)] animate-in zoom-in-95 duration-300 border border-white/40 dark:border-white/5 flex flex-col max-h-[90vh]">
 
                 {/* Header */}
-                <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-white dark:bg-slate-900 sticky top-0 z-10">
+                <div className="p-8 border-b border-gray-200/50 dark:border-white/5 flex justify-between items-center bg-transparent sticky top-0 z-10">
                     <div>
                         <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Bundle Courses</h3>
                         <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-widest mt-0.5">
@@ -56,9 +56,9 @@ export default function BundleCoursesModal({ isOpen, onClose, bundleOrder, allCo
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full transition-colors text-gray-400 cursor-pointer"
+                        className="p-2 hover:bg-gray-200/50 dark:hover:bg-white/10 rounded-full transition-all text-gray-400 hover:text-gray-600 dark:hover:text-white cursor-pointer active:scale-90"
                     >
-                        <X size={22} />
+                        <X size={24} />
                     </button>
                 </div>
 
@@ -77,7 +77,7 @@ export default function BundleCoursesModal({ isOpen, onClose, bundleOrder, allCo
                         const done = Math.round((progress / 100) * totalLessons);
 
                         return (
-                            <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-4 bg-gray-50 dark:bg-slate-800/40 p-4 rounded-3xl border border-gray-100 dark:border-gray-700 hover:border-emerald-500/30 transition-all group">
+                            <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-5 bg-white dark:bg-white/5 p-5 rounded-[2rem] border border-gray-200/50 dark:border-white/5 hover:border-emerald-500/30 dark:hover:border-emerald-500/20 transition-all duration-300 group shadow-sm hover:shadow-xl hover:shadow-emerald-500/5">
                                 {/* Thumbnail */}
                                 <div className="w-full sm:w-24 h-16 rounded-2xl overflow-hidden flex-shrink-0 border border-white dark:border-slate-700 shadow-sm">
                                     <img src={getImageUrl(courseSnapshot.thumbnail)} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="" />
@@ -115,10 +115,10 @@ export default function BundleCoursesModal({ isOpen, onClose, bundleOrder, allCo
                                             navigate(`/watch/courses/${courseSlug}/lessons/${currentLesson}`);
                                             onClose();
                                         }}
-                                        className="w-full sm:w-auto cursor-pointer mt-2 sm:mt-0 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition-all shadow-md shadow-emerald-200 dark:shadow-none flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest active:scale-95"
+                                        className="w-full sm:w-auto cursor-pointer mt-2 sm:mt-0 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider active:scale-95"
                                     >
-                                        <PlayCircle size={14} />
-                                        Continue
+                                        <PlayCircle size={16} />
+                                        Continue Learning
                                     </button>
                                 ) : (
                                     <button
@@ -135,12 +135,12 @@ export default function BundleCoursesModal({ isOpen, onClose, bundleOrder, allCo
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 bg-gray-50 dark:bg-slate-800/80 border-t border-gray-100 dark:border-gray-700">
+                <div className="p-8 bg-transparent border-t border-gray-200/50 dark:border-white/5">
                     <button
                         onClick={onClose}
-                        className="w-full py-4 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] uppercase tracking-[0.2em] rounded-2xl shadow-xl shadow-emerald-200 dark:shadow-none transition-all active:scale-95"
+                        className="w-full py-4 cursor-pointer bg-emerald-600 dark:bg-white text-white dark:text-slate-900 font-bold text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl transition-all active:scale-95 hover:opacity-90"
                     >
-                        Close View
+                        Return to Dashboard
                     </button>
                 </div>
             </div>

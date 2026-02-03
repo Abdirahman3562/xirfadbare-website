@@ -61,7 +61,7 @@ const ManageUsers = () => {
         email: '',
         phone: '',
         role: 'student',
-        description: '',
+        bio: '',
         image: '',
         isActive: true,
         password: '' // Only for create
@@ -121,7 +121,7 @@ const ManageUsers = () => {
             email: '',
             phone: '',
             role: 'student',
-            description: '',
+            bio: '',
             image: '',
             isActive: true,
             password: ''
@@ -139,7 +139,7 @@ const ManageUsers = () => {
                 email: userData.email || '',
                 phone: userData.phone || '',
                 role: userData.role || 'student',
-                description: userData.description || '',
+                bio: userData.bio || '',
                 image: userData.image || '',
                 isActive: userData.isActive !== false,
                 password: '' // Don't show password on edit
@@ -164,7 +164,6 @@ const ManageUsers = () => {
             } else {
                 const dataToSend = { ...formData };
                 if (!dataToSend.password) delete dataToSend.password; // Don't send empty password if not changing
-
                 const res = await adminUpdateUser(selectedUser._id, dataToSend, token);
                 if (res) {
                     toast.success("User data updated successfully!");
@@ -622,8 +621,8 @@ const ManageUsers = () => {
                                                     rows="4"
                                                     className="w-full pl-12 pr-6 py-4 bg-gray-50 dark:bg-slate-800 border border-transparent dark:border-slate-700 rounded-2xl outline-none focus:bg-white dark:focus:bg-slate-900 focus:border-emerald-500 dark:focus:border-emerald-500 transition-all font-bold text-gray-700 dark:text-gray-200 resize-none"
                                                     placeholder="Write a brief note about this user..."
-                                                    value={formData.description}
-                                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                                    value={formData.bio}
+                                                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                                                 ></textarea>
                                             </div>
                                         </div>

@@ -16,6 +16,7 @@ import {
 import { usePermissions } from '../../../hooks/usePermissions';
 import { useNavigate } from 'react-router-dom';
 import { getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial } from '../../../api/adminService';
+import { getImageUrl } from '../../../utils/format';
 import { toast } from 'react-toastify';
 import PremiumLoader from '../../../components/ui/PremiumLoader';
 import { API_BASE_URL, SERVER_URL } from '../../../config';
@@ -162,10 +163,7 @@ const ManageTestimonials = () => {
         setEditingId(null);
     };
 
-    const getImageUrl = (image) => {
-        if (!image) return null;
-        return image.startsWith('/') ? `${SERVER_URL}${image}` : image;
-    };
+
 
     const filteredTestimonials = testimonials.filter(t =>
         t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

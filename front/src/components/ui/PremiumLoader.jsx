@@ -9,7 +9,7 @@ import { PlayCircle } from "lucide-react";
 const PremiumLoader = ({ text = "Loading Content", fullScreen = true }) => {
     return (
         <div
-            className={`${fullScreen ? "min-h-screen" : "h-full min-h-[400px]"} w-full bg-[#f8fafc] dark:bg-slate-900 flex flex-col items-center justify-center p-4 transition-colors duration-500`}
+            className={`${fullScreen ? "min-h-screen" : "h-full min-h-[400px]"} w-full bg-white/10 border border-gray-200 shadow-sm dark:bg-slate-900 flex flex-col items-center justify-center p-4 transition-colors duration-500`}
         >
             <div className="relative group">
                 {/* Main outer glow/pulse */}

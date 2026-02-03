@@ -139,7 +139,7 @@ function Nav() {
           <NavLink to="/" className="flex items-center gap-2 ml-[40px] mt-4">
             <img
               src={logoSrc}
-              alt={settings.websiteTitle}
+              alt={settings?.websiteTitle || "Samafale Academy"}
               className={`object-contain transition-all duration-300 ${scrolled ? "h-10 w-auto" : "h-12 w-auto"
                 }`}
             />
