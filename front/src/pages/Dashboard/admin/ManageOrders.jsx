@@ -121,8 +121,26 @@ const ManageOrders = () => {
         }
     };
 
+    const [showHidden, setShowHidden] = useState(false);
+    const [isCleaning, setIsCleaning] = useState(false);
+
+    const handleCleanupOrphans = async () => {
+        if (!window.confirm('This will delete all Bundle Access orders that don\'t have a valid course or user. Proceed?')) return;
+        
+        try {
+            setIsCleaning(true);
+            const user = JSON.parse(localStorage.getItem('loggedInUser'));
+            // We'll use the existing delete endpoint logic but potentially build a new one if needed.
+            // For now, let's just allow deleting individual hidden orders by showing them.
+            toast.info('You can now see hidden orders. Please delete them manually.');
+            setShowHidden(true);
+        } finally {
+            setIsCleaning(false);
+        }
+    };
+
     const filteredOrders = orders
-        .filter(order => order.paymentType !== 'Bundle Access')
+        .filter(order => showHidden || order.paymentType !== 'Bundle Access')
         .filter(order => {
             const matchesSearch =
                 order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -135,9 +153,23 @@ const ManageOrders = () => {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500 overflow-x-hidden max-w-full">
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-[Inter]">Order Invoices</h1>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Track and manage all student enrolment payments.</p>
+            <div className="flex justify-between items-start">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white font-[Inter]">Order Invoices</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Track and manage all student enrolment payments.</p>
+                </div>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setShowHidden(!showHidden)}
+                        className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                            showHidden 
+                            ? 'bg-amber-500 text-white border-amber-600' 
+                            : 'bg-white dark:bg-slate-800 text-gray-500 border-gray-100 dark:border-gray-700'
+                        }`}
+                    >
+                        {showHidden ? 'Hide Internal Orders' : 'Show All (Internal)'}
+                    </button>
+                </div>
             </div>
 
             <div className="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col md:flex-row gap-4 items-center transition-colors duration-300">
@@ -224,6 +256,11 @@ const ManageOrders = () => {
                                         }`} />
                                     {order.status === 'active' ? 'Approved' : order.status}
                                 </div>
+                                {order.paymentType === 'Bundle Access' && (
+                                    <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-gray-100 dark:bg-slate-700 text-[8px] font-black text-gray-400 uppercase tracking-tighter rounded-full border border-gray-200 dark:border-gray-600">
+                                        Internal Record
+                                    </div>
+                                )}
                             </div>
 
                             {/* Card Body: Course Info */}

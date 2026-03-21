@@ -77,6 +77,7 @@ const orderSchema = mongoose.Schema(
       enum: ['pending', 'active', 'rejected'],
       default: 'pending',
     },
+    parentOrder: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' },
   },
   { timestamps: true }
 );

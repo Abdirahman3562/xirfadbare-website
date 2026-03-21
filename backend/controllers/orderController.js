@@ -211,6 +211,7 @@ const updateOrderToActive = async (req, res) => {
                 status: 'active', // Automatically active
                 totalToPay: 0,
                 finalPrice: 0,
+                parentOrder: order._id,
               });
               await newOrder.save();
             }
@@ -399,18 +400,23 @@ const deleteOrder = async (req, res) => {
 
     if (order) {
       // 🗑️ Cascading Delete for Bundles
-      if (order.isBundle && order.bundleCourses && order.bundleCourses.length > 0) {
+      if (order.isBundle) {
         console.log(`Deleting bundle child orders for Order ID: ${order._id}`);
 
-        const courseIds = order.bundleCourses.map(c => c._id);
-
-        await Order.deleteMany({
-          user: order.user,
-          course: { $in: courseIds },
-          paymentType: 'Bundle Access'
+        // Try deleting by parentOrder first (new robust way)
+        const deletedByParent = await Order.deleteMany({
+          parentOrder: order._id
         });
 
-        console.log(`Successfully deleted child orders containing courses: ${courseIds}`);
+        // Fallback for older orders (legacy way)
+        if (deletedByParent.deletedCount === 0 && order.bundleCourses && order.bundleCourses.length > 0) {
+          const courseIds = order.bundleCourses.map(c => c._id);
+          await Order.deleteMany({
+            user: order.user,
+            course: { $in: courseIds },
+            paymentType: 'Bundle Access'
+          });
+        }
       }
 
       await order.deleteOne();
